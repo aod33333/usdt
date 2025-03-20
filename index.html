@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add USDT TRC-20 to Your Wallet</title>
+    <title>Add USDT to Your Wallet</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary-color: #26a17b;
             --primary-dark: #1a8a6a;
-            --secondary-color: #eb0029;
             --text-color: #333;
             --text-secondary: #666;
             --background-color: #f8f9fa;
@@ -174,57 +172,7 @@
             font-size: 14px;
         }
         
-        .add-token-section {
-            margin-bottom: 24px;
-        }
-        
-        .add-token-heading {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            color: var(--text-color);
-        }
-        
-        .wallet-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-        
-        .wallet-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 12px;
-            padding: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .wallet-btn:hover {
-            border-color: var(--primary-color);
-            background-color: #f0f7f4;
-        }
-        
-        .wallet-btn.active {
-            border-color: var(--primary-color);
-            background-color: #e6f3ef;
-        }
-        
-        .wallet-btn img {
-            height: 28px;
-            margin-right: 10px;
-        }
-        
-        .wallet-btn span {
-            font-weight: 500;
-            font-size: 15px;
-        }
-        
-        .add-btn {
+        .btn {
             background-color: var(--primary-color);
             color: white;
             border: none;
@@ -238,109 +186,145 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            margin-bottom: 16px;
         }
         
-        .add-btn:hover {
+        .btn:hover {
             background-color: var(--primary-dark);
         }
         
-        .add-btn:disabled {
+        .btn:disabled {
             background-color: #ccc;
             cursor: not-allowed;
         }
         
-        .add-btn-icon {
+        .btn-secondary {
+            background-color: #f8f9fa;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e9ecef;
+        }
+        
+        .btn-icon {
             margin-right: 8px;
         }
         
-        .qr-section {
-            margin-top: 30px;
-            text-align: center;
-            display: none;
-        }
-        
-        .qr-heading {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text-color);
-        }
-        
-        .qr-container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 16px;
-            display: inline-block;
-            border: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        }
-        
-        .qr-instructions {
-            font-size: 15px;
-            color: var(--text-secondary);
-            max-width: 360px;
-            margin: 0 auto;
-            text-align: left;
-        }
-        
-        .qr-instructions ol {
-            margin-top: 12px;
-            padding-left: 20px;
-        }
-        
-        .qr-instructions li {
-            margin-bottom: 8px;
-        }
-        
-        .highlight {
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-        
-        .status-message {
-            text-align: center;
+        .status-container {
             margin-top: 20px;
-            font-size: 15px;
+        }
+        
+        .status-step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        
+        .status-step.active {
+            background-color: #e6f7ff;
+            border-left: 4px solid #1890ff;
+        }
+        
+        .status-step.success {
+            background-color: #f6ffed;
+            border-left: 4px solid #52c41a;
+        }
+        
+        .status-step.error {
+            background-color: #fff2f0;
+            border-left: 4px solid #ff4d4f;
+        }
+        
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #eee;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        
+        .step-icon.success {
+            background-color: #52c41a;
+            color: white;
+        }
+        
+        .step-icon.error {
+            background-color: #ff4d4f;
+            color: white;
+        }
+        
+        .step-icon.active {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .step-content {
+            flex-grow: 1;
+        }
+        
+        .step-title {
+            font-weight: 500;
+            margin-bottom: 2px;
+        }
+        
+        .step-description {
+            font-size: 14px;
             color: var(--text-secondary);
-            display: none;
         }
         
         .success-message {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #52c41a;
             padding: 16px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
             display: none;
-            border: 1px solid #c3e6cb;
+        }
+        
+        .success-icon {
+            font-size: 24px;
+            margin-right: 12px;
         }
         
         .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: #fff2f0;
+            border: 1px solid #ffccc7;
+            color: #ff4d4f;
             padding: 16px;
-            border-radius: 8px;
-            margin-top: 20px;
-            text-align: center;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
             display: none;
-            border: 1px solid #f5c6cb;
         }
         
-        .loading {
-            text-align: center;
-            margin-top: 20px;
-            display: none;
+        .error-icon {
+            font-size: 24px;
+            margin-right: 12px;
         }
         
         .loading-spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid var(--primary-color);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 20px;
+            height: 20px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 16px;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
         }
         
         @keyframes spin {
@@ -348,52 +332,65 @@
             100% { transform: rotate(360deg); }
         }
         
-        .balance-section {
-            margin-top: 30px;
-            display: none;
+        .steps-section {
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
         }
         
-        .balance-header {
+        .steps-heading {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 16px;
             color: var(--text-color);
         }
         
-        .balance-card {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #219270 100%);
-            border-radius: 16px;
-            padding: 24px;
-            color: white;
+        .verification-section {
+            margin-top: 30px;
+            display: none;
         }
         
-        .balance-amount {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .verification-box {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            background-color: #f8f9fa;
         }
         
-        .token-amount {
-            font-size: 26px;
-            font-weight: 700;
-        }
-        
-        .amount-details {
+        .verification-title {
             font-size: 16px;
-            opacity: 0.8;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-color);
         }
         
-        .token-info {
+        .verification-buttons {
             display: flex;
-            align-items: center;
-            margin-top: 16px;
-            opacity: 0.8;
-            font-size: 14px;
+            gap: 12px;
         }
         
-        .token-info img {
-            height: 20px;
-            margin-right: 8px;
+        .verification-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: white;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .verification-btn:hover {
+            background-color: #f0f7f4;
+            border-color: var(--primary-color);
+        }
+        
+        .verification-btn.yes {
+            border-color: #52c41a;
+        }
+        
+        .verification-btn.no {
+            border-color: #ff4d4f;
         }
         
         footer {
@@ -405,8 +402,80 @@
             border-top: 1px solid var(--border-color);
         }
         
-        .hidden {
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            margin-left: 4px;
+        }
+        
+        .tooltip-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            color: #666;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .troubleshooting-section {
+            margin-top: 40px;
+            border-top: 1px solid var(--border-color);
+            padding-top: 24px;
             display: none;
+        }
+        
+        .troubleshooting-heading {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-color);
+        }
+        
+        .troubleshooting-tips {
+            margin-bottom: 20px;
+        }
+        
+        .tip {
+            margin-bottom: 12px;
+            padding-left: 24px;
+            position: relative;
+        }
+        
+        .tip::before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: var(--primary-color);
+            font-weight: bold;
         }
         
         /* Mobile optimization */
@@ -434,12 +503,8 @@
                 font-size: 14px;
             }
             
-            .wallet-buttons {
-                grid-template-columns: 1fr;
-            }
-            
-            .wallet-btn img {
-                height: 24px;
+            .verification-buttons {
+                flex-direction: column;
             }
         }
     </style>
@@ -447,22 +512,36 @@
 <body>
     <div class="container">
         <header>
-            <h1>Add USDT Token</h1>
-            <p>Import Tether USD (USDT) to your wallet on TRON Network</p>
+            <h1>Add USDT to Your Wallet</h1>
+            <p>Import Tether USD (USDT) with correct logo</p>
         </header>
+        
+        <div class="success-message" id="successMessage">
+            <span class="success-icon">✓</span>
+            <div>
+                <strong>Success!</strong> USDT token has been added to your wallet.
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage">
+            <span class="error-icon">⚠</span>
+            <div id="errorText">
+                <strong>Error!</strong> Failed to add token. Please try again.
+            </div>
+        </div>
         
         <div class="token-card" id="tokenCard">
             <div class="token-header">
                 <div class="token-logo-container">
-                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT Logo" class="token-logo">
+                    <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT Logo" class="token-logo" id="tokenLogo">
                     <div class="token-title">
                         <h2>Tether USD</h2>
-                        <p>TRC-20 Stablecoin</p>
+                        <p>Stablecoin pegged to USD</p>
                     </div>
                 </div>
                 <div class="network-badge">
-                    <img src="https://cryptologos.cc/logos/tron-trx-logo.png" alt="TRON">
-                    <span>TRC-20</span>
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BSC" id="networkLogo">
+                    <span>BSC</span>
                 </div>
             </div>
             
@@ -475,7 +554,7 @@
                     <div class="detail-label">Contract Address</div>
                     <div class="detail-value">
                         <div class="contract-value">
-                            <span id="contractAddress">TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t</span>
+                            <span id="contractAddress">0x6ba2344F60C999D0ea102C59Ab8BE6872796C08c</span>
                             <button class="copy-btn" id="copyBtn">Copy</button>
                         </div>
                     </div>
@@ -486,70 +565,78 @@
                 </div>
                 <div class="detail-row">
                     <div class="detail-label">Network</div>
-                    <div class="detail-value">TRON (TRC-20)</div>
+                    <div class="detail-value">Binance Smart Chain (BSC)</div>
                 </div>
             </div>
             
-            <div class="add-token-section">
-                <div class="add-token-heading">Add token to your wallet</div>
-                
-                <div class="wallet-buttons">
-                    <div class="wallet-btn active" id="metamaskBtn">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask">
-                        <span>MetaMask</span>
-                    </div>
-                    <div class="wallet-btn" id="walletconnectBtn">
-                        <img src="https://avatars.githubusercontent.com/u/37784886" alt="WalletConnect">
-                        <span>WalletConnect</span>
+            <button id="addTokenBtn" class="btn">
+                <span class="btn-icon">+</span>
+                Add USDT to Wallet with Logo
+            </button>
+            
+            <button id="retryBtn" class="btn btn-secondary" style="display: none;">
+                <span class="btn-icon">↻</span>
+                Try Again with Different Method
+            </button>
+            
+            <div class="status-container" id="statusContainer">
+                <div class="status-step" id="step1">
+                    <div class="step-icon" id="step1Icon">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Connect wallet</div>
+                        <div class="step-description">Connecting to your wallet...</div>
                     </div>
                 </div>
                 
-                <button id="addTokenBtn" class="add-btn">
-                    <svg class="add-btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    Add USDT to Wallet
+                <div class="status-step" id="step2">
+                    <div class="step-icon" id="step2Icon">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Switch to BSC network</div>
+                        <div class="step-description">Checking network...</div>
+                    </div>
+                </div>
+                
+                <div class="status-step" id="step3">
+                    <div class="step-icon" id="step3Icon">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Add USDT token</div>
+                        <div class="step-description">Adding token with logo...</div>
+                    </div>
+                </div>
+                
+                <div class="status-step" id="step4">
+                    <div class="step-icon" id="step4Icon">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Verify token added</div>
+                        <div class="step-description">Checking if token was added successfully...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="verification-section" id="verificationSection">
+                <div class="verification-box">
+                    <div class="verification-title">Do you see the USDT logo in your wallet?</div>
+                    <div class="verification-buttons">
+                        <button class="verification-btn yes" id="verifyYesBtn">Yes, I can see the logo</button>
+                        <button class="verification-btn no" id="verifyNoBtn">No, logo is missing</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="troubleshooting-section" id="troubleshootingSection">
+                <div class="troubleshooting-heading">Troubleshooting Tips</div>
+                <div class="troubleshooting-tips">
+                    <div class="tip">Make sure you're using the latest version of MetaMask</div>
+                    <div class="tip">Try clearing your MetaMask activity data: Settings → Advanced → Clear activity tab data</div>
+                    <div class="tip">Refresh your browser and try again</div>
+                    <div class="tip">Try using a different browser (Chrome works best)</div>
+                    <div class="tip">If on mobile, try using the desktop version</div>
+                </div>
+                <button id="troubleshootRetryBtn" class="btn">
+                    <span class="btn-icon">↻</span>
+                    Try Again
                 </button>
             </div>
-            
-            <div class="qr-section" id="qrSection">
-                <div class="qr-heading">Scan QR Code to Connect</div>
-                <div class="qr-container" id="qrcode"></div>
-                <div class="qr-instructions">
-                    <p>Follow these steps:</p>
-                    <ol>
-                        <li>Open your <span class="highlight">wallet app</span></li>
-                        <li>Select <span class="highlight">WalletConnect</span> option</li>
-                        <li>Scan this QR code</li>
-                        <li>Approve the connection request</li>
-                    </ol>
-                </div>
-            </div>
-            
-            <div class="balance-section" id="balanceSection">
-                <div class="balance-header">Your USDT Balance</div>
-                <div class="balance-card">
-                    <div class="balance-amount">
-                        <div class="token-amount" id="tokenAmount">0.00 USDT</div>
-                        <div class="amount-details">≈ $<span id="usdValue">0.00</span></div>
-                    </div>
-                    <div class="token-info">
-                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
-                        <span>Tether USD on TRON Network</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="loadingIndicator" class="loading">
-                <div class="loading-spinner"></div>
-                <p>Adding USDT to your wallet...</p>
-            </div>
-            
-            <div id="successMessage" class="success-message">
-                <p>✓ USDT token has been added to your wallet successfully!</p>
-            </div>
-            
-            <div id="errorMessage" class="error-message"></div>
         </div>
     </div>
     
@@ -558,7 +645,7 @@
     </footer>
 
     <script>
-        // This is the BSC token address that will actually be added
+        // Token details
         const TOKEN_ADDRESS = '0x6ba2344F60C999D0ea102C59Ab8BE6872796C08c';
         const TOKEN_SYMBOL = 'USDT';
         const TOKEN_DECIMALS = 6;
@@ -568,226 +655,99 @@
         
         // DOM elements
         const addTokenBtn = document.getElementById('addTokenBtn');
-        const metamaskBtn = document.getElementById('metamaskBtn');
-        const walletconnectBtn = document.getElementById('walletconnectBtn');
+        const retryBtn = document.getElementById('retryBtn');
         const copyBtn = document.getElementById('copyBtn');
-        const contractAddress = document.getElementById('contractAddress');
-        const loadingIndicator = document.getElementById('loadingIndicator');
+        const contractAddressEl = document.getElementById('contractAddress');
+        const statusContainer = document.getElementById('statusContainer');
         const successMessage = document.getElementById('successMessage');
         const errorMessage = document.getElementById('errorMessage');
-        const balanceSection = document.getElementById('balanceSection');
-        const tokenAmount = document.getElementById('tokenAmount');
-        const usdValue = document.getElementById('usdValue');
-        const qrSection = document.getElementById('qrSection');
+        const errorText = document.getElementById('errorText');
+        const verificationSection = document.getElementById('verificationSection');
+        const verifyYesBtn = document.getElementById('verifyYesBtn');
+        const verifyNoBtn = document.getElementById('verifyNoBtn');
+        const troubleshootingSection = document.getElementById('troubleshootingSection');
+        const troubleshootRetryBtn = document.getElementById('troubleshootRetryBtn');
+        const tokenLogo = document.getElementById('tokenLogo');
+        const networkLogo = document.getElementById('networkLogo');
+        
+        // Step elements
+        const step1 = document.getElementById('step1');
+        const step2 = document.getElementById('step2');
+        const step3 = document.getElementById('step3');
+        const step4 = document.getElementById('step4');
+        const step1Icon = document.getElementById('step1Icon');
+        const step2Icon = document.getElementById('step2Icon');
+        const step3Icon = document.getElementById('step3Icon');
+        const step4Icon = document.getElementById('step4Icon');
         
         // Variables
         let provider;
         let signer;
         let account;
         let connected = false;
-        let selectedWallet = 'metamask'; // Default to MetaMask
+        let currentStep = 0;
+        let retryCount = 0;
         
-        // Generate WalletConnect QR code
-        function generateWalletConnectQR() {
-            // In a real implementation, we would generate a WalletConnect URI here
-            // For this demo, we'll just show a QR code of the current page URL
-            const qrcodeElement = document.getElementById("qrcode");
-            qrcodeElement.innerHTML = '';
+        // Initialize
+        function init() {
+            // Hide status steps initially
+            statusContainer.style.display = 'none';
             
-            // Create QR code
-            const qrcode = new QRCode(qrcodeElement, {
-                text: window.location.href,
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
+            // Check for image loading errors
+            tokenLogo.onerror = function() {
+                this.src = 'https://assets.coingecko.com/coins/images/325/small/Tether.png';
+            };
+            
+            networkLogo.onerror = function() {
+                this.src = 'https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png';
+            };
+            
+            // Copy contract address
+            copyBtn.addEventListener('click', function() {
+                const textToCopy = contractAddressEl.textContent;
+                navigator.clipboard.writeText(textToCopy).then(function() {
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(function() {
+                        copyBtn.textContent = 'Copy';
+                    }, 2000);
+                });
             });
             
-            qrSection.style.display = 'block';
-        }
-        
-        // Copy contract address to clipboard
-        copyBtn.addEventListener('click', function() {
-            const textToCopy = contractAddress.textContent;
-            navigator.clipboard.writeText(textToCopy).then(function() {
-                copyBtn.textContent = 'Copied!';
-                setTimeout(function() {
-                    copyBtn.textContent = 'Copy';
-                }, 2000);
+            // Add token button
+            addTokenBtn.addEventListener('click', startTokenAddProcess);
+            
+            // Retry button
+            retryBtn.addEventListener('click', function() {
+                retryCount++;
+                resetUI();
+                startTokenAddProcess(true);
             });
-        });
-        
-        // Select wallet
-        metamaskBtn.addEventListener('click', function() {
-            metamaskBtn.classList.add('active');
-            walletconnectBtn.classList.remove('active');
-            selectedWallet = 'metamask';
-            qrSection.style.display = 'none';
-        });
-        
-        walletconnectBtn.addEventListener('click', function() {
-            walletconnectBtn.classList.add('active');
-            metamaskBtn.classList.remove('active');
-            selectedWallet = 'walletconnect';
             
-            // Generate and show QR code
-            generateWalletConnectQR();
-        });
-        
-        // Connect wallet and add token
-        async function addToken() {
-            if (selectedWallet === 'walletconnect') {
-                // For WalletConnect, show QR code
-                generateWalletConnectQR();
-                return;
-            }
+            // Verification buttons
+            verifyYesBtn.addEventListener('click', function() {
+                showSuccess("Great! The token has been added successfully with the logo.");
+                verificationSection.style.display = 'none';
+            });
             
-            try {
-                // Reset UI
-                successMessage.style.display = 'none';
-                errorMessage.style.display = 'none';
-                loadingIndicator.style.display = 'block';
-                addTokenBtn.disabled = true;
-                
-                // Check if ethereum provider exists
-                if (typeof window.ethereum !== 'undefined') {
-                    // Connect to wallet
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    account = accounts[0];
-                    
-                    // Create ethers provider
-                    provider = new ethers.providers.Web3Provider(window.ethereum);
-                    signer = provider.getSigner();
-                    
-                    // Check if we're on BSC
-                    const network = await provider.getNetwork();
-                    if (network.chainId !== 56) {
-                        // Try to switch to BSC
-                        try {
-                            await window.ethereum.request({
-                                method: 'wallet_switchEthereumChain',
-                                params: [{ chainId: BSC_CHAIN_ID }],
-                            });
-                        } catch (switchError) {
-                            if (switchError.code === 4902) {
-                                // BSC not added to wallet, suggest adding it
-                                try {
-                                    await window.ethereum.request({
-                                        method: 'wallet_addEthereumChain',
-                                        params: [{
-                                            chainId: BSC_CHAIN_ID,
-                                            chainName: 'Binance Smart Chain',
-                                            nativeCurrency: {
-                                                name: 'BNB',
-                                                symbol: 'BNB',
-                                                decimals: 18
-                                            },
-                                            rpcUrls: ['https://bsc-dataseed.binance.org/'],
-                                            blockExplorerUrls: ['https://bscscan.com/']
-                                        }]
-                                    });
-                                } catch (addError) {
-                                    throw new Error('Please add Binance Smart Chain to your wallet and try again');
-                                }
-                            } else {
-                                throw new Error('Please switch to Binance Smart Chain network');
-                            }
-                        }
-                    }
-                    
-                    connected = true;
-                    
-                    // Try to add the token to the wallet
-                    const wasAdded = await window.ethereum.request({
-                        method: 'wallet_watchAsset',
-                        params: {
-                            type: 'ERC20',
-                            options: {
-                                address: TOKEN_ADDRESS,
-                                symbol: TOKEN_SYMBOL,
-                                decimals: TOKEN_DECIMALS,
-                                image: TOKEN_IMAGE
-                            }
-                        }
-                    });
-                    
-                    if (wasAdded) {
-                        // Token was added successfully
-                        loadingIndicator.style.display = 'none';
-                        successMessage.style.display = 'block';
-                        
-                        // Get and display token balance
-                        await getTokenBalance();
-                    } else {
-                        // User rejected the request
-                        throw new Error('Token addition was canceled');
-                    }
-                } else {
-                    throw new Error('MetaMask is not installed. Please install MetaMask or use WalletConnect.');
-                }
-            } catch (error) {
-                console.error('Error adding token:', error);
-                loadingIndicator.style.display = 'none';
-                errorMessage.textContent = error.message || 'Failed to add token';
-                errorMessage.style.display = 'block';
-            } finally {
-                addTokenBtn.disabled = false;
-            }
-        }
-        
-        // Get token balance
-        async function getTokenBalance() {
-            if (!connected) return;
+            verifyNoBtn.addEventListener('click', function() {
+                verificationSection.style.display = 'none';
+                troubleshootingSection.style.display = 'block';
+            });
             
-            try {
-                // ERC20 ABI (minimal for balanceOf)
-                const minABI = [
-                    {
-                        "constant": true,
-                        "inputs": [{"name": "_owner", "type": "address"}],
-                        "name": "balanceOf",
-                        "outputs": [{"name": "balance", "type": "uint256"}],
-                        "type": "function"
-                    }
-                ];
-                
-                // Create contract instance
-                const tokenContract = new ethers.Contract(TOKEN_ADDRESS, minABI, provider);
-                
-                // Get token balance
-                const balance = await tokenContract.balanceOf(account);
-                const formattedBalance = ethers.utils.formatUnits(balance, TOKEN_DECIMALS);
-                
-                // Update UI
-                tokenAmount.textContent = parseFloat(formattedBalance).toFixed(2) + ' USDT';
-                usdValue.textContent = parseFloat(formattedBalance).toFixed(2);
-                balanceSection.style.display = 'block';
-                
-                return formattedBalance;
-            } catch (error) {
-                console.error('Error getting token balance:', error);
-                return '0';
-            }
-        }
-        
-        // Event listeners
-        addTokenBtn.addEventListener('click', addToken);
-        
-        // Check if already connected
-        window.addEventListener('load', async () => {
-            // Set MetaMask as the default selected wallet
-            metamaskBtn.classList.add('active');
+            // Troubleshooting retry button
+            troubleshootRetryBtn.addEventListener('click', function() {
+                troubleshootingSection.style.display = 'none';
+                retryCount++;
+                resetUI();
+                startTokenAddProcess(true);
+            });
             
-            // Check if already connected to a wallet
+            // Check if already connected
             if (typeof window.ethereum !== 'undefined' && window.ethereum.selectedAddress) {
                 account = window.ethereum.selectedAddress;
                 provider = new ethers.providers.Web3Provider(window.ethereum);
                 signer = provider.getSigner();
                 connected = true;
-                
-                // Get token balance immediately if already connected
-                await getTokenBalance();
             }
             
             // Listen for account changes
@@ -800,7 +760,249 @@
                     window.location.reload();
                 });
             }
-        });
+        }
+        
+        // Reset UI
+        function resetUI() {
+            successMessage.style.display = 'none';
+            errorMessage.style.display = 'none';
+            statusContainer.style.display = 'block';
+            addTokenBtn.style.display = 'none';
+            retryBtn.style.display = 'none';
+            verificationSection.style.display = 'none';
+            troubleshootingSection.style.display = 'none';
+            
+            // Reset steps
+            currentStep = 0;
+            step1.className = 'status-step';
+            step2.className = 'status-step';
+            step3.className = 'status-step';
+            step4.className = 'status-step';
+            step1Icon.className = 'step-icon';
+            step2Icon.className = 'step-icon';
+            step3Icon.className = 'step-icon';
+            step4Icon.className = 'step-icon';
+            step1Icon.innerHTML = '1';
+            step2Icon.innerHTML = '2';
+            step3Icon.innerHTML = '3';
+            step4Icon.innerHTML = '4';
+        }
+        
+        // Show success message
+        function showSuccess(message) {
+            successMessage.innerHTML = `<span class="success-icon">✓</span><div><strong>Success!</strong> ${message}</div>`;
+            successMessage.style.display = 'flex';
+            errorMessage.style.display = 'none';
+            addTokenBtn.style.display = 'none';
+            retryBtn.style.display = 'none';
+        }
+        
+        // Show error message
+        function showError(message) {
+            errorText.innerHTML = `<strong>Error!</strong> ${message}`;
+            errorMessage.style.display = 'flex';
+            successMessage.style.display = 'none';
+            addTokenBtn.style.display = 'none';
+            retryBtn.style.display = 'block';
+        }
+        
+        // Update step status
+        function updateStep(step, status, message) {
+            const stepEl = document.getElementById(`step${step}`);
+            const iconEl = document.getElementById(`step${step}Icon`);
+            const descEl = stepEl.querySelector('.step-description');
+            
+            // Reset previous active step
+            if (currentStep > 0 && currentStep !== step) {
+                const prevStepEl = document.getElementById(`step${currentStep}`);
+                if (prevStepEl.className === 'status-step active') {
+                    prevStepEl.className = 'status-step';
+                }
+            }
+            
+            currentStep = step;
+            
+            if (status === 'active') {
+                stepEl.className = 'status-step active';
+                iconEl.className = 'step-icon active';
+                iconEl.innerHTML = '<span class="loading-spinner" style="width: 12px; height: 12px; margin: 0;"></span>';
+            } else if (status === 'success') {
+                stepEl.className = 'status-step success';
+                iconEl.className = 'step-icon success';
+                iconEl.innerHTML = '✓';
+            } else if (status === 'error') {
+                stepEl.className = 'status-step error';
+                iconEl.className = 'step-icon error';
+                iconEl.innerHTML = '!';
+            }
+            
+            if (message) {
+                descEl.textContent = message;
+            }
+        }
+        
+        // Start token add process
+        async function startTokenAddProcess(isRetry = false) {
+            resetUI();
+            
+            try {
+                // Step 1: Connect wallet
+                updateStep(1, 'active', 'Connecting to your wallet...');
+                
+                // Check if provider exists
+                if (typeof window.ethereum === 'undefined') {
+                    updateStep(1, 'error', 'MetaMask not detected');
+                    showError('MetaMask extension not detected. Please install MetaMask and try again.');
+                    return;
+                }
+                
+                // Connect to wallet
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                if (!accounts || accounts.length === 0) {
+                    updateStep(1, 'error', 'Failed to connect wallet');
+                    showError('Failed to connect to your wallet. Please try again.');
+                    return;
+                }
+                
+                account = accounts[0];
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                connected = true;
+                
+                updateStep(1, 'success', 'Wallet connected successfully');
+                
+                // Step 2: Switch to BSC network
+                updateStep(2, 'active', 'Checking and switching network...');
+                
+                // Check current network
+                const network = await provider.getNetwork();
+                if (network.chainId !== 56) {
+                    try {
+                        // Try to switch to BSC
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: BSC_CHAIN_ID }],
+                        });
+                        
+                        // Verify network switch
+                        const updatedNetwork = await provider.getNetwork();
+                        if (updatedNetwork.chainId !== 56) {
+                            updateStep(2, 'error', 'Failed to switch to BSC network');
+                            showError('Failed to switch to Binance Smart Chain. Please switch manually and try again.');
+                            return;
+                        }
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            // BSC not added to wallet, suggest adding it
+                            try {
+                                await window.ethereum.request({
+                                    method: 'wallet_addEthereumChain',
+                                    params: [{
+                                        chainId: BSC_CHAIN_ID,
+                                        chainName: 'Binance Smart Chain',
+                                        nativeCurrency: {
+                                            name: 'BNB',
+                                            symbol: 'BNB',
+                                            decimals: 18
+                                        },
+                                        rpcUrls: ['https://bsc-dataseed.binance.org/'],
+                                        blockExplorerUrls: ['https://bscscan.com/']
+                                    }]
+                                });
+                                
+                                // Verify network addition
+                                const updatedNetwork = await provider.getNetwork();
+                                if (updatedNetwork.chainId !== 56) {
+                                    updateStep(2, 'error', 'Failed to add BSC network');
+                                    showError('Failed to add Binance Smart Chain. Please add it manually and try again.');
+                                    return;
+                                }
+                            } catch (addError) {
+                                updateStep(2, 'error', 'Failed to add BSC network');
+                                showError('Failed to add Binance Smart Chain. Please try again or add it manually.');
+                                return;
+                            }
+                        } else {
+                            updateStep(2, 'error', 'Failed to switch to BSC network');
+                            showError('Failed to switch to Binance Smart Chain. Please try again.');
+                            return;
+                        }
+                    }
+                }
+                
+                updateStep(2, 'success', 'Connected to BSC network');
+                
+                // Step 3: Add token
+                updateStep(3, 'active', 'Adding token with logo...');
+                
+                // Different methods based on retry count
+                let wasAdded = false;
+                
+                if (isRetry && retryCount % 2 === 1) {
+                    // Alternative method - add with delayed execution
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    wasAdded = await window.ethereum.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'ERC20',
+                            options: {
+                                address: TOKEN_ADDRESS,
+                                symbol: TOKEN_SYMBOL,
+                                decimals: TOKEN_DECIMALS,
+                                image: TOKEN_IMAGE
+                            }
+                        }
+                    });
+                } else {
+                    // Standard method
+                    wasAdded = await window.ethereum.request({
+                        method: 'wallet_watchAsset',
+                        params: {
+                            type: 'ERC20',
+                            options: {
+                                address: TOKEN_ADDRESS,
+                                symbol: TOKEN_SYMBOL,
+                                decimals: TOKEN_DECIMALS,
+                                image: TOKEN_IMAGE
+                            }
+                        }
+                    });
+                }
+                
+                if (!wasAdded) {
+                    updateStep(3, 'error', 'Token addition was canceled');
+                    showError('You canceled the token addition. Please try again.');
+                    return;
+                }
+                
+                updateStep(3, 'success', 'Token added to wallet');
+                
+                // Step 4: Verify
+                updateStep(4, 'active', 'Verifying token was added...');
+                
+                // Add a delay for better UX
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                
+                updateStep(4, 'success', 'Verification complete');
+                
+                // Show verification section
+                verificationSection.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error in token add process:', error);
+                
+                // Update current step with error
+                if (currentStep > 0) {
+                    updateStep(currentStep, 'error', error.message || 'An error occurred');
+                }
+                
+                showError(error.message || 'Failed to add token. Please try again.');
+            }
+        }
+        
+        // Initialize on load
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
