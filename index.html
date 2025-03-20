@@ -3,7 +3,33 @@
                 <div>
                     <div class="holdings-amount">100,000,000 USDT</div>
                     <div class="holdings-value">$100,000,000.00</div>
+                <!-- Transfer Modal -->
+    <div class="transfer-modal" id="transfer-modal">
+        <div class="transfer-modal-content">
+            <div class="transfer-header">
+                <div class="transfer-title">Send USDT</div>
+                <div class="transfer-description">Transfer funds to another wallet</div>
+            </div>
+            <div class="transfer-form">
+                <div class="form-group wallet-selector">
+                    <label class="form-label">To Wallet</label>
+                    <input type="text" class="form-control" id="wallet-address" placeholder="Select wallet" readonly>
+                    <div class="wallet-dropdown" id="wallet-dropdown">
+                        <div class="wallet-option" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e">Wallet 1 (0x742d...f44e)</div>
+                        <div class="wallet-option" data-address="0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0">Wallet 2 (0x8A7F...F8a0)</div>
+                    </div>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Amount (USDT)</label>
+                    <input type="number" class="form-control" id="transfer-amount" placeholder="0.00">
+                </div>
+            </div>
+            <div class="transfer-buttons">
+                <div class="transfer-button button-cancel" id="cancel-transfer">Cancel</div>
+                <div class="transfer-button button-confirm" id="confirm-transfer">Send</div>
+            </div>
+        </div>
+    </div>
             </div>
             <div class="token-buttons">
                 <div class="token-button button-send">Send</div>
@@ -70,6 +96,7 @@
         const walletScreen = document.getElementById('wallet-screen');
         const tokenDetailScreen = document.getElementById('token-detail-screen');
         const loadingOverlay = document.querySelector('.loading-overlay');
+        const transferModal = document.getElementById('transfer-modal');
         
         // Passcode Screen Elements
         const passcodeKeys = document.querySelectorAll('.passcode-key');
@@ -82,16 +109,69 @@
         const tokens = document.querySelectorAll('.token-item');
         const usdtToken = document.getElementById('usdt-token');
         const tabItems = document.querySelectorAll('.tab-item');
+        const sendButton = document.querySelector('.wallet-action-button:nth-child(1)');
         
         // Token Detail Screen Elements
         const backButton = document.querySelector('.back-button');
         const chartTabs = document.querySelectorAll('.chart-tab');
-        const sendButton = document.querySelector('.button-send');
+        const tokenSendButton = document.querySelector('.button-send');
         const receiveButton = document.querySelector('.button-receive');
+        
+        // Transfer Modal Elements
+        const walletAddressInput = document.getElementById('wallet-address');
+        const walletDropdown = document.getElementById('wallet-dropdown');
+        const walletOptions = document.querySelectorAll('.wallet-option');
+        const transferAmountInput = document.getElementById('transfer-amount');
+        const cancelTransferButton = document.getElementById('cancel-transfer');
+        const confirmTransferButton = document.getElementById('confirm-transfer');
         
         // Global Variables
         let passcode = '';
         const correctPasscode = '123456'; // For demo purposes
+        let currentWalletAddress = '0x1234...6789'; // Your wallet
+        let alternateWalletAddress = '';
+        
+        // Wallet balances
+        const walletBalances = {
+            'main': {
+                'USDT': 100000000,
+                'BTC': 847,
+                'ETH': 50000,
+                'XRP': 500000000
+            },
+            '0x742d35Cc6634C0532925a3b844Bc454e4438f44e': {
+                'USDT': 250000,
+                'BTC': 3.5,
+                'ETH': 125,
+                'XRP': 750000
+            },
+            '0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0': {
+                'USDT': 500000,
+                'BTC': 5,
+                'ETH': 200,
+                'XRP': 1500000
+            }
+        };
+        
+        // Transaction history
+        let transactionHistory = [
+            {
+                from: 'main',
+                to: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+                token: 'USDT',
+                amount: 50000,
+                date: 'Mar 15, 2025',
+                type: 'send'
+            },
+            {
+                from: '0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0',
+                to: 'main',
+                token: 'USDT',
+                amount: 150000,
+                date: 'Mar 10, 2025',
+                type: 'receive'
+            }
+        ];
         
         // Show loading overlay
         function showLoading() {
@@ -103,185 +183,14 @@
             loadingOverlay.style.display = 'none';
         }
         
-        // Update the time in the status bar
-        function updateTime() {
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            hours = hours < 10 ? '0' + hours : hours;
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            const timeString = hours + ':' + minutes;
-            document.querySelector('.status-time').textContent = timeString;
+        // Format number with commas
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         }
         
-        // Initialize app
-        function initApp() {
-            updateTime();
-            
-            // Update time every minute
-            setInterval(updateTime, 60000);
-            
-            // Simulate splash screen for 1 second instead of 2
-            setTimeout(() => {
-                splashScreen.style.opacity = 0;
-                setTimeout(() => {
-                    splashScreen.style.display = 'none';
-                    // Skip passcode screen and go directly to wallet
-                    walletScreen.style.display = 'flex';
-                }, 500);
-            }, 1000);
-        }
-        
-        // Process passcode input
-        function processPasscode(key) {
-            if (passcode.length < 6) {
-                passcode += key;
-                passcodeDots[passcode.length - 1].classList.add('filled');
-                
-                if (passcode.length === 6) {
-                    // Check if passcode is correct (for demo, any 6-digit code works)
-                    setTimeout(() => {
-                        showLoading();
-                        setTimeout(() => {
-                            passcodeScreen.style.display = 'none';
-                            walletScreen.style.display = 'flex';
-                            hideLoading();
-                        }, 1000);
-                    }, 300);
-                }
-            }
-        }
-        
-        // Backspace passcode
-        function backspacePasscode() {
-            if (passcode.length > 0) {
-                passcode = passcode.substring(0, passcode.length - 1);
-                passcodeDots[passcode.length].classList.remove('filled');
-            }
-        }
-        
-        // Reset passcode
-        function resetPasscode() {
-            passcode = '';
-            passcodeDots.forEach(dot => dot.classList.remove('filled'));
-        }
-        
-        // Set active tab in wallet screen
-        function setActiveTab(index) {
-            tabItems.forEach(tab => tab.classList.remove('active'));
-            tabItems[index].classList.add('active');
-        }
-        
-        // Set active chart period in token detail
-        function setActiveChartPeriod(element) {
-            chartTabs.forEach(tab => tab.classList.remove('active'));
-            element.classList.add('active');
-        }
-        
-        // Show toast message
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.style.position = 'fixed';
-            toast.style.bottom = '80px';
-            toast.style.left = '50%';
-            toast.style.transform = 'translateX(-50%)';
-            toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-            toast.style.color = 'white';
-            toast.style.padding = '10px 20px';
-            toast.style.borderRadius = '20px';
-            toast.style.zIndex = '1000';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.5s';
-                setTimeout(() => {
-                    document.body.removeChild(toast);
-                }, 500);
-            }, 2000);
-        }
-        
-        // Event listeners
-        
-        // Passcode keys
-        passcodeKeys.forEach(key => {
-            if (!key.classList.contains('biometric') && !key.classList.contains('backspace')) {
-                key.addEventListener('click', () => {
-                    processPasscode(key.textContent);
-                });
-            }
-        });
-        
-        // Biometric button
-        passcodeBiometric.addEventListener('click', () => {
-            // Simulate biometric authentication
-            showLoading();
-            setTimeout(() => {
-                passcodeScreen.style.display = 'none';
-                walletScreen.style.display = 'flex';
-                hideLoading();
-            }, 1000);
-        });
-        
-        // Backspace button
-        passcodeBackspace.addEventListener('click', backspacePasscode);
-        
-        // Cancel button
-        passcodeCancel.addEventListener('click', resetPasscode);
-        
-        // USDT token click
-        usdtToken.addEventListener('click', () => {
-            showLoading();
-            setTimeout(() => {
-                walletScreen.style.display = 'none';
-                tokenDetailScreen.style.display = 'flex';
-                hideLoading();
-            }, 500);
-        });
-        
-        // Back button in token detail
-        backButton.addEventListener('click', () => {
-            tokenDetailScreen.style.display = 'none';
-            walletScreen.style.display = 'flex';
-        });
-        
-        // Tab bar items
-        tabItems.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                if (index === 0) {
-                    setActiveTab(index);
-                } else {
-                    showToast('Feature not available in demo');
-                }
-            });
-        });
-        
-        // Chart period tabs
-        chartTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                setActiveChartPeriod(tab);
-            });
-        });
-        
-        // Send button
-        sendButton.addEventListener('click', () => {
-            showToast('Send feature not available in demo');
-        });
-        
-        // Receive button
-        receiveButton.addEventListener('click', () => {
-            showToast('Receive feature not available in demo');
-        });
-        
-        // Network selector
-        document.querySelector('.network-selector').addEventListener('click', () => {
-            showToast('Network selector not available in demo');
-        });
-        
-        // Settings button
-        document.querySelector('.wallet-settings').addEventListener('click', () => {
-            showToast('Settings not available in demo');
+        // Format currency
+        function formatCurrency(num) {
+            return ' not available in demo');
         });
         
         // Scan button
@@ -834,6 +743,2598 @@
         .section-title {
             font-size: 16px;
             font-weight: 600;
+        }
+
+        .network-selector {
+            display: flex;
+            align-items: center;
+            background-color: #E9EAEC;
+            border-radius: 16px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .network-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
+        .network-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .network-arrow {
+            margin-left: 6px;
+            width: 12px;
+            height: 12px;
+            opacity: 0.5;
+        }
+
+        .wallet-token-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .token-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E9EAEC;
+            cursor: pointer;
+        }
+
+        .token-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            margin-right: 12px;
+            overflow: hidden;
+        }
+
+        .token-details {
+            flex: 1;
+        }
+
+        .token-name-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .token-name {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .token-symbol {
+            color: #7F8489;
+            font-size: 13px;
+        }
+
+        .token-balance {
+            font-size: 13px;
+        }
+
+        .token-value {
+            text-align: right;
+        }
+
+        .token-fiat-value {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .token-price-change {
+            font-size: 12px;
+            color: #2FD27A;
+        }
+
+        .token-price-down {
+            color: #EB5757;
+        }
+
+        /* Tab bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 950;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            width: 25%;
+            cursor: pointer;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            opacity: 0.5;
+        }
+
+        .tab-label {
+            font-size: 11px;
+            color: #7F8489;
+        }
+
+        .tab-item.active .tab-icon {
+            opacity: 1;
+        }
+
+        .tab-item.active .tab-label {
+            color: #0B65C6;
+            font-weight: 500;
+        }
+
+        /* Token detail screen */
+        #token-detail-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: none;
+            flex-direction: column;
+            z-index: 850;
+        }
+
+        .token-header {
+            padding: 16px;
+            padding-top: calc(16px + 24px); /* Add status bar height */
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .back-button {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+
+        .token-header-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .token-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            margin-right: 12px;
+        }
+
+        .token-header-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .more-options {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .token-chart-area {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .token-price {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .token-24h-change {
+            font-size: 14px;
+            color: #2FD27A;
+            margin-bottom: 20px;
+        }
+
+        .token-chart {
+            height: 180px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #0B65C6, #3D8DDF);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Cpath d='M0,50 C50,30 100,70 150,50 C200,30 250,50 300,40 L300,100 L0,100 Z' fill='%23000'/%3E%3C/svg%3E");
+            mask-size: cover;
+            border-radius: 8px;
+        }
+
+        .chart-tabs {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-tab {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #7F8489;
+            cursor: pointer;
+        }
+
+        .chart-tab.active {
+            background-color: #E9EAEC;
+            color: #1A2024;
+            font-weight: 500;
+        }
+
+        .token-info-area {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .token-holdings {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .holdings-amount {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .holdings-value {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        .token-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .token-button {
+            width: 48%;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button-send {
+            background-color: #0B65C6;
+            color: white;
+        }
+
+        .button-receive {
+            background-color: #E9EAEC;
+            color: #1A2024;
+        }
+
+        .token-history-area {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-header {
+            padding: 20px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .transaction-list {
+            padding: 0 16px;
+        }
+
+        .transaction-item {
+            display: flex;
+            padding: 16px 0;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #E9EAEC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+        }
+
+        .transaction-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-value {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-usd {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #E9EAEC;
+            border-top: 3px solid #0B65C6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Touch animation */
+        .touch-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-effect:after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+
+        .touch-effect:active:after {
+            transform: scale(0, 0);
+            opacity: .3;
+            transition: 0s;
+        }
+
+        /* Dark mode theming for status bar */
+        @media (prefers-color-scheme: dark) {
+            .status-bar {
+                color: black;
+            }
+        }
+        
+        /* Transfer modal styles */
+        .transfer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .transfer-modal-content {
+            width: 90%;
+            max-width: 340px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .transfer-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .transfer-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .transfer-description {
+            font-size: 14px;
+            color: #7F8489;
+        }
+        
+        .transfer-form {
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #E9EAEC;
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: #0B65C6;
+            outline: none;
+        }
+        
+        .transfer-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .transfer-button {
+            flex: 1;
+            height: 48px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .button-cancel {
+            background-color: #E9EAEC;
+            color: #1A2024;
+            margin-right: 12px;
+        }
+        
+        .button-confirm {
+            background-color: #0B65C6;
+            color: white;
+        }
+        
+        /* Wallet selector dropdown */
+        .wallet-selector {
+            position: relative;
+        }
+        
+        .wallet-dropdown {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #E9EAEC;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 10;
+        }
+        
+        .wallet-option {
+            padding: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .wallet-option:hover {
+            background-color: #F5F5F7;
+        }
+        
+        .wallet-option:not(:last-child) {
+            border-bottom: 1px solid #E9EAEC;
+        }
+    </style>
+        }
+
+        .network-selector {
+            display: flex;
+            align-items: center;
+            background-color: #E9EAEC;
+            border-radius: 16px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .network-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
+        .network-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .network-arrow {
+            margin-left: 6px;
+            width: 12px;
+            height: 12px;
+            opacity: 0.5;
+        }
+
+        .wallet-token-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .token-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E9EAEC;
+            cursor: pointer;
+        }
+
+        .token-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            margin-right: 12px;
+            overflow: hidden;
+        }
+
+        .token-details {
+            flex: 1;
+        }
+
+        .token-name-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .token-name {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .token-symbol {
+            color: #7F8489;
+            font-size: 13px;
+        }
+
+        .token-balance {
+            font-size: 13px;
+        }
+
+        .token-value {
+            text-align: right;
+        }
+
+        .token-fiat-value {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .token-price-change {
+            font-size: 12px;
+            color: #2FD27A;
+        }
+
+        .token-price-down {
+            color: #EB5757;
+        }
+
+        /* Tab bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 950;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            width: 25%;
+            cursor: pointer;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            opacity: 0.5;
+        }
+
+        .tab-label {
+            font-size: 11px;
+            color: #7F8489;
+        }
+
+        .tab-item.active .tab-icon {
+            opacity: 1;
+        }
+
+        .tab-item.active .tab-label {
+            color: #0B65C6;
+            font-weight: 500;
+        }
+
+        /* Token detail screen */
+        #token-detail-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: none;
+            flex-direction: column;
+            z-index: 850;
+        }
+
+        .token-header {
+            padding: 16px;
+            padding-top: calc(16px + 24px); /* Add status bar height */
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .back-button {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+
+        .token-header-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .token-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            margin-right: 12px;
+        }
+
+        .token-header-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .more-options {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .token-chart-area {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .token-price {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .token-24h-change {
+            font-size: 14px;
+            color: #2FD27A;
+            margin-bottom: 20px;
+        }
+
+        .token-chart {
+            height: 180px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #0B65C6, #3D8DDF);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Cpath d='M0,50 C50,30 100,70 150,50 C200,30 250,50 300,40 L300,100 L0,100 Z' fill='%23000'/%3E%3C/svg%3E");
+            mask-size: cover;
+            border-radius: 8px;
+        }
+
+        .chart-tabs {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-tab {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #7F8489;
+            cursor: pointer;
+        }
+
+        .chart-tab.active {
+            background-color: #E9EAEC;
+            color: #1A2024;
+            font-weight: 500;
+        }
+
+        .token-info-area {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .token-holdings {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .holdings-amount {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .holdings-value {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        .token-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .token-button {
+            width: 48%;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button-send {
+            background-color: #0B65C6;
+            color: white;
+        }
+
+        .button-receive {
+            background-color: #E9EAEC;
+            color: #1A2024;
+        }
+
+        .token-history-area {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-header {
+            padding: 20px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .transaction-list {
+            padding: 0 16px;
+        }
+
+        .transaction-item {
+            display: flex;
+            padding: 16px 0;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #E9EAEC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+        }
+
+        .transaction-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-value {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-usd {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #E9EAEC;
+            border-top: 3px solid #0B65C6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Touch animation */
+        .touch-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-effect:after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+
+        .touch-effect:active:after {
+            transform: scale(0, 0);
+            opacity: .3;
+            transition: 0s;
+        }
+
+        /* Dark mode theming for status bar */
+        @media (prefers-color-scheme: dark) {
+            .status-bar {
+                color: black;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Status bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span class="status-time">9:41</span>
+        </div>
+        
+        <div class="wallet-tokens-container">
+            <div class="wallet-section-header">
+                <div class="section-title">Tokens</div>
+                <div class="network-selector">
+                    <img class="network-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAVYSURBVHgB7VldbBRVFD4zO7u7pYLaWin9EUgKaZUfBVQK+BMhCCjKj4GEEB/0AfnzgUQliPLkg0ET44MJhgQhQIwP+iBBEYQ/ExACP0XAUgv9oaVlt8XSdrvdnTs+d+7M7szu3L3TbksT6Jfc7My9d+7cb84599xzZgzI45FHHkkC0nTYIMqYMWFqzJhqGM07L196hTHrJEy9ByEORDl/2Gg6bLf9+eNnmfbnr0BRbJ0PofYKL5WKZZhSLGdctQphFJuRjM1ghhXL+c1JU79uXZV4ZYLbKDYLAsPHGfhY87o1Juw3HxgaH02EehTYcnCNrJfaQKhpUNSgSbsQCeRSn2EyLpGLm57wBZ5UidVGDXcTpQKFCgdSvbUwCo3F70p9xLk13Qm71UAUImYwChuJL3Gn0A01ENb64ZS6TAwGpXpC1qGFXvwDcgTqKPkgTIimyKwRWYMGDQfXrZb6tDh2T4RIdDdJfRDFJfnwSNAjzn9AZcB5I8JofNxOKSa9VlJcYN6LZm3t21gQ+1eWBuCUXeGN0RV8XnRLUCr7K6xP23xQr0qYi9VIK9Oo+6hhtGbS3kzaGrfA7Sje4PaXuKprGRQlz4qfR2dYn3QKlKANXtU4G69xqI3n3qQWXFRv6lUWIjW8qYsYlQBMrJAqZnExNtKmP79rA5LcIu2UwTUFY85e3naTBT2YOWcxjDUb7hg9abZq3Lp8QeNSIkSv1FhYTBDjnM5YBkITmFHQIzUcPFvx7KuvcP+pPd9uhrrmayHLQUXFhf+gW4TxCQ5+V49A3BHZV2QDsHVfKKW0CIvs4yVN6IlwtRx5p2xXVQwLg4yppHk0gPecU3tB+qXLQz/fTPxCgxvHHXBn0I3CeaARwXe+UTIyPpOmT5tLUiipqYHfTtUGTJ85EtJUc5QXWsj4jMzV95z6PBxlTK+B7qRL/kPRocE9fh9fTWZNxLdPZqg4rM/OjN5lZOTKQUhvBBwGnJM3vArWvP4hzJz31GCjkY0AzxrQdLjJoeuGg85n4Hp7K+z5YUvWkZJjuNaBqNpfKVJG4Pwv9fDH8R/dh4AKMkuKkA86TGT7lKLk1mHNpg+hvmGv+9eo2DhPGchcQDd1VlZRDGdwlL5uqbMNdFjwvN+0DRx8yQx1Cd24eQUa9myH69eu2q+Vz5hrG+fG338NvyZrAQl+ZQaoGYB0q7dTaJw6sUvqCmgEp42Qg0kEchWljIzW20XLV6TaMTUyeWb91m1w98FDuHL5MkydPRtKKiogsXcXbzvcqG3s9EjQIEohUhkhuwJAZsFJ4ynPPRPJd6WJ1TYqXNsMhQ9iYHJNjT0qBBphOnNTazdfQ2SMgGpBRRCZnpXLMh5QGvmM5wJahCiWmANpUySZFLm5Fq/o5YtZFx4Jlg1QbqI6ByEm0jXfTcSI0ORphCoTlEZoZZGRCuNZv7kOjrU0QfdAn3MuqMEZQTJKoSxViAKJVJ+9lA2Bjo77MKO4UmGUekToJVZNZGQjLCMzQYy5jqr0u86T6VOSHlQyIVKEnkJU0PBbUPGBRK26sUMGqCYI8hJQzXRNrqfhJwYHM4MJKnrpJVAZcb/EEqZ+j0aA0iZ33xg0ImoZT+i59geMnzQ1Mz4QKScvWlzl5Ick5zv0CEQRtYznOQKUA7vX/gQXtdCahHxFLwZ4BsjwB+3RaRNBNQb5gfNp3AMKRoiPyFE/JBDIPx4FJCNLZ08c/zy1bVtRKOgDPUEY+f8UZB55/J/xLwfTBzmOPYj7AAAAAElFTkSuQmCC" alt="BNB">
+                    <span class="network-name">BNB Smart Chain</span>
+                    <img class="network-arrow" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iMTIiIHZpZXdCb3g9IjAgMCAxMiAxMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTYgOUwxMC41IDRMOSA5LjVMNiAxMyIgc3Ryb2tlPSIjN0Y4NDg5IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik02IDlMMiA0TDMgOS41TDYgMTMiIHN0cm9rZT0iIzdGODQ4OSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8L3N2Zz4K" alt="arrow">
+                </div>
+            </div>
+            
+            <div class="wallet-token-list">
+                <!-- USDT Token -->
+                <div class="token-item touch-effect" id="usdt-token">
+                    <img class="token-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAO2SURBVHgB7VhNTBNBFH7TUmhLQVHxJ6EmBuWiEm+NN43xYjwYD8ajJ9ODF8PBg5ho4smTidGDJngx0YMHNTGaGEk0JmI0XjSCv4kiYBBQWmxL+Wl3fW9hd7vbnd1Zpd3E9Eteds3Mzrz5vvfmzbwBiCOOOGKGFBSRqS9geOYtWMgSDKa+gBwUgWSzQkGRgSK1HpJJDsB6Zy5kwAiYcj28+f4JstkHKFVbsEg7f8GUMrsBPVYnZDm/g2a7wWKjJQBUYrT8BvoXlwAUU5DhYcnkRJDOa/w/nLwNJ6a7yb2vZ3WFNLiFTEv1/hzuSm2E+pQKKLM5Yta5QXYjDpeTTe3SsZnxjwNkW7/jbwn07VoPyXpCyXXwqKiOPGvxxXzBQ/TbFrzV7E8ZcY84zpHWcI6pZcLeDCW97F4DXVhzUJeKQ6wUDqUCHYXrwjXI4jK/LzZZE3K5dQnjD+0FUJSeE5Fns1miBpvVCtk52WAhY0Q6PYeEvs9h6FMXHr0+UMjO5/KLXLpUCpSicrblRGZYx9z8PHi9Xhjp+qDRsVW69YLJJ4AefnRtEDWQMrDV4YSSwgLQA8p1nTwClUc7oLLBuSIXTAVIOa80Hhc/MzePAiZhemrKCBKXwA9sjgKEzZA/YuB3v1IJJpPp/wuQkpKwBSiHUm4h+6/RBTB2dRo0wdvtMLF7D/hPn4HJI0dBCeNaKJJPTFlABp/7/X7V/lyRmwSjBQWQiAJSUSyDKQGO+kaYnJ1VLXxzSGCZB9cqQE84CbDqVUGYNgqmBFDZ3PQPzfZYBSilkqkQGnt9A9o6OtRXkP8BTAlIunBRs31sYnJJQITHTX7wGgVJ3rVjpEsCnr3oMvTSTAmYv3lLsz0xIVGy31JaCtkOh6EdvR8+arYnYr9yCZgS4D95CqCrS9UWpQJ89c0w29Or2r99914G29fCptJiyYZejGn6h8V9BT8wlYVmT5yE5CuXIGHTJlVb9BRSY+tRLchsGwAXHrvM7DSZLHDv4SOyXUrnSZ9I5dGC6TTqO3kKUh8+AHNVlZD2W4H+0lKY3rsP/E1NYClfK+kbeUFu2OTcPPQPj0DLi1fQN+SGMacTwGKB2l074WhdDRRkrwm7ACZ3i4Z7nZfvk62sIA+KsrIWPx9jhKiwOkk7TdPKYkv5AebW7aqgUPKXPnXDw+fdZPz5OV9Ue57uRnWHGKMfFcTWixcWQWJ10lc1FW3TJMIKw35GiCOOlYK/yL85FJugI8UAAAAASUVORK5CYII=" alt="USDT">
+                    <div class="token-details">
+                        <div class="token-name-row">
+                            <span class="token-name">Tether USD</span>
+                            <span class="token-symbol">USDT</span>
+                        </div>
+                        <div class="token-balance">100,000,000 USDT</div>
+                    </div>
+                    <div class="token-value">
+                        <div class="token-fiat-value">$100,000,000.00</div>
+                        <div class="token-price-change">+0.03%</div>
+                    </div>
+                </div>
+                
+                <!-- BNB Token -->
+                <div class="token-item touch-effect">
+                    <img class="token-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAVYSURBVHgB7VldbBRVFD4zO7u7pYLaWin9EUgKaZUfBVQK+BMhCCjKj4GEEB/0AfnzgUQliPLkg0ET44MJhgQhQIwP+iBBEYQ/ExAIP0XAUgv9oaVlt8XSdrvdnTs+d+7M7szu3L3TbksT6Jfc7My9d+7cb84599xzZgzI45FHHkkC0nTYIMqYMWFqzJhqGM07L196hTHrJEy9ByEORDl/2Gg6bLf9+eNnmfbnr0BRbJ0PofYKL5WKZZhSLGdctQphFJuRjM1ghhXL+c1JU79uXZV4ZYLbKDYLAsPHGfhY87o1Juw3HxgaH02EehTYcnCNrJfaQKhpUNSgSbsQCeRSn2EyLpGLm57wBZ5UidVGDXcTpQKFCgdSvbUwCo3F70p9xLk13Qm71UAUImYwChuJL3Gn0A01ENb64ZS6TAwGpXpC1qGFXvwDcgTqKPkgTIimyKwRWYMGDQfXrZb6tDh2T4RIdDdJfRDFJfnwSNAjzn9AZcB5I8JofNxOKSa9VlJcYN6LZm3t21gQ+1eWBuCUXeGN0RV8XnRLUCr7K6xP23xQr0qYi9VIK9Oo+6hhtGbS3kzaGrfA7Sje4PaXuKprGRQlz4qfR2dYn3QKlKANXtU4G69xqI3n3qQWXFRv6lUWIjW8qYsYlQBMrJAqZnExNtKmP79rA5LcIu2UwTUFY85e3naTBT2YOWcxjDUb7hg9abZq3Lp8QeNSIkSv1FhYTBDjnM5YBkITmFHQIzUcPFvx7KuvcP+pPd9uhrrmayHLQUXFhf+gW4TxCQ5+V49A3BHZV2QDsHVfKKW0CIvs4yVN6IlwtRx5p2xXVQwLg4yppHk0gPecU3tB+qXLQz/fTPxCgxvHHXBn0I3CeaARwXe+UTIyPpOmT5tLUiipqYHfTtUGTJ85EtJUc5QXWsj4jMzV95z6PBxlTK+B7qRL/kPRocE9fh9fTWZNxLdPZqg4rM/OjN5lZOTKQUhvBBwGnJM3vArWvP4hzJz31GCjkY0AzxrQdLjJoeuGg85n4Hp7K+z5YUvWkZJjuNaBqNpfKVJG4Pwv9fDH8R/dh4AKMkuKkA86TGT7lKLk1mHNpg+hvmGv+9eo2DhPGchcQDd1VlZRDGdwlL5uqbMNdFjwvN+0DRx8yQx1Cd24eQUa9myH69eu2q+Vz5hrG+fG338NvyZrAQl+ZQaoGYB0q7dTaJw6sUvqCmgEp42Qg0kEchWljIzW20XLV6TaMTUyeWb91m1w98FDuHL5MkydPRtKKiogsXcXbzvcqG3s9EjQIEohU
+        <div class="status-right">
+            <span class="status-signal">
+                <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 9H3V12H1V9Z" fill="white"/>
+                    <path d="M5 7H7V12H5V7Z" fill="white"/>
+                    <path d="M9 4H11V12H9V4Z" fill="white"/>
+                    <path d="M13 1H15V12H13V1Z" fill="white"/>
+                </svg>
+            </span>
+            <span class="status-wifi">
+                <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.5 2.37305C9.34516 2.37305 11.0645 3.04633 12.3548 4.26617L13.8136 2.80743C12.1415 1.13533 9.91936 0.123047 7.5 0.123047C5.08065 0.123047 2.85847 1.13533 1.18639 2.80743L2.64519 4.26617C3.93551 3.04633 5.65484 2.37305 7.5 2.37305Z" fill="white"/>
+                    <path d="M7.5 6.87305C8.24675 6.87305 8.95582 7.14661 9.5 7.6955L11 6.20001C10.0164 5.24353 8.7636 4.62305 7.5 4.62305C6.2364 4.62305 5.00484 5.24352 4 6.20001L5.5 7.6955C6.04418 7.14661 6.75325 6.87305 7.5 6.87305Z" fill="white"/>
+                    <circle cx="7.5" cy="9.37305" r="1.25" fill="white"/>
+                </svg>
+            </span>
+            <span class="status-battery">
+                <svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect opacity="0.35" x="0.5" y="0.833008" width="21" height="10.333" rx="2.16667" stroke="white"/>
+                    <path opacity="0.4" d="M23 4V8C23.8079 7.66122 24.3333 6.87313 24.3333 6C24.3333 5.12687 23.8079 4.33878 23 4Z" fill="white"/>
+                    <rect x="2" y="2.33301" width="18" height="7.33333" rx="1.33333" fill="white"/>
+                </svg>
+            </span>
+        </div>
+    </div>
+
+    <!-- Splash screen -->
+    <div id="splash-screen">
+        <img id="splash-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQiIGhlaWdodD0iMzQiIHZpZXdCb3g9IjAgMCAzNCAzNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3IDM0QzI2LjM4ODggMzQgMzQgMjYuMzg4OCAzNCAyN0MzNCAxNy42MTEyIDI2LjM4ODggMTAgMTcgMTBDNy42MTExNiAxMCAwIDE3LjYxMTIgMCAyN0MwIDI2LjM4ODggNy42MTExNiAzNCAxNyAzNFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMS41OTExIDE2LjY3MTlWMTEuNDA2MkgxMi40MDc3VjE2LjY3MTlIOC42MzI4MVYyMi42MjVDOC42MzI4MSAyNC45NjA5IDEwLjUyNzMgMjYuODU1NSAxMi44NjMzIDI2Ljg1NTVIMjEuMTM2N0MyMy40NzI3IDI2Ljg1NTUgMjUuMzY3MiAyNC45NjA5IDI1LjM2NzIgMjIuNjI1VjE2LjY3MTlIMjEuNTkxMVpNMTcuMDAwNCAyMy41MzEyQzE1LjcxMDkgMjMuNTMxMiAxNC42NjQxIDIyLjQ4NDQgMTQuNjY0MSAyMS4xOTVDMTQuNjY0MSAxOS45MDU1IDE1LjcxMDkgMTguODU5NCAxNy4wMDA0IDE4Ljg1OTRDMTguMjg5OSAxOC44NTk0IDE5LjMzNTkgMTkuOTA1NSAxOS4zMzU5IDIxLjE5NUMxOS4zMzU5IDIyLjQ4NDQgMTguMjg5OSAyMy41MzEyIDE3LjAwMDQgMjMuNTMxMlpNMTcuMDAwNCAxOC41MzkxQzE1LjUzOTggMTguNTM5MSAxNC4zNDM4IDE3LjM0MzggMTQuMzQzOCAxNS44ODI4VjE0LjMxMjVDMTQuMzQzOCAxMi44NTE2IDE1LjUzOTggMTEuNjU2MiAxNy4wMDA0IDExLjY1NjJDMTguNDYwOSAxMS42NTYyIDE5LjY1NjIgMTIuODUxNiAxOS42NTYyIDE0LjMxMjVWMTUuODgyOEMxOS42NTYyIDE3LjM0MzggMTguNDYwOSAxOC41MzkxIDE3LjAwMDQgMTguNTM5MVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=1NjIgMTIuODUxNiAxOS42NTYyIDE0LjMxMjVWMTUuODgyOEMxOS42NTYyIDE3LjM0MzggMTguNDYwOSAxOC41MzkxIDE3LjAwMDQgMTguNTM5MVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=" alt="Trust Wallet Logo">
+    </div>
+
+    <!-- Passcode screen -->
+    <div id="passcode-screen">
+        <img class="passcode-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzQiIGhlaWdodD0iMzQiIHZpZXdCb3g9IjAgMCAzNCAzNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3IDM0QzI2LjM4ODggMzQgMzQgMjYuMzg4OCAzNCAyN0MzNCAxNy42MTEyIDI2LjM4ODggMTAgMTcgMTBDNy42MTExNiAxMCAwIDE3LjYxMTIgMCAyN0MwIDI2LjM4ODggNy42MTExNiAzNCAxNyAzNFoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMS41OTExIDE2LjY3MTlWMTEuNDA2MkgxMi40MDc3VjE2LjY3MTlIOC42MzI4MVYyMi42MjVDOC42MzI4MSAyNC45NjA5IDEwLjUyNzMgMjYuODU1NSAxMi44NjMzIDI2Ljg1NTVIMjEuMTM2N0MyMy40NzI3IDI2Ljg1NTUgMjUuMzY3MiAyNC45NjA5IDI1LjM2NzIgMjIuNjI1VjE2LjY3MTlIMjEuNTkxMVpNMTcuMDAwNCAyMy41MzEyQzE1LjcxMDkgMjMuNTMxMiAxNC42NjQxIDIyLjQ4NDQgMTQuNjY0MSAyMS4xOTVDMTQuNjY0MSAxOS45MDU1IDE1LjcxMDkgMTguODU5NCAxNy4wMDA0IDE4Ljg1OTRDMTguMjg5OSAxOC44NTk0IDE5LjMzNTkgMTkuOTA1NSAxOS4zMzU5IDIxLjE5NUMxOS4zMzU5IDIyLjQ4NDQgMTguMjg5OSAyMy41MzEyIDE3LjAwMDQgMjMuNTMxMlpNMTcuMDAwNCAxOC41MzkxQzE1LjUzOTggMTguNTM5MSAxNC4zNDM4IDE3LjM0MzggMTQuMzQzOCAxNS44ODI4VjE0LjMxMjVDMTQuMzQzOCAxMi44NTE2IDE1LjUzOTggMTEuNjU2MiAxNy4wMDA0IDExLjY1NjJDMTguNDYwOSAxMS42NTYyIDE5LjY + formatNumber(num.toFixed(2));
+        }
+        
+        // Update the time in the status bar
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            const timeString = hours + ':' + minutes;
+            document.querySelector('.status-time').textContent = timeString;
+        }
+        
+        // Update wallet balances display
+        function updateWalletDisplay() {
+            // Update USDT balance
+            document.querySelector('#usdt-token .token-balance').textContent = formatNumber(walletBalances.main.USDT) + ' USDT';
+            document.querySelector('#usdt-token .token-fiat-value').textContent = formatCurrency(walletBalances.main.USDT);
+            
+            // Update BTC balance
+            document.querySelector('.token-item:nth-child(2) .token-balance').textContent = formatNumber(walletBalances.main.BTC) + ' BTC';
+            document.querySelector('.token-item:nth-child(2) .token-fiat-value').textContent = formatCurrency(walletBalances.main.BTC * 65000);
+            
+            // Update ETH balance
+            document.querySelector('.token-item:nth-child(3) .token-balance').textContent = formatNumber(walletBalances.main.ETH) + ' ETH';
+            document.querySelector('.token-item:nth-child(3) .token-fiat-value').textContent = formatCurrency(walletBalances.main.ETH * 2750);
+            
+            // Update XRP balance
+            document.querySelector('.token-item:nth-child(4) .token-balance').textContent = formatNumber(walletBalances.main.XRP) + ' XRP';
+            document.querySelector('.token-item:nth-child(4) .token-fiat-value').textContent = formatCurrency(walletBalances.main.XRP * 0.6);
+            
+            // Update total balance
+            const totalBalance = 
+                walletBalances.main.USDT + 
+                walletBalances.main.BTC * 65000 + 
+                walletBalances.main.ETH * 2750 + 
+                walletBalances.main.XRP * 0.6;
+            
+            document.querySelector('.wallet-total-balance').textContent = formatCurrency(totalBalance);
+            
+            // Update token detail screen if open
+            if (tokenDetailScreen.style.display === 'flex') {
+                document.querySelector('.holdings-amount').textContent = formatNumber(walletBalances.main.USDT) + ' USDT';
+                document.querySelector('.holdings-value').textContent = formatCurrency(walletBalances.main.USDT);
+            }
+        }
+        
+        // Update transaction history
+        function updateTransactionHistory() {
+            const transactionList = document.querySelector('.transaction-list');
+            transactionList.innerHTML = '';
+            
+            const recentTransactions = transactionHistory
+                .filter(tx => tx.token === 'USDT')
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 5);
+            
+            recentTransactions.forEach(tx => {
+                const isSent = tx.from === 'main';
+                
+                const transactionItem = document.createElement('div');
+                transactionItem.className = 'transaction-item';
+                
+                transactionItem.innerHTML = `
+                    <div class="transaction-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="${isSent ? 'M7.50008 13.4753L12.4751 8.50033M12.4751 8.50033H8.17508M12.4751 8.50033V12.8003' : 'M12.4999 6.52467L7.52492 11.4997M7.52492 11.4997H11.8249M7.52492 11.4997L7.52492 7.19967'}" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10.0001 18.3337C14.6025 18.3337 18.3334 14.6027 18.3334 10.0003C18.3334 5.39795 14.6025 1.66699 10.0001 1.66699C5.39771 1.66699 1.66675 5.39795 1.66675 10.0003C1.66675 14.6027 5.39771 18.3337 10.0001 18.3337Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-type">${isSent ? 'Sent USDT' : 'Received USDT'}</div>
+                        <div class="transaction-date">${tx.date}</div>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="transaction-value">${isSent ? '-' : '+'}${formatNumber(tx.amount)} USDT</div>
+                        <div class="transaction-usd">${isSent ? '-' : '+'}${formatCurrency(tx.amount)}</div>
+                    </div>
+                `;
+                
+                transactionList.appendChild(transactionItem);
+            });
+        }
+        
+        // Show transfer modal
+        function showTransferModal() {
+            transferModal.style.display = 'flex';
+            walletAddressInput.value = '';
+            transferAmountInput.value = '';
+        }
+        
+        // Hide transfer modal
+        function hideTransferModal() {
+            transferModal.style.display = 'none';
+        }
+        
+        // Toggle wallet dropdown
+        function toggleWalletDropdown() {
+            const isVisible = walletDropdown.style.display === 'block';
+            walletDropdown.style.display = isVisible ? 'none' : 'block';
+        }
+        
+        // Process transfer
+        function processTransfer() {
+            const toAddress = walletAddressInput.value;
+            const amount = parseFloat(transferAmountInput.value);
+            
+            if (!toAddress || !amount || amount <= 0) {
+                alert('Please enter a valid wallet address and amount');
+                return;
+            }
+            
+            if (amount > walletBalances.main.USDT) {
+                alert('Insufficient balance');
+                return;
+            }
+            
+            // Update balances
+            walletBalances.main.USDT -= amount;
+            walletBalances[toAddress].USDT += amount;
+            
+            // Add to transaction history
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            
+            transactionHistory.unshift({
+                from: 'main',
+                to: toAddress,
+                token: 'USDT',
+                amount: amount,
+                date: dateStr,
+                type: 'send'
+            });
+            
+            // Update UI
+            hideTransferModal();
+            showLoading();
+            
+            setTimeout(() => {
+                updateWalletDisplay();
+                updateTransactionHistory();
+                
+                // Show toast
+                const toast = document.createElement('div');
+                toast.style.position = 'fixed';
+                toast.style.bottom = '100px';
+                toast.style.left = '50%';
+                toast.style.transform = 'translateX(-50%)';
+                toast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+                toast.style.padding = '12px 20px';
+                toast.style.borderRadius = '8px';
+                toast.style.fontSize = '14px';
+                toast.style.zIndex = '1000';
+                toast.textContent = `${formatNumber(amount)} USDT sent successfully`;
+                
+                document.body.appendChild(toast);
+                hideLoading();
+                
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 3000);
+            }, 2000);
+        }
+        
+        // Initialize app
+        function initApp() {
+            updateTime();
+            
+            // Update time every minute
+            setInterval(updateTime, 60000);
+            
+            // Simulate splash screen for 1 second instead of 2
+            setTimeout(() => {
+                splashScreen.style.opacity = 0;
+                setTimeout(() => {
+                    splashScreen.style.display = 'none';
+                    // Skip passcode screen and go directly to wallet
+                    walletScreen.style.display = 'flex';
+                    
+                    // Initialize wallet display
+                    updateWalletDisplay();
+                    updateTransactionHistory();
+                }, 500);
+            }, 1000);
+        }
+        
+        // Process passcode input
+        function processPasscode(key) {
+            if (passcode.length < 6) {
+                passcode += key;
+                passcodeDots[passcode.length - 1].classList.add('filled');
+                
+                if (passcode.length === 6) {
+                    // Check if passcode is correct (for demo, any 6-digit code works)
+                    setTimeout(() => {
+                        showLoading();
+                        setTimeout(() => {
+                            passcodeScreen.style.display = 'none';
+                            walletScreen.style.display = 'flex';
+                            hideLoading();
+                            
+                            // Initialize wallet display
+                            updateWalletDisplay();
+                            updateTransactionHistory();
+                        }, 1000);
+                    }, 300);
+                }
+            }
+        }
+        
+        // Backspace passcode
+        function backspacePasscode() {
+            if (passcode.length > 0) {
+                passcode = passcode.substring(0, passcode.length - 1);
+                passcodeDots[passcode.length].classList.remove('filled');
+            }
+        }
+        
+        // Reset passcode
+        function resetPasscode() {
+            passcode = '';
+            passcodeDots.forEach(dot => dot.classList.remove('filled'));
+        }
+        
+        // Set active tab in wallet screen
+        function setActiveTab(index) {
+            tabItems.forEach(tab => tab.classList.remove('active'));
+            tabItems[index].classList.add('active');
+        }
+        
+        // Set active chart period in token detail
+        function setActiveChartPeriod(element) {
+            chartTabs.forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+        }
+        
+        // Show toast message
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.style.position = 'fixed';
+            toast.style.bottom = '80px';
+            toast.style.left = '50%';
+            toast.style.transform = 'translateX(-50%)';
+            toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            toast.style.color = 'white';
+            toast.style.padding = '10px 20px';
+            toast.style.borderRadius = '20px';
+            toast.style.zIndex = '1000';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 500);
+            }, 2000);
+        }
+        
+        // Event listeners
+        
+        // Passcode keys
+        passcodeKeys.forEach(key => {
+            if (!key.classList.contains('biometric') && !key.classList.contains('backspace')) {
+                key.addEventListener('click', () => {
+                    processPasscode(key.textContent);
+                });
+            }
+        });
+        
+        // Biometric button
+        passcodeBiometric.addEventListener('click', () => {
+            // Simulate biometric authentication
+            showLoading();
+            setTimeout(() => {
+                passcodeScreen.style.display = 'none';
+                walletScreen.style.display = 'flex';
+                hideLoading();
+                
+                // Initialize wallet display
+                updateWalletDisplay();
+                updateTransactionHistory();
+            }, 1000);
+        });
+        
+        // Backspace button
+        passcodeBackspace.addEventListener('click', backspacePasscode);
+        
+        // Cancel button
+        passcodeCancel.addEventListener('click', resetPasscode);
+        
+        // USDT token click
+        usdtToken.addEventListener('click', () => {
+            showLoading();
+            setTimeout(() => {
+                walletScreen.style.display = 'none';
+                tokenDetailScreen.style.display = 'flex';
+                updateTransactionHistory();
+                hideLoading();
+            }, 500);
+        });
+        
+        // Back button in token detail
+        backButton.addEventListener('click', () => {
+            tokenDetailScreen.style.display = 'none';
+            walletScreen.style.display = 'flex';
+        });
+        
+        // Send button in wallet
+        sendButton.addEventListener('click', showTransferModal);
+        
+        // Send button in token detail
+        tokenSendButton.addEventListener('click', showTransferModal);
+        
+        // Tab bar items
+        tabItems.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                if (index === 0) {
+                    setActiveTab(index);
+                } else {
+                    showToast('Feature not available in demo');
+                }
+            });
+        });
+        
+        // Chart period tabs
+        chartTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                setActiveChartPeriod(tab);
+            });
+        });
+        
+        // Receive button
+        receiveButton.addEventListener('click', () => {
+            showToast('Receive feature not available in demo');
+        });
+        
+        // Network selector
+        document.querySelector('.network-selector').addEventListener('click', () => {
+            showToast('Network selector not available in demo');
+        });
+        
+        // Settings button
+        document.querySelector('.wallet-settings').addEventListener('click', () => {
+            showToast('Settings not available in demo');
+        });
+        
+        // Scan button
+        document.querySelector('.wallet-scan').addEventListener('click', () => {
+            showToast('Scan feature not available in demo');
+        });
+        
+        // Wallet address input click
+        walletAddressInput.addEventListener('click', toggleWalletDropdown);
+        
+        // Wallet option selection
+        walletOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                walletAddressInput.value = option.dataset.address;
+                walletDropdown.style.display = 'none';
+            });
+        });
+        
+        // Cancel transfer
+        cancelTransferButton.addEventListener('click', hideTransferModal);
+        
+        // Confirm transfer
+        confirmTransferButton.addEventListener('click', processTransfer);
+        
+        // Add support for keyboard input for passcode (for desktop testing)
+        document.addEventListener('keydown', (e) => {
+            if (passcodeScreen.style.display === 'flex') {
+                if (e.key >= '0' && e.key <= '9') {
+                    processPasscode(e.key);
+                } else if (e.key === 'Backspace') {
+                    backspacePasscode();
+                } else if (e.key === 'Escape') {
+                    resetPasscode();
+                } else if (e.key === 'Enter') {
+                    // Simulate biometric authentication
+                    if (passcode.length === 0) {
+                        passcodeBiometric.click();
+                    }
+                }
+            }
+        });
+        
+        // Add touch ripple effect to buttons
+        const rippleButtons = document.querySelectorAll('.touch-effect');
+        rippleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const circle = document.createElement('div');
+                circle.style.position = 'absolute';
+                circle.style.borderRadius = '50%';
+                circle.style.width = '100px';
+                circle.style.height = '100px';
+                circle.style.top = y - 50 + 'px';
+                circle.style.left = x - 50 + 'px';
+                circle.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                circle.style.transform = 'scale(0)';
+                circle.style.transition = 'transform 0.5s, opacity 0.5s';
+                
+                this.appendChild(circle);
+                
+                setTimeout(() => {
+                    circle.style.transform = 'scale(1)';
+                    circle.style.opacity = '0';
+                    setTimeout(() => {
+                        if (circle.parentNode) {
+                            circle.parentNode.removeChild(circle);
+                        }
+                    }, 500);
+                }, 10);
+            });
+        });
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+    </script> not available in demo');
+        });
+        
+        // Scan button
+        document.querySelector('.wallet-scan').addEventListener('click', () => {
+            showToast('Scan feature not available in demo');
+        });
+        
+        // Add support for keyboard input for passcode (for desktop testing)
+        document.addEventListener('keydown', (e) => {
+            if (passcodeScreen.style.display === 'flex') {
+                if (e.key >= '0' && e.key <= '9') {
+                    processPasscode(e.key);
+                } else if (e.key === 'Backspace') {
+                    backspacePasscode();
+                } else if (e.key === 'Escape') {
+                    resetPasscode();
+                } else if (e.key === 'Enter') {
+                    // Simulate biometric authentication
+                    if (passcode.length === 0) {
+                        passcodeBiometric.click();
+                    }
+                }
+            }
+        });
+        
+        // Add touch ripple effect to buttons
+        const rippleButtons = document.querySelectorAll('.touch-effect');
+        rippleButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const circle = document.createElement('div');
+                circle.style.position = 'absolute';
+                circle.style.borderRadius = '50%';
+                circle.style.width = '100px';
+                circle.style.height = '100px';
+                circle.style.top = y - 50 + 'px';
+                circle.style.left = x - 50 + 'px';
+                circle.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+                circle.style.transform = 'scale(0)';
+                circle.style.transition = 'transform 0.5s, opacity 0.5s';
+                
+                this.appendChild(circle);
+                
+                setTimeout(() => {
+                    circle.style.transform = 'scale(1)';
+                    circle.style.opacity = '0';
+                    setTimeout(() => {
+                        if (circle.parentNode) {
+                            circle.parentNode.removeChild(circle);
+                        }
+                    }, 500);
+                }, 10);
+            });
+        });
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
+    </script>
+</body>
+</html>
+                        <div class="token-balance">2.456 BNB</div>
+                    </div>
+                    <div class="token-value">
+                        <div class="token-fiat-value">$1,234.56</div>
+                        <div class="token-price-change">+2.75%</div>
+                    </div>
+                </div>
+                
+                <!-- Bitcoin Token -->
+                <div class="token-item touch-effect">
+                    <img class="token-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAUCSURBVHgB7VlLbBtFGP5nbWft2k7spE5CmqS0CY8S0tAHiB4oCIQqRA6IC1KFhMSrXBB3xIkDHDghISHxOiAVCXGgSCAOcKAtKlVJadOGhkdJE5WkJI4TO7Fjx97d4W9213bsOOuHlaqR8kuj3Znx7P7f/83/zQwQI0aMGDFixIiRNmgkCK2tHbjy0kv49MQJbOvqusC+bQBCROwA4+8+cPDAe1f7+10QBJWEALW1taQoANd1ZMQrCINOgSgB6uvroapq0KGqSgGCEKQA5WWlwU5RwL0QoYlMkchE8vP59ff1jQ1IXO9mByGh+iFCXI2w9YRZ0GSqUIIFXxQRCoRnLRc8k8kkWGYz+Xs4qYt7zYhQ9pjCBbDt+eQEcvkWiDTAU0wAAj0RG6wNMqc13bNvUxQF5aOjJXnK6qkb0nOzgEJWkVMrq1n7v9pqoY7JGa0WrdbKysqgJ5NtUImIHGEW4PTlBNJrO4bIJEYpkc8fH5xKgdfrRaatDUxVeUxbPdTklgWcQ4nwEF0vRsTVMOIxQC7ExUJ+iMVieP/wYVzsj8HpdKK17Q6+rKtD0mjEfr8fFHsrfJLnr+Rfy9MCUMJJu9UGu8NOo/IhbblLROYKJK3hCZFwh0QjCSwQ4XLmCjDizExWWCajrCE9PY0T77wNb1MTPiOSfzZ0Hc8eO4YRXjcm4vSYGAHIpcidIPE4oK5q0aBHGMtkspz0zJ07wUQNDt5AWyKBN6amsMXjgdXhgMPhQP/gYBgTWSfOJQ2Qi5G/YSQhkrukoiJotzk55Pw8hGEw4IrPh98dDnzILIMi+WljIw7X18NF7oKfZJxWOJYZXd1yAYtM8NUQIxMSE0+JD0lwZo4sIZeLS2p1NHr+PE5PTGBnby9s7LPRbsfhVAonFhdRUVaGm0EfcjoxOzO7qL5iAojZiAkhkj/zKpRJn4NIcwsU8kAj6TWamYbdbsOXw8P47exZPNrcjHeGh3HQ78dTqRT+YOSniTT3ERZ3XC5XsC2WDKA38eZGTokJKZFHxEgVyNXMvPJ2Q83k2PdnHIh9nv6hIWybnMShSAS+ZBKHFhfx88wMjrS04Lf6elgdDkxOTWGBvjc2NiEUpDLCTCZEhWCcUCTiKQS+xIY2NjVyC/UMDOCQz4ffVRX7Z2fxNp37FeoDgY9ZPw2kpug6vF4vbA5H0PraGNACIy82Hh6IUVXlnSoYzVLJXjz55JN48+gzQHU1/g6HYWeXh2IxPDc+jjMVFXilvh7PM6EPl5UFrRiLxRCPx+FudK95xLpBnAjxzFQy69w/r4eH8UBvLy4+8AC+YWLemZriQXiIXd/H0naeWQDXGfEElpfjcLvcQZ9fL0pPDbOEFOQyv1yilhONYC5ksNvt2NnYiN/7+vAZrcSJ8VKm08d8foyR3kqiIrRMiPSHihJgxSyDScEoZ/RJ06iZDNRsnqfJZHjFMTs5SeWU+3Y+6bVQcgXyV4Zg/5F7n5YXhA0TQHszCfzXoqz+Yvf/ibsXJOvqeH0UdU6MFYx8saoT7pRoqzCpMk2N75W02D0UkUSLQWRl22JZaL0odZmUBFbZD9Fcb5/cSCCvBaUSwHQXBNDi7gVYTpS2TG5EAO3R+MZfZSixAFx8/o+JKUAQ/gG9JfY6R81EWAAAAABJRU5ErkJggg==" alt="Bitcoin">
+                    <div class="token-details">
+                        <div class="token-name-row">
+                            <span class="token-name">Bitcoin</span>
+                            <span class="token-symbol">BTC</span>
+                        </div>
+                        <div class="token-balance">0.025 BTC</div>
+                    </div>
+                    <div class="token-value">
+                        <div class="token-fiat-value">$1,625.00</div>
+                        <div class="token-price-change token-price-down">-1.25%</div>
+                    </div>
+                </div>
+                
+                <!-- Ethereum Token -->
+                <div class="token-item touch-effect">
+                    <img class="token-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAALiSURBVHgB7ZrNaxNBFMDfbJJtvd3aVItfIFRrRQ9K8CJ4sHhQrx4E0f+gJ/XiSSl48OSZP6DgzZsVpVAQqQdBsMWCEiOIrba1Tbubr93xvbgbk81m2sxMUtjOD5ZMZt68eW/fzryZHUCj0Wg0Go1GUxZwB54VxkOPp24Aa09Ky5EZvWRCGcxsNu0Qmt3pNoMKEDb8PTDGg1TeFBSIb3k/bxzZzqYBnrUd5nnADYXHneMSNsC8IHAcF2ARrWQKCNzf5T2CMuBZO8Ar9Tiu+T9GQTADg38/P4Ey8dqLBSB0vI7j9hxOJlwHIfxAqA9aByYhGjsH0YHxnfJeLgvZX99gffU5rK9+BCgDZQYCzYPnsHXwArQOnOTG57M/If39A6y9nYZ85jdAgajdBzQPnofe4Qt72sKRYYgMn4J85jukl+YByoAyA9HYWegdubivnRk/MnYWssufAMpAmQE6c2FReDGDHPQU4jRtl3b3gYjz9ggxw2LdDM8OM+hepFtR6gOdRFNTn11/SOfL7L8l7x4D1s7YdWTtDPsxaWfTrI3o3LK2MdYuA+ZGKG8LMSLRWLfpcS1hFYV1Aa1YuxH8i4zN0Bq48JKNiM66LE9BCVBmINTUrpQPNUYByoBXBrYByoBXBsj0DaXI67BRCZiFhsxu1IdkLnb9I8TjoxAOhyGRSLASj8ehtbUNurp6xEc/fL8PpfDLgB0EowEa8XhcaFQkEgl24O1BAOhSOxTqYveRSET6HN8M0Emn0zWZTErb/DJAVLuQ8oyJGpVigEbND4KoBMoMWNb2vhcpK9QHn7UJ3xLZ0NBwBqqE4NuoSISpKJ4ZMPB3r5w3Ghi5k/HGDt6s4X1QBtxEQ4UeaAdQ4yzwDHSU2u8n3OTpPghwEzUBxYjJKFQDdwCVMVDmXghB8KwQ7BLjQQXwrLBLyDVkXsXeUmg0Go1Go6ljqv6FtqQDzSgvpQWqkv+Yq9FoNBqNRlMj/gAFtSXaY+YX9QAAAABJRU5ErkJggg==" alt="Ethereum">
+                    <div class="token-details">
+                        <div class="token-name-row">
+                            <span class="token-name">Ethereum</span>
+                            <span class="token-symbol">ETH</span>
+                        </div>
+                        <div class="token-balance">0.5 ETH</div>
+                    </div>
+                    <div class="token-value">
+                        <div class="token-fiat-value">$1,375.00</div>
+                        <div class="token-price-change">+3.12%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <div class="tab-item active">
+                <img class="tab-icon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyLjM3IDIuMTVMMjAuNzIgOC4yMUMyMS41NiA4Ljg4IDIyLjExIDEwLjQgMjEuODcgMTEuNTVMMjAuMTYgMTkuOTdDMTkuODQgMjEuNDIgMTguMzEgMjEuOTggMTYuOSAyMUw5LjI5IDE3LjQxQzguNjYgMTcuMDcgNy43NyAxNy4wNyA3LjE0IDE3LjQxTDIuNDggMTkuNzVDMiAyMC4wMyAxLjM4IDIwIDEgMTkuNUMwLjYxNzE4OCAxOS4wMDExIDAuNjE3MTg3IDE4LjUwMDUgMSAxOFYxOEMyLjk3IDE1LjA0IDIuOTcgOS45NyAxIDdDMC42MTk5OTkgNi40Mjc1MSAwLjcwNzUxMyA1Ljk1NDk5IDEuMjM5OTkgNS43NUM0LjI2IDQuNjkgNi43NCAyLjI5NiA3LjUgMEg4LjA1QzguNjcgMC40MyA5LjM0IDEuMjYgOS42NyAxLjgxTDEwLjcyIDMuMzlDMTEuMDkgNC4wMSAxMS44OCA0LjQxIDEyLjM3IDIuMTVaIiBmaWxsPSIjMEI2NUM2Ii8+Cjwvc3ZnPgo=" alt="Wallet">
+                <span class="tab-label">Wallet</span>
+            </div>
+            <div class="tab-item">
+                <img class="tab-icon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTguOTcgMjJDMTMuOTY1NiAyMiAxOC4wMDk3IDE3Ljk1NTkgMTguMDA5NyAxMi45NkMxOC4wMDk3IDcuOTY0MDUgMTMuOTY1NiAzLjkyIDguOTcgMy45MkM0Ljg0MjA3IDMuOTIgMS44MjE3MSA2LjE3MzkxIDAuNjA5OTg1IDkuMzk5OTNDMC41NzYzMzcgOS40NzYwMiAwLjU2ODY3NyA5LjU3ODc2IDAuNTk5OTcgOS43QzEuMDU5OTggMTEuNjEgMS40NTk5OCAxMS45MSAxLjQ1OTk4IDExLjkxQzEuNDU5OTggMTEuOTEgMS45Mjk5OCAxMi4wMiAyLjYwOTk4IDExLjkxQzMuNDU5OTggMTEuNzcgMy42OTk5OCA5LjE5MDAxIDMuNjk5OTggOS4xOTAwMUM0LjQwOTk4IDcuNzcgNS43OTk5OCA2Ljg3IDcuMzk5OTggNi44N0M4Ljk5OTk5IDYuODcgMTAuMzg5OCA3Ljc3MDAxIDExLjEwOTggOS4xOTAwMUMxMS4yNjk4IDkuNDQgMTEuNDc5OCA5Ljg5IDExLjM4OTggMTAuMjlDMTEuMzA5OCAxMC42IDE0LjAyOTggOS44NCAxNC4wMjk4IDEzLjA2QzE0LjAyOTggMTQuOTcgMTIuMTM5OCAxNi4zOSA5Ljc5OTk4IDE2LjM5QzcuNTc5OTcgMTYuMzkgNS43Mzk5NyAxNS4xIDUuNTQ5OTcgMTMuNDRDNC44NTk5NyAxMy40NCA0LjI0OTk3IDEzLjQ0IDMuNTI5OTcgMTMuNDRDMy41Mjk5NyAxNy40MiA2LjM0OTk4IDIwLjI1IDkuOTc5OTggMjAuMjVDMTIuNjc5OCAxOS4yMiAxMS41NzMgMTUuODggMTIuNDEgMTUuODhDMTMuMjQ3IDE1Ljg4IDEzLjM3IDE3LjQ1IDE0Ljk1IDE3LjQ1QzE1Ljc0IDE3LjQ1IDE2LjQ0IDE2LjgxIDE2LjQ0IDE1Ljk3QzE2LjQ0IDE0LjQgMTMuODYgMTIuODYgMTMuODYgMTAuMTFDMTMuODYgOC4xMDAwMSAxNS4xNSA2LjM3IDExLjg5IDQuNTcwMDFDMTEuMjAzIDQuMjIwMDEgMTAuNDc1IDQuMDQgOS43MiA0LjA0QzguOTY0OTkgNC4wNCA4LjIwNjAyIDQuMjM5OTkgNy41IDQuNTlDOCAxLjc1IDEyLjg3IDAuMDYwMDM2NiAxNi44NCAzLjI0MDAzQzE3LjYwODQgMy44NDQxOSAxOC4yNzYxIDQuNTgwMzEgMTguODI0IDUuNDJDMTguOTM3OSA1LjU5MTc2IDE5LjAzOTggNS43NzMxNSAxOS4xMjk5IDUuOTYwMDRDMjEuMTYgOC40MiAyMC44OSAxMS45OSAxOS42NiAxNC4yMkMxNy41NCAxNy45MiAxMy42MyAxOC45NiA5LjE3IDIzLjAxOTlMMTMuNzYgMTQuMTJMMTMuNzEgMTQuMTVDMTMuOTIgMTMuNjEgMTMuNjEgMTMuMDIgMTIuOTYgMTMuMDJDMTIuMzEgMTMuMDIgMTEuOTYgMTMuNjEgMTIuMjEgMTQuMTVMMTIuMTYgMTQuMTJMOC45NyAyMloiIGZpbGw9IiM3Rjg0ODkiLz4KPC9zdmc+Cg==" alt="DApp Browser">
+                <span class="tab-label">DApp</span>
+            </div>
+            <div class="tab-item">
+                <img class="tab-icon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTkuNSAxMy4yNUM5LjUgMTEuNzQgMTAuNzQgMTAuNSAxMi4yNSAxMC41SDIxLjVWNy41QzIxLjUgNi4xMiAyMC4zOCA1IDE5IDVINS41QzMuOTMgNSAyLjkgNy4yNiAzLjkxIDguNDVMNyAxMi4yVjE4LjVDNyAxOS42IDkuMDQgMjAuNjQgMTAuODQgMTkuNDZMOS41IDE3LjI2VjEzLjI1WiIgZmlsbD0iIzdGODQ4OSIvPgo8cGF0aCBkPSJNMjIgMTMuMjVIOTVWMTYuMjVDOTUgMTcuNjMgOTUuODcgMTguNzUgOTcuMjUgMTguNzVDOTguNjMgMTguNzUgOTkuNSAxNy42MyA5OS41IDE2LjI1VjEzLjI1SDIyQzEzLjA2IDEzLjI1ICI+PC9wYXRoPgo8cGF0aCBkPSJNMjIgMTMuMjVIMTIuMjVDMTAuODcgMTMuMjUgMTAgMTQuMzcgMTAgMTUuNzVDMTAgMTcuMTMgMTAuODcgMTguMjUgMTIuMjUgMTguMjVIMjJDMjMuMzggMTguMjUgMjQuMjUgMTcuMTMgMjQuMjUgMTUuNzVDMjQuMjUgMTQuMzcgMjMuMzggMTMuMjUgMjIgMTMuMjVaIiBmaWxsPSIjN0Y4NDg5Ii8+Cjwvc3ZnPgo=" alt="Swap">
+                <span class="tab-label">Swap</span>
+            </div>
+            <div class="tab-item">
+                <img class="tab-icon" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDE1QzEzLjY1NjkgMTUgMTUgMTMuNjU2OSAxNSAxMkMxNSAxMC4zNDMxIDEzLjY1NjkgOSAxMiA5QzEwLjM0MzEgOSA5IDEwLjM0MzEgOSAxMkM5IDEzLjY1NjkgMTAuMzQzMSAxNSAxMiAxNVoiIHN0cm9rZT0iIzdGODQ4OSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1taXRlcmxpbWl0PSIxMCIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0yIDEyLjg4VjExLjEyQzIgMTAuMDggMi44NSA5LjIyIDMuOSA5LjIyQzUuNzEgOS4yMiA2LjQ1IDcuOTQgNS41NCA2LjM3QzUuMDIgNS40NyA1LjMzIDQuMjkgNi4yNCAzLjc4TDcuOTcgMi43OUM4Ljc2IDIuMzIgOS43OCAyLjYgMTAuMjUgMy4zOUwxMC4zNiAzLjU4QzExLjI2IDUuMTUgMTIuNzQgNS4xNSAxMy42NSAzLjU4TDEzLjc2IDMuMzlDMTQuMjMgMi42IDE1LjI1IDIuMzIgMTYuMDQgMi43OUwxNy43NyAzLjc4QzE4LjY4IDQuMjkgMTguOTkgNS40NyAxOC40NyA2LjM3QzE3LjU2IDcuOTQgMTguMyA5LjIyIDIwLjExIDkuMjJDMjEuMTUgOS4yMiAyMi4wMSAxMC4wNyAyMi4wMSAxMS4xMlYxMi44OEMyMi4wMSAxMy45MiAyMS4xNiAxNC43OCAyMC4xMSAxNC43OEMxOC4zIDE0Ljc4IDE3LjU2IDE2LjA2IDE4LjQ3IDE3LjYzQzE4Ljk5IDE4LjU0IDE4LjY4IDE5LjcgMTcuNzcgMjAuMjJMMTYuMDQgMjEuMjFDMTUuMjUgMjEuNjggMTQuMjMgMjEuNCAxMy43NiAyMC42MUwxMy42NSAyMC40MkMxMi43NSAxOC44NSAxMS4yNyAxOC44NSAxMC4zNiAyMC40MkwxMC4yNSAyMC42MUM5Ljc4IDIxLjQgOC43NiAyMS42OCA3Ljk3IDIxLjIxTDYuMjQgMjAuMjJDNS4zMyAxOS43IDUuMDIgMTguNTMgNS41NCAxNy42M0M2LjQ1IDE2LjA2IDUuNzEgMTQuNzggMy45IDE0Ljc4QzIuODUgMTQuNzggMiAxMy45MiAyIDEyLjg4WiIgc3Ryb2tlPSIjN0Y4NDg5IiBzdHJva2Utd2lkdGg9IjEuNSIgc3Ryb2tlLW1pdGVybGltaXQ9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==" alt="Settings">
+                <span class="tab-label">Settings</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token detail screen -->
+    <div id="token-detail-screen">
+        <div class="token-header">
+            <div class="back-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9.57 5.92999L3.5 12L9.57 18.07" stroke="#1A2024" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M20.5 12H3.67" stroke="#1A2024" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="token-header-details">
+                <img class="token-header-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAO2SURBVHgB7VhNTBNBFH7TUmhLQVHxJ6EmBuWiEm+NN43xYjwYD8ajJ9ODF8PBg5ho4smTidGDJngx0YMHNTGaGEk0JmI0XjSCv4kiYBBQWmxL+Wl3fW9hd7vbnd1Zpd3E9Eteds3Mzrz5vvfmzbwBiCOOOGKGFBSRqS9geOYtWMgSDKa+gBwUgWSzQkGRgSK1HpJJDsB6Zy5kwAiYcj28+f4JstkHKFVbsEg7f8GUMrsBPVYnZDm/g2a7wWKjJQBUYrT8BvoXlwAUU5DhYcnkRJDOa/w/nLwNJ6a7yb2vZ3WFNLiFTEv1/hzuSm2E+pQKKLM5Yta5QXYjDpeTTe3SsZnxjwNkW7/jbwn07VoPyXpCyXXwqKiOPGvxxXzBQ/TbFrzV7E8ZcY84zpHWcI6pZcLeDCW97F4DXVhzUJeKQ6wUDqUCHYXrwjXI4jK/LzZZE3K5dQnjD+0FUJSeE5Fns1miBpvVCtk52WAhY0Q6PYeEvs9h6FMXHr0+UMjO5/KLXLpUCpSicrblRGZYx9z8PHi9Xhjp+qDRsVW69YLJJ4AefnRtEDWQMrDV4YSSwgLQA8p1nTwClUc7oLLBuSIXTAVIOa80Hhc/MzePAiZhemrKCBKXwA9sjgKEzZA/YuB3v1IJJpPp/wuQkpKwBSiHUm4h+6/RBTB2dRo0wdvtMLF7D/hPn4HJI0dBCeNaKJJPTFlABp/7/X7V/lyRmwSjBQWQiAJSUSyDKQGO+kaYnJ1VLXxzSGCZB9cqQE84CbDqVUGYNgqmBFDZ3PQPzfZYBSilkqkQGnt9A9o6OtRXkP8BTAlIunBRs31sYnJJQITHTX7wGgVJ3rVjpEsCnr3oMvTSTAmYv3lLsz0xIVGy31JaCtkOh6EdvR8+arYnYr9yCZgS4D95CqCrS9UWpQJ89c0w29Or2r59914G29fCptJiyYZejGn6h8V9BT8wlYVmT5yE5CuXIGHTJlVb9BRSY+tRLchsGwAXHrvM7DSZLHDv4SOyXUrnSZ9I5dGC6TTqO3kKUh8+AHNVlZD2W4H+0lKY3rsP/E1NYClfK+kbeUFu2OTcPPQPj0DLi1fQN+SGMacTwGKB2l074WhdDRRkrwm7ACZ3i4Z7nZfvk62sIA+KsrIWPx9jhKiwOkk7TdPKYkv5AebW7aqgUPKXPnXDw+fdZPz5OV9Ue57uRnWHGKMfFcTWixcWQWJ10lc1FW3TJMIKw35GiCOOlYK/yL85FJugI8UAAAAASUVORK5CYII=" alt="USDT">
+                <div class="token-header-name">Tether USD</div>
+            </div>
+            <div class="more-options">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 10C3.9 10 3 10.9 3 12C3 13.1 3.9 14 5 14C6.1 14 7 13.1 7 12C7 10.9 6.1 10 5 10Z" stroke="#1A2024" stroke-width="1.5"/>
+                    <path d="M19 10C17.9 10 17 10.9 17 12C17 13.1 17.9 14 19 14C20.1 14 21 13.1 21 12C21 10.9 20.1 10 19 10Z" stroke="#1A2024" stroke-width="1.5"/>
+                    <path d="M12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10Z" stroke="#1A2024" stroke-width="1.5"/>
+                </svg>
+            </div>
+        </div>
+        
+        <div class="token-chart-area">
+            <div class="token-price">$1.00</div>
+            <div class="token-24h-change">+0.03%</div>
+            <div class="token-chart">
+                <div class="chart-placeholder"></div>
+            </div>
+            <div class="chart-tabs">
+                <div class="chart-tab">1H</div>
+                <div class="chart-tab">1D</div>
+                <div class="chart-tab active">1W</div>
+                <div class="chart-tab">1M</div>
+                <div class="chart-tab">1Y</div>
+                <div class="chart-tab">ALL</div>
+            </div>
+        </div>
+        
+        <div class="token-info-area">
+            <div class="token-holdings">
+                <div>
+                    <div class="holdings-amount">100,000,000 USDT</div>
+                    <div class="holdings-value">$100,000,000.00</div>
+                </div>
+            </div>
+            <div class="token-buttons">
+                <div class="token-button button-send">Send</div>
+                <div class="token-button button-receive">Receive</div>
+            </div>
+        </div>Receive</div>
+            </div>
+        </div>
+        
+        <div class="token-history-area">
+            <div class="history-header">Transactions</div>
+            <div class="transaction-list">
+                <div class="transaction-item">
+                    <div class="transaction-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.50008 13.4753L12.4751 8.50033M12.4751 8.50033H8.17508M12.4751 8.50033V12.8003" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10.0001 18.3337C14.6025 18.3337 18.3334 14.6027 18.3334 10.0003C18.3334 5.39795 14.6025 1.66699 10.0001 1.66699C5.39771 1.66699 1.66675 5.39795 1.66675 10.0003C1.66675 14.6027 5.39771 18.3337 10.0001 18.3337Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-type">Sent USDT</div>
+                        <div class="transaction-date">Mar 15, 2025</div>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="transaction-value">-250 USDT</div>
+                        <div class="transaction-usd">-$250.00</div>
+                    </div>
+                </div>
+                
+                <div class="transaction-item">
+                    <div class="transaction-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12.4999 6.52467L7.52492 11.4997M7.52492 11.4997H11.8249M7.52492 11.4997L7.52492 7.19967" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M9.99992 1.66634C5.39754 1.66634 1.66659 5.39729 1.66659 9.99967C1.66659 14.602 5.39754 18.333 9.99992 18.333C14.6023 18.333 18.3333 14.602 18.3333 9.99967C18.3333 5.39729 14.6023 1.66634 9.99992 1.66634Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-type">Received USDT</div>
+                        <div class="transaction-date">Mar 10, 2025</div>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="transaction-value">+1,000 USDT</div>
+                        <div class="transaction-usd">+$1,000.00</div>
+                    </div>
+                </div>
+                
+                <div class="transaction-item">
+                    <div class="transaction-icon">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5.83341 9.16699H14.1667" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M10 1.66699C5.39762 1.66699 1.66666 5.39795 1.66666 10.0003C1.66666 14.6027 5.39762 18.3337 10 18.3337C14.6024 18.3337 18.3333 14.6027 18.3333 10.0003C18.3333 5.39795 14.6024 1.66699 10 1.66699Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <div class="transaction-details">
+                        <div class="transaction-type">Swap BNB to USDT</div>
+                        <div class="transaction-date">Mar 5, 2025</div>
+                    </div>
+                    <div class="transaction-amount">
+                        <div class="transaction-value">+500 USDT</div>
+                        <div class="transaction-usd">+$500.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+Cg==" alt="Settings">
+                <span class="tab-label">Settings</span><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Trust Wallet</title>
+    <!-- Preload fonts for faster rendering -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset CSS */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #F5F5F7;
+            color: #1A2024;
+            font-size: 14px;
+            line-height: 1.5;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Splash screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0B65C6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 1000;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #splash-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Status bar */
+        .status-bar {
+            height: 24px;
+            width: 100%;
+            background-color: #0B65C6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 10px;
+            color: white;
+            font-size: 12px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 900;
+        }
+
+        .status-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-time {
+            font-weight: 600;
+        }
+
+        .status-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .status-battery, .status-wifi, .status-signal {
+            margin-left: 5px;
+        }
+
+        /* Passcode screen */
+        #passcode-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0B65C6;
+            display: none;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            z-index: 900;
+            padding-top: 80px;
+        }
+
+        .passcode-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+
+        .passcode-title {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .passcode-dots {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .passcode-dot {
+            width: 14px;
+            height: 14px;
+            border: 2px solid white;
+            border-radius: 50%;
+            margin: 0 8px;
+        }
+
+        .passcode-dot.filled {
+            background-color: white;
+        }
+
+        .passcode-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-gap: 20px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .passcode-key {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+            font-weight: 300;
+            height: 60px;
+            width: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.15);
+            user-select: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .passcode-key:active {
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .passcode-key.biometric {
+            background-color: transparent;
+            font-size: 22px;
+            margin-top: 20px;
+        }
+
+        .passcode-key.backspace {
+            background-color: transparent;
+            font-size: 22px;
+        }
+
+        .passcode-cancel {
+            position: absolute;
+            bottom: 30px;
+            color: white;
+            font-size: 16px;
+            opacity: 0.8;
+            cursor: pointer;
+        }
+
+        /* Main wallet screen */
+        #wallet-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #F5F5F7;
+            display: none;
+            flex-direction: column;
+            z-index: 800;
+            overflow: hidden;
+        }
+
+        .wallet-header {
+            background-color: #0B65C6;
+            color: white;
+            padding: 25px 16px 16px;
+            padding-top: calc(25px + 24px); /* Add status bar height */
+        }
+
+        .wallet-top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .wallet-settings {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .wallet-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .wallet-scan {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .wallet-balance-area {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .wallet-total-label {
+            font-size: 13px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .wallet-total-balance {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .wallet-balance-change {
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .balance-up {
+            color: #2FD27A;
+        }
+
+        .wallet-actions {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .wallet-action-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0 24px;
+            cursor: pointer;
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .action-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .action-label {
+            font-size: 13px;
+        }
+
+        .wallet-tokens-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            padding-bottom: 80px; /* Space for tab bar */
+        }
+
+        .wallet-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .network-selector {
+            display: flex;
+            align-items: center;
+            background-color: #E9EAEC;
+            border-radius: 16px;
+            padding: 6px 10px;
+            cursor: pointer;
+        }
+
+        .network-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+        }
+
+        .network-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .network-arrow {
+            margin-left: 6px;
+            width: 12px;
+            height: 12px;
+            opacity: 0.5;
+        }
+
+        .wallet-token-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .token-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #E9EAEC;
+            cursor: pointer;
+        }
+
+        .token-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            margin-right: 12px;
+            overflow: hidden;
+        }
+
+        .token-details {
+            flex: 1;
+        }
+
+        .token-name-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .token-name {
+            font-weight: 600;
+            margin-right: 6px;
+        }
+
+        .token-symbol {
+            color: #7F8489;
+            font-size: 13px;
+        }
+
+        .token-balance {
+            font-size: 13px;
+        }
+
+        .token-value {
+            text-align: right;
+        }
+
+        .token-fiat-value {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .token-price-change {
+            font-size: 12px;
+            color: #2FD27A;
+        }
+
+        .token-price-down {
+            color: #EB5757;
+        }
+
+        /* Tab bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 64px;
+            background-color: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 950;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 0;
+            width: 25%;
+            cursor: pointer;
+        }
+
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
+            opacity: 0.5;
+        }
+
+        .tab-label {
+            font-size: 11px;
+            color: #7F8489;
+        }
+
+        .tab-item.active .tab-icon {
+            opacity: 1;
+        }
+
+        .tab-item.active .tab-label {
+            color: #0B65C6;
+            font-weight: 500;
+        }
+
+        /* Token detail screen */
+        #token-detail-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            display: none;
+            flex-direction: column;
+            z-index: 850;
+        }
+
+        .token-header {
+            padding: 16px;
+            padding-top: calc(16px + 24px); /* Add status bar height */
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .back-button {
+            width: 24px;
+            height: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+        }
+
+        .token-header-details {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .token-header-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 16px;
+            margin-right: 12px;
+        }
+
+        .token-header-name {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .more-options {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .token-chart-area {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .token-price {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .token-24h-change {
+            font-size: 14px;
+            color: #2FD27A;
+            margin-bottom: 20px;
+        }
+
+        .token-chart {
+            height: 180px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #0B65C6, #3D8DDF);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 100'%3E%3Cpath d='M0,50 C50,30 100,70 150,50 C200,30 250,50 300,40 L300,100 L0,100 Z' fill='%23000'/%3E%3C/svg%3E");
+            mask-size: cover;
+            border-radius: 8px;
+        }
+
+        .chart-tabs {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .chart-tab {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            color: #7F8489;
+            cursor: pointer;
+        }
+
+        .chart-tab.active {
+            background-color: #E9EAEC;
+            color: #1A2024;
+            font-weight: 500;
+        }
+
+        .token-info-area {
+            padding: 20px 16px;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .token-holdings {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .holdings-amount {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .holdings-value {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        .token-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .token-button {
+            width: 48%;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .button-send {
+            background-color: #0B65C6;
+            color: white;
+        }
+
+        .button-receive {
+            background-color: #E9EAEC;
+            color: #1A2024;
+        }
+
+        .token-history-area {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .history-header {
+            padding: 20px 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .transaction-list {
+            padding: 0 16px;
+        }
+
+        .transaction-item {
+            display: flex;
+            padding: 16px 0;
+            border-bottom: 1px solid #E9EAEC;
+        }
+
+        .transaction-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 20px;
+            background-color: #E9EAEC;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 16px;
+        }
+
+        .transaction-icon img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-type {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        .transaction-amount {
+            text-align: right;
+        }
+
+        .transaction-value {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .transaction-usd {
+            font-size: 13px;
+            color: #7F8489;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid #E9EAEC;
+            border-top: 3px solid #0B65C6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Utility classes */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Touch animation */
+        .touch-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .touch-effect:after {
+            content: '';
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10, 10);
+            opacity: 0;
+            transition: transform .5s, opacity 1s;
+        }
+
+        .touch-effect:active:after {
+            transform: scale(0, 0);
+            opacity: .3;
+            transition: 0s;
+        }
+
+        /* Dark mode theming for status bar */
+        @media (prefers-color-scheme: dark) {
+            .status-bar {
+                color: black;
+            }
+        }
+        
+        /* Transfer modal styles */
+        .transfer-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .transfer-modal-content {
+            width: 90%;
+            max-width: 340px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .transfer-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .transfer-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .transfer-description {
+            font-size: 14px;
+            color: #7F8489;
+        }
+        
+        .transfer-form {
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            height: 48px;
+            border: 1px solid #E9EAEC;
+            border-radius: 8px;
+            padding: 0 12px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-control:focus {
+            border-color: #0B65C6;
+            outline: none;
+        }
+        
+        .transfer-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .transfer-button {
+            flex: 1;
+            height: 48px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .button-cancel {
+            background-color: #E9EAEC;
+            color: #1A2024;
+            margin-right: 12px;
+        }
+        
+        .button-confirm {
+            background-color: #0B65C6;
+            color: white;
+        }
+        
+        /* Wallet selector dropdown */
+        .wallet-selector {
+            position: relative;
+        }
+        
+        .wallet-dropdown {
+            position: absolute;
+            top: 48px;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            border: 1px solid #E9EAEC;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+            z-index: 10;
+        }
+        
+        .wallet-option {
+            padding: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .wallet-option:hover {
+            background-color: #F5F5F7;
+        }
+        
+        .wallet-option:not(:last-child) {
+            border-bottom: 1px solid #E9EAEC;
+        }
+    </style>
         }
 
         .network-selector {
