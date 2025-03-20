@@ -1,4 +1,12 @@
-<div class="token-info-area">
+// Wallet title click
+        document.querySelector('.wallet-title').addEventListener('click', toggleAccountsDropdown);
+        
+        // Account options
+        document.querySelectorAll('.account-option').forEach(option => {
+            option.addEventListener('click', () => {
+                switchAccount(option.dataset.account);
+            });
+        });        <div class="token-info-area">
             <div class="token-holdings">
                 <div>
                     <div class="holdings-amount">100,000,000 USDT</div>
@@ -128,6 +136,7 @@
         // Global Variables
         let passcode = '';
         const correctPasscode = '123456'; // For demo purposes
+        let currentAccount = 'main'; // main or second
         let currentWalletAddress = '0x1234...6789'; // Your wallet
         let alternateWalletAddress = '';
         
@@ -138,6 +147,12 @@
                 'BTC': 847,
                 'ETH': 50000,
                 'XRP': 500000000
+            },
+            'second': {
+                'USDT': 0,
+                'BTC': 0,
+                'ETH': 0,
+                'XRP': 0
             },
             '0x742d35Cc6634C0532925a3b844Bc454e4438f44e': {
                 'USDT': 250000,
@@ -656,6 +671,61 @@
         .wallet-title {
             font-size: 18px;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .wallet-dropdown-arrow {
+            margin-left: 5px;
+            width: 12px;
+            height: 12px;
+            transition: transform 0.2s;
+        }
+        
+        .wallet-dropdown-arrow.active {
+            transform: rotate(180deg);
+        }
+        
+        .accounts-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 160px;
+            z-index: 100;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .account-option {
+            padding: 12px 16px;
+            border-bottom: 1px solid #E9EAEC;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+        
+        .account-option:last-child {
+            border-bottom: none;
+        }
+        
+        .account-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #0B65C6;
+            border-radius: 50%;
+            margin-right: 8px;
+            opacity: 0;
+        }
+        
+        .account-option.active .account-dot {
+            opacity: 1;
         }
 
         .wallet-scan {
@@ -1816,35 +1886,41 @@
         // Update wallet balances display
         function updateWalletDisplay() {
             // Update USDT balance
-            document.querySelector('#usdt-token .token-balance').textContent = formatNumber(walletBalances.main.USDT) + ' USDT';
-            document.querySelector('#usdt-token .token-fiat-value').textContent = formatCurrency(walletBalances.main.USDT);
+            document.querySelector('#usdt-token .token-balance').textContent = formatNumber(walletBalances[currentAccount].USDT) + ' USDT';
+            document.querySelector('#usdt-token .token-fiat-value').textContent = formatCurrency(walletBalances[currentAccount].USDT);
             
             // Update BTC balance
-            document.querySelector('.token-item:nth-child(2) .token-balance').textContent = formatNumber(walletBalances.main.BTC) + ' BTC';
-            document.querySelector('.token-item:nth-child(2) .token-fiat-value').textContent = formatCurrency(walletBalances.main.BTC * 65000);
+            document.querySelector('.token-item:nth-child(2) .token-balance').textContent = formatNumber(walletBalances[currentAccount].BTC) + ' BTC';
+            document.querySelector('.token-item:nth-child(2) .token-fiat-value').textContent = formatCurrency(walletBalances[currentAccount].BTC * 65000);
             
             // Update ETH balance
-            document.querySelector('.token-item:nth-child(3) .token-balance').textContent = formatNumber(walletBalances.main.ETH) + ' ETH';
-            document.querySelector('.token-item:nth-child(3) .token-fiat-value').textContent = formatCurrency(walletBalances.main.ETH * 2750);
+            document.querySelector('.token-item:nth-child(3) .token-balance').textContent = formatNumber(walletBalances[currentAccount].ETH) + ' ETH';
+            document.querySelector('.token-item:nth-child(3) .token-fiat-value').textContent = formatCurrency(walletBalances[currentAccount].ETH * 2750);
             
             // Update XRP balance
-            document.querySelector('.token-item:nth-child(4) .token-balance').textContent = formatNumber(walletBalances.main.XRP) + ' XRP';
-            document.querySelector('.token-item:nth-child(4) .token-fiat-value').textContent = formatCurrency(walletBalances.main.XRP * 0.6);
+            document.querySelector('.token-item:nth-child(4) .token-balance').textContent = formatNumber(walletBalances[currentAccount].XRP) + ' XRP';
+            document.querySelector('.token-item:nth-child(4) .token-fiat-value').textContent = formatCurrency(walletBalances[currentAccount].XRP * 0.6);
             
             // Update total balance
             const totalBalance = 
-                walletBalances.main.USDT + 
-                walletBalances.main.BTC * 65000 + 
-                walletBalances.main.ETH * 2750 + 
-                walletBalances.main.XRP * 0.6;
+                walletBalances[currentAccount].USDT + 
+                walletBalances[currentAccount].BTC * 65000 + 
+                walletBalances[currentAccount].ETH * 2750 + 
+                walletBalances[currentAccount].XRP * 0.6;
             
             document.querySelector('.wallet-total-balance').textContent = formatCurrency(totalBalance);
             
             // Update token detail screen if open
             if (tokenDetailScreen.style.display === 'flex') {
-                document.querySelector('.holdings-amount').textContent = formatNumber(walletBalances.main.USDT) + ' USDT';
-                document.querySelector('.holdings-value').textContent = formatCurrency(walletBalances.main.USDT);
+                document.querySelector('.holdings-amount').textContent = formatNumber(walletBalances[currentAccount].USDT) + ' USDT';
+                document.querySelector('.holdings-value').textContent = formatCurrency(walletBalances[currentAccount].USDT);
             }
+            
+            // Update account selection
+            const accountOptions = document.querySelectorAll('.account-option');
+            accountOptions.forEach(option => {
+                option.classList.toggle('active', option.dataset.account === currentAccount);
+            });
         }
         
         // Update transaction history
@@ -1853,12 +1929,15 @@
             transactionList.innerHTML = '';
             
             const recentTransactions = transactionHistory
-                .filter(tx => tx.token === 'USDT')
+                .filter(tx => {
+                    return tx.token === 'USDT' && 
+                    (tx.from === currentAccount || tx.to === currentAccount);
+                })
                 .sort((a, b) => new Date(b.date) - new Date(a.date))
                 .slice(0, 5);
             
             recentTransactions.forEach(tx => {
-                const isSent = tx.from === 'main';
+                const isSent = tx.from === currentAccount;
                 
                 const transactionItem = document.createElement('div');
                 transactionItem.className = 'transaction-item';
@@ -1912,22 +1991,43 @@
                 return;
             }
             
-            if (amount > walletBalances.main.USDT) {
+            if (amount > walletBalances[currentAccount].USDT) {
                 alert('Insufficient balance');
                 return;
             }
             
+            // Determine the recipient account
+            let toAccount;
+            if (toAddress === '0x742d35Cc6634C0532925a3b844Bc454e4438f44e') {
+                // For simplicity, we'll send directly to Account 2 when the first wallet is selected
+                toAccount = 'second';
+            } else if (toAddress === '0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0') {
+                // When second wallet is selected, let's update both the external wallet and Account 2
+                toAccount = 'second';
+            } else {
+                toAccount = toAddress;
+            }
+            
             // Update balances
-            walletBalances.main.USDT -= amount;
-            walletBalances[toAddress].USDT += amount;
+            walletBalances[currentAccount].USDT -= amount;
+            
+            // Update destination balance
+            if (toAccount === 'second') {
+                walletBalances.second.USDT += amount;
+            }
+            
+            // Also update the actual wallet address balance for realism
+            if (walletBalances[toAddress]) {
+                walletBalances[toAddress].USDT += amount;
+            }
             
             // Add to transaction history
             const today = new Date();
             const dateStr = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
             
             transactionHistory.unshift({
-                from: 'main',
-                to: toAddress,
+                from: currentAccount,
+                to: toAccount,
                 token: 'USDT',
                 amount: amount,
                 date: dateStr,
@@ -1965,12 +2065,89 @@
             }, 2000);
         }
         
+        // Toggle accounts dropdown
+        function toggleAccountsDropdown() {
+            const dropdown = document.getElementById('accounts-dropdown');
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            
+            // Toggle arrow direction
+            const arrow = document.querySelector('.wallet-dropdown-arrow');
+            arrow.classList.toggle('active', !isVisible);
+        }
+        
+        // Switch account
+        function switchAccount(account) {
+            currentAccount = account;
+            updateWalletDisplay();
+            updateTransactionHistory();
+            
+            // Update UI to reflect active account
+            document.querySelectorAll('.account-option').forEach(option => {
+                option.classList.toggle('active', option.dataset.account === account);
+            });
+            
+            // Update wallet dropdown options based on current account
+            updateTransferOptions();
+            
+            // Hide dropdown
+            document.getElementById('accounts-dropdown').style.display = 'none';
+            document.querySelector('.wallet-dropdown-arrow').classList.remove('active');
+        }
+        
+        // Update transfer options based on current account
+        function updateTransferOptions() {
+            // Clear existing options
+            const dropdown = document.getElementById('wallet-dropdown');
+            dropdown.innerHTML = '';
+            
+            // If we're in the main account, the destination can be Account 2 or external wallets
+            if (currentAccount === 'main') {
+                const option1 = document.createElement('div');
+                option1.className = 'wallet-option';
+                option1.dataset.address = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+                option1.textContent = 'Account 2';
+                dropdown.appendChild(option1);
+                
+                const option2 = document.createElement('div');
+                option2.className = 'wallet-option';
+                option2.dataset.address = '0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0';
+                option2.textContent = 'External Wallet (0x8A7F...)';
+                dropdown.appendChild(option2);
+            } 
+            // If we're in Account 2, the destination can be the main account or external wallet
+            else if (currentAccount === 'second') {
+                const option1 = document.createElement('div');
+                option1.className = 'wallet-option';
+                option1.dataset.address = 'main';
+                option1.textContent = 'Account 1';
+                dropdown.appendChild(option1);
+                
+                const option2 = document.createElement('div');
+                option2.className = 'wallet-option';
+                option2.dataset.address = '0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0';
+                option2.textContent = 'External Wallet (0x8A7F...)';
+                dropdown.appendChild(option2);
+            }
+            
+            // Reattach click events
+            document.querySelectorAll('.wallet-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    walletAddressInput.value = option.dataset.address;
+                    walletDropdown.style.display = 'none';
+                });
+            });
+        }
+        
         // Initialize app
         function initApp() {
             updateTime();
             
             // Update time every minute
             setInterval(updateTime, 60000);
+            
+            // Initialize transfer options
+            updateTransferOptions();
             
             // Simulate splash screen for 1 second instead of 2
             setTimeout(() => {
