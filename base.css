@@ -1,0 +1,129 @@
+/* Reset CSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+body {
+    background-color: #F5F5F7;
+    color: #1A2024;
+    font-size: 14px;
+    line-height: 1.5;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Status bar */
+.status-bar {
+    height: 24px;
+    width: 100%;
+    background-color: #0B65C6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+    color: white;
+    font-size: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 900;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+}
+
+.status-time {
+    font-weight: 600;
+}
+
+.status-right {
+    display: flex;
+    align-items: center;
+}
+
+.status-battery, .status-wifi, .status-signal {
+    margin-left: 5px;
+}
+
+/* Core utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Touch animation */
+.touch-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.touch-effect:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform .5s, opacity 1s;
+}
+
+.touch-effect:active:after {
+    transform: scale(0, 0);
+    opacity: .3;
+    transition: 0s;
+}
+
+/* Loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #E9EAEC;
+    border-top: 3px solid #0B65C6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* Dark mode theming for status bar */
+@media (prefers-color-scheme: dark) {
+    .status-bar {
+        color: black;
+    }
+}
