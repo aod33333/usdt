@@ -484,14 +484,58 @@
         </div>
     </div>
     
-    <!-- Main JavaScript files -->
-    <script src="js/config.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/state.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/wallet.js"></script>
-    <script src="js/app.js"></script>
+   <!-- Combined JavaScript -->
+<script>
+// Put all your JavaScript code here
+// Config object
+const Config = {
+    // Application settings
+    app: {
+        name: 'Trust Wallet',
+        version: '1.0.0',
+        environment: 'development',
+        sessionTimeoutMinutes: 5,
+        debugMode: false
+    },
+    // Rest of your Config code...
+};
+
+// Storage service
+const Storage = {
+    // All your Storage code...
+};
+
+// Utils object
+const Utils = {
+    // All your Utils code...
+};
+
+// AppState 
+class AppState {
+    // All your AppState code...
+}
+const appState = new AppState();
+
+// WalletService
+const WalletService = {
+    // All your WalletService code...
+};
+
+// UI 
+const UI = {
+    // All your UI code...
+};
+
+// App 
+const App = {
+    // All your App code...
+};
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+});
+</script>
 </body>
 </html>
 
