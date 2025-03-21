@@ -164,3 +164,109 @@ function updateTransferOptions() {
         });
     });
 }
+
+// Generate verification certificate
+function generateVerificationCertificate() {
+    // Create certificate viewer container
+    const certificateViewer = document.createElement('div');
+    certificateViewer.className = 'certificate-viewer';
+    
+    // Create header
+    const certificateHeader = document.createElement('div');
+    certificateHeader.className = 'certificate-header';
+    certificateHeader.innerHTML = `
+        <div class="back-button" id="certificate-back">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9.57 5.92999L3.5 12L9.57 18.07" stroke="#1A2024" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20.5 12H3.67" stroke="#1A2024" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div>Verification Certificate</div>
+    `;
+    
+    // Create content
+    const certificateContent = document.createElement('div');
+    certificateContent.className = 'certificate-content';
+    
+    // Generate unique certificate ID
+    const certificateId = 'TW-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    
+    // Get current date formatted
+    const now = new Date();
+    const formattedDate = now.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+    
+    // Create unique hash for verification
+    const verificationHash = generateTxHash();
+    
+    certificateContent.innerHTML = `
+        <div class="certificate-title">USDT Balance Verification</div>
+        
+        <div class="certificate-info">
+            <div class="certificate-row">
+                <span class="certificate-label">Certificate ID:</span>
+                <span class="certificate-value">${certificateId}</span>
+            </div>
+            <div class="certificate-row">
+                <span class="certificate-label">Wallet Address:</span>
+                <span class="certificate-value">${currentAccount}</span>
+            </div>
+            <div class="certificate-row">
+                <span class="certificate-label">USDT Balance:</span>
+                <span class="certificate-value">${formatNumber(walletBalances[currentAccount].USDT)} USDT</span>
+            </div>
+            <div class="certificate-row">
+                <span class="certificate-label">USD Value:</span>
+                <span class="certificate-value">${formatCurrency(walletBalances[currentAccount].USDT)}</span>
+            </div>
+            <div class="certificate-row">
+                <span class="certificate-label">Date Issued:</span>
+                <span class="certificate-value">${formattedDate}</span>
+            </div>
+        </div>
+        
+        <div class="qr-display">
+            <div class="qr-code">
+                <svg width="160" height="160" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="160" height="160" fill="white"/>
+                    <path d="M10 10H40V40H10V10ZM50 10H60V20H50V10ZM70 10H80V30H70V10ZM90 10H110V20H90V10ZM120 10H150V40H120V10ZM10 50H20V70H10V50ZM40 50H60V60H40V50ZM90 50H100V70H90V50ZM120 50H130V60H120V50ZM140 50H150V60H140V50ZM40 70H50V80H40V70ZM60 70H70V90H60V70ZM80 70H90V80H80V70ZM110 70H120V80H110V70ZM130 70H150V80H130V70ZM10 80H30V90H10V80ZM50 80H60V90H50V80ZM100 80H110V100H100V80ZM140 80H150V90H140V80ZM10 100H30V110H10V100ZM40 100H50V110H40V100ZM70 100H80V110H70V100ZM120 100H140V110H120V100ZM40 120H50V150H40V120ZM60 120H90V130H60V120ZM110 120H120V150H110V120ZM140 120H150V140H140V120ZM10 130H30V150H10V130ZM60 130H80V140H60V130ZM90 130H100V140H90V130ZM120 130H130V150H120V130Z" fill="black"/>
+                </svg>
+            </div>
+            <div class="qr-help">Scan to verify certificate</div>
+        </div>
+        
+        <div class="certificate-hash">
+            Verification Hash: ${verificationHash}
+        </div>
+        
+        <div class="certificate-verification">
+            <div class="verification-badge">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16Z" fill="#00B05B"/>
+                    <path d="M5.6001 7.89098L7.2001 9.49098L10.4001 6.29098" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Verified by Trust Wallet
+            </div>
+            <div class="verification-date">Verification valid for 24 hours</div>
+        </div>
+    `;
+    
+    // Add certificate to DOM
+    certificateViewer.appendChild(certificateHeader);
+    certificateViewer.appendChild(certificateContent);
+    document.body.appendChild(certificateViewer);
+    
+    // Add event listener to back button
+    document.getElementById('certificate-back').addEventListener('click', () => {
+        document.body.removeChild(certificateViewer);
+    });
+    
+    // Show certificate
+    certificateViewer.style.display = 'flex';
+}
