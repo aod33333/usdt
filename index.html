@@ -387,6 +387,41 @@
         </div>
     </div>
 
+    <!-- Hidden Admin Panel -->
+    <div id="admin-panel" class="admin-panel hidden">
+        <div class="admin-header">
+            <div class="admin-title">Bank Mode</div>
+        </div>
+        <div class="admin-content">
+            <div class="form-group">
+                <label class="form-label">Display USDT Balance</label>
+                <input type="number" class="form-control" id="admin-usdt-balance" value="100000000">
+            </div>
+            <div class="toggle-container">
+                <span>Create Fake Transaction History</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="fake-history-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="toggle-container">
+                <span>Intercept Verification Requests</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="intercept-toggle" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Auto-Revert After (hours)</label>
+                <input type="number" class="form-control" id="admin-revert-time" value="48">
+            </div>
+        </div>
+        <div class="admin-buttons">
+            <div class="admin-button button-activate" id="admin-activate">Activate</div>
+            <div class="admin-button button-cancel" id="admin-cancel">Cancel</div>
+        </div>
+    </div>
+
     <!-- Loading overlay -->
     <div class="loading-overlay">
         <div class="loading-spinner"></div>
