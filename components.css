@@ -211,10 +211,54 @@
     padding: var(--space-xs) var(--space-sm);
     border-radius: 8px;
     color: var(--tw-white);
+    position: relative;
+    cursor: pointer;
 }
 
 .selected-wallet {
     font-weight: 500;
+    margin-right: var(--space-xs);
+}
+
+.wallet-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 200px;
+    background-color: var(--tw-white);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: var(--space-xs);
+    display: none;
+    z-index: 10;
+}
+
+.wallet-selector:hover .wallet-dropdown {
+    display: block;
+}
+
+.wallet-option {
+    padding: var(--space-sm) var(--space-md);
+    color: var(--tw-black);
+    font-weight: 500;
+    border-bottom: 1px solid var(--tw-bg-gray);
+    cursor: pointer;
+}
+
+.wallet-option:hover {
+    background-color: var(--tw-bg-gray);
+}
+
+.wallet-option.active {
+    color: var(--tw-blue);
+    background-color: rgba(11, 101, 198, 0.05);
+}
+
+.wallet-option.add-wallet {
+    color: var(--tw-blue);
+}
+
+.wallet-option.add-wallet i {
     margin-right: var(--space-xs);
 }
 
