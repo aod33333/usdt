@@ -1,7 +1,7 @@
 // Define wallet data structure
 const walletData = {
     main: {
-        totalBalance: 0.00,
+        totalBalance: 8409708.67,
         tokens: [
             {
                 id: 'btc',
@@ -9,8 +9,8 @@ const walletData = {
                 symbol: 'BTC',
                 network: 'Bitcoin',
                 icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-                amount: 0,
-                value: 0.00,
+                amount: 100,
+                value: 8398474.00,
                 price: 83984.74,
                 change: -0.59,
                 chainBadge: null
@@ -21,10 +21,22 @@ const walletData = {
                 symbol: 'ETH',
                 network: 'Ethereum',
                 icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-                amount: 0,
-                value: 0.00,
+                amount: 500,
+                value: 986905.00,
                 price: 1973.81,
                 change: -0.71,
+                chainBadge: null
+            },
+            {
+                id: 'pol',
+                name: 'Polygon',
+                symbol: 'POL',
+                network: 'Polygon',
+                icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+                amount: 0,
+                value: 0.00,
+                price: 0.20,
+                change: -2.05,
                 chainBadge: null
             },
             {
@@ -40,18 +52,6 @@ const walletData = {
                 chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
             },
             {
-                id: 'usdt',
-                name: 'Tether',
-                symbol: 'USDT',
-                network: 'BNB Smart Chain',
-                icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-                amount: 0,
-                value: 0.00,
-                price: 1.00,
-                change: 0.00,
-                chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-            },
-            {
                 id: 'trx',
                 name: 'TRON',
                 symbol: 'TRX',
@@ -61,6 +61,42 @@ const walletData = {
                 value: 0.00,
                 price: 0.13,
                 change: 0.95,
+                chainBadge: null
+            },
+            {
+                id: 'twt',
+                name: 'Trust Wallet Token',
+                symbol: 'TWT',
+                network: 'BNB Smart Chain',
+                icon: 'https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png',
+                amount: 0,
+                value: 0.00,
+                price: 0.89,
+                change: 0.09,
+                chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+                id: 'usdt',
+                name: 'Tether',
+                symbol: 'USDT',
+                network: 'BNB Smart Chain',
+                icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+                amount: 10000000,
+                value: 10000000.00,
+                price: 1.00,
+                change: 0.00,
+                chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+                id: 'xrp',
+                name: 'XRP',
+                symbol: 'XRP',
+                network: 'XRP Ledger',
+                icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+                amount: 50000000,
+                value: 24329.67,
+                price: 0.49,
+                change: 1.25,
                 chainBadge: null
             }
         ]
@@ -111,6 +147,83 @@ const walletData = {
             }
         ]
     }
+};
+
+// Store original wallet data for reset functionality
+const originalWalletData = JSON.parse(JSON.stringify(walletData));
+
+// Current wallet data (can be modified by admin panel)
+let currentWalletData = JSON.parse(JSON.stringify(walletData));
+
+// Current active wallet
+let activeWallet = 'main';
+
+// Update wallet UI with current data
+function updateWalletUI() {
+    // Get current wallet data
+    const walletToShow = currentWalletData[activeWallet];
+    
+    // Update total balance
+    const totalBalanceElement = document.getElementById('total-balance');
+    totalBalanceElement.textContent = formatCurrency(walletToShow.totalBalance);
+    
+    // Update token list
+    const tokenListElement = document.getElementById('token-list');
+    tokenListElement.innerHTML = '';
+    
+    walletToShow.tokens.forEach(token => {
+        const tokenElement = createTokenElement(token);
+        tokenListElement.appendChild(tokenElement);
+    });
+}
+
+// Create token element
+function createTokenElement(token) {
+    const tokenItem = document.createElement('div');
+    tokenItem.className = 'token-item';
+    tokenItem.setAttribute('data-token-id', token.id);
+    
+    let chainBadgeHTML = '';
+    if (token.chainBadge) {
+        chainBadgeHTML = `
+            <div class="chain-badge">
+                <img src="${token.chainBadge}" alt="${token.network}">
+            </div>
+        `;
+    }
+    
+    // Format price with thousands separator
+    const formattedPrice = token.price >= 1 
+        ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : token.price.toFixed(2);
+    
+    // Format change with + or - sign
+    const changeClass = token.change >= 0 ? 'positive' : 'negative';
+    const changeSign = token.change >= 0 ? '+' : '';
+    
+    tokenItem.innerHTML = `
+        <div class="token-icon">
+            <img src="${token.icon}" alt="${token.name}">
+            ${chainBadgeHTML}
+        </div>
+        <div class="token-info">
+            <div class="token-name">
+                ${token.symbol} <span class="token-network">${token.network}</span>
+            </div>
+            <div class="token-price">
+                ${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
+            </div>
+        </div>
+        <div class="token-amount">
+            <div class="token-balance">${token.amount.toLocaleString()}</div>
+            <div class="token-value">${formatCurrency(token.value)}</div>
+        </div>
+    `;
+    
+    return tokenItem;
+}
+
+// The rest of the file remains the same...
 };
 
 // Store original wallet data for reset functionality
