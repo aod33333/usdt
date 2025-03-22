@@ -1,4 +1,437 @@
+/* screens.css - Trust Wallet Screens Styling */
+
+/* Lock Screen */
+#lock-screen {
+    background-color: var(--tw-white);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lock-header {
+    width: 100%;
+    padding: var(--space-xl) 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.lock-logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: var(--space-md);
+}
+
+.lock-subtitle {
+    font-size: var(--font-sm);
+    color: var(--tw-medium-gray);
+    text-align: center;
+}
+
+.passcode-container {
+    width: 100%;
+    padding: var(--space-xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.passcode-container h3 {
+    color: var(--tw-black);
+    margin-bottom: var(--space-lg);
+}
+
+.passcode-dots {
+    display: flex;
+    margin-bottom: var(--space-xl);
+}
+
+.dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid var(--tw-medium-gray);
+    margin: 0 var(--space-xs);
+}
+
+.dot.filled {
+    background-color: var(--tw-blue);
+    border-color: var(--tw-blue);
+}
+
+.numpad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-md);
+    width: 80%;
+    max-width: 300px;
+}
+
+.numpad-key {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: var(--tw-bg-gray);
+    color: var(--tw-black);
+    font-size: var(--font-lg);
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.numpad-key:active {
+    background-color: var(--tw-light-gray);
+}
+
+.numpad-key.biometric {
+    font-size: 24px;
+    color: var(--tw-blue);
+}
+
+.numpad-key.backspace {
+    font-size: 20px;
+    color: var(--tw-dark-gray);
+}
+
+.unlock-button {
+    width: 80%;
+    max-width: 250px;
+    margin: var(--space-lg) auto 0;
+    padding: var(--space-sm);
+    background-color: var(--tw-blue);
+    color: var(--tw-white);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: var(--font-md);
+}
+
+.reset-wallet-container {
+    margin-top: var(--space-xl);
+    text-align: center;
+}
+
+.reset-wallet-container p {
+    font-size: var(--font-xs);
+    color: var(--tw-medium-gray);
+    margin-bottom: var(--space-sm);
+}
+
+.reset-wallet-button {
+    color: var(--tw-blue);
+    font-weight: 500;
+    font-size: var(--font-xs);
+}
+
+/* Wallet Screen */
+.wallet-header {
+    background: var(--tw-white);
+    padding: var(--space-lg) var(--space-md);
+    color: var(--tw-black);
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.balance-container {
+    text-align: center;
+}
+
+.total-balance {
+    font-size: var(--font-xxl);
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+}
+
+.wallet-body {
+    flex: 1;
+    overflow-y: auto;
+    background-color: var(--tw-white);
+}
+
+.wallet-footer {
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--tw-white);
+    border-top: 1px solid var(--tw-bg-gray);
+    padding: var(--space-xs) 0;
+    height: 55px;
+}
+
+.token-list {
+    padding-bottom: var(--space-lg);
+}
+
+/* Token styles */
+.token-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-md);
+    border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+    background-color: var(--tw-white);
+}
+
+.token-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: var(--space-md);
+    position: relative;
+}
+
+.token-icon img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.chain-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--tw-white);
+    padding: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chain-badge img {
+    width: 100%;
+    height: 100%;
+}
+
+.token-info {
+    flex: 1;
+}
+
+.token-name {
+    font-weight: 600;
+    color: var(--tw-black);
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.token-price {
+    font-size: var(--font-sm);
+    color: var(--tw-medium-gray);
+    margin-top: 2px;
+}
+
+.token-price-change {
+    font-size: var(--font-xs);
+    padding-left: var(--space-xs);
+}
+
+.token-amount {
+    text-align: right;
+}
+
+.token-balance {
+    font-weight: 600;
+    color: var(--tw-black);
+    font-size: 17px;
+}
+
+.token-value {
+    font-size: var(--font-sm);
+    color: var(--tw-medium-gray);
+    margin-top: 2px;
+}
+
+/* Token Detail Screen */
+.detail-header {
+    background: var(--tw-white);
+    padding: var(--space-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--tw-black);
+    border-bottom: 1px solid var(--tw-bg-gray);
+}
+
+.token-title {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.detail-balance {
+    background: var(--tw-white);
+    padding: var(--space-lg) var(--space-md);
+    color: var(--tw-black);
+    text-align: center;
+}
+
+.detail-amount {
+    font-size: var(--font-xl);
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+}
+
+.detail-value {
+    font-size: var(--font-lg);
+    margin-bottom: var(--space-xs);
+}
+
+.detail-change {
+    font-size: var(--font-sm);
+}
+
+.chart-container {
+    background-color: var(--tw-white);
+    padding: var(--space-md) 0;
+    margin-bottom: var(--space-md);
+}
+
+canvas#price-chart {
+    width: 100%;
+    height: 200px;
+    margin-bottom: var(--space-md);
+}
+
+.detail-actions {
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--tw-white);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.transaction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+}
+
+.transaction-header h3 {
+    color: var(--tw-black);
+    font-size: var(--font-md);
+}
+
+.transaction-list {
+    padding-bottom: var(--space-lg);
+}
+
+/* Password entry animation */
 @keyframes dot-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.dot.pulse {
+    animation: dot-pulse 0.3s ease-in-out;
+}
+
+/* Pull to refresh */
+.pull-to-refresh {
+    padding: var(--space-md) 0;
+    text-align: center;
+    color: var(--tw-medium-gray);
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pull-arrow {
+    animation: bounce 1.5s infinite;
+}
+
+.refreshing-spinner {
+    font-size: var(--font-lg);
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Disclaimer text */
+.disclaimer-text {
+    padding: var(--space-md) var(--space-md) 70px;
+    font-size: 12px;
+    color: var(--tw-medium-gray);
+    text-align: center;
+    line-height: 1.4;
+    border-top: 1px solid rgba(128, 128, 128, 0.1);
+    background-color: var(--tw-white);
+    position: relative;
+    bottom: 0;
+}
+
+.disclaimer-link {
+    color: var(--tw-blue);
+    text-decoration: none;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--tw-white);
+    padding: 0;
+    position: relative;
+}
+
+.tab-button {
+    flex: 1;
+    text-align: center;
+    padding: var(--space-sm) 0;
+    color: var(--tw-black);
+    font-weight: 500;
+    font-size: 16px;
+    position: relative;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+    color: var(--tw-black);
+    border-bottom: 2px solid #05C46B;
+}
+
+/* Footer buttons */
+.footer-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--tw-medium-gray);
+    height: 100%;
+}
+
+.footer-button i {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
+
+.footer-button span {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.footer-button.active {
+    color: var(--tw-blue);
+}@keyframes dot-pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.2); }
     100% { transform: scale(1); }
