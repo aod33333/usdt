@@ -325,14 +325,13 @@
     </div>
     
     <!-- Risk Warning Banner -->
-    <div id="risk-warning" class="risk-warning">
-        <div class="risk-warning-content">
+    <div id="investment-warning" class="investment-warning">
+        <div class="investment-warning-content">
             <i class="fas fa-exclamation-triangle"></i>
-            <div class="risk-warning-text">
-                <h4>Crypto Warning</h4>
-                <p>You could lose all your funds. Only send to trusted addresses. Always verify the receiving address.</p>
+            <div class="investment-warning-text">
+                <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
             </div>
-            <button id="close-warning" class="close-warning">
+            <button id="close-investment-warning" class="close-warning">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -343,7 +342,7 @@
         <!-- Lock Screen -->
         <div id="lock-screen" class="screen">
             <div class="lock-header">
-                <img src="https://trustwallet.com/assets/images/trust_logo.svg" alt="Trust Wallet" class="lock-logo">
+                <img src="https://trustwallet.com/assets/images/trust-wallet.svg" alt="Trust Wallet" class="lock-logo">
                 <div class="lock-subtitle">Secure and trusted multi-chain crypto wallet</div>
             </div>
             <div class="passcode-container">
@@ -389,15 +388,18 @@
                         <i class="fas fa-cog"></i>
                     </button>
                     <div class="wallet-selector" id="wallet-selector">
-                        <span class="selected-wallet">Main Wallet</span>
+                        <span class="selected-wallet">Mnemonic 1</span>
                         <i class="fas fa-chevron-down"></i>
                         <div class="wallet-dropdown">
-                            <div class="wallet-option active" data-wallet="main">Main Wallet</div>
-                            <div class="wallet-option" data-wallet="secondary">Secondary Wallet</div>
-                            <div class="wallet-option" data-wallet="business">Business Wallet</div>
+                            <div class="wallet-option active" data-wallet="main">Mnemonic 1</div>
+                            <div class="wallet-option" data-wallet="secondary">Mnemonic 2</div>
+                            <div class="wallet-option" data-wallet="business">Mnemonic 3</div>
                             <div class="wallet-option add-wallet"><i class="fas fa-plus"></i> Add Wallet</div>
                         </div>
                     </div>
+                    <button id="theme-toggle" class="icon-button">
+                        <i class="fas fa-moon"></i>
+                    </button>
                     <button id="scan-button" class="icon-button">
                         <i class="fas fa-qrcode"></i>
                     </button>
@@ -430,6 +432,15 @@
             </div>
             
             <div class="wallet-body">
+                <div class="pull-to-refresh">
+                    <div class="pull-arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="refreshing-spinner hidden">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                </div>
+                
                 <div class="tabs">
                     <button class="tab-button active" data-tab="tokens">Tokens</button>
                     <button class="tab-button" data-tab="nfts">NFTs</button>
@@ -438,6 +449,10 @@
                 
                 <div class="token-list" id="token-list">
                     <!-- Tokens will be inserted here by JS -->
+                </div>
+                
+                <div class="disclaimer-text">
+                    Past performance is not a reliable indicator of future results. Data source is from CoinMarketCap. <a href="#" class="disclaimer-link">Learn more about the risks</a>.
                 </div>
             </div>
             
