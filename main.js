@@ -26,8 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initPasscode();
     initAdminPanel();
     initWalletSelector();
-    initDarkMode();
-    initChart();
     initEventListeners();
     initInvestmentWarning();
     initPullToRefresh();
@@ -427,7 +425,7 @@ function initEventListeners() {
     });
     
     // Initialize send form
-    document.getElementById('continue-send').addEventListener('click', processSendTransaction);
+    document.getElementById('continue-send') && document.getElementById('continue-send').addEventListener('click', processSendTransaction);
     
     // Tab switching
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -436,6 +434,13 @@ function initEventListeners() {
             tabButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
         });
+    });
+    
+    // Initialize chart when needed
+    document.addEventListener('showTokenDetail', function() {
+        if (!chartInstance && document.getElementById('price-chart')) {
+            initChart();
+        }
     });
 }
 
