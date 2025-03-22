@@ -211,16 +211,17 @@ button {
     overflow: hidden;
 }
 
+/* Update to base.css to fix warning banner position */
+
 /* Warning banners */
 .investment-warning {
-    position: fixed;
-    bottom: 0;
-    left: 0;
+    position: relative; /* Changed from fixed */
     width: 100%;
     background-color: rgba(0, 0, 0, 0.9);
     color: var(--tw-white);
-    z-index: 999;
+    z-index: 10; /* Reduced z-index to ensure it doesn't overlap with modals */
     padding: var(--space-sm);
+    margin-bottom: var(--space-sm);
 }
 
 .investment-warning-content {
@@ -258,28 +259,4 @@ button {
     border: none;
     padding: 0;
     margin-left: var(--space-sm);
-}
-
-.bitcoin-warning {
-    background-color: var(--tw-amber);
-    color: black;
-    padding: var(--space-sm);
-    margin-bottom: var(--space-md);
-}
-
-.bitcoin-warning-content {
-    display: flex;
-    align-items: flex-start;
-}
-
-.bitcoin-warning-content i {
-    font-size: 18px;
-    margin-right: var(--space-sm);
-    margin-top: 2px;
-}
-
-.bitcoin-warning-text p {
-    font-size: var(--font-xs);
-    margin: 0;
-    line-height: 1.4;
 }
