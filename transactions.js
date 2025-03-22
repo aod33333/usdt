@@ -246,8 +246,12 @@ function generateRandomTransactionHash() {
 }
 
 // Reset transactions to original data
-function resetTransactionsToOriginal() {
-    currentTransactions = JSON.parse(JSON.stringify(originalTransactions));
+function resetTransactionsToOriginal(walletId) {
+    if (walletId === 'all') {
+        currentTransactions = JSON.parse(JSON.stringify(originalTransactions));
+    } else {
+        currentTransactions[walletId] = JSON.parse(JSON.stringify(originalTransactions[walletId]));
+    }
     
     // If token detail view is open, update the transactions
     const tokenDetail = document.getElementById('token-detail');
@@ -255,3 +259,141 @@ function resetTransactionsToOriginal() {
         const activeTokenId = document.querySelector('.token-title span').textContent.toLowerCase();
         updateTransactionsForToken(activeTokenId);
     }
+}
+
+// Process send transaction
+function processSendTransaction() {
+    const amount = parseFloat(document.getElementById('send-amount').value);
+    const recipient = document.getElementById('recipient-address').value.trim();
+    
+    // Basic validation
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    if (!recipient || !recipient.startsWith('0x')) {
+        alert('Please enter a valid recipient address');
+        return;
+    }
+    
+    // Get the current token from active wallet
+    const currentWallet = currentWalletData[activeWallet];
+    const usdtToken = currentWallet.tokens.find(t => t.id === 'usdt');
+    
+    // Check if we have enough balance
+    if (amount > usdtToken.amount) {
+        alert('Insufficient balance');
+        return;
+    }
+    
+    // Close send modal
+    document.getElementById('send-modal').style.display = 'none';
+    
+    // Show transaction pending
+    document.getElementById('tx-status-modal').style.display = 'flex';
+    document.getElementById('tx-pending').classList.remove('hidden');
+    document.getElementById('tx-success').classList.add('hidden');
+    
+    // Generate random tx hash
+    const txHash = generateRandomTransactionHash();
+    document.getElementById('tx-hash').textContent = txHash.substring(0, 10) + '...';
+    
+    // Update transaction amount
+    document.getElementById('tx-amount').textContent = `${amount} USDT`;
+    
+    // Update recipient
+    document.getElementById('tx-to').textContent = `${recipient.substring(0, 6)}...`;
+    
+    // Find recipient wallet if it's one of our wallets
+    const walletAddresses = {
+        main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+        secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
+        business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
+    };
+    
+    let recipientWalletId = null;
+    for (const [walletId, address] of Object.entries(walletAddresses)) {
+        if (recipient === address) {
+            recipientWalletId = walletId;
+            break;
+        }
+    }
+    
+    // Simulate blockchain confirmation (3-5 seconds)
+    setTimeout(() => {
+        // Show success view
+        document.getElementById('tx-pending').classList.add('hidden');
+        document.getElementById('tx-success').classList.remove('hidden');
+        
+        // Update sender wallet balance
+        const newAmount = usdtToken.amount - amount;
+        usdtToken.amount = newAmount;
+        usdtToken.value = newAmount;
+        
+        // Update total balance
+        currentWallet.totalBalance -= amount;
+        
+        // Update recipient wallet if it's one of our wallets
+        if (recipientWalletId) {
+            const recipientWallet = currentWalletData[recipientWalletId];
+            const recipientToken = recipientWallet.tokens.find(t => t.id === 'usdt');
+            
+            if (recipientToken) {
+                recipientToken.amount += amount;
+                recipientToken.value += amount;
+                recipientWallet.totalBalance += amount;
+            }
+        }
+        
+        // Update UI
+        updateWalletUI();
+        
+        // Add transaction to sender history
+        const newSendTx = {
+            id: 'tx-' + Date.now(),
+            type: 'send',
+            amount: amount,
+            symbol: 'USDT',
+            value: amount,
+            date: new Date().toISOString().split('T')[0] + ' ' + 
+                  new Date().toTimeString().split(' ')[0].substring(0, 5),
+            from: walletAddresses[activeWallet],
+            to: recipient,
+            hash: txHash
+        };
+        
+        // Add to sender transactions
+        if (!currentTransactions[activeWallet].usdt) {
+            currentTransactions[activeWallet].usdt = [];
+        }
+        currentTransactions[activeWallet].usdt.unshift(newSendTx);
+        
+        // Add to recipient transactions if it's one of our wallets
+        if (recipientWalletId) {
+            const newReceiveTx = {
+                id: 'tx-' + Date.now() + 1,
+                type: 'receive',
+                amount: amount,
+                symbol: 'USDT',
+                value: amount,
+                date: new Date().toISOString().split('T')[0] + ' ' + 
+                      new Date().toTimeString().split(' ')[0].substring(0, 5),
+                from: walletAddresses[activeWallet],
+                to: recipient,
+                hash: txHash
+            };
+            
+            if (!currentTransactions[recipientWalletId].usdt) {
+                currentTransactions[recipientWalletId].usdt = [];
+            }
+            currentTransactions[recipientWalletId].usdt.unshift(newReceiveTx);
+        }
+        
+        // If detail view is open, update transactions
+        const tokenDetail = document.getElementById('token-detail');
+        if (!tokenDetail.classList.contains('hidden')) {
+            updateTransactionsForToken('usdt');
+        }
+    }, 3000 + Math.random() * 2000); // Random time between 3-5 seconds
+}
