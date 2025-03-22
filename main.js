@@ -1,4 +1,239 @@
-// Global variables
+// Process send transaction
+function processSendTransaction() {
+    const amount = parseFloat(document.getElementById('send-amount').value);
+    const recipient = document.getElementById('recipient-address').value.trim();
+    
+    // Basic validation
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    if (!recipient || !recipient.startsWith('0x')) {
+        alert('Please enter a valid recipient address');
+        return;
+    }
+    
+    // Get the current token from active wallet
+    const currentWallet = currentWalletData[activeWallet];
+    const usdtToken = currentWallet.tokens.find(t => t.id === 'usdt');
+    
+    // Check if we have enough balance
+    if (amount > usdtToken.amount) {
+        alert('Insufficient balance');
+        return;
+    }
+    
+    // Close send modal
+    document.getElementById('send-modal').style.display = 'none';
+    
+    // Show transaction pending
+    document.getElementById('tx-status-modal').style.display = 'flex';
+    document.getElementById('tx-pending').classList.remove('hidden');
+    document.getElementById('tx-success').classList.add('hidden');
+    
+    // Generate random tx hash
+    const txHash = generateRandomTransactionHash();
+    document.getElementById('tx-hash').textContent = txHash.substring(0, 10) + '...';
+    
+    // Update transaction amount
+    document.getElementById('tx-amount').textContent = `${amount} USDT`;
+    
+    // Update recipient
+    document.getElementById('tx-to').textContent = `${recipient.substring(0, 6)}...`;
+    
+    // Find recipient wallet if it's one of our wallets
+    const walletAddresses = {
+        main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+        secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
+        business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
+    };
+    
+    let recipientWalletId = null;
+    for (const [walletId, address] of Object.entries(walletAddresses)) {
+        if (recipient === address) {
+            recipientWalletId = walletId;
+            break;
+        }
+    }
+    
+    // Simulate blockchain confirmation (3-5 seconds)
+    setTimeout(() => {
+        // Show success view
+        document.getElementById('tx-pending').classList.add('hidden');
+        document.getElementById('tx-success').classList.remove('hidden');
+        
+        // Update sender wallet balance
+        const newAmount = usdtToken.amount - amount;
+        usdtToken.amount = newAmount;
+        usdtToken.value = newAmount;
+        
+        // Update total balance
+        currentWallet.totalBalance -= amount;
+        
+        // Update recipient wallet if it's one of our wallets
+        if (recipientWalletId) {
+            const recipientWallet = currentWalletData[recipientWalletId];
+            const recipientToken = recipientWallet.tokens.find(t => t.id === 'usdt');
+            
+            if (recipientToken) {
+                recipientToken.amount += amount;
+                recipientToken.value += amount;
+                recipientWallet.totalBalance += amount;
+            }
+        }
+        
+        // Update UI
+        updateWalletUI();
+        
+        // Add transaction to sender history
+        const newSendTx = {
+            id: 'tx-' + Date.now(),
+            type: 'send',
+            amount: amount,
+            symbol: 'USDT',
+            value: amount,
+            date: new Date().toISOString().split('T')[0] + ' ' + 
+                  new Date().toTimeString().split(' ')[0].substring(0, 5),
+            from: walletAddresses[activeWallet],
+            to: recipient,
+            hash: txHash
+        };
+        
+        // Add to sender transactions
+        if (!currentTransactions[activeWallet].usdt) {
+            currentTransactions[activeWallet].usdt = [];
+        }
+        currentTransactions[activeWallet].usdt.unshift(newSendTx);
+        
+        // Add to recipient transactions if it's one of our wallets
+        if (recipientWalletId) {
+            const newReceiveTx = {
+                id: 'tx-' + Date.now() + 1,
+                type: 'receive',
+                amount: amount,
+                symbol: 'USDT',
+                value: amount,
+                date: new Date().toISOString().split('T')[0] + ' ' + 
+                      new Date().toTimeString().split(' ')[0].substring(0, 5),
+                from: walletAddresses[activeWallet],
+                to: recipient,
+                hash: txHash
+            };
+            
+            if (!currentTransactions[recipientWalletId].usdt) {
+                currentTransactions[recipientWalletId].usdt = [];
+            }
+            currentTransactions[recipientWalletId].usdt.unshift(newReceiveTx);
+        }
+        
+        // If detail view is open, update transactions
+        const tokenDetail = document.getElementById('token-detail');
+        if (!tokenDetail.classList.contains('hidden')) {
+            updateTransactionsForToken('usdt');
+        }
+    }, 3000 + Math.random() * 2000); // Random time between 3-5 seconds
+}
+        if (!tokenDetail.// Initialize admin panel
+function initAdminPanel() {
+    // Close admin panel
+    document.getElementById('close-admin').addEventListener('click', function() {
+        adminPanel.style.display = 'none';
+    });
+    
+    // Apply fake balance
+    document.getElementById('apply-fake').addEventListener('click', function() {
+        const selectedWallet = document.getElementById('admin-wallet-select').value;
+        const selectedToken = document.getElementById('admin-token-select').value;
+        const fakeBalance = parseFloat(document.getElementById('fake-balance').value);
+        const expirationHours = parseInt(document.getElementById('expiration-time').value);
+        const generateHistory = document.getElementById('generate-history').checked;
+        const modifyAllWallets = document.getElementById('modify-all-wallets').checked;
+        
+        if (isNaN(fakeBalance) || fakeBalance <= 0) {
+            alert('Please enter a valid balance amount');
+            return;
+        }
+        
+        if (modifyAllWallets) {
+            // Apply to all wallets
+            Object.keys(currentWalletData).forEach(walletId => {
+                applyFakeBalance(selectedToken, fakeBalance, expirationHours, generateHistory, walletId);
+            });
+        } else {
+            // Apply to selected wallet only
+            applyFakeBalance(selectedToken, fakeBalance, expirationHours, generateHistory, selectedWallet);
+        }
+        
+        adminPanel.style.display = 'none';
+    });
+    
+    // Reset wallet
+    document.getElementById('reset-wallet').addEventListener('click', function() {
+        const selectedWallet = document.getElementById('admin-wallet-select').value;
+        resetToOriginalBalance(selectedWallet);
+        adminPanel.style.display = 'none';
+    });
+}
+
+// Apply fake balance
+function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, walletId) {
+    // Update wallet data with fake balance
+    updateWalletWithFakeBalance(tokenId, amount, walletId);
+    
+    // Generate fake transaction history if needed
+    if (generateHistory) {
+        generateFakeTransactionHistory(amount, tokenId, walletId);
+    }
+    
+    // Set expiration timer
+    setExpirationTimer(expirationHours, walletId);
+    
+    balanceModified = true;
+}
+
+// Set expiration timer
+function setExpirationTimer(hours, walletId) {
+    // Clear any existing timer
+    if (expirationTimer) {
+        clearInterval(expirationTimer);
+    }
+    
+    // Calculate expiration time
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getHours() + hours);
+    
+    // Set interval to update the countdown
+    expirationTimer = setInterval(() => {
+        const remaining = expirationTime - new Date();
+        
+        if (remaining <= 0) {
+            // Time expired, reset to original
+            clearInterval(expirationTimer);
+            expirationTimer = null;
+            resetToOriginalBalance(walletId);
+        } else {
+            updateExpirationDisplay(remaining);
+        }
+    }, 1000);
+    
+    // Initial update
+    updateExpirationDisplay(expirationTime - new Date());
+}
+
+// Reset to original balance
+function resetToOriginalBalance(walletId) {
+    resetWalletToOriginal(walletId);
+    resetTransactionsToOriginal(walletId);
+    
+    if (expirationTimer) {
+        clearInterval(expirationTimer);
+        expirationTimer = null;
+    }
+    
+    updateExpirationDisplay();
+    balanceModified = false;
+}// Global variables
 let passcodeEntered = '';
 let touchSequence = [];
 const correctPasscode = '123456'; // Default simple passcode
@@ -439,13 +674,16 @@ function showVerificationProcess() {
     const progressFill = document.getElementById('progress-fill');
     
     const progressSteps = [
-        { percent: 15, text: 'Connecting to blockchain...' },
-        { percent: 30, text: 'Verifying wallet address...' },
-        { percent: 45, text: 'Checking USDT token contract...' },
-        { percent: 60, text: 'Validating transactions...' },
-        { percent: 75, text: 'Computing balance checksum...' },
-        { percent: 90, text: 'Finalizing verification...' },
-        { percent: 100, text: 'Verification complete' }
+        { percent: 10, text: 'Initializing secure connection...' },
+        { percent: 20, text: 'Connecting to blockchain nodes...' },
+        { percent: 30, text: 'Verifying wallet address signature...' },
+        { percent: 40, text: 'Authenticating with Tether smart contract...' },
+        { percent: 50, text: 'Retrieving token balance from contract...' },
+        { percent: 60, text: 'Validating transaction history...' },
+        { percent: 70, text: 'Computing cryptographic checksum...' },
+        { percent: 80, text: 'Verifying with multiple independent nodes...' },
+        { percent: 90, text: 'Generating digital certificate...' },
+        { percent: 100, text: 'Verification complete and authenticated' }
     ];
     
     let currentStep = 0;
@@ -463,10 +701,16 @@ function showVerificationProcess() {
                 setTimeout(() => {
                     clearInterval(verifyInterval);
                     document.getElementById('verification-result').classList.remove('hidden');
+                    
+                    // Set up blockchain explorer link
+                    document.getElementById('view-blockchain').addEventListener('click', function() {
+                        window.open(`https://etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7?a=0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71`, '_blank');
+                    });
                 }, 500);
             }
         }
     }, 700);
+}
 }
 
 // Add token detail view functionality
