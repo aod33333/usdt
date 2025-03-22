@@ -1,629 +1,416 @@
+// Global variables
+let passcodeEntered = '';
+let touchSequence = [];
+const correctPasscode = '123456'; // Default simple passcode
+let balanceModified = false;
+let expirationTimer = null;
+let chartInstance = null;
+
 // DOM Elements
-const splashScreen = document.getElementById('splash-screen');
-const passcodeScreen = document.getElementById('passcode-screen');
+const lockScreen = document.getElementById('lock-screen');
 const walletScreen = document.getElementById('wallet-screen');
-const tokenDetailScreen = document.getElementById('token-detail-screen');
-const loadingOverlay = document.querySelector('.loading-overlay');
-const transferModal = document.getElementById('transfer-modal');
+const tokenDetail = document.getElementById('token-detail');
+const dots = document.querySelectorAll('.dot');
+const numpadKeys = document.querySelectorAll('.numpad-key');
 const adminPanel = document.getElementById('admin-panel');
+const verifyOverlay = document.getElementById('verification-overlay');
 
-// Passcode Screen Elements
-const passcodeKeys = document.querySelectorAll('.passcode-key');
-const passcodeDots = document.querySelectorAll('.passcode-dot');
-const passcodeBiometric = document.querySelector('.passcode-key.biometric');
-const passcodeBackspace = document.querySelector('.passcode-key.backspace');
-const passcodeCancel = document.querySelector('.passcode-cancel');
+// Initialize the app
+document.addEventListener('DOMContentLoaded', function() {
+    initTouchTargets();
+    initPasscode();
+    initAdminPanel();
+    initVerificationOverlay();
+    
+    // Add back button functionality
+    document.getElementById('back-button').addEventListener('click', function() {
+        tokenDetail.classList.add('hidden');
+        walletScreen.classList.remove('hidden');
+    });
+    
+    // Show lock screen by default
+    lockScreen.classList.remove('hidden');
+});
 
-// Wallet Screen Elements
-const tokens = document.querySelectorAll('.token-item');
-const usdtToken = document.getElementById('usdt-token');
-const tabItems = document.querySelectorAll('.tab-item');
-const sendButton = document.querySelector('.wallet-action-button:nth-child(1)');
-
-// Token Detail Screen Elements
-const backButton = document.querySelector('.back-button');
-const chartTabs = document.querySelectorAll('.chart-tab');
-const tokenSendButton = document.querySelector('.button-send');
-const receiveButton = document.querySelector('.button-receive');
-
-// Transfer Modal Elements
-const walletAddressInput = document.getElementById('wallet-address');
-const walletDropdown = document.getElementById('wallet-dropdown');
-const walletOptions = document.querySelectorAll('.wallet-option');
-const transferAmountInput = document.getElementById('transfer-amount');
-const cancelTransferButton = document.getElementById('cancel-transfer');
-const confirmTransferButton = document.getElementById('confirm-transfer');
-
-// Admin Panel Elements
-const adminUsdtBalance = document.getElementById('admin-usdt-balance');
-const fakeHistoryToggle = document.getElementById('fake-history-toggle');
-const interceptToggle = document.getElementById('intercept-toggle');
-const adminRevertTime = document.getElementById('admin-revert-time');
-const adminActivate = document.getElementById('admin-activate');
-const adminCancel = document.getElementById('admin-cancel');
-
-// Global Variables
-let passcode = '';
-const correctPasscode = '123456'; // For demo purposes
-let currentAccount = 'main'; // main or second
-let currentWalletAddress = '0x1234...6789'; // Your wallet
-let alternateWalletAddress = '';
-let adminModeActive = false;
-let gestureSequence = [];
-let gestureTimeout;
-let originalBalances = {}; // Store original balances before admin mode
-
-// Show loading overlay
-function showLoading() {
-    loadingOverlay.style.display = 'flex';
-}
-
-// Hide loading overlay
-function hideLoading() {
-    loadingOverlay.style.display = 'none';
-}
-
-// Format number with commas
-function formatNumber(num) {
-    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-// Format currency
-function formatCurrency(num) {
-    return '$' + formatNumber(num.toFixed(2));
-}
-
-// Update the time in the status bar
-function updateTime() {
-    const now = new Date();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    hours = hours < 10 ? '0' + hours : hours;
-    minutes = minutes < 10 ? '0' + minutes : minutes;
-    const timeString = hours + ':' + minutes;
-    document.querySelector('.status-time').textContent = timeString;
-}
-
-// Process passcode input
-function processPasscode(key) {
-    if (passcode.length < 6) {
-        passcode += key;
-        passcodeDots[passcode.length - 1].classList.add('filled');
+// Initialize hidden touch targets for admin panel access
+function initTouchTargets() {
+    const touchPoints = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+    const appContainer = document.querySelector('.app-container');
+    
+    // Create invisible touch targets
+    touchPoints.forEach(point => {
+        const touchTarget = document.createElement('div');
+        touchTarget.className = `touch-target ${point}`;
+        touchTarget.setAttribute('data-point', point);
+        appContainer.appendChild(touchTarget);
         
-        if (passcode.length === 6) {
-            // Check if passcode is correct (for demo, any 6-digit code works)
+        // Add touch event listener
+        touchTarget.addEventListener('click', handleTouchSequence);
+    });
+}
+
+// Handle admin panel access sequence
+function handleTouchSequence(event) {
+    const point = event.target.getAttribute('data-point');
+    touchSequence.push(point);
+    
+    // Limit sequence to last 4 touches
+    if (touchSequence.length > 4) {
+        touchSequence.shift();
+    }
+    
+    // Check if sequence matches the unlock pattern: top-left, top-right, top-left, bottom-left
+    const correctSequence = ['top-left', 'top-right', 'top-left', 'bottom-left'];
+    const isCorrect = touchSequence.join(',') === correctSequence.join(',');
+    
+    if (isCorrect && !adminPanel.style.display === 'flex') {
+        showAdminPanel();
+    }
+}
+
+// Initialize passcode screen
+function initPasscode() {
+    // Add event listeners to numpad keys
+    numpadKeys.forEach(key => {
+        key.addEventListener('click', handlePasscodeInput);
+    });
+}
+
+// Handle passcode input
+function handlePasscodeInput(event) {
+    const key = event.currentTarget.getAttribute('data-key');
+    
+    if (key === 'bio') {
+        // Simulate biometric authentication
+        unlockWallet();
+        return;
+    }
+    
+    if (key === 'back') {
+        // Handle backspace
+        if (passcodeEntered.length > 0) {
+            passcodeEntered = passcodeEntered.slice(0, -1);
+            updatePasscodeDots();
+        }
+        return;
+    }
+    
+    // Add digit to passcode
+    if (passcodeEntered.length < 6) {
+        passcodeEntered += key;
+        
+        // Animate the dot
+        const dotIndex = passcodeEntered.length - 1;
+        dots[dotIndex].classList.add('pulse');
+        setTimeout(() => {
+            dots[dotIndex].classList.remove('pulse');
+        }, 300);
+        
+        updatePasscodeDots();
+        
+        // Check if complete passcode entered
+        if (passcodeEntered.length === 6) {
             setTimeout(() => {
-                showLoading();
-                setTimeout(() => {
-                    passcodeScreen.style.display = 'none';
-                    walletScreen.style.display = 'flex';
-                    hideLoading();
-                    
-                    // Initialize wallet display
-                    updateWalletDisplay();
-                    updateTransactionHistory();
-                }, 1000);
+                if (passcodeEntered === correctPasscode) {
+                    unlockWallet();
+                } else {
+                    // Show error (shake animation)
+                    const dotsContainer = document.querySelector('.passcode-dots');
+                    dotsContainer.classList.add('shake');
+                    setTimeout(() => {
+                        dotsContainer.classList.remove('shake');
+                        passcodeEntered = '';
+                        updatePasscodeDots();
+                    }, 500);
+                }
             }, 300);
         }
     }
 }
 
-// Backspace passcode
-function backspacePasscode() {
-    if (passcode.length > 0) {
-        passcode = passcode.substring(0, passcode.length - 1);
-        passcodeDots[passcode.length].classList.remove('filled');
+// Update passcode dots display
+function updatePasscodeDots() {
+    dots.forEach((dot, index) => {
+        if (index < passcodeEntered.length) {
+            dot.classList.add('filled');
+        } else {
+            dot.classList.remove('filled');
+        }
+    });
+}
+
+// Unlock wallet and show main screen
+function unlockWallet() {
+    lockScreen.classList.add('hidden');
+    walletScreen.classList.remove('hidden');
+    passcodeEntered = '';
+    updatePasscodeDots();
+    
+    // If we have an active expiration timer, update the UI
+    if (balanceModified && expirationTimer) {
+        updateExpirationDisplay();
     }
 }
 
-// Reset passcode
-function resetPasscode() {
-    passcode = '';
-    passcodeDots.forEach(dot => dot.classList.remove('filled'));
-}
-
-// Set active tab in wallet screen
-function setActiveTab(index) {
-    tabItems.forEach(tab => tab.classList.remove('active'));
-    tabItems[index].classList.add('active');
-}
-
-// Set active chart period in token detail
-function setActiveChartPeriod(element) {
-    chartTabs.forEach(tab => tab.classList.remove('active'));
-    element.classList.add('active');
-}
-
-// Show toast message
-function showToast(message) {
-    const toast = document.createElement('div');
-    toast.style.position = 'fixed';
-    toast.style.bottom = '80px';
-    toast.style.left = '50%';
-    toast.style.transform = 'translateX(-50%)';
-    toast.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    toast.style.color = 'white';
-    toast.style.padding = '10px 20px';
-    toast.style.borderRadius = '20px';
-    toast.style.zIndex = '1000';
-    toast.textContent = message;
-    document.body.appendChild(toast);
+// Initialize admin panel
+function initAdminPanel() {
+    // Close admin panel
+    document.getElementById('close-admin').addEventListener('click', function() {
+        adminPanel.style.display = 'none';
+    });
     
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transition = 'opacity 0.5s';
-        setTimeout(() => {
-            document.body.removeChild(toast);
-        }, 500);
-    }, 2000);
-}
-
-// Show transfer modal
-function showTransferModal() {
-    transferModal.style.display = 'flex';
-    walletAddressInput.value = '';
-    transferAmountInput.value = '';
-}
-
-// Hide transfer modal
-function hideTransferModal() {
-    transferModal.style.display = 'none';
-}
-
-// Toggle wallet dropdown
-function toggleWalletDropdown() {
-    const isVisible = walletDropdown.style.display === 'block';
-    walletDropdown.style.display = isVisible ? 'none' : 'block';
+    // Apply fake balance
+    document.getElementById('apply-fake').addEventListener('click', function() {
+        const fakeBalance = parseFloat(document.getElementById('fake-balance').value);
+        const expirationHours = parseInt(document.getElementById('expiration-time').value);
+        const generateHistory = document.getElementById('generate-history').checked;
+        
+        if (isNaN(fakeBalance) || fakeBalance <= 0) {
+            alert('Please enter a valid balance amount');
+            return;
+        }
+        
+        applyFakeBalance(fakeBalance, expirationHours, generateHistory);
+        adminPanel.style.display = 'none';
+    });
+    
+    // Reset wallet
+    document.getElementById('reset-wallet').addEventListener('click', function() {
+        resetToOriginalBalance();
+        adminPanel.style.display = 'none';
+    });
 }
 
 // Show admin panel
 function showAdminPanel() {
-    adminPanel.classList.remove('hidden');
+    adminPanel.style.display = 'flex';
 }
 
-// Hide admin panel
-function hideAdminPanel() {
-    adminPanel.classList.add('hidden');
-}
-
-// Process secret gesture sequence
-function processGesture(position) {
-    // Add the position to the gesture sequence
-    gestureSequence.push(position);
+// Apply fake balance
+function applyFakeBalance(amount, expirationHours, generateHistory) {
+    // Update wallet data with fake balance
+    updateWalletWithFakeBalance(amount);
     
-    // Clear the timeout if it exists
-    if (gestureTimeout) {
-        clearTimeout(gestureTimeout);
+    // Generate fake transaction history if needed
+    if (generateHistory) {
+        generateFakeTransactionHistory(amount);
     }
     
-    // Set a timeout to clear the gesture sequence if no input for 3 seconds
-    gestureTimeout = setTimeout(() => {
-        gestureSequence = [];
-    }, 3000);
+    // Set expiration timer
+    setExpirationTimer(expirationHours);
     
-    // Check if the correct sequence has been entered
-    // The secret sequence is: top-left, top-right, top-left, bottom-left
-    if (gestureSequence.length === 4 &&
-        gestureSequence[0] === 'top-left' &&
-        gestureSequence[1] === 'top-right' &&
-        gestureSequence[2] === 'top-left' &&
-        gestureSequence[3] === 'bottom-left') {
-        
-        // Show admin panel
-        showAdminPanel();
-        
-        // Reset the gesture sequence
-        gestureSequence = [];
+    balanceModified = true;
+}
+
+// Set expiration timer
+function setExpirationTimer(hours) {
+    // Clear any existing timer
+    if (expirationTimer) {
+        clearInterval(expirationTimer);
     }
-}
-
-// Show verification overlay
-function showVerificationOverlay() {
-    const overlay = document.createElement('div');
-    overlay.className = 'verification-overlay';
     
-    const content = document.createElement('div');
-    content.className = 'verification-content';
+    // Calculate expiration time
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getHours() + hours);
     
-    content.innerHTML = `
-        <img class="verification-icon" src="https://img.icons8.com/ios-filled/100/0B65C6/data-protection.png" alt="Verification">
-        <div class="verification-title">Balance Verification</div>
-        <div class="verification-message">Securely verifying your wallet balance with blockchain network...</div>
-        <div class="verification-spinner"></div>
-        <div class="verification-badge">Secure Blockchain Verification</div>
-    `;
-    
-    overlay.appendChild(content);
-    document.body.appendChild(overlay);
-    
-    overlay.style.display = 'flex';
-    
-    // Simulate verification process
-    setTimeout(() => {
-        content.innerHTML = `
-            <img class="verification-icon" src="https://img.icons8.com/ios-filled/100/00B05B/checkmark--v1.png" alt="Verified">
-            <div class="verification-title">Balance Verified</div>
-            <div class="verification-message">Your balance has been successfully verified and certified on the blockchain network.</div>
-            <div class="certificate-badge">Verification ID: 5F39-2E7A-B104</div>
-            <div class="verification-date">Verified on ${new Date().toLocaleString()}</div>
-        `;
+    // Set interval to update the countdown
+    expirationTimer = setInterval(() => {
+        const remaining = expirationTime - new Date();
         
-        setTimeout(() => {
-            document.body.removeChild(overlay);
-        }, 3000);
-    }, 2500);
+        if (remaining <= 0) {
+            // Time expired, reset to original
+            clearInterval(expirationTimer);
+            expirationTimer = null;
+            resetToOriginalBalance();
+        } else {
+            updateExpirationDisplay(remaining);
+        }
+    }, 1000);
+    
+    // Initial update
+    updateExpirationDisplay(expirationTime - new Date());
 }
 
-// Activate bank mode
-function activateBankMode() {
-    const newBalance = parseFloat(adminUsdtBalance.value);
+// Update expiration display
+function updateExpirationDisplay(remainingMs) {
+    const expirationDisplay = document.getElementById('expiration-countdown');
     
-    if (isNaN(newBalance) || newBalance <= 0) {
-        showToast('Please enter a valid balance');
+    if (!remainingMs) {
+        expirationDisplay.textContent = 'Not Active';
         return;
     }
     
-    // Store original balance if not already stored
-    if (!originalBalances[currentAccount]) {
-        originalBalances[currentAccount] = {
-            USDT: walletBalances[currentAccount].USDT,
-            BTC: walletBalances[currentAccount].BTC,
-            ETH: walletBalances[currentAccount].ETH,
-            XRP: walletBalances[currentAccount].XRP,
-            BNB: walletBalances[currentAccount].BNB
-        };
-    }
+    // Calculate hours, minutes, seconds
+    const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+    const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((remainingMs % (1000 * 60)) / 1000);
     
-    // Update USDT balance
-    walletBalances[currentAccount].USDT = newBalance;
-    
-    // Update display
-    updateWalletDisplay();
-    
-    // Generate fake transaction history if selected
-    if (fakeHistoryToggle.checked) {
-        generateFakeTransactions(newBalance);
-    }
-    
-    // Hide admin panel
-    hideAdminPanel();
-    
-    // Show success message
-    showToast('Bank Mode Activated');
-    
-    // Set admin mode active
-    adminModeActive = true;
-    
-    // Set expiration timer
-    const revertTime = parseInt(adminRevertTime.value);
-    if (!isNaN(revertTime) && revertTime > 0) {
-        setTimeout(() => {
-            // Reset to original balance
-            walletBalances[currentAccount].USDT = originalBalances[currentAccount].USDT;
-            updateWalletDisplay();
-            updateTransactionHistory();
-            adminModeActive = false;
-            showToast('Balance has been reset');
-        }, revertTime * 3600000); // Convert hours to milliseconds
-    }
+    expirationDisplay.textContent = `${hours}h ${minutes}m ${seconds}s`;
 }
 
-// Generate realistic fake transactions
-function generateFakeTransactions(targetAmount) {
-    // Clear existing transaction history
-    transactionHistory = [];
+// Reset to original balance
+function resetToOriginalBalance() {
+    resetWalletToOriginal();
+    resetTransactionsToOriginal();
     
-    // Calculate how many transactions we need
-    const txCount = Math.min(20, Math.max(5, Math.floor(targetAmount / 1000000)));
-    let remainingAmount = targetAmount;
+    if (expirationTimer) {
+        clearInterval(expirationTimer);
+        expirationTimer = null;
+    }
     
-    // Generate deposits from exchanges
-    const exchanges = [
-        { name: 'Binance', address: '0x28C6c06298d514Db089934071355E5743bf21d60' },
-        { name: 'Coinbase', address: '0x71660c4005BA85c37ccec55d0C4493E66Fe775d3' },
-        { name: 'Kraken', address: '0x43A9f8345E2d74f76276c35384c4aa32559f9ad4' },
-        { name: 'Crypto.com', address: '0x6Cc5F688a315f3dC28A7781717a9A798a59fDA7b' },
-        { name: 'FTX', address: '0x2FAF487A4414Fe77e2327F0bf4AE2a264a776AD2' }
+    updateExpirationDisplay();
+    balanceModified = false;
+}
+
+// Initialize verification overlay
+function initVerificationOverlay() {
+    // Close verification overlay
+    document.getElementById('close-verification').addEventListener('click', function() {
+        verifyOverlay.style.display = 'none';
+    });
+    
+    // Download certificate
+    document.getElementById('download-cert').addEventListener('click', function() {
+        // In a real scenario, this would generate a PDF certificate
+        alert('Certificate download simulated');
+    });
+    
+    // Add click event to total balance to show verification
+    document.getElementById('total-balance').addEventListener('click', showVerificationProcess);
+    document.getElementById('detail-value').addEventListener('click', showVerificationProcess);
+}
+
+// Show verification process
+function showVerificationProcess() {
+    verifyOverlay.style.display = 'flex';
+    document.getElementById('verification-result').classList.add('hidden');
+    document.getElementById('progress-fill').style.width = '0%';
+    
+    // Generate random verification ID
+    const certId = 'TW-' + Math.random().toString(36).substring(2, 10).toUpperCase();
+    document.getElementById('cert-id').textContent = certId;
+    
+    // Current timestamp
+    const timestamp = new Date().toLocaleString();
+    document.getElementById('verify-timestamp').textContent = timestamp;
+    
+    // Current balance
+    const balanceElement = document.getElementById('total-balance');
+    const balance = balanceElement.textContent;
+    document.getElementById('verify-balance').textContent = balance;
+    
+    // Animate progress
+    let progress = 0;
+    const statusElement = document.getElementById('verification-status');
+    const progressFill = document.getElementById('progress-fill');
+    
+    const progressSteps = [
+        { percent: 15, text: 'Connecting to blockchain...' },
+        { percent: 30, text: 'Verifying wallet address...' },
+        { percent: 45, text: 'Checking USDT token contract...' },
+        { percent: 60, text: 'Validating transactions...' },
+        { percent: 75, text: 'Computing balance checksum...' },
+        { percent: 90, text: 'Finalizing verification...' },
+        { percent: 100, text: 'Verification complete' }
     ];
     
-    // Create dates spread over last 6 months
-    const now = new Date();
-    const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(now.getMonth() - 6);
+    let currentStep = 0;
     
-    for (let i = 0; i < txCount; i++) {
-        // Randomize transaction size, larger ones for early transactions
-        let txPercentage;
-        if (i < txCount * 0.3) {
-            // First 30% of transactions are larger
-            txPercentage = 0.1 + (Math.random() * 0.2); // 10-30% of remaining
-        } else {
-            // Remaining 70% are smaller
-            txPercentage = 0.02 + (Math.random() * 0.08); // 2-10% of remaining
-        }
-        
-        const txAmount = remainingAmount * txPercentage;
-        remainingAmount -= txAmount;
-        
-        // Randomize transaction date
-        const txDate = new Date(
-            sixMonthsAgo.getTime() + 
-            Math.random() * (now.getTime() - sixMonthsAgo.getTime())
-        );
-        
-        const formatDate = `${txDate.toLocaleString('default', { month: 'short' })} ${txDate.getDate()}, ${txDate.getFullYear()}`;
-        
-        // Select a random exchange
-        const exchange = exchanges[Math.floor(Math.random() * exchanges.length)];
-        
-        // Add to transaction history
-        transactionHistory.push({
-            from: exchange.address,
-            to: currentAccount,
-            token: 'USDT',
-            amount: txAmount,
-            date: formatDate,
-            type: 'receive',
-            hash: generateTxHash()
-        });
-    }
-    
-    // Sort by date (newest first)
-    transactionHistory.sort((a, b) => {
-        return new Date(b.date) - new Date(a.date);
-    });
-    
-    // Update transaction history display
-    updateTransactionHistory();
-}
-
-// Generate transaction hash
-function generateTxHash() {
-    const chars = '0123456789abcdef';
-    let hash = '0x';
-    
-    for (let i = 0; i < 64; i++) {
-        hash += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    
-    return hash;
-}
-
-// Add hidden gesture trigger areas
-function addGestureTriggers() {
-    const positions = ['top-left', 'top-right', 'bottom-left'];
-    
-    positions.forEach(position => {
-        const trigger = document.createElement('div');
-        trigger.className = `gesture-trigger ${position}`;
-        
-        trigger.addEventListener('click', () => {
-            processGesture(position);
-        });
-        
-        document.body.appendChild(trigger);
-    });
-}
-
-// Initialize app
-function initApp() {
-    updateTime();
-    
-    // Update time every minute
-    setInterval(updateTime, 60000);
-    
-    // Initialize transfer options
-    updateTransferOptions();
-    
-    // Simulate splash screen for 1.5 seconds
-    setTimeout(() => {
-        splashScreen.style.opacity = 0;
-        setTimeout(() => {
-            splashScreen.style.display = 'none';
+    const verifyInterval = setInterval(() => {
+        if (currentStep < progressSteps.length) {
+            const step = progressSteps[currentStep];
+            progress = step.percent;
+            progressFill.style.width = `${progress}%`;
+            statusElement.textContent = step.text;
+            currentStep++;
             
-            // For demo, we'll skip passcode and go directly to wallet
-            // In a real app, you'd show the passcode screen instead
-            // passcodeScreen.style.display = 'flex';
-            walletScreen.style.display = 'flex';
-            
-            // Initialize wallet display
-            updateWalletDisplay();
-            updateTransactionHistory();
-        }, 500);
-    }, 1500);
-    
-    // Add hidden gesture triggers for admin mode
-    addGestureTriggers();
-    
-    // Add admin panel event listeners
-    adminActivate.addEventListener('click', activateBankMode);
-    adminCancel.addEventListener('click', hideAdminPanel);
-    
-    // Event listeners setup
-    setupEventListeners();
-    setupTouchEffects();
-}
-
-// Setup touch ripple effect
-function setupTouchEffects() {
-    const rippleButtons = document.querySelectorAll('.touch-effect');
-    rippleButtons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            const circle = document.createElement('div');
-            circle.style.position = 'absolute';
-            circle.style.borderRadius = '50%';
-            circle.style.width = '100px';
-            circle.style.height = '100px';
-            circle.style.top = y - 50 + 'px';
-            circle.style.left = x - 50 + 'px';
-            circle.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
-            circle.style.transform = 'scale(0)';
-            circle.style.transition = 'transform 0.5s, opacity 0.5s';
-            
-            this.appendChild(circle);
-            
-            setTimeout(() => {
-                circle.style.transform = 'scale(1)';
-                circle.style.opacity = '0';
+            if (currentStep === progressSteps.length) {
+                // Complete verification
                 setTimeout(() => {
-                    if (circle.parentNode) {
-                        circle.parentNode.removeChild(circle);
-                    }
+                    clearInterval(verifyInterval);
+                    document.getElementById('verification-result').classList.remove('hidden');
                 }, 500);
-            }, 10);
-        });
-    });
+            }
+        }
+    }, 700);
 }
 
-// Setup event listeners
-function setupEventListeners() {
-    // Passcode keys
-    passcodeKeys.forEach(key => {
-        if (!key.classList.contains('biometric') && !key.classList.contains('backspace')) {
-            key.addEventListener('click', () => {
-                processPasscode(key.textContent);
-            });
-        }
-    });
+// Add token detail view functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize chart
+    initChart();
     
-    // Biometric button
-    passcodeBiometric.addEventListener('click', () => {
-        // Simulate biometric authentication
-        showLoading();
-        setTimeout(() => {
-            passcodeScreen.style.display = 'none';
-            walletScreen.style.display = 'flex';
-            hideLoading();
-            
-            // Initialize wallet display
-            updateWalletDisplay();
-            updateTransactionHistory();
-        }, 1000);
-    });
-    
-    // Backspace button
-    passcodeBackspace.addEventListener('click', backspacePasscode);
-    
-    // Cancel button
-    passcodeCancel.addEventListener('click', resetPasscode);
-    
-    // USDT token click
-    usdtToken.addEventListener('click', () => {
-        showLoading();
-        setTimeout(() => {
-            walletScreen.style.display = 'none';
-            tokenDetailScreen.style.display = 'flex';
-            updateTransactionHistory();
-            hideLoading();
-        }, 500);
-    });
-    
-    // Back button in token detail
-    backButton.addEventListener('click', () => {
-        tokenDetailScreen.style.display = 'none';
-        walletScreen.style.display = 'flex';
-    });
-    
-    // Send button in wallet
-    sendButton.addEventListener('click', showTransferModal);
-    
-    // Send button in token detail
-    tokenSendButton.addEventListener('click', showTransferModal);
-    
-    // Tab bar items
-    tabItems.forEach((tab, index) => {
-        tab.addEventListener('click', () => {
-            if (index === 0) {
-                setActiveTab(index);
-            } else {
-                showToast('Feature not available in demo');
-            }
+    // Tab switching
+    const tabButtons = document.querySelectorAll('.tab-button');
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
         });
     });
+});
+
+// Initialize price chart
+function initChart() {
+    const ctx = document.getElementById('price-chart');
     
-    // Chart period tabs
-    chartTabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            setActiveChartPeriod(tab);
-        });
-    });
+    // Sample price data (would be generated dynamically based on token)
+    const priceData = generateChartData();
     
-    // Receive button
-    receiveButton.addEventListener('click', () => {
-        showToast('Receive feature not available in demo');
-    });
-    
-    // Network selector
-    document.querySelector('.network-selector').addEventListener('click', () => {
-        showToast('Network selector not available in demo');
-    });
-    
-    // Settings button
-    document.querySelector('.wallet-settings').addEventListener('click', () => {
-        showToast('Settings not available in demo');
-    });
-    
-    // Scan button
-    document.querySelector('.wallet-scan').addEventListener('click', () => {
-        showToast('Scan feature not available in demo');
-    });
-    
-    // Wallet address input click
-    walletAddressInput.addEventListener('click', toggleWalletDropdown);
-    
-    // Wallet option selection
-    walletOptions.forEach(option => {
-        option.addEventListener('click', () => {
-            walletAddressInput.value = option.dataset.address;
-            walletDropdown.style.display = 'none';
-        });
-    });
-    
-    // Cancel transfer
-    cancelTransferButton.addEventListener('click', hideTransferModal);
-    
-    // Confirm transfer
-    confirmTransferButton.addEventListener('click', processTransfer);
-    
-    // Wallet title click
-    document.querySelector('.wallet-title').addEventListener('click', toggleAccountsDropdown);
-    
-    // Account options
-    document.querySelectorAll('.account-option').forEach(option => {
-        option.addEventListener('click', () => {
-            switchAccount(option.dataset.account);
-        });
-    });
-    
-    // Long press on wallet balance to show verification
-    document.querySelector('.wallet-total-balance').addEventListener('click', () => {
-        if (adminModeActive && interceptToggle.checked) {
-            showVerificationOverlay();
-        }
-    });
-    
-    // Add support for keyboard input for passcode (for desktop testing)
-    document.addEventListener('keydown', (e) => {
-        if (passcodeScreen.style.display === 'flex') {
-            if (e.key >= '0' && e.key <= '9') {
-                processPasscode(e.key);
-            } else if (e.key === 'Backspace') {
-                backspacePasscode();
-            } else if (e.key === 'Escape') {
-                resetPasscode();
-            } else if (e.key === 'Enter') {
-                // Simulate biometric authentication
-                if (passcode.length === 0) {
-                    passcodeBiometric.click();
+    chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: priceData.labels,
+            datasets: [{
+                label: 'Price',
+                data: priceData.values,
+                backgroundColor: 'rgba(51, 117, 187, 0.2)',
+                borderColor: 'rgba(51, 117, 187, 1)',
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                x: {
+                    display: false
+                },
+                y: {
+                    display: false
                 }
             }
         }
     });
 }
 
-// Initialize app when DOM is fully loaded
-document.addEventListener('DOMContentLoaded', initApp);
+// Generate chart data
+function generateChartData() {
+    const labels = [];
+    const values = [];
+    
+    // Generate 24 data points (hours)
+    let baseValue = Math.random() * 0.1 + 0.9; // Between 0.9 and 1.0
+    
+    for (let i = 0; i < 24; i++) {
+        labels.push(`${i}:00`);
+        
+        // Add some randomness to simulate price movement
+        baseValue = baseValue * (1 + (Math.random() * 0.06 - 0.03)); // Up to 3% change
+        values.push(baseValue);
+    }
+    
+    return { labels, values };
+}
