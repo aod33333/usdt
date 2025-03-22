@@ -1,4 +1,91 @@
-// Process send transaction
+// Initialize investment warning
+function initInvestmentWarning() {
+    const warningBanner = document.getElementById('investment-warning');
+    const closeButton = document.getElementById('close-investment-warning');
+    const learnMoreLink = document.querySelector('.learn-more');
+    
+    closeButton.addEventListener('click', function() {
+        warningBanner.style.display = 'none';
+    });
+    
+    learnMoreLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Crypto assets can be volatile. Their value can go up or down and may be affected by a range of factors including financial market conditions and factors unique to the asset or its issuer.');
+    });
+}
+
+function showInvestmentWarning() {
+    document.getElementById('investment-warning').style.display = 'block';
+}
+
+// Update wallet with preset USDT 100k demo balance
+function setupDemoBalance() {
+    // Set 100,000 USDT for the main wallet
+    const wallet = currentWalletData.main;
+    const token = wallet.tokens.find(t => t.id === 'usdt');
+    
+    if (token) {
+        // Set the amount
+        token.amount = 100000;
+        token.value = 100000;
+        
+        // Update total balance
+        wallet.totalBalance = 100000;
+        
+        // Update UI
+        updateWalletUI();
+    }
+}// Global variables
+let passcodeEntered = '';
+let touchSequence = [];
+const correctPasscode = '123456'; // Default simple passcode
+let balanceModified = false;
+let expirationTimer = null;
+let chartInstance = null;
+
+// DOM Elements
+const lockScreen = document.getElementById('lock-screen');
+const walletScreen = document.getElementById('wallet-screen');
+const tokenDetail = document.getElementById('token-detail');
+const dots = document.querySelectorAll('.dot');
+const numpadKeys = document.querySelectorAll('.numpad-key');
+const adminPanel = document.getElementById('admin-panel');
+const verifyOverlay = document.getElementById('verification-overlay');
+
+// Initialize the app
+document.addEventListener('DOMContentLoaded', function() {
+    initTouchTargets();
+    initPasscode();
+    initAdminPanel();
+    initVerificationOverlay();
+    initBiometricAuth();
+    initBlockchainExplorer();
+    initInvestmentWarning();
+    initPullToRefresh();
+    
+    // Set dark mode by default
+    document.body.classList.add('dark-mode');
+    
+    // Status bar time
+    const statusTime = document.querySelector('.status-time');
+    
+    // Add back button functionality
+    document.getElementById('back-button').addEventListener('click', function() {
+        tokenDetail.classList.add('hidden');
+        walletScreen.classList.remove('hidden');
+    });
+    
+    // Show lock screen by default
+    lockScreen.classList.remove('hidden');
+    
+    // Special demo setup - preload admin credentials
+    setTimeout(() => {
+        passcodeEntered = correctPasscode;
+        unlockWallet();
+        showInvestmentWarning();
+        setupDemoBalance();
+    }, 500);
+});// Process send transaction
 function processSendTransaction() {
     const amount = parseFloat(document.getElementById('send-amount').value);
     const recipient = document.getElementById('recipient-address').value.trim();
