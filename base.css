@@ -1,7 +1,4 @@
-/* Add padding for screens after login */
-.with-status-bar {
-    padding-top: 24px; /* For status bar */
-}/* Reset & Base Styles */
+/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -12,9 +9,9 @@
 /* Trust Wallet Colors - Light/Dark mode variables */
 :root {
     /* Colors */
-    --tw-blue-dark: #0B65C6;
     --tw-blue: #3375BB;
-    --tw-blue-light: #2B80D4;
+    --tw-blue-light: #4D91DD;
+    --tw-blue-dark: #1F5BB6;
     --tw-green: #05C46B;
     --tw-red: #EB5757;
     --tw-black: #1A2024;
@@ -22,8 +19,11 @@
     --tw-medium-gray: #8A939D;
     --tw-light-gray: #C4C9CC;
     --tw-bg-gray: #F5F5F5;
+    --tw-off-white: #F8F8F8;
     --tw-white: #FFFFFF;
-    --tw-amber: #FFB300;
+    --tw-amber: #FFD700;
+    --tw-warning-bg: #FEF9E7;
+    --tw-warning-text: #D4AC0D;
     
     /* Font sizes */
     --font-xs: 12px;
@@ -211,30 +211,31 @@ button {
     overflow: hidden;
 }
 
-/* Update to base.css to fix warning banner position */
+/* Add padding for screens after login */
+.with-status-bar {
+    padding-top: 24px; /* For status bar */
+}
 
 /* Warning banners */
 .investment-warning {
-    position: relative; /* Changed from fixed */
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    color: var(--tw-white);
-    z-index: 10; /* Reduced z-index to ensure it doesn't overlap with modals */
-    padding: var(--space-sm);
+    background-color: var(--tw-warning-bg);
+    color: var(--tw-warning-text);
+    padding: var(--space-sm) var(--space-md);
     margin-bottom: var(--space-sm);
+    border-radius: 0;
 }
 
 .investment-warning-content {
     display: flex;
-    align-items: center;
-    max-width: 480px;
-    margin: 0 auto;
+    align-items: flex-start;
 }
 
-.investment-warning-content i {
+.warning-icon {
     font-size: 20px;
     margin-right: var(--space-sm);
-    color: #FFD700;
+    color: var(--tw-warning-text);
+    flex-shrink: 0;
 }
 
 .investment-warning-text {
@@ -245,18 +246,87 @@ button {
     font-size: var(--font-xs);
     margin: 0;
     line-height: 1.4;
+    color: var(--tw-black);
 }
 
 .learn-more {
-    color: #4DA9FF;
+    color: var(--tw-blue);
     text-decoration: underline;
 }
 
 .close-warning {
-    color: var(--tw-white);
+    color: var(--tw-medium-gray);
     font-size: var(--font-md);
     background: none;
     border: none;
     padding: 0;
     margin-left: var(--space-sm);
+}
+
+/* Main header */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background-color: var(--tw-white);
+}
+
+.page-title {
+    font-size: var(--font-xl);
+    font-weight: 600;
+    text-align: center;
+}
+
+.icon-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--tw-dark-gray);
+    background-color: transparent;
+}
+
+/* Search Container */
+.search-container {
+    padding: 0 var(--space-md) var(--space-md);
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: var(--tw-bg-gray);
+    border-radius: 30px;
+    padding: var(--space-sm) var(--space-md);
+}
+
+.search-bar i {
+    color: var(--tw-medium-gray);
+    margin-right: var(--space-sm);
+}
+
+.search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    flex: 1;
+    color: var(--tw-black);
+    font-size: var(--font-md);
+}
+
+/* Footer Info */
+.footer-info, 
+.disclaimer-text {
+    font-size: 12px;
+    color: var(--tw-medium-gray);
+    text-align: center;
+    padding: var(--space-md) var(--space-md) 70px;
+    line-height: 1.4;
+}
+
+.disclaimer-link {
+    color: var(--tw-blue);
+    text-decoration: none;
 }
