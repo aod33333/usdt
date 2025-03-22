@@ -177,7 +177,7 @@ function updateWalletUI() {
     });
 }
 
-// Create token element
+// Update the function to show tokens correctly
 function createTokenElement(token) {
     const tokenItem = document.createElement('div');
     tokenItem.className = 'token-item';
@@ -191,6 +191,45 @@ function createTokenElement(token) {
             </div>
         `;
     }
+    
+    // Format price with appropriate precision
+    const formattedPrice = token.price >= 1 
+        ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+        : token.price.toFixed(2);
+    
+    // Format change with + or - sign
+    const changeClass = token.change >= 0 ? 'positive' : 'negative';
+    const changeSign = token.change >= 0 ? '+' : '';
+    
+    // Format the token amount display
+    const formattedAmount = token.amount > 0 ? token.amount : '0';
+    
+    // Format token value with appropriate precision
+    const formattedValue = token.value > 0 
+        ? formatCurrency(token.value) 
+        : '$0.00';
+    
+    tokenItem.innerHTML = `
+        <div class="token-icon">
+            <img src="${token.icon}" alt="${token.name}">
+            ${chainBadgeHTML}
+        </div>
+        <div class="token-info">
+            <div class="token-name">
+                ${token.symbol} <span class="token-network">${token.name}</span>
+            </div>
+            <div class="token-price">
+                $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
+            </div>
+        </div>
+        <div class="token-amount">
+            <div class="token-balance">${formattedAmount}</div>
+            <div class="token-value">${formattedValue}</div>
+        </div>
+    `;
+    
+    return tokenItem;
+}
     
     // Format price with thousands separator
     const formattedPrice = token.price >= 1 
