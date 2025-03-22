@@ -13,10 +13,20 @@
 <body>
     <!-- App container -->
     <div class="app-container">
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-time">12:30</div>
+            <div class="status-icons">
+                <i class="fas fa-signal"></i>
+                <i class="fas fa-wifi"></i>
+                <i class="fas fa-battery-full"></i>
+            </div>
+        </div>
+        
         <!-- Lock Screen -->
         <div id="lock-screen" class="screen">
             <div class="lock-header">
-                <img src="data:image/png;base64,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" alt="Trust Wallet" class="lock-logo">
+                <img src="https://ibb.co/yGjjMk7" onerror="this.src='https://i.ibb.co/TtCwm7X/trust-wallet-logo.png'" alt="Trust Wallet" class="lock-logo">
                 <div class="lock-subtitle">Secure and trusted multi-chain crypto wallet</div>
             </div>
             <div class="passcode-container">
@@ -56,10 +66,21 @@
         
         <!-- Main Wallet Screen -->
         <div id="wallet-screen" class="screen hidden">
+            <!-- Main Header with title -->
+            <div class="main-header">
+                <button class="icon-button settings-button">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <h1 class="page-title">Home</h1>
+                <button class="icon-button notifications-button">
+                    <i class="fas fa-bell"></i>
+                </button>
+            </div>
+            
             <!-- Investment Warning Banner -->
             <div id="investment-warning" class="investment-warning">
                 <div class="investment-warning-content">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i class="fas fa-exclamation-circle warning-icon"></i>
                     <div class="investment-warning-text">
                         <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
                     </div>
@@ -69,60 +90,66 @@
                 </div>
             </div>
             
-            <div class="wallet-header">
-                <div class="page-header">
-                    <h1 class="page-title">Home</h1>
-                    <div class="header-actions">
-                        <button class="header-button">
-                            <i class="fas fa-cog"></i>
-                        </button>
-                        <button class="header-button">
-                            <i class="fas fa-qrcode"></i>
-                        </button>
-                    </div>
-                </div>
-                
+            <!-- Search Bar -->
+            <div class="search-container">
                 <div class="search-bar">
                     <i class="fas fa-search"></i>
                     <input type="text" placeholder="Search">
                 </div>
-                
+            </div>
+            
+            <!-- Wallet Selector -->
+            <div class="wallet-selector-container">
                 <div class="wallet-selector">
-                    <div class="wallet-name">Main Wallet 1</div>
+                    <span class="wallet-name">Main Wallet 1</span>
                     <i class="fas fa-chevron-down"></i>
                 </div>
-                
-                <div class="balance-display">
-                    <div class="balance-amount" id="total-balance">$0.00</div>
-                    <button class="visibility-toggle">
-                        <i class="fas fa-eye"></i>
+                <div class="wallet-actions">
+                    <button class="wallet-action-button">
+                        <i class="fas fa-copy"></i>
                     </button>
-                </div>
-                
-                <div class="balance-actions">
-                    <button class="action-button" id="send-button">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>Send</span>
+                    <button class="wallet-action-button">
+                        <i class="fas fa-qrcode"></i>
                     </button>
-                    <button class="action-button" id="receive-button">
-                        <i class="fas fa-arrow-down"></i>
-                        <span>Receive</span>
-                    </button>
-                    <button class="action-button">
-                        <i class="fas fa-credit-card"></i>
-                        <span>Buy</span>
-                    </button>
-                    <button class="action-button">
-                        <i class="fas fa-building"></i>
-                        <span>Sell</span>
-                    </button>
-                    <button class="action-button">
-                        <i class="fas fa-history"></i>
-                        <span>History</span>
+                    <button class="wallet-action-button">
+                        <i class="fas fa-bell"></i>
                     </button>
                 </div>
             </div>
             
+            <!-- Balance Display -->
+            <div class="balance-display">
+                <div class="balance-amount" id="total-balance">$0.00</div>
+                <button class="visibility-toggle">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-circle" id="send-button">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Send</span>
+                </button>
+                <button class="action-circle" id="receive-button">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Receive</span>
+                </button>
+                <button class="action-circle">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Buy</span>
+                </button>
+                <button class="action-circle">
+                    <i class="fas fa-university"></i>
+                    <span>Sell</span>
+                </button>
+                <button class="action-circle">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </button>
+            </div>
+            
+            <!-- Backup Banner -->
             <div class="backup-banner">
                 <div class="backup-icon">
                     <img src="https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png" alt="Backup">
@@ -136,20 +163,24 @@
             </div>
             
             <div class="wallet-body">
+                <!-- Tab Navigation -->
                 <div class="tabs">
                     <button class="tab-button active" data-tab="tokens">Crypto (%24H)</button>
-                    <button class="tab-button nfts-tab" data-tab="nfts">NFTs</button>
+                    <button class="tab-button" data-tab="nfts">NFTs</button>
                 </div>
                 
+                <!-- Token List -->
                 <div class="token-list" id="token-list">
                     <!-- Tokens will be inserted here by JS -->
                 </div>
                 
+                <!-- Footer Info -->
                 <div class="footer-info">
                     Past performance is not a reliable indicator of future results. Data source is from CoinMarketCap. <a href="#" class="disclaimer-link">Learn more about risks</a>.
                 </div>
             </div>
             
+            <!-- Bottom Navigation -->
             <div class="bottom-tabs">
                 <div class="tab-item active">
                     <i class="fas fa-home"></i>
@@ -160,7 +191,7 @@
                     <span>Swap</span>
                 </div>
                 <div class="tab-item">
-                    <i class="fas fa-chart-line"></i>
+                    <i class="fas fa-piggy-bank"></i>
                     <span>Earn</span>
                 </div>
                 <div class="tab-item">
@@ -241,9 +272,7 @@
                     <i class="fas fa-arrow-left"></i>
                 </button>
                 <h2>Receive</h2>
-                <button class="info-button">
-                    <i class="fas fa-info-circle"></i>
-                </button>
+                <div class="placeholder-icon"></div>
             </div>
             
             <!-- Bitcoin Warning Banner -->
@@ -258,16 +287,16 @@
             
             <div id="receive-content" class="receive-content">
                 <div class="token-selection">
-                    <div class="token-logo">
+                    <div class="token-icon-large">
                         <img id="receive-token-icon" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC">
                     </div>
-                    <div class="token-details">
-                        <span class="token-symbol" id="receive-token-name">BTC</span>
-                        <span class="network-badge">COIN</span>
+                    <div class="token-label">
+                        <span id="receive-token-name">BTC</span>
+                        <span class="token-network">BITCOIN</span>
                     </div>
                 </div>
                 
-                <div class="qr-container">
+                <div class="qr-code-container">
                     <canvas id="qr-code" width="250" height="250"></canvas>
                 </div>
                 
@@ -276,23 +305,13 @@
                 </div>
                 
                 <div class="receive-actions">
-                    <div class="receive-action">
-                        <div class="action-circle">
-                            <i class="fas fa-copy"></i>
-                        </div>
-                        <span class="action-label">Copy</span>
+                    <div class="action-round-button">
+                        <i class="fas fa-copy"></i>
+                        <span>Copy</span>
                     </div>
-                    <div class="receive-action">
-                        <div class="action-circle">
-                            <i class="fas fa-sliders-h"></i>
-                        </div>
-                        <span class="action-label">Set Amount</span>
-                    </div>
-                    <div class="receive-action">
-                        <div class="action-circle">
-                            <i class="fas fa-share-alt"></i>
-                        </div>
-                        <span class="action-label">Share</span>
+                    <div class="action-round-button">
+                        <i class="fas fa-share-alt"></i>
+                        <span>Share</span>
                     </div>
                 </div>
             </div>
@@ -308,124 +327,66 @@
                 <div class="placeholder-icon"></div>
             </div>
             
-            <div class="send-form">
+            <div class="send-content">
                 <div class="form-group">
-                    <label class="form-label">Address or Domain Name</label>
-                    <div class="input-container">
-                        <input type="text" id="recipient-address" placeholder="Search or Enter">
-                        <div class="input-action">Paste</div>
-                        <div class="input-icon">
+                    <label>Recipient Address</label>
+                    <div class="address-input">
+                        <input type="text" id="recipient-address" placeholder="Wallet Address or ENS">
+                        <button class="paste-button">Paste</button>
+                        <button class="scan-button">
                             <i class="fas fa-qrcode"></i>
-                        </div>
-                        <div class="input-icon">
-                            <i class="fas fa-expand"></i>
-                        </div>
+                        </button>
                     </div>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Amount</label>
-                    <div class="input-container">
-                        <input type="text" id="send-amount" placeholder="USDT Amount">
-                        <div class="input-action">Max</div>
+                    <label>Amount</label>
+                    <div class="amount-input">
+                        <input type="text" id="send-amount" placeholder="0">
+                        <button class="max-button">Max</button>
+                    </div>
+                    <div id="available-balance">Available: <span id="max-amount">0</span> <span id="max-symbol">USDT</span></div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Network Fee</label>
+                    <div class="fee-options">
+                        <div class="fee-option active">
+                            <div class="fee-name">Low</div>
+                            <div class="fee-value">$0.02</div>
+                            <div class="fee-time">~10 min</div>
+                        </div>
+                        <div class="fee-option">
+                            <div class="fee-name">Medium</div>
+                            <div class="fee-value">$0.05</div>
+                            <div class="fee-time">~3 min</div>
+                        </div>
+                        <div class="fee-option">
+                            <div class="fee-name">High</div>
+                            <div class="fee-value">$0.10</div>
+                            <div class="fee-time">~30 sec</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Keyboard shortcuts -->
-            <div class="keyboard-shortcuts">
-                <div class="keyboard-shortcut">
-                    <i class="far fa-smile"></i>
-                </div>
-                <div class="keyboard-shortcut">
-                    <i class="far fa-image"></i>
-                </div>
-                <div class="keyboard-shortcut">
-                    <i class="far fa-clipboard"></i>
-                </div>
-                <div class="keyboard-shortcut">
-                    <i class="fas fa-cog"></i>
-                </div>
-                <div class="keyboard-shortcut">
-                    <i class="fas fa-ellipsis-h"></i>
-                </div>
-            </div>
-            
-            <!-- Virtual keyboard -->
-            <div class="virtual-keyboard">
-                <div class="keyboard-row">
-                    <div class="key">1</div>
-                    <div class="key">2</div>
-                    <div class="key">3</div>
-                    <div class="key">4</div>
-                    <div class="key">5</div>
-                    <div class="key">6</div>
-                    <div class="key">7</div>
-                    <div class="key">8</div>
-                    <div class="key">9</div>
-                    <div class="key">0</div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key">q</div>
-                    <div class="key">w</div>
-                    <div class="key">e</div>
-                    <div class="key">r</div>
-                    <div class="key">t</div>
-                    <div class="key">y</div>
-                    <div class="key">u</div>
-                    <div class="key">i</div>
-                    <div class="key">o</div>
-                    <div class="key">p</div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key">a</div>
-                    <div class="key">s</div>
-                    <div class="key">d</div>
-                    <div class="key">f</div>
-                    <div class="key">g</div>
-                    <div class="key">h</div>
-                    <div class="key">j</div>
-                    <div class="key">k</div>
-                    <div class="key">l</div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key shift">⇧</div>
-                    <div class="key">z</div>
-                    <div class="key">x</div>
-                    <div class="key">c</div>
-                    <div class="key">v</div>
-                    <div class="key">b</div>
-                    <div class="key">n</div>
-                    <div class="key">m</div>
-                    <div class="key backspace">⌫</div>
-                </div>
-                <div class="keyboard-row">
-                    <div class="key special">!#1</div>
-                    <div class="key special">@</div>
-                    <div class="key space">EN(UK)</div>
-                    <div class="key special">.</div>
-                    <div class="key special">.com</div>
-                    <div class="key special">Done</div>
-                </div>
+                
+                <button id="continue-send" class="send-button">Continue</button>
             </div>
         </div>
     </div>
     
     <!-- Biometric Authentication Overlay -->
     <div id="biometric-overlay" class="modal">
-        <div class="biometric-container">
-            <div class="biometric-content">
-                <h3>Touch ID</h3>
-                <p>Verify your identity</p>
-                <div class="fingerprint-container">
-                    <div id="fingerprint-icon" class="fingerprint-icon">
-                        <i class="fas fa-fingerprint"></i>
-                    </div>
-                    <div id="fingerprint-scanning" class="fingerprint-scanning"></div>
+        <div class="biometric-content">
+            <h3>Touch ID</h3>
+            <p>Verify your identity</p>
+            <div class="fingerprint-container">
+                <div id="fingerprint-icon" class="fingerprint-icon">
+                    <i class="fas fa-fingerprint"></i>
                 </div>
-                <div id="biometric-status" class="biometric-status">Touch sensor</div>
-                <button id="cancel-biometric" class="cancel-biometric">Cancel</button>
+                <div id="fingerprint-scanning" class="fingerprint-scanning"></div>
             </div>
+            <div id="biometric-status" class="biometric-status">Touch sensor</div>
+            <button id="cancel-biometric" class="cancel-biometric">Cancel</button>
         </div>
     </div>
     
@@ -436,7 +397,7 @@
             <button id="close-admin" class="close-button"><i class="fas fa-times"></i></button>
             
             <div class="admin-form">
-                <div class="admin-wallet-selector">
+                <div class="admin-form-group">
                     <label>Select Wallet to Modify</label>
                     <select id="admin-wallet-select">
                         <option value="main">Mnemonic 1</option>
@@ -445,7 +406,7 @@
                     </select>
                 </div>
                 
-                <div class="admin-token-selector">
+                <div class="admin-form-group">
                     <label>Select Token to Modify</label>
                     <select id="admin-token-select">
                         <option value="usdt">Tether (USDT)</option>
