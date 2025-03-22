@@ -25,13 +25,13 @@
     --tw-warning-bg: #FEF9E7;
     --tw-warning-text: #D4AC0D;
     
-    /* Font sizes */
-    --font-xs: 12px;
-    --font-sm: 14px;
-    --font-md: 16px;
-    --font-lg: 18px;
-    --font-xl: 22px;
-    --font-xxl: 28px;
+    /* Font sizes - adjusted to match Trust Wallet */
+--font-xs: 10px;
+--font-sm: 12px;
+--font-md: 14px;
+--font-lg: 16px;
+--font-xl: 20px;
+--font-xxl: 24px;
     
     /* Spacing */
     --space-xs: 4px;
