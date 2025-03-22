@@ -12,7 +12,7 @@
     gap: var(--space-xs);
     background-color: var(--tw-bg-gray);
     padding: var(--space-xs) var(--space-md);
-    border-radius: 20px;
+    border-radius: 16px;
 }
 
 .wallet-name {
@@ -27,8 +27,8 @@
 }
 
 .wallet-action-button {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background-color: var(--tw-bg-gray);
     display: flex;
@@ -40,12 +40,12 @@
 /* Balance Display */
 .balance-display {
     text-align: center;
-    padding: var(--space-sm) var(--space-md) var(--space-lg);
+    padding: var(--space-sm) var(--space-md) var(--space-md);
 }
 
 .balance-amount {
     font-size: var(--font-xxl);
-    font-weight: 700;
+    font-weight: 600;
     color: var(--tw-black);
     display: flex;
     align-items: center;
@@ -63,7 +63,7 @@
 .quick-actions {
     display: flex;
     justify-content: space-around;
-    padding: 0 var(--space-md) var(--space-lg);
+    padding: 0 var(--space-md) var(--space-md);
 }
 
 .action-circle {
@@ -77,8 +77,8 @@
     font-size: var(--font-md);
     margin-bottom: var(--space-xs);
     background-color: var(--tw-bg-gray);
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -88,44 +88,6 @@
 
 .action-circle span {
     font-size: var(--font-xs);
-    font-weight: 500;
-}
-
-/* Backup Banner */
-.backup-banner {
-    margin: 0 var(--space-md) var(--space-md);
-    background-color: var(--tw-bg-gray);
-    border-radius: 12px;
-    padding: var(--space-md);
-    display: flex;
-    align-items: center;
-}
-
-.backup-icon {
-    margin-right: var(--space-md);
-}
-
-.backup-icon img {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-}
-
-.backup-content {
-    flex: 1;
-}
-
-.backup-title {
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: var(--tw-black);
-}
-
-.backup-action {
-    color: var(--tw-blue);
-    display: flex;
-    align-items: center;
-    gap: 4px;
     font-weight: 500;
 }
 
@@ -154,10 +116,10 @@
 .tab-button.active::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -1px;
     left: 0;
     width: 100%;
-    height: 3px;
+    height: 2px;
     background-color: var(--tw-blue);
 }
 
@@ -175,8 +137,8 @@
 }
 
 .token-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     overflow: hidden;
     margin-right: var(--space-md);
@@ -199,10 +161,11 @@
     font-weight: 600;
     color: var(--tw-black);
     margin-bottom: 2px;
+    font-size: var(--font-md);
 }
 
 .token-price {
-    font-size: var(--font-xs);
+    font-size: var(--font-sm);
     color: var(--tw-medium-gray);
     display: flex;
     align-items: center;
@@ -225,7 +188,7 @@
 }
 
 .token-value {
-    font-size: var(--font-xs);
+    font-size: var(--font-sm);
     color: var(--tw-medium-gray);
 }
 
@@ -251,7 +214,7 @@
 }
 
 .tab-item i {
-    font-size: 22px;
+    font-size: 20px;
     margin-bottom: 4px;
     color: var(--tw-medium-gray);
 }
@@ -261,7 +224,7 @@
 }
 
 .tab-item span {
-    font-size: 12px;
+    font-size: var(--font-xs);
     color: var(--tw-medium-gray);
 }
 
@@ -279,8 +242,8 @@
 }
 
 .transaction-icon {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -306,6 +269,7 @@
 .transaction-type {
     font-weight: 600;
     color: var(--tw-black);
+    font-size: var(--font-md);
 }
 
 .transaction-date {
@@ -321,6 +285,7 @@
 .transaction-value {
     font-weight: 600;
     color: var(--tw-black);
+    font-size: var(--font-md);
 }
 
 .transaction-receive .transaction-value {
@@ -346,12 +311,12 @@
 }
 
 .detail-action i {
-    font-size: var(--font-lg);
+    font-size: var(--font-md);
     margin-bottom: var(--space-xs);
     background-color: rgba(51, 117, 187, 0.1);
     color: var(--tw-blue);
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     display: flex;
     justify-content: center;
     align-items: center;
