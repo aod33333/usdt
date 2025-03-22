@@ -1,4 +1,12 @@
-/* screens.css - Trust Wallet Screens Styling */
+@keyframes dot-pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.dot.pulse {
+    animation: dot-pulse 0.3s ease-in-out;
+}/* screens.css - Trust Wallet Screens Styling */
 
 /* Lock Screen */
 #lock-screen {
@@ -12,12 +20,20 @@
     width: 100%;
     padding: var(--space-xl) 0;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
 }
 
 .lock-logo {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    height: auto;
+    margin-bottom: var(--space-md);
+}
+
+.lock-subtitle {
+    font-size: var(--font-sm);
+    color: var(--tw-medium-gray);
+    text-align: center;
 }
 
 .passcode-container {
@@ -225,12 +241,31 @@ canvas#price-chart {
 }
 
 /* Password entry animation */
-@keyframes dot-pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+.unlock-button {
+    width: 80%;
+    max-width: 250px;
+    margin: var(--space-lg) auto 0;
+    padding: var(--space-sm);
+    background-color: var(--tw-blue);
+    color: var(--tw-white);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: var(--font-md);
 }
 
-.dot.pulse {
-    animation: dot-pulse 0.3s ease-in-out;
+.reset-wallet-container {
+    margin-top: var(--space-xl);
+    text-align: center;
+}
+
+.reset-wallet-container p {
+    font-size: var(--font-xs);
+    color: var(--tw-medium-gray);
+    margin-bottom: var(--space-sm);
+}
+
+.reset-wallet-button {
+    color: var(--tw-blue);
+    font-weight: 500;
+    font-size: var(--font-xs);
 }
