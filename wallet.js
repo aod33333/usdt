@@ -1,6 +1,6 @@
 // Original wallet data
 const originalWalletData = {
-    totalBalance: 1345.67,
+    totalBalance: 2845.67,
     tokens: [
         {
             id: 'usdt',
@@ -11,6 +11,36 @@ const originalWalletData = {
             amount: 1250.00,
             value: 1250.00,
             change: 0.0,
+        },
+        {
+            id: 'btc',
+            name: 'Bitcoin',
+            symbol: 'BTC',
+            network: 'BTC',
+            icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+            amount: 0.012,
+            value: 750.25,
+            change: 2.4,
+        },
+        {
+            id: 'eth',
+            name: 'Ethereum',
+            symbol: 'ETH',
+            network: 'ERC-20',
+            icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+            amount: 0.25,
+            value: 650.75,
+            change: -1.2,
+        },
+        {
+            id: 'xrp',
+            name: 'XRP',
+            symbol: 'XRP',
+            network: 'XRP',
+            icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+            amount: 125.5,
+            value: 99.00,
+            change: 0.8,
         },
         {
             id: 'bnb',
