@@ -163,6 +163,10 @@ function initWalletSelector() {
             
             // Update wallet display
             updateWalletUI();
+            
+            // Show investment warning when switching wallets
+            const warningBanner = document.getElementById('investment-warning');
+            warningBanner.style.display = 'block';
         });
     });
 }
