@@ -65,41 +65,48 @@
     gap: var(--space-md);
     width: 80%;
     max-width: 300px;
+    margin-bottom: var(--space-xl);
 }
 
 .numpad-key {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    background-color: var(--tw-bg-gray);
-    color: var(--tw-black);
-    font-size: var(--font-lg);
+    background-color: #262b35;
+    color: var(--tw-white);
+    font-size: var(--font-xl);
     font-weight: 600;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
+.numpad-key.big-key {
+    width: 80px;
+    height: 80px;
+    font-size: 28px;
+}
+
 .numpad-key:active {
-    background-color: var(--tw-light-gray);
+    background-color: #3a4049;
 }
 
 .numpad-key.biometric {
-    font-size: 24px;
-    color: var(--tw-blue);
+    font-size: 30px;
+    color: #3375BB;
 }
 
 .numpad-key.backspace {
-    font-size: 20px;
-    color: var(--tw-dark-gray);
+    font-size: 24px;
+    color: var(--tw-white);
 }
 
 .unlock-button {
     width: 80%;
-    max-width: 250px;
-    margin: var(--space-lg) auto 0;
-    padding: var(--space-sm);
-    background-color: var(--tw-blue);
+    max-width: 350px;
+    margin: 0 auto;
+    padding: var(--space-md);
+    background-color: #3375BB;
     color: var(--tw-white);
     border-radius: 8px;
     font-weight: 600;
