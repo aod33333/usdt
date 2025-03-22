@@ -66,7 +66,41 @@ html, body {
     overflow: hidden;
     background-color: var(--tw-white);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    padding-top: 24px; /* For status bar */
+}
+
+/* Transactions banner */
+.transactions-banner {
+    background-color: #FFB300;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: black;
+    position: relative;
+}
+
+.transactions-banner h3 {
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.filter-icon {
+    position: absolute;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    background-color: #333;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.warning-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 24px;
 }
 
 .screen {
