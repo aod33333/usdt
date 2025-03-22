@@ -27,50 +27,69 @@
     background-color: var(--tw-white);
 }
 
-/* Risk Warning Banner */
-.risk-warning {
+/* Investment Warning Banner */
+.investment-warning {
     position: fixed;
-    top: 0;
     left: 0;
     width: 100%;
-    background-color: rgba(235, 87, 87, 0.9);
+    background-color: rgba(0, 0, 0, 0.9);
     color: var(--tw-white);
     z-index: 999;
     padding: var(--space-sm);
+    bottom: 0;
+    display: none;
 }
 
-.risk-warning-content {
+.investment-warning-content {
     display: flex;
     align-items: center;
     max-width: 480px;
     margin: 0 auto;
 }
 
-.risk-warning-content i {
-    font-size: 24px;
+.investment-warning-content i {
+    font-size: 20px;
     margin-right: var(--space-sm);
+    color: #FFD700;
 }
 
-.risk-warning-text {
+.investment-warning-text {
     flex: 1;
 }
 
-.risk-warning-text h4 {
-    font-weight: 600;
-    margin-bottom: 2px;
-}
-
-.risk-warning-text p {
+.investment-warning-text p {
     font-size: var(--font-xs);
     margin: 0;
+    line-height: 1.4;
+}
+
+.learn-more {
+    color: #4DA9FF;
+    text-decoration: underline;
 }
 
 .close-warning {
     color: var(--tw-white);
-    font-size: var(--font-lg);
+    font-size: var(--font-md);
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: var(--space-sm);
 }
 
-/* Biometric Authentication Styles */
+/* Dark mode */
+body.dark-mode {
+    --tw-black: #FFFFFF;
+    --tw-dark-gray: #C4C9CC;
+    --tw-medium-gray: #8A939D; 
+    --tw-light-gray: #5F6C75;
+    --tw-bg-gray: #2C2F36;
+    --tw-white: #1F2128;
+}
+
+body.dark-mode .wallet-header {
+    background: linear-gradient(135deg, #0B3B69, #1E4D80);
+}
 .biometric-container {
     display: flex;
     justify-content: center;
@@ -361,8 +380,9 @@
     -webkit-tap-highlight-color: transparent;
 }
 
+/* Dark mode support */
 :root {
-    /* Trust Wallet Colors */
+    /* Trust Wallet Colors - Light Mode */
     --tw-blue-dark: #0B65C6;
     --tw-blue: #3375BB;
     --tw-blue-light: #2B80D4;
