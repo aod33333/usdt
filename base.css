@@ -1,4 +1,359 @@
-/* Reset & Base Styles */
+.tx-button.secondary {
+    background-color: var(--tw-bg-gray);
+    color: var(--tw-dark-gray);
+}
+
+/* Admin form enhancements */
+.admin-wallet-selector,
+.admin-token-selector {
+    margin-bottom: var(--space-md);
+}
+
+.admin-wallet-selector label,
+.admin-token-selector label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    color: var(--tw-dark-gray);
+    font-weight: 500;
+}
+
+.admin-wallet-selector select,
+.admin-token-selector select {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--tw-light-gray);
+    border-radius: 8px;
+    font-size: var(--font-md);
+    background-color: var(--tw-white);
+}
+
+/* Risk Warning Banner */
+.risk-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(235, 87, 87, 0.9);
+    color: var(--tw-white);
+    z-index: 999;
+    padding: var(--space-sm);
+}
+
+.risk-warning-content {
+    display: flex;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.risk-warning-content i {
+    font-size: 24px;
+    margin-right: var(--space-sm);
+}
+
+.risk-warning-text {
+    flex: 1;
+}
+
+.risk-warning-text h4 {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.risk-warning-text p {
+    font-size: var(--font-xs);
+    margin: 0;
+}
+
+.close-warning {
+    color: var(--tw-white);
+    font-size: var(--font-lg);
+}
+
+/* Biometric Authentication Styles */
+.biometric-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.biometric-content {
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    text-align: center;
+    width: 80%;
+    max-width: 300px;
+}
+
+.biometric-content h3 {
+    font-size: var(--font-lg);
+    margin-bottom: var(--space-sm);
+}
+
+.biometric-content p {
+    color: var(--tw-medium-gray);
+    margin-bottom: var(--space-lg);
+}
+
+.fingerprint-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto var(--space-lg);
+}
+
+.fingerprint-icon {
+    font-size: 60px;
+    color: var(--tw-dark-gray);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.fingerprint-scanning {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to bottom, rgba(11, 101, 198, 0.3), transparent);
+    border-radius: 50%;
+    animation: scanning 2s infinite;
+}
+
+@keyframes scanning {
+    0% {
+        height: 0%;
+        top: 0;
+    }
+    50% {
+        height: 100%;
+        top: 0;
+    }
+    100% {
+        height: 0%;
+        top: 100%;
+    }
+}
+
+.biometric-status {
+    color: var(--tw-dark-gray);
+    margin-bottom: var(--space-lg);
+}
+
+.cancel-biometric {
+    color: var(--tw-blue);
+    background: none;
+    font-weight: 500;
+}
+
+/* Blockchain Explorer Styles */
+.explorer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--tw-white);
+    z-index: 1500;
+    display: none;
+    flex-direction: column;
+}
+
+.explorer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background-color: var(--tw-blue);
+    color: var(--tw-white);
+}
+
+.explorer-title {
+    font-weight: 600;
+    font-size: var(--font-lg);
+}
+
+.explorer-back-button, 
+.explorer-button {
+    color: var(--tw-white);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.explorer-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.explorer-search-container {
+    padding: var(--space-md);
+    background-color: var(--tw-blue-light);
+}
+
+.explorer-search {
+    display: flex;
+    align-items: center;
+    background-color: var(--tw-white);
+    border-radius: 8px;
+    padding: var(--space-sm);
+}
+
+.explorer-search i {
+    color: var(--tw-medium-gray);
+    margin-right: var(--space-sm);
+    margin-left: var(--space-xs);
+}
+
+.explorer-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: var(--font-sm);
+}
+
+.explorer-transaction {
+    padding: var(--space-md);
+}
+
+.explorer-section {
+    background-color: var(--tw-white);
+    border-radius: 8px;
+    margin-bottom: var(--space-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.explorer-section-header {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--tw-bg-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.explorer-section-header h3 {
+    font-size: var(--font-md);
+    font-weight: 600;
+    margin: 0;
+}
+
+.explorer-status {
+    font-size: var(--font-xs);
+    font-weight: 500;
+}
+
+.explorer-status.success {
+    color: var(--tw-green);
+}
+
+.explorer-detail-rows {
+    padding: var(--space-md);
+}
+
+.explorer-detail-row {
+    display: flex;
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-sm);
+}
+
+.explorer-detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.explorer-detail-label {
+    color: var(--tw-dark-gray);
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.explorer-detail-value {
+    flex: 1;
+    word-break: break-all;
+}
+
+.explorer-detail-value.address {
+    color: var(--tw-blue);
+}
+
+.explorer-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.explorer-badge.success {
+    background-color: rgba(5, 196, 107, 0.1);
+    color: var(--tw-green);
+}
+
+.explorer-confirmations {
+    font-size: 11px;
+    color: var(--tw-medium-gray);
+    margin-left: var(--space-xs);
+}
+
+.explorer-token-transfer {
+    padding: var(--space-md);
+    display: flex;
+    align-items: center;
+}
+
+.explorer-token-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: var(--space-md);
+}
+
+.explorer-token-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.explorer-token-details {
+    flex: 1;
+}
+
+.explorer-token-from-to {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.explorer-address-short {
+    color: var(--tw-blue);
+    font-size: var(--font-xs);
+}
+
+.explorer-token-from-to i {
+    margin: 0 var(--space-xs);
+    color: var(--tw-medium-gray);
+    font-size: 10px;
+}
+
+.explorer-token-info {
+    font-size: var(--font-xs);
+    color: var(--tw-dark-gray);
+}
+
+.explorer-token-amount {
+    font-weight: 600;
+    color: var(--tw-black);
+    margin-left: var(--space-xs);
+}/* Reset & Base Styles */
 * {
     margin: 0;
     padding: 0;
