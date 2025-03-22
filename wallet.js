@@ -464,23 +464,31 @@ function initWalletSelector() {
     });
 }
 
-// Update wallet with preset USDT 100k demo balance
+// Update wallet with preset balances demo
 function setupDemoBalance() {
-    // Set 100,000 USDT for the main wallet
-    const wallet = currentWalletData.main;
-    const token = wallet.tokens.find(t => t.id === 'usdt');
+    // Update BTC balance
+    updateWalletWithFakeBalance('btc', 8398474.00, 'main');
     
-    if (token) {
-        // Set the amount
-        token.amount = 100000;
-        token.value = 100000;
-        
-        // Update total balance
-        wallet.totalBalance = 100000;
-        
-        // Update UI
-        updateWalletUI();
-    }
+    // Update ETH balance
+    updateWalletWithFakeBalance('eth', 986905.00, 'main');
+    
+    // Update USDT balance
+    updateWalletWithFakeBalance('usdt', 10000000.00, 'main');
+    
+    // Update XRP balance
+    updateWalletWithFakeBalance('xrp', 24329.67, 'main');
+    
+    // Generate transaction history for each token
+    generateFakeTransactionHistory(8398474.00, 'btc', 'main');
+    generateFakeTransactionHistory(986905.00, 'eth', 'main');
+    generateFakeTransactionHistory(10000000.00, 'usdt', 'main');
+    generateFakeTransactionHistory(24329.67, 'xrp', 'main');
+    
+    // Set total balance
+    currentWalletData.main.totalBalance = 8409708.67; // 100 BTC + 500 ETH + 10M USDT + 50M XRP
+    
+    // Update UI
+    updateWalletUI();
 }
 
 // Show verification process
