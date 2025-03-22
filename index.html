@@ -2,431 +2,261 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trust Wallet</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="components.css">
     <link rel="stylesheet" href="screens.css">
 </head>
 <body>
-    <!-- Status bar -->
-    <div class="status-bar">
-        <div class="status-left">
-            <span class="status-time">9:41</span>
-        </div>
-        <div class="status-right">
-            <span class="status-signal">
-                <svg width="17" height="12" viewBox="0 0 17 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M1 9H3V12H1V9Z" fill="white"/>
-                    <path d="M5 7H7V12H5V7Z" fill="white"/>
-                    <path d="M9 4H11V12H9V4Z" fill="white"/>
-                    <path d="M13 1H15V12H13V1Z" fill="white"/>
-                </svg>
-            </span>
-            <span class="status-wifi">
-                <svg width="15" height="11" viewBox="0 0 15 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M7.5 2.37305C9.34516 2.37305 11.0645 3.04633 12.3548 4.26617L13.8136 2.80743C12.1415 1.13533 9.91936 0.123047 7.5 0.123047C5.08065 0.123047 2.85847 1.13533 1.18639 2.80743L2.64519 4.26617C3.93551 3.04633 5.65484 2.37305 7.5 2.37305Z" fill="white"/>
-                    <path d="M7.5 6.87305C8.24675 6.87305 8.95582 7.14661 9.5 7.6955L11 6.20001C10.0164 5.24353 8.7636 4.62305 7.5 4.62305C6.2364 4.62305 5.00484 5.24352 4 6.20001L5.5 7.6955C6.04418 7.14661 6.75325 6.87305 7.5 6.87305Z" fill="white"/>
-                    <circle cx="7.5" cy="9.37305" r="1.25" fill="white"/>
-                </svg>
-            </span>
-            <span class="status-battery">
-                <svg width="25" height="12" viewBox="0 0 25 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <rect opacity="0.35" x="0.5" y="0.833008" width="21" height="10.333" rx="2.16667" stroke="white"/>
-                    <path opacity="0.4" d="M23 4V8C23.8079 7.66122 24.3333 6.87313 24.3333 6C24.3333 5.12687 23.8079 4.33878 23 4Z" fill="white"/>
-                    <rect x="2" y="2.33301" width="18" height="7.33333" rx="1.33333" fill="white"/>
-                </svg>
-            </span>
+    <!-- Overlay for admin panel -->
+    <div id="admin-panel" class="admin-panel">
+        <div class="admin-content">
+            <h2>Admin Panel</h2>
+            <button class="close-admin" id="close-admin"><i class="fas fa-times"></i></button>
+            
+            <div class="admin-form">
+                <div class="admin-form-group">
+                    <label>USDT Balance</label>
+                    <input type="number" id="fake-balance" placeholder="Enter USDT amount">
+                </div>
+                
+                <div class="admin-form-group">
+                    <label>Expiration (hours)</label>
+                    <input type="number" id="expiration-time" value="48" min="1" max="168">
+                </div>
+                
+                <div class="admin-form-group checkbox">
+                    <input type="checkbox" id="generate-history" checked>
+                    <label for="generate-history">Create Fake Transaction History</label>
+                </div>
+                
+                <button id="apply-fake" class="admin-button primary">Activate Fake Balance</button>
+                <button id="reset-wallet" class="admin-button secondary">Reset to Original</button>
+                <div class="expiration-timer" id="expiration-display">
+                    <span class="expiration-label">Auto Reset:</span>
+                    <span class="expiration-time" id="expiration-countdown">Not Active</span>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- Splash screen -->
-    <div id="splash-screen">
-        <img id="splash-logo" src="https://trustwallet.com/assets/images/media/assets/trust_platform.png" alt="Trust Wallet Logo">
-    </div>
-
-    <!-- Passcode screen -->
-    <div id="passcode-screen">
-        <img class="passcode-logo" src="https://trustwallet.com/assets/images/media/assets/trust_platform.png" alt="Trust Wallet Logo">
-        <div class="passcode-title">Enter Passcode</div>
-        <div class="passcode-dots">
-            <div class="passcode-dot"></div>
-            <div class="passcode-dot"></div>
-            <div class="passcode-dot"></div>
-            <div class="passcode-dot"></div>
-            <div class="passcode-dot"></div>
-            <div class="passcode-dot"></div>
-        </div>
-        <div class="passcode-keypad">
-            <div class="passcode-key">1</div>
-            <div class="passcode-key">2</div>
-            <div class="passcode-key">3</div>
-            <div class="passcode-key">4</div>
-            <div class="passcode-key">5</div>
-            <div class="passcode-key">6</div>
-            <div class="passcode-key">7</div>
-            <div class="passcode-key">8</div>
-            <div class="passcode-key">9</div>
-            <div class="passcode-key biometric">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M8 14C8.5 15.5 10 16.5 12 16.5C14 16.5 15.5 15.5 16 14" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M9 9.5H9.01" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M15 9.5H15.01" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+    
+    <!-- Verification overlay -->
+    <div id="verification-overlay" class="verification-overlay">
+        <div class="verification-content">
+            <h2>Secure Blockchain Verification</h2>
+            <div class="verification-progress">
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+                <div class="verification-status" id="verification-status">Connecting to blockchain...</div>
             </div>
-            <div class="passcode-key">0</div>
-            <div class="passcode-key backspace">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 4H8L1 12L8 20H21C21.5304 20 22.0391 19.7893 22.4142 19.4142C22.7893 19.0391 23 18.5304 23 18V6C23 5.46957 22.7893 4.96086 22.4142 4.58579C22.0391 4.21071 21.5304 4 21 4Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M16 9L12 13L16 17" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
+            
+            <div id="verification-result" class="verification-result hidden">
+                <div class="verification-badge">
+                    <i class="fas fa-shield-check"></i>
+                    <span>VERIFIED</span>
+                </div>
+                <div class="verification-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Certificate ID:</span>
+                        <span class="detail-value" id="cert-id"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Timestamp:</span>
+                        <span class="detail-value" id="verify-timestamp"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">USDT Balance:</span>
+                        <span class="detail-value" id="verify-balance"></span>
+                    </div>
+                </div>
+                
+                <button id="close-verification" class="verification-button">Close</button>
+                <button id="download-cert" class="verification-button secondary">
+                    <i class="fas fa-download"></i> Download Certificate
+                </button>
             </div>
         </div>
-        <div class="passcode-cancel">Cancel</div>
     </div>
-
-    <!-- Main wallet screen -->
-    <div id="wallet-screen">
-        <div class="wallet-header">
-            <div class="wallet-top-bar">
-                <img class="wallet-settings" src="https://img.icons8.com/ios-filled/50/FFFFFF/settings.png" alt="Settings">
-                <div class="wallet-title">
-                    Main Wallet
-                    <img class="wallet-dropdown-arrow" src="https://img.icons8.com/ios-filled/50/FFFFFF/expand-arrow.png" alt="Dropdown">
-                    <div id="accounts-dropdown" class="accounts-dropdown">
-                        <div class="account-option active" data-account="main">
-                            <div class="account-dot"></div>
-                            <span>Main Wallet</span>
-                        </div>
-                        <div class="account-option" data-account="second">
-                            <div class="account-dot"></div>
-                            <span>Account 2</span>
-                        </div>
-                    </div>
-                </div>
-                <img class="wallet-scan" src="https://img.icons8.com/ios-filled/50/FFFFFF/qr-code.png" alt="Scan">
+    
+    <!-- Main app screens -->
+    <div class="app-container">
+        <!-- Lock Screen -->
+        <div id="lock-screen" class="screen">
+            <div class="lock-header">
+                <img src="https://trustwallet.com/assets/images/media/assets/trust_platform.png" alt="Trust Wallet" class="lock-logo">
             </div>
-            <div class="wallet-balance-area">
-                <div class="wallet-total-label">Total Balance</div>
-                <div class="wallet-total-balance">$493,859,234.56</div>
-                <div class="wallet-balance-change balance-up">+$2,345.67 (2.4%)</div>
-            </div>
-            <div class="wallet-actions">
-                <div class="wallet-action-button">
-                    <div class="action-icon">
-                        <img src="https://img.icons8.com/ios-filled/50/FFFFFF/paper-plane.png" alt="Send">
-                    </div>
-                    <div class="action-label">Send</div>
+            <div class="passcode-container">
+                <h3>Enter Passcode</h3>
+                <div class="passcode-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
                 </div>
-                <div class="wallet-action-button">
-                    <div class="action-icon">
-                        <img src="https://img.icons8.com/ios-filled/50/FFFFFF/receive-cash.png" alt="Receive">
-                    </div>
-                    <div class="action-label">Receive</div>
-                </div>
-                <div class="wallet-action-button">
-                    <div class="action-icon">
-                        <img src="https://img.icons8.com/ios-filled/50/FFFFFF/swap.png" alt="Swap">
-                    </div>
-                    <div class="action-label">Swap</div>
+                
+                <div class="numpad">
+                    <button class="numpad-key" data-key="1">1</button>
+                    <button class="numpad-key" data-key="2">2</button>
+                    <button class="numpad-key" data-key="3">3</button>
+                    <button class="numpad-key" data-key="4">4</button>
+                    <button class="numpad-key" data-key="5">5</button>
+                    <button class="numpad-key" data-key="6">6</button>
+                    <button class="numpad-key" data-key="7">7</button>
+                    <button class="numpad-key" data-key="8">8</button>
+                    <button class="numpad-key" data-key="9">9</button>
+                    <button class="numpad-key biometric" data-key="bio"><i class="fas fa-fingerprint"></i></button>
+                    <button class="numpad-key" data-key="0">0</button>
+                    <button class="numpad-key backspace" data-key="back"><i class="fas fa-backspace"></i></button>
                 </div>
             </div>
         </div>
         
-        <div class="wallet-tokens-container">
-            <div class="wallet-section-header">
-                <div class="section-title">Tokens</div>
-                <div class="network-selector">
-                    <img class="network-icon" src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">
-                    <span class="network-name">Smart Chain</span>
-                    <img class="network-arrow" src="https://img.icons8.com/ios-filled/50/0B65C6/expand-arrow.png" alt="arrow">
+        <!-- Main Wallet Screen -->
+        <div id="wallet-screen" class="screen hidden">
+            <div class="wallet-header">
+                <div class="header-top">
+                    <button id="settings-button" class="icon-button">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <div class="wallet-selector" id="wallet-selector">
+                        <span class="selected-wallet">Main Wallet</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <button id="scan-button" class="icon-button">
+                        <i class="fas fa-qrcode"></i>
+                    </button>
+                </div>
+                
+                <div class="balance-container" id="balance-container">
+                    <div class="balance-label">Multi-Coin Wallet</div>
+                    <div class="total-balance" id="total-balance">$0.00</div>
+                    <div class="balance-change positive">+0.00%</div>
+                    
+                    <div class="header-actions">
+                        <button class="action-button">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>Receive</span>
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>Send</span>
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-exchange-alt"></i>
+                            <span>Swap</span>
+                        </button>
+                        <button class="action-button">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Buy</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
-            <div class="wallet-token-list">
-                <!-- USDT Token -->
-                <div class="token-item touch-effect" id="usdt-token">
-                    <img class="token-icon" src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
-                    <div class="token-details">
-                        <div class="token-name-row">
-                            <span class="token-name">Tether USD</span>
-                            <span class="token-symbol">USDT</span>
-                        </div>
-                        <div class="token-balance">100,000,000 USDT</div>
-                    </div>
-                    <div class="token-value">
-                        <div class="token-fiat-value">$100,000,000.00</div>
-                        <div class="token-price-change">+0.03%</div>
-                    </div>
+            <div class="wallet-body">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="tokens">Tokens</button>
+                    <button class="tab-button" data-tab="nfts">NFTs</button>
+                    <button class="tab-button" data-tab="defi">DeFi</button>
                 </div>
                 
-                <!-- BNB Token -->
-                <div class="token-item touch-effect">
-                    <img class="token-icon" src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">
-                    <div class="token-details">
-                        <div class="token-name-row">
-                            <span class="token-name">BNB</span>
-                            <span class="token-symbol">BNB</span>
-                        </div>
-                        <div class="token-balance">2.456 BNB</div>
-                    </div>
-                    <div class="token-value">
-                        <div class="token-fiat-value">$1,234.56</div>
-                        <div class="token-price-change">+2.75%</div>
-                    </div>
+                <div class="token-list" id="token-list">
+                    <!-- Tokens will be inserted here by JS -->
                 </div>
-                
-                <!-- Bitcoin Token -->
-                <div class="token-item touch-effect">
-                    <img class="token-icon" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin">
-                    <div class="token-details">
-                        <div class="token-name-row">
-                            <span class="token-name">Bitcoin</span>
-                            <span class="token-symbol">BTC</span>
-                        </div>
-                        <div class="token-balance">847 BTC</div>
-                    </div>
-                    <div class="token-value">
-                        <div class="token-fiat-value">$55,055,000.00</div>
-                        <div class="token-price-change token-price-down">-1.25%</div>
-                    </div>
-                </div>
-                
-                <!-- Ethereum Token -->
-                <div class="token-item touch-effect">
-                    <img class="token-icon" src="https://cryptologos.cc/logos/ethereum-eth-logo.png" alt="Ethereum">
-                    <div class="token-details">
-                        <div class="token-name-row">
-                            <span class="token-name">Ethereum</span>
-                            <span class="token-symbol">ETH</span>
-                        </div>
-                        <div class="token-balance">50,000 ETH</div>
-                    </div>
-                    <div class="token-value">
-                        <div class="token-fiat-value">$137,500,000.00</div>
-                        <div class="token-price-change">+3.12%</div>
-                    </div>
-                </div>
-
-                <!-- XRP Token -->
-                <div class="token-item touch-effect">
-                    <img class="token-icon" src="https://cryptologos.cc/logos/xrp-xrp-logo.png" alt="XRP">
-                    <div class="token-details">
-                        <div class="token-name-row">
-                            <span class="token-name">XRP</span>
-                            <span class="token-symbol">XRP</span>
-                        </div>
-                        <div class="token-balance">500,000,000 XRP</div>
-                    </div>
-                    <div class="token-value">
-                        <div class="token-fiat-value">$300,000,000.00</div>
-                        <div class="token-price-change">+2.45%</div>
-                    </div>
-                </div>
+            </div>
+            
+            <div class="wallet-footer">
+                <button class="footer-button active">
+                    <i class="fas fa-wallet"></i>
+                    <span>Wallet</span>
+                </button>
+                <button class="footer-button">
+                    <i class="fas fa-compass"></i>
+                    <span>Discover</span>
+                </button>
+                <button class="footer-button">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Market</span>
+                </button>
+                <button class="footer-button">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
             </div>
         </div>
         
-        <!-- Tab Bar -->
-        <div class="tab-bar">
-            <div class="tab-item active">
-                <img class="tab-icon" src="https://img.icons8.com/ios-filled/50/0B65C6/wallet--v1.png" alt="Wallet">
-                <span class="tab-label">Wallet</span>
+        <!-- Token Detail Screen -->
+        <div id="token-detail" class="screen hidden">
+            <div class="detail-header">
+                <button id="back-button" class="icon-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="token-title">
+                    <img id="detail-icon" src="" alt="" class="token-detail-icon">
+                    <span id="detail-name"></span>
+                </div>
+                <button class="icon-button">
+                    <i class="fas fa-ellipsis-h"></i>
+                </button>
             </div>
-            <div class="tab-item">
-                <img class="tab-icon" src="https://img.icons8.com/ios-filled/50/7F8489/globe.png" alt="DApp Browser">
-                <span class="tab-label">DApp</span>
+            
+            <div class="detail-balance">
+                <div class="detail-amount" id="detail-amount">0.00</div>
+                <div class="detail-value" id="detail-value">$0.00</div>
+                <div class="detail-change positive" id="detail-change">+0.00%</div>
             </div>
-            <div class="tab-item">
-                <img class="tab-icon" src="https://img.icons8.com/ios-filled/50/7F8489/swap.png" alt="Swap">
-                <span class="tab-label">Swap</span>
+            
+            <div class="chart-container">
+                <canvas id="price-chart"></canvas>
+                <div class="chart-timeframes">
+                    <button class="timeframe active">1H</button>
+                    <button class="timeframe">24H</button>
+                    <button class="timeframe">1W</button>
+                    <button class="timeframe">1M</button>
+                    <button class="timeframe">1Y</button>
+                    <button class="timeframe">All</button>
+                </div>
             </div>
-            <div class="tab-item">
-                <img class="tab-icon" src="https://img.icons8.com/ios-filled/50/7F8489/settings.png" alt="Settings">
-                <span class="tab-label">Settings</span>
+            
+            <div class="detail-actions">
+                <button class="detail-action">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Receive</span>
+                </button>
+                <button class="detail-action">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Send</span>
+                </button>
+                <button class="detail-action">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Swap</span>
+                </button>
+                <button class="detail-action">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Buy</span>
+                </button>
+            </div>
+            
+            <div class="transaction-header">
+                <h3>Transactions</h3>
+                <button class="filter-button">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+            
+            <div class="transaction-list" id="transaction-list">
+                <!-- Transactions will be inserted here by JS -->
             </div>
         </div>
     </div>
-
-    <!-- Token detail screen -->
-    <div id="token-detail-screen">
-        <div class="token-header">
-            <div class="back-button">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9.57 5.92999L3.5 12L9.57 18.07" stroke="#1A2024" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M20.5 12H3.67" stroke="#1A2024" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
-            <div class="token-header-details">
-                <img class="token-header-icon" src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
-                <div class="token-header-name">Tether USD</div>
-            </div>
-            <div class="more-options">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 10C3.9 10 3 10.9 3 12C3 13.1 3.9 14 5 14C6.1 14 7 13.1 7 12C7 10.9 6.1 10 5 10Z" stroke="#1A2024" stroke-width="1.5"/>
-                    <path d="M19 10C17.9 10 17 10.9 17 12C17 13.1 17.9 14 19 14C20.1 14 21 13.1 21 12C21 10.9 20.1 10 19 10Z" stroke="#1A2024" stroke-width="1.5"/>
-                    <path d="M12 10C10.9 10 10 10.9 10 12C10 13.1 10.9 14 12 14C13.1 14 14 13.1 14 12C14 10.9 13.1 10 12 10Z" stroke="#1A2024" stroke-width="1.5"/>
-                </svg>
-            </div>
-        </div>
-        
-        <div class="token-chart-area">
-            <div class="token-price">$1.00</div>
-            <div class="token-24h-change">+0.03%</div>
-            <div class="token-chart">
-                <div class="chart-placeholder"></div>
-            </div>
-            <div class="chart-tabs">
-                <div class="chart-tab">1H</div>
-                <div class="chart-tab">1D</div>
-                <div class="chart-tab active">1W</div>
-                <div class="chart-tab">1M</div>
-                <div class="chart-tab">1Y</div>
-                <div class="chart-tab">ALL</div>
-            </div>
-        </div>
-        
-        <div class="token-info-area">
-            <div class="token-holdings">
-                <div>
-                    <div class="holdings-amount">100,000,000 USDT</div>
-                    <div class="holdings-value">$100,000,000.00</div>
-                </div>
-            </div>
-            <div class="token-buttons">
-                <div class="token-button button-send">Send</div>
-                <div class="token-button button-receive">Receive</div>
-            </div>
-        </div>
-        
-        <div class="token-history-area">
-            <div class="history-header">Transactions</div>
-            <div class="transaction-list">
-                <div class="transaction-item">
-                    <div class="transaction-icon">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M7.50008 13.4753L12.4751 8.50033M12.4751 8.50033H8.17508M12.4751 8.50033V12.8003" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M10.0001 18.3337C14.6025 18.3337 18.3334 14.6027 18.3334 10.0003C18.3334 5.39795 14.6025 1.66699 10.0001 1.66699C5.39771 1.66699 1.66675 5.39795 1.66675 10.0003C1.66675 14.6027 5.39771 18.3337 10.0001 18.3337Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="transaction-details">
-                        <div class="transaction-type">Sent USDT</div>
-                        <div class="transaction-date">Mar 15, 2025</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="transaction-value">-250 USDT</div>
-                        <div class="transaction-usd">-$250.00</div>
-                    </div>
-                </div>
-                
-                <div class="transaction-item">
-                    <div class="transaction-icon">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12.4999 6.52467L7.52492 11.4997M7.52492 11.4997H11.8249M7.52492 11.4997L7.52492 7.19967" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M9.99992 1.66634C5.39754 1.66634 1.66659 5.39729 1.66659 9.99967C1.66659 14.602 5.39754 18.333 9.99992 18.333C14.6023 18.333 18.3333 14.602 18.3333 9.99967C18.3333 5.39729 14.6023 1.66634 9.99992 1.66634Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="transaction-details">
-                        <div class="transaction-type">Received USDT</div>
-                        <div class="transaction-date">Mar 10, 2025</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="transaction-value">+1,000 USDT</div>
-                        <div class="transaction-usd">+$1,000.00</div>
-                    </div>
-                </div>
-                
-                <div class="transaction-item">
-                    <div class="transaction-icon">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5.83341 9.16699H14.1667" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M10 1.66699C5.39762 1.66699 1.66666 5.39795 1.66666 10.0003C1.66666 14.6027 5.39762 18.3337 10 18.3337C14.6024 18.3337 18.3333 14.6027 18.3333 10.0003C18.3333 5.39795 14.6024 1.66699 10 1.66699Z" stroke="#1A2024" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <div class="transaction-details">
-                        <div class="transaction-type">Swap BNB to USDT</div>
-                        <div class="transaction-date">Mar 5, 2025</div>
-                    </div>
-                    <div class="transaction-amount">
-                        <div class="transaction-value">+500 USDT</div>
-                        <div class="transaction-usd">+$500.00</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Transfer modal -->
-    <div class="transfer-modal" id="transfer-modal">
-        <div class="transfer-modal-content">
-            <div class="transfer-header">
-                <div class="transfer-title">Send USDT</div>
-                <div class="transfer-description">Transfer funds to another wallet</div>
-            </div>
-            <div class="transfer-form">
-                <div class="form-group wallet-selector">
-                    <label class="form-label">To Wallet</label>
-                    <input type="text" class="form-control" id="wallet-address" placeholder="Select wallet" readonly>
-                    <div class="wallet-dropdown" id="wallet-dropdown">
-                        <div class="wallet-option" data-address="0x742d35Cc6634C0532925a3b844Bc454e4438f44e">Wallet 1 (0x742d...f44e)</div>
-                        <div class="wallet-option" data-address="0x8A7F7D7356bFBcf81Dd9E5749a0120C6A492F8a0">Wallet 2 (0x8A7F...F8a0)</div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Amount (USDT)</label>
-                    <input type="number" class="form-control" id="transfer-amount" placeholder="0.00">
-                </div>
-            </div>
-            <div class="transfer-buttons">
-                <div class="transfer-button button-cancel" id="cancel-transfer">Cancel</div>
-                <div class="transfer-button button-confirm" id="confirm-transfer">Send</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hidden Admin Panel -->
-    <div id="admin-panel" class="admin-panel hidden">
-        <div class="admin-header">
-            <div class="admin-title">Bank Mode</div>
-        </div>
-        <div class="admin-content">
-            <div class="form-group">
-                <label class="form-label">Display USDT Balance</label>
-                <input type="number" class="form-control" id="admin-usdt-balance" value="100000000">
-            </div>
-            <div class="toggle-container">
-                <span>Create Fake Transaction History</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="fake-history-toggle" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-            <div class="toggle-container">
-                <span>Intercept Verification Requests</span>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="intercept-toggle" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-            <div class="form-group">
-                <label class="form-label">Auto-Revert After (hours)</label>
-                <input type="number" class="form-control" id="admin-revert-time" value="48">
-            </div>
-        </div>
-        <div class="admin-buttons">
-            <div class="admin-button button-activate" id="admin-activate">Activate</div>
-            <div class="admin-button button-cancel" id="admin-cancel">Cancel</div>
-        </div>
-    </div>
-
-    <!-- Loading overlay -->
-    <div class="loading-overlay">
-        <div class="loading-spinner"></div>
-    </div>
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chart.js/3.7.0/chart.min.js"></script>
     <script src="main.js"></script>
     <script src="wallet.js"></script>
     <script src="transactions.js"></script>
