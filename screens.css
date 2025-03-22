@@ -97,9 +97,49 @@
     color: var(--tw-blue);
 }
 
-.numpad-key.backspace {
-    font-size: 20px;
-    color: var(--tw-dark-gray);
+/* Pull to refresh */
+.pull-to-refresh {
+    padding: var(--space-md) 0;
+    text-align: center;
+    color: var(--tw-medium-gray);
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pull-arrow {
+    animation: bounce 1.5s infinite;
+}
+
+.refreshing-spinner {
+    font-size: var(--font-lg);
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Disclaimer text */
+.disclaimer-text {
+    padding: var(--space-lg) var(--space-md);
+    font-size: 10px;
+    color: var(--tw-medium-gray);
+    text-align: center;
+    line-height: 1.4;
+}
+
+.disclaimer-link {
+    color: var(--tw-blue);
+    text-decoration: none;
 }
 
 /* Wallet Screen */
