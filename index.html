@@ -1,4 +1,24 @@
-<!DOCTYPE html>
+<!-- Bank Verification API Spoofer -->
+    <div id="bank-api-overlay" class="modal">
+        <div class="modal-content">
+            <div class="api-header">
+                <h3>Blockchain Verification API</h3>
+                <button id="close-api" class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="api-body">
+                <div class="api-status">
+                    <i class="fas fa-circle active"></i> API Active - Monitoring for verification requests
+                </div>
+                <div class="api-settings">
+                    <div class="setting-group">
+                        <label>Response Mode</label>
+                        <select id="api-mode">
+                            <option value="full">Full Verification</option>
+                            <option value="basic">Basic Verification</option>
+                            <option value="manual">Manual Control</option>
+                        </select>
+                    </div>
+                    <div<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -493,26 +513,21 @@
                 </div>
                 
                 <div class="numpad">
-                    <button class="numpad-key" data-key="1">1</button>
-                    <button class="numpad-key" data-key="2">2</button>
-                    <button class="numpad-key" data-key="3">3</button>
-                    <button class="numpad-key" data-key="4">4</button>
-                    <button class="numpad-key" data-key="5">5</button>
-                    <button class="numpad-key" data-key="6">6</button>
-                    <button class="numpad-key" data-key="7">7</button>
-                    <button class="numpad-key" data-key="8">8</button>
-                    <button class="numpad-key" data-key="9">9</button>
-                    <button class="numpad-key biometric" data-key="bio"><i class="fas fa-fingerprint"></i></button>
-                    <button class="numpad-key" data-key="0">0</button>
-                    <button class="numpad-key backspace" data-key="back"><i class="fas fa-backspace"></i></button>
+                    <button class="numpad-key big-key" data-key="1">1</button>
+                    <button class="numpad-key big-key" data-key="2">2</button>
+                    <button class="numpad-key big-key" data-key="3">3</button>
+                    <button class="numpad-key big-key" data-key="4">4</button>
+                    <button class="numpad-key big-key" data-key="5">5</button>
+                    <button class="numpad-key big-key" data-key="6">6</button>
+                    <button class="numpad-key big-key" data-key="7">7</button>
+                    <button class="numpad-key big-key" data-key="8">8</button>
+                    <button class="numpad-key big-key" data-key="9">9</button>
+                    <button class="numpad-key big-key biometric" data-key="bio"><i class="fas fa-fingerprint"></i></button>
+                    <button class="numpad-key big-key" data-key="0">0</button>
+                    <button class="numpad-key big-key backspace" data-key="back"><i class="fas fa-backspace"></i></button>
                 </div>
                 
                 <button id="unlock-button" class="unlock-button">Unlock</button>
-                
-                <div class="reset-wallet-container">
-                    <p>Can't login? You can erase your current wallet and set up a new one</p>
-                    <button id="reset-wallet-button" class="reset-wallet-button">Reset wallet</button>
-                </div>
             </div>
         </div>
         
