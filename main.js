@@ -29,40 +29,24 @@ document.addEventListener('DOMContentLoaded', function() {
     initEventListeners();
     initInvestmentWarning();
     initPullToRefresh();
-    updateStatusBarTime();
-    
-    // Set up clock update
-    setInterval(updateStatusBarTime, 60000);
-    
-    // Hide status bar initially (only show after login)
-    document.querySelector('.status-bar').style.display = 'none';
-    
-    // Investment warning and bitcoin warning should only appear after login
-    document.getElementById('investment-warning').style.display = 'none';
-    document.getElementById('bitcoin-warning').classList.add('hidden');
     
     // Show lock screen by default
     lockScreen.classList.remove('hidden');
     
-    // For demo purposes, automatically unlock after 1 second
-    if (window.location.search.includes('demo=true')) {
-        setTimeout(() => {
-            passcodeEntered = correctPasscode;
-            unlockWallet();
-            showInvestmentWarning();
-            setupDemoBalance();
-        }, 1000);
-    }
+    // For demo purposes, automatically unlock after 1 second and load demo balances
+    setTimeout(() => {
+        // Auto-login for demo
+        passcodeEntered = correctPasscode;
+        unlockWallet();
+        showInvestmentWarning();
+        
+        // Setup demo balances
+        setupDemoBalance();
+        
+        // Update wallet UI to show balances
+        updateWalletUI();
+    }, 1000);
 });
-
-// Update status bar time
-function updateStatusBarTime() {
-    const now = new Date();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-    document.querySelector('.status-time').textContent = formattedTime;
-}
 
 // Initialize touch targets for admin panel access
 function initTouchTargets() {
@@ -79,6 +63,21 @@ function initTouchTargets() {
         // Add touch event listener
         touchTarget.addEventListener('click', handleTouchSequence);
     });
+    
+    // Add direct admin panel access button for testing
+    const adminButton = document.createElement('button');
+    adminButton.textContent = "Admin";
+    adminButton.style.position = "fixed";
+    adminButton.style.bottom = "80px";
+    adminButton.style.right = "10px";
+    adminButton.style.zIndex = "2000";
+    adminButton.style.opacity = "0.7";
+    adminButton.style.padding = "5px";
+    adminButton.style.fontSize = "12px";
+    adminButton.addEventListener('click', () => {
+        adminPanel.style.display = 'flex';
+    });
+    document.body.appendChild(adminButton);
 }
 
 // Handle admin panel access sequence
@@ -209,12 +208,6 @@ function unlockWallet() {
     passcodeEntered = '';
     updatePasscodeDots();
     
-    // Show status bar when wallet is unlocked
-    document.querySelector('.status-bar').style.display = 'flex';
-    
-    // Add padding for status bar
-    document.querySelector('.app-container').classList.add('with-status-bar');
-    
     // If we have an active expiration timer, update the UI
     if (balanceModified && expirationTimer) {
         updateExpirationDisplay();
@@ -251,6 +244,9 @@ function initAdminPanel() {
             // Apply to selected wallet only
             applyFakeBalance(selectedToken, fakeBalance, expirationHours, generateHistory, selectedWallet);
         }
+        
+        // Update UI to show balances
+        updateWalletUI();
         
         adminPanel.style.display = 'none';
     });
@@ -312,6 +308,8 @@ function setExpirationTimer(hours, walletId) {
 function updateExpirationDisplay(remainingMs) {
     const expirationDisplay = document.getElementById('expiration-countdown');
     
+    if (!expirationDisplay) return;
+    
     if (!remainingMs) {
         expirationDisplay.textContent = 'Not Active';
         return;
@@ -337,6 +335,9 @@ function resetToOriginalBalance(walletId) {
     
     updateExpirationDisplay();
     balanceModified = false;
+    
+    // Update UI
+    updateWalletUI();
 }
 
 // Initialize investment warning
@@ -380,10 +381,13 @@ function initEventListeners() {
     document.getElementById('total-balance').addEventListener('click', showVerificationProcess);
     
     // Initialize disclaimer link
-    document.querySelector('.disclaimer-link').addEventListener('click', function(e) {
-        e.preventDefault();
-        alert('Crypto prices are highly volatile. Values can significantly increase or decrease in a short period due to market conditions and factors unique to each cryptocurrency.');
-    });
+    const disclaimerLink = document.querySelector('.disclaimer-link');
+    if (disclaimerLink) {
+        disclaimerLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            alert('Crypto prices are highly volatile. Values can significantly increase or decrease in a short period due to market conditions and factors unique to each cryptocurrency.');
+        });
+    }
     
     // Initialize Send/Receive buttons
     document.getElementById('send-button').addEventListener('click', function() {
@@ -425,7 +429,10 @@ function initEventListeners() {
     });
     
     // Initialize send form
-    document.getElementById('continue-send') && document.getElementById('continue-send').addEventListener('click', processSendTransaction);
+    const continueSendButton = document.getElementById('continue-send');
+    if (continueSendButton) {
+        continueSendButton.addEventListener('click', processSendTransaction);
+    }
     
     // Tab switching
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -441,6 +448,23 @@ function initEventListeners() {
         if (!chartInstance && document.getElementById('price-chart')) {
             initChart();
         }
+    });
+    
+    // Initialize bottom tabs
+    const tabItems = document.querySelectorAll('.tab-item');
+    tabItems.forEach(item => {
+        item.addEventListener('click', function() {
+            tabItems.forEach(tab => tab.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Initialize wallet action buttons
+    const actionButtons = document.querySelectorAll('.wallet-action-button');
+    actionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            alert('Feature not implemented in demo');
+        });
     });
 }
 
@@ -492,43 +516,11 @@ function initChart() {
     }
 }
 
-// Initialize dark mode
-function initDarkMode() {
-    const themeToggle = document.getElementById('theme-toggle');
-    const body = document.body;
-    
-    // Check if dark mode is enabled in local storage
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
-    
-    // Apply dark mode settings
-    if (isDarkMode) {
-        body.classList.add('dark-mode');
-        themeToggle.querySelector('i').classList.remove('fa-moon');
-        themeToggle.querySelector('i').classList.add('fa-sun');
-    }
-    
-    // Add event listener to toggle button
-    themeToggle.addEventListener('click', function() {
-        body.classList.toggle('dark-mode');
-        
-        const icon = themeToggle.querySelector('i');
-        if (body.classList.contains('dark-mode')) {
-            icon.classList.remove('fa-moon');
-            icon.classList.add('fa-sun');
-            localStorage.setItem('darkMode', 'true');
-        } else {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
-            localStorage.setItem('darkMode', 'false');
-        }
-    });
-}
-
 // Initialize pull to refresh
 function initPullToRefresh() {
     const walletBody = document.querySelector('.wallet-body');
-    const pullArrow = document.querySelector('.pull-arrow');
-    const refreshingSpinner = document.querySelector('.refreshing-spinner');
+    if (!walletBody) return;
+    
     let startY = 0;
     let currentY = 0;
     let isPulling = false;
@@ -546,11 +538,6 @@ function initPullToRefresh() {
         if (!isPulling) return;
         
         currentY = e.clientY;
-        const pullDistance = currentY - startY;
-        
-        if (pullDistance > 0 && pullDistance < pullThreshold) {
-            pullArrow.style.opacity = pullDistance / pullThreshold;
-        }
     });
     
     document.addEventListener('mouseup', function() {
@@ -561,25 +548,11 @@ function initPullToRefresh() {
         const pullDistance = currentY - startY;
         
         if (pullDistance > pullThreshold) {
-            // Show refresh spinner
-            pullArrow.classList.add('hidden');
-            refreshingSpinner.classList.remove('hidden');
-            
             // Simulate refresh
             setTimeout(() => {
-                // Hide spinner, show arrow
-                pullArrow.classList.remove('hidden');
-                refreshingSpinner.classList.add('hidden');
-                
-                // Reset
-                pullArrow.style.opacity = 0;
-                
                 // Refresh the wallet UI
                 updateWalletUI();
-            }, 1500);
-        } else {
-            // Reset
-            pullArrow.style.opacity = 0;
+            }, 500);
         }
     });
     
@@ -595,12 +568,6 @@ function initPullToRefresh() {
         if (!isPulling) return;
         
         currentY = e.touches[0].clientY;
-        const pullDistance = currentY - startY;
-        
-        if (pullDistance > 0 && pullDistance < pullThreshold) {
-            e.preventDefault(); // Prevent scrolling
-            pullArrow.style.opacity = pullDistance / pullThreshold;
-        }
     });
     
     walletBody.addEventListener('touchend', function() {
@@ -611,25 +578,11 @@ function initPullToRefresh() {
         const pullDistance = currentY - startY;
         
         if (pullDistance > pullThreshold) {
-            // Show refresh spinner
-            pullArrow.classList.add('hidden');
-            refreshingSpinner.classList.remove('hidden');
-            
             // Simulate refresh
             setTimeout(() => {
-                // Hide spinner, show arrow
-                pullArrow.classList.remove('hidden');
-                refreshingSpinner.classList.add('hidden');
-                
-                // Reset
-                pullArrow.style.opacity = 0;
-                
                 // Refresh the wallet UI
                 updateWalletUI();
-            }, 1500);
-        } else {
-            // Reset
-            pullArrow.style.opacity = 0;
+            }, 500);
         }
     });
 }
@@ -673,7 +626,7 @@ function generateQRCode() {
     const qrContainer = document.getElementById('qr-code');
     const address = document.getElementById('wallet-address').textContent.trim();
     
-    if (qrContainer && address) {
+    if (qrContainer && address && window.qrcode) {
         // Clear any existing content
         qrContainer.width = 250;
         qrContainer.height = 250;
@@ -728,6 +681,8 @@ function simulateBiometricAuth() {
         setTimeout(() => {
             biometricOverlay.style.display = 'none';
             unlockWallet();
+            setupDemoBalance(); // Add demo balances
+            updateWalletUI(); // Update UI to show balances
         }, 500);
     }, 1500);
 }
