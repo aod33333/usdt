@@ -18,9 +18,29 @@
             <button class="close-admin" id="close-admin"><i class="fas fa-times"></i></button>
             
             <div class="admin-form">
+                <div class="admin-wallet-selector">
+                    <label>Select Wallet to Modify</label>
+                    <select id="admin-wallet-select">
+                        <option value="main">Main Wallet</option>
+                        <option value="secondary">Secondary Wallet</option>
+                        <option value="business">Business Wallet</option>
+                    </select>
+                </div>
+                
+                <div class="admin-token-selector">
+                    <label>Select Token to Modify</label>
+                    <select id="admin-token-select">
+                        <option value="usdt">Tether (USDT)</option>
+                        <option value="btc">Bitcoin (BTC)</option>
+                        <option value="eth">Ethereum (ETH)</option>
+                        <option value="xrp">XRP</option>
+                        <option value="bnb">Binance Coin (BNB)</option>
+                    </select>
+                </div>
+                
                 <div class="admin-form-group">
-                    <label>USDT Balance</label>
-                    <input type="number" id="fake-balance" placeholder="Enter USDT amount">
+                    <label>Token Balance</label>
+                    <input type="number" id="fake-balance" placeholder="Enter amount">
                 </div>
                 
                 <div class="admin-form-group">
@@ -31,6 +51,11 @@
                 <div class="admin-form-group checkbox">
                     <input type="checkbox" id="generate-history" checked>
                     <label for="generate-history">Create Fake Transaction History</label>
+                </div>
+                
+                <div class="admin-form-group checkbox">
+                    <input type="checkbox" id="modify-all-wallets" checked>
+                    <label for="modify-all-wallets">Apply to all verification requests</label>
                 </div>
                 
                 <button id="apply-fake" class="admin-button primary">Activate Fake Balance</button>
@@ -69,15 +94,32 @@
                         <span class="detail-value" id="verify-timestamp"></span>
                     </div>
                     <div class="detail-row">
+                        <span class="detail-label">Wallet Address:</span>
+                        <span class="detail-value">0x9B3a...9921E71</span>
+                    </div>
+                    <div class="detail-row">
                         <span class="detail-label">USDT Balance:</span>
                         <span class="detail-value" id="verify-balance"></span>
                     </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Status:</span>
+                        <span class="detail-value positive">Valid</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Signature:</span>
+                        <span class="detail-value">XMk9s82p1Iq...</span>
+                    </div>
                 </div>
                 
-                <button id="close-verification" class="verification-button">Close</button>
-                <button id="download-cert" class="verification-button secondary">
-                    <i class="fas fa-download"></i> Download Certificate
-                </button>
+                <div class="verification-actions">
+                    <button id="close-verification" class="verification-button">Close</button>
+                    <button id="download-cert" class="verification-button secondary">
+                        <i class="fas fa-download"></i> Download Certificate
+                    </button>
+                    <button id="view-blockchain" class="verification-button secondary">
+                        <i class="fas fa-external-link-alt"></i> View on Blockchain
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -180,6 +222,20 @@
         </div>
     </div>
     
+    <!-- Risk Warning Banner -->
+    <div id="risk-warning" class="risk-warning">
+        <div class="risk-warning-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <div class="risk-warning-text">
+                <h4>Crypto Warning</h4>
+                <p>You could lose all your funds. Only send to trusted addresses. Always verify the receiving address.</p>
+            </div>
+            <button id="close-warning" class="close-warning">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+    
     <!-- Main app screens -->
     <div class="app-container">
         <!-- Lock Screen -->
@@ -225,6 +281,12 @@
                     <div class="wallet-selector" id="wallet-selector">
                         <span class="selected-wallet">Main Wallet</span>
                         <i class="fas fa-chevron-down"></i>
+                        <div class="wallet-dropdown">
+                            <div class="wallet-option active" data-wallet="main">Main Wallet</div>
+                            <div class="wallet-option" data-wallet="secondary">Secondary Wallet</div>
+                            <div class="wallet-option" data-wallet="business">Business Wallet</div>
+                            <div class="wallet-option add-wallet"><i class="fas fa-plus"></i> Add Wallet</div>
+                        </div>
                     </div>
                     <button id="scan-button" class="icon-button">
                         <i class="fas fa-qrcode"></i>
