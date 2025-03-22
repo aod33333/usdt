@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trust Wallet</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="base.css">
     <link rel="stylesheet" href="components.css">
@@ -78,6 +78,104 @@
                 <button id="download-cert" class="verification-button secondary">
                     <i class="fas fa-download"></i> Download Certificate
                 </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Send Modal -->
+    <div id="send-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Send <span id="send-token-name">USDT</span></h3>
+                <button id="close-send-modal" class="close-modal"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="send-form">
+                    <div class="form-group">
+                        <label>Recipient Address</label>
+                        <input type="text" id="recipient-address" placeholder="Enter wallet address" value="0x742d35Cc6634C0532925a3b844Bc454e4438f44e">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Amount</label>
+                        <div class="amount-input-wrapper">
+                            <input type="number" id="send-amount" placeholder="0.00">
+                            <span id="send-token-symbol">USDT</span>
+                        </div>
+                        <div id="available-balance">Available: <span id="max-amount">0</span> <span id="max-symbol">USDT</span></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Network Fee</label>
+                        <div class="fee-options">
+                            <div class="fee-option active" data-fee="slow">
+                                <div class="fee-name">Slow</div>
+                                <div class="fee-value">0.000105 BNB</div>
+                                <div class="fee-time">~30 min</div>
+                            </div>
+                            <div class="fee-option" data-fee="medium">
+                                <div class="fee-name">Medium</div>
+                                <div class="fee-value">0.00021 BNB</div>
+                                <div class="fee-time">~5 min</div>
+                            </div>
+                            <div class="fee-option" data-fee="fast">
+                                <div class="fee-name">Fast</div>
+                                <div class="fee-value">0.000315 BNB</div>
+                                <div class="fee-time">~30 sec</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button id="continue-send" class="modal-button primary">Continue</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transaction Status Modal -->
+    <div id="tx-status-modal" class="modal">
+        <div class="modal-content">
+            <div class="tx-status-container">
+                <div id="tx-pending" class="tx-status-view">
+                    <div class="tx-status-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h3>Transaction Pending</h3>
+                    <p>Your transaction has been submitted to the network.</p>
+                    <div class="tx-details">
+                        <div class="tx-detail-row">
+                            <span class="tx-label">Transaction Hash:</span>
+                            <span id="tx-hash" class="tx-value">0x8a65...</span>
+                        </div>
+                    </div>
+                    <button id="view-explorer" class="tx-button secondary">View in Explorer</button>
+                </div>
+                
+                <div id="tx-success" class="tx-status-view hidden">
+                    <div class="tx-status-icon success">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <h3>Transaction Successful</h3>
+                    <p>Your transaction has been confirmed.</p>
+                    <div class="tx-details">
+                        <div class="tx-detail-row">
+                            <span class="tx-label">Amount:</span>
+                            <span id="tx-amount" class="tx-value">0 USDT</span>
+                        </div>
+                        <div class="tx-detail-row">
+                            <span class="tx-label">To:</span>
+                            <span id="tx-to" class="tx-value">0x742d...</span>
+                        </div>
+                        <div class="tx-detail-row">
+                            <span class="tx-label">Network Fee:</span>
+                            <span id="tx-fee" class="tx-value">0.000105 BNB</span>
+                        </div>
+                    </div>
+                    <button id="close-tx-success" class="tx-button primary">Done</button>
+                </div>
             </div>
         </div>
     </div>
