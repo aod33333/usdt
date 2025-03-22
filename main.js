@@ -63,7 +63,7 @@ function handleTouchSequence(event) {
     const correctSequence = ['top-left', 'top-right', 'top-left', 'bottom-left'];
     const isCorrect = touchSequence.join(',') === correctSequence.join(',');
     
-    if (isCorrect && !adminPanel.style.display === 'flex') {
+    if (isCorrect) {
         showAdminPanel();
     }
 }
