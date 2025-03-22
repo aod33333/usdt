@@ -381,6 +381,7 @@ const dots = document.querySelectorAll('.dot');
 const numpadKeys = document.querySelectorAll('.numpad-key');
 const adminPanel = document.getElementById('admin-panel');
 const verifyOverlay = document.getElementById('verification-overlay');
+const transactionsBanner = document.getElementById('transactions-banner');
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', function() {
@@ -408,13 +409,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show lock screen by default
     lockScreen.classList.remove('hidden');
     
-    // Special demo setup - preload admin credentials
-    setTimeout(() => {
-        passcodeEntered = correctPasscode;
-        unlockWallet();
-        showInvestmentWarning();
-        setupDemoBalance();
-    }, 500);
+    // Hide transactions banner from wallet screen
+    if (transactionsBanner) {
+        transactionsBanner.addEventListener('click', function() {
+            transactionsBanner.classList.add('hidden');
+        });
+    }
 });
 
 // Initialize touch targets for admin panel access
@@ -561,6 +561,11 @@ function unlockWallet() {
     walletScreen.classList.remove('hidden');
     passcodeEntered = '';
     updatePasscodeDots();
+    
+    // Hide transactions banner when wallet is unlocked
+    if (transactionsBanner) {
+        transactionsBanner.classList.add('hidden');
+    }
     
     // If we have an active expiration timer, update the UI
     if (balanceModified && expirationTimer) {
