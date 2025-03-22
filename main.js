@@ -262,22 +262,156 @@ function resetToOriginalBalance() {
     balanceModified = false;
 }
 
-// Initialize verification overlay
-function initVerificationOverlay() {
-    // Close verification overlay
-    document.getElementById('close-verification').addEventListener('click', function() {
-        verifyOverlay.style.display = 'none';
+// Initialize send functionality
+document.addEventListener('DOMContentLoaded', function() {
+    initSendFunctionality();
+});
+
+// Initialize send functionality
+function initSendFunctionality() {
+    // Send buttons in wallet and detail view
+    const sendButtons = document.querySelectorAll('.action-button:nth-child(2), .detail-action:nth-child(2)');
+    sendButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            showSendModal();
+        });
     });
     
-    // Download certificate
-    document.getElementById('download-cert').addEventListener('click', function() {
-        // In a real scenario, this would generate a PDF certificate
-        alert('Certificate download simulated');
+    // Close send modal
+    document.getElementById('close-send-modal').addEventListener('click', function() {
+        document.getElementById('send-modal').style.display = 'none';
     });
     
-    // Add click event to total balance to show verification
-    document.getElementById('total-balance').addEventListener('click', showVerificationProcess);
-    document.getElementById('detail-value').addEventListener('click', showVerificationProcess);
+    // Switch between fee options
+    const feeOptions = document.querySelectorAll('.fee-option');
+    feeOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            feeOptions.forEach(opt => opt.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+    
+    // Continue send button
+    document.getElementById('continue-send').addEventListener('click', function() {
+        processSendTransaction();
+    });
+    
+    // Close transaction success
+    document.getElementById('close-tx-success').addEventListener('click', function() {
+        document.getElementById('tx-status-modal').style.display = 'none';
+    });
+    
+    // View in explorer
+    document.getElementById('view-explorer').addEventListener('click', function() {
+        const txHash = document.getElementById('tx-hash').textContent;
+        window.open(`https://bscscan.com/tx/${txHash}`, '_blank');
+    });
+}
+
+// Show send modal
+function showSendModal() {
+    // Get current token info (just using USDT for demo)
+    const usdtToken = currentWalletData.tokens.find(t => t.id === 'usdt');
+    
+    // Update modal with token info
+    document.getElementById('send-token-name').textContent = usdtToken.name;
+    document.getElementById('send-token-symbol').textContent = usdtToken.symbol;
+    document.getElementById('max-amount').textContent = usdtToken.amount;
+    document.getElementById('max-symbol').textContent = usdtToken.symbol;
+    
+    // Clear previous input
+    document.getElementById('send-amount').value = '';
+    
+    // Show modal
+    document.getElementById('send-modal').style.display = 'flex';
+}
+
+// Process send transaction
+function processSendTransaction() {
+    const amount = parseFloat(document.getElementById('send-amount').value);
+    const recipient = document.getElementById('recipient-address').value.trim();
+    
+    // Basic validation
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    if (!recipient || !recipient.startsWith('0x')) {
+        alert('Please enter a valid recipient address');
+        return;
+    }
+    
+    const usdtToken = currentWalletData.tokens.find(t => t.id === 'usdt');
+    
+    // Check if we have enough balance
+    if (amount > usdtToken.amount) {
+        alert('Insufficient balance');
+        return;
+    }
+    
+    // Close send modal
+    document.getElementById('send-modal').style.display = 'none';
+    
+    // Show transaction pending
+    document.getElementById('tx-status-modal').style.display = 'flex';
+    document.getElementById('tx-pending').classList.remove('hidden');
+    document.getElementById('tx-success').classList.add('hidden');
+    
+    // Generate random tx hash
+    const txHash = generateRandomTransactionHash();
+    document.getElementById('tx-hash').textContent = txHash.substring(0, 10) + '...';
+    
+    // Update transaction amount
+    document.getElementById('tx-amount').textContent = `${amount} USDT`;
+    
+    // Update recipient
+    document.getElementById('tx-to').textContent = `${recipient.substring(0, 6)}...`;
+    
+    // Simulate blockchain confirmation (3-5 seconds)
+    setTimeout(() => {
+        // Show success view
+        document.getElementById('tx-pending').classList.add('hidden');
+        document.getElementById('tx-success').classList.remove('hidden');
+        
+        // Update wallet balance
+        const newAmount = usdtToken.amount - amount;
+        usdtToken.amount = newAmount;
+        usdtToken.value = newAmount;
+        
+        // Update total balance
+        currentWalletData.totalBalance -= amount;
+        
+        // Update UI
+        updateWalletUI();
+        
+        // Add transaction to history
+        const newTx = {
+            id: 'tx-' + Date.now(),
+            type: 'send',
+            amount: amount,
+            symbol: 'USDT',
+            value: amount,
+            date: new Date().toISOString().split('T')[0] + ' ' + 
+                  new Date().toTimeString().split(' ')[0].substring(0, 5),
+            from: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71', // User's address
+            to: recipient,
+            hash: txHash
+        };
+        
+        // Add to transactions
+        if (currentTransactions.usdt) {
+            currentTransactions.usdt.unshift(newTx);
+        } else {
+            currentTransactions.usdt = [newTx];
+        }
+        
+        // If detail view is open, update transactions
+        const tokenDetail = document.getElementById('token-detail');
+        if (!tokenDetail.classList.contains('hidden')) {
+            updateTransactionsForToken('usdt');
+        }
+    }, 3000 + Math.random() * 2000); // Random time between 3-5 seconds
 }
 
 // Show verification process
