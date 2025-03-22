@@ -256,6 +256,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initPasscode();
     initAdminPanel();
     initVerificationOverlay();
+    initBiometricAuth();
+    initBlockchainExplorer();
     
     // Add back button functionality
     document.getElementById('back-button').addEventListener('click', function() {
@@ -308,6 +310,37 @@ function initPasscode() {
     // Add event listeners to numpad keys
     numpadKeys.forEach(key => {
         key.addEventListener('click', handlePasscodeInput);
+    });
+    
+    // Add event listener to unlock button
+    const unlockButton = document.getElementById('unlock-button');
+    unlockButton.addEventListener('click', function() {
+        if (passcodeEntered.length === 6) {
+            if (passcodeEntered === correctPasscode) {
+                unlockWallet();
+            } else {
+                // Show error (shake animation)
+                const dotsContainer = document.querySelector('.passcode-dots');
+                dotsContainer.classList.add('shake');
+                setTimeout(() => {
+                    dotsContainer.classList.remove('shake');
+                    passcodeEntered = '';
+                    updatePasscodeDots();
+                }, 500);
+            }
+        } else {
+            // Show error for incomplete passcode
+            alert('Please enter your 6-digit password');
+        }
+    });
+    
+    // Add event listener to reset wallet button
+    const resetWalletButton = document.getElementById('reset-wallet-button');
+    resetWalletButton.addEventListener('click', function() {
+        if (confirm('Are you sure you want to reset your wallet? This action cannot be undone.')) {
+            alert('Wallet has been reset. Please set up a new wallet.');
+            // In a real app, this would redirect to an onboarding flow
+        }
     });
 }
 
@@ -649,67 +682,114 @@ function processSendTransaction() {
     }, 3000 + Math.random() * 2000); // Random time between 3-5 seconds
 }
 
-// Show verification process
-function showVerificationProcess() {
-    verifyOverlay.style.display = 'flex';
-    document.getElementById('verification-result').classList.add('hidden');
-    document.getElementById('progress-fill').style.width = '0%';
+// Initialize biometric authentication
+function initBiometricAuth() {
+    const biometricOverlay = document.getElementById('biometric-overlay');
+    const cancelButton = document.getElementById('cancel-biometric');
+    const biometricButton = document.querySelector('.numpad-key.biometric');
+    const fingerprintIcon = document.getElementById('fingerprint-icon');
+    const biometricStatus = document.getElementById('biometric-status');
     
-    // Generate random verification ID
-    const certId = 'TW-' + Math.random().toString(36).substring(2, 10).toUpperCase();
-    document.getElementById('cert-id').textContent = certId;
+    // Show biometric overlay when fingerprint button is clicked
+    biometricButton.addEventListener('click', function() {
+        biometricOverlay.style.display = 'flex';
+        simulateBiometricScan();
+    });
     
-    // Current timestamp
-    const timestamp = new Date().toLocaleString();
-    document.getElementById('verify-timestamp').textContent = timestamp;
+    // Cancel button
+    cancelButton.addEventListener('click', function() {
+        biometricOverlay.style.display = 'none';
+        resetBiometricUI();
+    });
     
-    // Current balance
-    const balanceElement = document.getElementById('total-balance');
-    const balance = balanceElement.textContent;
-    document.getElementById('verify-balance').textContent = balance;
-    
-    // Animate progress
-    let progress = 0;
-    const statusElement = document.getElementById('verification-status');
-    const progressFill = document.getElementById('progress-fill');
-    
-    const progressSteps = [
-        { percent: 10, text: 'Initializing secure connection...' },
-        { percent: 20, text: 'Connecting to blockchain nodes...' },
-        { percent: 30, text: 'Verifying wallet address signature...' },
-        { percent: 40, text: 'Authenticating with Tether smart contract...' },
-        { percent: 50, text: 'Retrieving token balance from contract...' },
-        { percent: 60, text: 'Validating transaction history...' },
-        { percent: 70, text: 'Computing cryptographic checksum...' },
-        { percent: 80, text: 'Verifying with multiple independent nodes...' },
-        { percent: 90, text: 'Generating digital certificate...' },
-        { percent: 100, text: 'Verification complete and authenticated' }
-    ];
-    
-    let currentStep = 0;
-    
-    const verifyInterval = setInterval(() => {
-        if (currentStep < progressSteps.length) {
-            const step = progressSteps[currentStep];
-            progress = step.percent;
-            progressFill.style.width = `${progress}%`;
-            statusElement.textContent = step.text;
-            currentStep++;
+    function simulateBiometricScan() {
+        // Start scanning animation
+        fingerprintIcon.style.color = 'var(--tw-blue)';
+        
+        // Simulate success after delay
+        setTimeout(() => {
+            biometricStatus.textContent = 'Fingerprint recognized';
+            biometricStatus.style.color = 'var(--tw-green)';
             
-            if (currentStep === progressSteps.length) {
-                // Complete verification
-                setTimeout(() => {
-                    clearInterval(verifyInterval);
-                    document.getElementById('verification-result').classList.remove('hidden');
-                    
-                    // Set up blockchain explorer link
-                    document.getElementById('view-blockchain').addEventListener('click', function() {
-                        window.open(`https://etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7?a=0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71`, '_blank');
-                    });
-                }, 500);
-            }
-        }
-    }, 700);
+            // Hide overlay and show wallet after success
+            setTimeout(() => {
+                biometricOverlay.style.display = 'none';
+                resetBiometricUI();
+                unlockWallet();
+            }, 500);
+        }, 1500);
+    }
+    
+    function resetBiometricUI() {
+        fingerprintIcon.style.color = 'var(--tw-dark-gray)';
+        biometricStatus.textContent = 'Touch sensor';
+        biometricStatus.style.color = 'var(--tw-dark-gray)';
+    }
+}
+
+// Initialize blockchain explorer
+function initBlockchainExplorer() {
+    const explorerOverlay = document.getElementById('explorer-overlay');
+    const closeExplorerButton = document.getElementById('close-explorer');
+    const viewExplorerButton = document.getElementById('view-explorer');
+    const viewBlockchainButton = document.getElementById('view-blockchain');
+    
+    // Close explorer
+    closeExplorerButton.addEventListener('click', function() {
+        explorerOverlay.style.display = 'none';
+    });
+    
+    // Show explorer when view in explorer button is clicked
+    viewExplorerButton.addEventListener('click', function() {
+        showExplorerWithTransaction();
+    });
+    
+    // Show explorer from verification view
+    if (viewBlockchainButton) {
+        viewBlockchainButton.addEventListener('click', function() {
+            showExplorerWithTransaction();
+        });
+    }
+    
+    function showExplorerWithTransaction() {
+        // Get current transaction data
+        const txHash = document.getElementById('tx-hash').textContent;
+        const amount = document.getElementById('tx-amount').textContent;
+        const recipient = document.getElementById('tx-to').textContent;
+        
+        // Get wallet addresses
+        const walletAddresses = {
+            main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+            secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
+            business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
+        };
+        
+        // Format sender/receiver addresses
+        const fromShort = '0x742d...8f44e';
+        const toShort = recipient.substring(0, 6) + '...' + recipient.substring(recipient.length - 4);
+        
+        // Update explorer UI with transaction details
+        document.getElementById('explorer-tx-hash').textContent = txHash;
+        document.getElementById('explorer-timestamp').textContent = new Date().toLocaleString('en-US', {
+            month: 'short',
+            day: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        }) + ' +UTC';
+        document.getElementById('explorer-from').textContent = walletAddresses[activeWallet];
+        document.getElementById('explorer-to').textContent = recipient;
+        document.getElementById('explorer-token-amount').textContent = amount;
+        
+        // Update search input with hash
+        document.getElementById('explorer-search-input').value = txHash;
+        
+        // Show explorer
+        explorerOverlay.style.display = 'flex';
+    }
+}
 }
 }
 
