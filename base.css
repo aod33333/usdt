@@ -367,9 +367,71 @@ button {
     color: var(--tw-white);
 }
 
-.tx-button.secondary {
-    background-color: var(--tw-bg-gray);
+/* Admin form enhancements */
+.admin-wallet-selector,
+.admin-token-selector {
+    margin-bottom: var(--space-md);
+}
+
+.admin-wallet-selector label,
+.admin-token-selector label {
+    display: block;
+    margin-bottom: var(--space-xs);
     color: var(--tw-dark-gray);
+    font-weight: 500;
+}
+
+.admin-wallet-selector select,
+.admin-token-selector select {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 1px solid var(--tw-light-gray);
+    border-radius: 8px;
+    font-size: var(--font-md);
+    background-color: var(--tw-white);
+}
+
+/* Risk Warning Banner */
+.risk-warning {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(235, 87, 87, 0.9);
+    color: var(--tw-white);
+    z-index: 999;
+    padding: var(--space-sm);
+}
+
+.risk-warning-content {
+    display: flex;
+    align-items: center;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.risk-warning-content i {
+    font-size: 24px;
+    margin-right: var(--space-sm);
+}
+
+.risk-warning-text {
+    flex: 1;
+}
+
+.risk-warning-text h4 {
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.risk-warning-text p {
+    font-size: var(--font-xs);
+    margin: 0;
+}
+
+.close-warning {
+    color: var(--tw-white);
+    font-size: var(--font-lg);
 }-radius: 8px;
     font-size: var(--font-md);
 }
