@@ -548,61 +548,51 @@ function generateChartData() {
 
 // Initialize chart
 function initChart() {
-    const chartElement = document.getElementById('price-chart');
-    if (!chartElement) return;
+    const canvas = document.getElementById('price-chart');
+    if (!canvas || !canvas.getContext) return;
     
-    // Clear any existing chart
-    chartElement.innerHTML = '';
-    
-    // Generate chart data
+    const ctx = canvas.getContext('2d');
     const priceData = generateChartData();
+    const values = priceData.values;
     
-    // ApexCharts configuration
-    const options = {
-        series: [{
-            name: 'Price',
-            data: priceData.values
-        }],
-        chart: {
-            height: 200,
-            type: 'area',
-            toolbar: {
-                show: false
-            },
-            animations: {
-                enabled: true
-            }
-        },
-        stroke: {
-            curve: 'smooth',
-            width: 2
-        },
-        colors: ['#3375BB'],
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shade: 'light',
-                type: "vertical",
-                opacityFrom: 0.4,
-                opacityTo: 0.1
-            }
-        },
-        xaxis: {
-            categories: priceData.labels,
-            labels: { show: false },
-            axisBorder: { show: false },
-            axisTicks: { show: false }
-        },
-        yaxis: {
-            labels: { show: false }
-        },
-        grid: { show: false },
-        tooltip: { enabled: true }
-    };
+    // Set canvas dimensions
+    canvas.width = canvas.offsetWidth || 300;
+    canvas.height = 200;
     
-    // Create and render chart
-    chartInstance = new ApexCharts(chartElement, options);
-    chartInstance.render();
+    // Find min/max for scaling
+    const min = Math.min(...values) * 0.9;
+    const max = Math.max(...values) * 1.1;
+    const range = max - min;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Draw line
+    ctx.beginPath();
+    values.forEach((value, index) => {
+        const x = (index / (values.length - 1)) * canvas.width;
+        const y = canvas.height - ((value - min) / range) * canvas.height;
+        
+        if (index === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    
+    // Style line
+    ctx.strokeStyle = '#3375BB';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Fill area under line
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(51, 117, 187, 0.2)';
+    ctx.fill();
+    
+    chartInstance = true;
 }
 
 // Initialize pull to refresh
