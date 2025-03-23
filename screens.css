@@ -1219,6 +1219,15 @@ canvas#price-chart {
     background-color: var(--tw-bg-gray);
 }
 
-.main-header {
-    padding: var(--space-sm) var(--space-md);
+..main-header {
+    padding: var(--space-xs) var(--space-md);
+}
+
+.page-title {
+    font-size: var(--font-lg);
+}
+
+.icon-button {
+    width: 32px;
+    height: 32px;
 }
