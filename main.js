@@ -745,44 +745,46 @@ function showSendScreen(tokenId) {
         id: 'usdt'
     };
 
+    // Ensure wallet data exists
+    if (!currentWalletData || !currentWalletData[activeWallet]) {
+        console.error('Wallet data not available');
+        return;
+    }
+
     // Find the specific token or use default
     let token = defaultToken;
     
-    try {
-        if (currentWalletData && 
-            currentWalletData[activeWallet] && 
-            currentWalletData[activeWallet].tokens) {
-            const foundToken = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-            if (foundToken) {
-                token = foundToken;
-            }
-        }
-        
-        // Update send screen elements
-        document.getElementById('send-token-title').textContent = `Send ${token.symbol}`;
-        document.getElementById('max-amount').textContent = token.amount;
-        document.getElementById('max-symbol').textContent = token.symbol;
-        
-        // Toggle screen visibility
-        walletScreen.classList.add('hidden');
-        sendScreen.classList.remove('hidden');
-    } catch (error) {
-        console.error("Error in showSendScreen:", error);
-        
-        // Fallback display
-        document.getElementById('send-token-title').textContent = "Send USDT";
-        document.getElementById('max-amount').textContent = "0";
-        document.getElementById('max-symbol').textContent = "USDT";
-        
-        walletScreen.classList.add('hidden');
-        sendScreen.classList.remove('hidden');
+    const tokens = currentWalletData[activeWallet].tokens;
+    const foundToken = tokens.find(t => t.id === tokenId);
+    
+    if (foundToken) {
+        token = foundToken;
     }
+    
+    // Update send screen elements
+    document.getElementById('send-token-title').textContent = `Send ${token.symbol}`;
+    document.getElementById('max-amount').textContent = token.amount;
+    document.getElementById('max-symbol').textContent = token.symbol;
+    
+    // Toggle screen visibility
+    walletScreen.classList.add('hidden');
+    sendScreen.classList.remove('hidden');
 }
 
-// Show receive screen
 function showReceiveScreen(tokenId) {
-    const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-    if (!token) return;
+    // Ensure wallet data exists
+    if (!currentWalletData || !currentWalletData[activeWallet]) {
+        console.error('Wallet data not available');
+        return;
+    }
+
+    const tokens = currentWalletData[activeWallet].tokens;
+    const token = tokens.find(t => t.id === tokenId);
+    
+    if (!token) {
+        console.error(`Token ${tokenId} not found`);
+        return;
+    }
     
     document.getElementById('receive-token-icon').src = token.icon;
     document.getElementById('receive-token-name').textContent = token.symbol;
@@ -798,6 +800,7 @@ function showReceiveScreen(tokenId) {
     
     // Generate QR code
     generateQRCode();
+}
 }
 
 // Generate QR code for receive address
