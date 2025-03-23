@@ -548,55 +548,62 @@ function generateChartData() {
 
 // Initialize chart
 function initChart() {
-    const ctx = document.getElementById('price-chart');
+    const chartElement = document.getElementById('price-chart');
+    if (!chartElement) return;
     
-    if (ctx) {
-        // Clear any existing content
-        ctx.innerHTML = '';
-        
-        // Sample price data
-        const priceData = generateChartData();
-        
-        try {
-            // Use native Canvas for chart instead of Chart.js to avoid CSP issues
-            const canvas = ctx;
-            const context = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            // Clear canvas
-            context.clearRect(0, 0, width, height);
-            
-            // Draw background
-            context.fillStyle = 'rgba(51, 117, 187, 0.1)';
-            context.fillRect(0, 0, width, height);
-            
-            // Draw chart line
-            context.beginPath();
-            context.moveTo(0, height - (priceData.values[0] / Math.max(...priceData.values)) * height);
-            
-            for (let i = 1; i < priceData.values.length; i++) {
-                const x = (i / priceData.values.length) * width;
-                const y = height - (priceData.values[i] / Math.max(...priceData.values)) * height;
-                context.lineTo(x, y);
+    // Clear any existing chart
+    chartElement.innerHTML = '';
+    
+    // Generate chart data
+    const priceData = generateChartData();
+    
+    // ApexCharts configuration
+    const options = {
+        series: [{
+            name: 'Price',
+            data: priceData.values
+        }],
+        chart: {
+            height: 200,
+            type: 'area',
+            toolbar: {
+                show: false
+            },
+            animations: {
+                enabled: true
             }
-            
-            // Line style
-            context.strokeStyle = 'rgba(51, 117, 187, 1)';
-            context.lineWidth = 2;
-            context.stroke();
-            
-            // Fill area under the curve
-            context.lineTo(width, height);
-            context.lineTo(0, height);
-            context.closePath();
-            context.fillStyle = 'rgba(51, 117, 187, 0.2)';
-            context.fill();
-            
-            chartInstance = true; // Mark as initialized
-        } catch (error) {
-            console.log('Chart rendering disabled due to an error:', error);
-        }
+        },
+        stroke: {
+            curve: 'smooth',
+            width: 2
+        },
+        colors: ['#3375BB'],
+        fill: {
+            type: 'gradient',
+            gradient: {
+                shade: 'light',
+                type: "vertical",
+                opacityFrom: 0.4,
+                opacityTo: 0.1
+            }
+        },
+        xaxis: {
+            categories: priceData.labels,
+            labels: { show: false },
+            axisBorder: { show: false },
+            axisTicks: { show: false }
+        },
+        yaxis: {
+            labels: { show: false }
+        },
+        grid: { show: false },
+        tooltip: { enabled: true }
+    };
+    
+    // Create and render chart
+    chartInstance = new ApexCharts(chartElement, options);
+    chartInstance.render();
+}
     }
 }
 
