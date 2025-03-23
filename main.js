@@ -553,7 +553,30 @@ function initChart() {
         const container = document.querySelector('.chart-container');
         container.innerHTML = '<canvas id="price-chart" width="300" height="200"></canvas>';
         canvas = document.getElementById('price-chart');
-    } 
+    }
+    
+    // Generate chart data
+    const chartData = generateChartData();
+    
+    // Create chart instance
+    chartInstance = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: chartData.labels,
+            datasets: [{
+                label: 'Price',
+                data: chartData.values,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+}
 
 // Initialize pull to refresh
 function initPullToRefresh() {
