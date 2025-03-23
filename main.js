@@ -1,3 +1,60 @@
+// Diagnostic logging
+console.error('FULL DIAGNOSTIC START');
+console.error('Window objects:', Object.keys(window));
+console.error('Script loading check:', {
+    walletJs: typeof updateWalletUI,
+    transactionsJs: typeof generateFakeTransactionHistory,
+    chartJs: typeof Chart
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.error('CRITICAL: DOM Loaded - Checking Global Variables');
+    
+    // Comprehensive global variable check
+    try {
+        console.error('Global Variables:', {
+            currentWalletData: typeof currentWalletData,
+            originalWalletData: typeof originalWalletData,
+            activeWallet: typeof activeWallet
+        });
+
+        // Detailed initialization with extensive logging
+        console.error('Starting Initialization Steps');
+        
+        initTouchTargets();
+        console.error('Touch Targets Initialized');
+        
+        initPasscode();
+        console.error('Passcode Initialized');
+        
+        initAdminPanel();
+        console.error('Admin Panel Initialized');
+        
+        initWalletSelector();
+        console.error('Wallet Selector Initialized');
+        
+        initEventListeners();
+        console.error('Event Listeners Initialized');
+        
+        initInvestmentWarning();
+        console.error('Investment Warning Initialized');
+        
+        initPullToRefresh();
+        console.error('Pull to Refresh Initialized');
+        
+        setupDemoBalance();
+        console.error('Demo Balance Setup');
+        
+        updateWalletUI();
+        console.error('Wallet UI Updated');
+
+        console.error('ALL INITIALIZATION COMPLETE');
+    } catch (error) {
+        console.error('CRITICAL INITIALIZATION ERROR:', error);
+        console.error('Error Stack:', error.stack);
+    }
+});
+
 // Global variables
 let passcodeEntered = '';
 let touchSequence = [];
