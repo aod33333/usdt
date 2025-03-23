@@ -738,18 +738,18 @@ function initPullToRefresh() {
 }
 
 // Show send screen
+
 function showSendScreen(tokenId) {
-   try {
-       // Use a default fallback if data isn't available
-       if (!currentWalletData || !currentWalletData[activeWallet] || !currentWalletData[activeWallet].tokens) {
-           document.getElementById('send-token-title').textContent = "Send";
-           document.getElementById('max-amount').textContent = "0";
-           document.getElementById('max-symbol').textContent = "USDT";
-           
-           walletScreen.classList.add('hidden');
-           sendScreen.classList.remove('hidden');
-           return;
-       }
+    const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+    if (!token) return;
+
+    document.getElementById('send-token-title').textContent = Send ${token.symbol};
+    document.getElementById('max-amount').textContent = token.amount;
+    document.getElementById('max-symbol').textContent = token.symbol;
+
+    walletScreen.classList.add('hidden');
+    sendScreen.classList.remove('hidden');
+}
        
        // Normal flow when data is available
        const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
