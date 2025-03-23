@@ -38,7 +38,9 @@
 }
 
 .balance-display {
-    text-align: left;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
     padding: var(--space-sm) var(--space-md) var(--space-md);
 }
 
@@ -46,16 +48,13 @@
     font-size: var(--font-xxl);
     font-weight: 600;
     color: var(--tw-black);
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--space-xs);
+    margin-right: 10px;
 }
 
 .visibility-toggle {
     color: var(--tw-medium-gray);
-    margin-left: var(--space-xs);
     font-size: var(--font-md);
+    flex-shrink: 0;
 }
 
 /* Quick Actions */
