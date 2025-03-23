@@ -30,8 +30,8 @@
 --font-sm: 12px;
 --font-md: 14px;
 --font-lg: 16px;
---font-xl: 20px;
---font-xxl: 24px;
+--font-xl: 19px;
+--font-xxl: 21px;
     
     /* Spacing */
     --space-xs: 4px;
@@ -273,7 +273,7 @@ button {
 }
 
 .page-title {
-    font-size: var(--font-xl);
+    font-size: 18px;
     font-weight: 600;
     text-align: center;
 }
