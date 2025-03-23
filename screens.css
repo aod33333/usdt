@@ -1233,6 +1233,13 @@ canvas#price-chart {
 }
 
 .investment-warning {
-    border-radius: 12px;
-    margin: var(--space-sm) var(--space-md);
+    margin-top: -var(--space-sm);
+    border-radius: 8px;
+    padding: var(--space-sm) var(--space-md);
+}
+
+.investment-warning-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
