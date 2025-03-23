@@ -409,6 +409,7 @@ const transactionList = document.getElementById('transaction-list');
 if (transactionList && currentTransactions[activeWallet] && currentTransactions[activeWallet][tokenId]) {
     updateTransactionsForToken(tokenId);
 }
+    }
 
 // Initialize event listeners
 function initEventListeners() {
