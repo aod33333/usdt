@@ -1234,6 +1234,9 @@ canvas#price-chart {
     margin-left: var(--space-md);
     margin-right: var(--space-md);
     border-radius: 8px;
+    max-width: calc(100% - (2 * var(--space-md)));
+    width: calc(100% - (2 * var(--space-md)));
+    box-sizing: border-box;
 }
 .investment-warning-content {
     display: flex;
