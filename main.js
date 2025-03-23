@@ -1,16 +1,48 @@
-// Diagnostic logging
-console.error('FULL DIAGNOSTIC START');
-console.error('Window objects:', Object.keys(window));
-console.error('Script loading check:', {
-    walletJs: typeof updateWalletUI,
-    transactionsJs: typeof generateFakeTransactionHistory,
-    chartJs: typeof Chart
-});
+// Initialize all screens to ensure proper setup
+function initializeAllScreens() {
+    console.error('SCREEN INITIALIZATION: Starting screen setup');
+    
+    const screens = [
+        'lock-screen', 
+        'wallet-screen', 
+        'token-detail', 
+        'send-screen', 
+        'receive-screen',
+        'admin-panel',
+        'verification-overlay',
+        'biometric-overlay',
+        'explorer-overlay',
+        'tx-status-modal'
+    ];
+    
+    screens.forEach(screenId => {
+        const screen = document.getElementById(screenId);
+        if (!screen) {
+            console.error(`SCREEN INITIALIZATION: Screen with ID ${screenId} not found`);
+            return;
+        }
+        
+        try {
+            // Ensure all screens start hidden except lock screen
+            if (screenId === 'lock-screen') {
+                screen.classList.remove('hidden');
+            } else {
+                screen.classList.add('hidden');
+            }
+            
+            console.log(`SCREEN INITIALIZATION: ${screenId} processed successfully`);
+        } catch (error) {
+            console.error(`SCREEN INITIALIZATION: Error processing ${screenId}`, error);
+        }
+    });
+    
+    console.error('SCREEN INITIALIZATION: Complete');
+}
 
+// Modify existing DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
     console.error('CRITICAL: DOM Loaded - Checking Global Variables');
     
-    // Comprehensive global variable check
     try {
         console.error('Global Variables:', {
             currentWalletData: typeof currentWalletData,
@@ -18,7 +50,9 @@ document.addEventListener('DOMContentLoaded', function() {
             activeWallet: typeof activeWallet
         });
 
-        // Detailed initialization with extensive logging
+        // Add screen initialization
+        initializeAllScreens();
+        
         console.error('Starting Initialization Steps');
         
         initTouchTargets();
@@ -47,7 +81,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateWalletUI();
         console.error('Wallet UI Updated');
-
         console.error('ALL INITIALIZATION COMPLETE');
     } catch (error) {
         console.error('CRITICAL INITIALIZATION ERROR:', error);
