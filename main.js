@@ -604,8 +604,6 @@ function initChart() {
     chartInstance = new ApexCharts(chartElement, options);
     chartInstance.render();
 }
-    }
-}
 
 // Initialize pull to refresh
 function initPullToRefresh() {
