@@ -398,15 +398,16 @@ function initEventListeners() {
         showReceiveScreen('btc');
     });
     
-    // Back buttons on send/receive screens
-    const backButtons = document.querySelectorAll('.back-button');
-    backButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            sendScreen.classList.add('hidden');
-            receiveScreen.classList.add('hidden');
-            walletScreen.classList.remove('hidden');
-        });
+ // Back buttons on send/receive screens
+const backButtons = document.querySelectorAll('.back-button');
+backButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        sendScreen.classList.add('hidden');
+        receiveScreen.classList.add('hidden');
+        tokenDetail.classList.add('hidden');
+        walletScreen.classList.remove('hidden');
     });
+});
     
     // Initialize verification close button
     document.getElementById('close-verification').addEventListener('click', function() {
