@@ -405,9 +405,9 @@ function showTokenDetail(tokenId) {
     tokenDetail.classList.remove('hidden');
     
     // Update transactions if there are any
-    if (currentTransactions[activeWallet] && currentTransactions[activeWallet][tokenId]) {
-        updateTransactionsForToken(tokenId);
-    }
+const transactionList = document.getElementById('transaction-list');
+if (transactionList && currentTransactions[activeWallet] && currentTransactions[activeWallet][tokenId]) {
+    updateTransactionsForToken(tokenId);
 }
 
 // Initialize event listeners
