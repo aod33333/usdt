@@ -760,3 +760,26 @@ function simulateBiometricAuth() {
         }, 500);
     }, 1500);
 }
+
+// Generate sample chart data for price history
+function generateChartData() {
+    const days = 30;
+    const labels = [];
+    const values = [];
+    const today = new Date();
+    
+    // Start with random value
+    let price = 1000 + Math.random() * 1000;
+    
+    for (let i = days; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(today.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Random price change
+        price = price * (0.98 + Math.random() * 0.04);
+        values.push(price);
+    }
+    
+    return { labels, values };
+}
