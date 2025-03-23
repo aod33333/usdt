@@ -1218,3 +1218,7 @@ canvas#price-chart {
     border-radius: 8px;
     background-color: var(--tw-bg-gray);
 }
+
+.investment-warning {
+    margin-top: -var(--space-md);
+}
