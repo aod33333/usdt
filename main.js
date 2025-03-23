@@ -367,8 +367,43 @@ function initEventListeners() {
         const tokenItem = event.target.closest('.token-item');
         if (tokenItem) {
             const tokenId = tokenItem.getAttribute('data-token-id');
-            showTokenDetail(tokenId);
-        }
+            function showTokenDetail(tokenId) {
+    // Get the token data
+    const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+    if (!token) return;
+    
+    // Update all token details
+    document.getElementById('detail-symbol').textContent = token.symbol;
+    document.getElementById('detail-fullname').textContent = token.name;
+    document.getElementById('token-detail-icon').src = token.icon;
+    document.getElementById('token-balance-amount').textContent = `${token.amount} ${token.symbol}`;
+    document.getElementById('token-balance-value').textContent = formatCurrency(token.value);
+    document.getElementById('token-staking-symbol').textContent = token.symbol;
+    document.getElementById('token-price-symbol').textContent = token.symbol;
+    document.getElementById('token-current-price').textContent = `$${token.price.toLocaleString()}`;
+    
+    // Set price change class and value
+    const priceChangeElement = document.getElementById('token-price-change');
+    if (token.change >= 0) {
+        priceChangeElement.className = 'positive';
+        priceChangeElement.textContent = `+${token.change}%`;
+    } else {
+        priceChangeElement.className = 'negative';
+        priceChangeElement.textContent = `${token.change}%`;
+    }
+    
+    // Update gas fee display for this token
+    document.getElementById('gas-fee-amount').textContent = token.id === 'eth' ? '$0.01' : '$0.00';
+    
+    // Show token detail and hide wallet screen
+    walletScreen.classList.add('hidden');
+    tokenDetail.classList.remove('hidden');
+    
+    // Update transactions if there are any
+    if (currentTransactions[activeWallet] && currentTransactions[activeWallet][tokenId]) {
+        updateTransactionsForToken(tokenId);
+    }
+}
     });
     
     // Back button on token detail
