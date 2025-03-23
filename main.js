@@ -776,6 +776,7 @@ function showSendScreen(tokenId) {
        
        walletScreen.classList.add('hidden');
        sendScreen.classList.remove('hidden');
+try {
    } catch (error) {
        console.error("Error in showSendScreen:", error);
        walletScreen.classList.add('hidden');
