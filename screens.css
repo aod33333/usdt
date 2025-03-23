@@ -1155,3 +1155,14 @@ canvas#price-chart {
     color: var(--tw-black);
     margin-left: var(--space-xs);
 }
+
+.chart-container {
+    height: 200px;
+    margin: 20px 0 30px;
+    padding: 10px 0;
+}
+
+#price-chart {
+    width: 100%;
+    height: 100%;
+}
