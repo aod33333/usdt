@@ -68,7 +68,7 @@ const walletData = {
                 name: 'Trust Wallet Token',
                 symbol: 'TWT',
                 network: 'BNB Smart Chain',
-                icon: 'https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png',
+                icon: 'https://assets.trustwalletapp.com/blockchains/smartchain/assets/0x4B0F1812e5Df2A09796481Ff14017e6005508003/logo.png',
                 amount: 0,
                 value: 0,
                 price: 0.89,
