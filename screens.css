@@ -1219,26 +1219,22 @@ canvas#price-chart {
     background-color: var(--tw-bg-gray);
 }
 
-..main-header {
+.main-header {
     padding: var(--space-xs) var(--space-md);
 }
-
 .page-title {
     font-size: var(--font-lg);
 }
-
 .icon-button {
     width: 32px;
     height: 32px;
 }
-
 .investment-warning {
     margin-top: -var(--space-md);
     margin-left: var(--space-md);
     margin-right: var(--space-md);
     border-radius: 8px;
 }
-
 .investment-warning-content {
     display: flex;
     align-items: center;
