@@ -1207,3 +1207,14 @@ canvas#price-chart {
 .status-icons span {
     font-size: 12px;
 }
+
+.wallet-selector {
+    background-color: transparent;
+    border: none;
+    padding: var(--space-xs) var(--space-md);
+}
+
+.wallet-actions .wallet-action-button {
+    border-radius: 8px;
+    background-color: var(--tw-bg-gray);
+}
