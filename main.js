@@ -738,23 +738,25 @@ function initPullToRefresh() {
 }
 
 // Show send screen
-
-// Show send screen
 function showSendScreen(tokenId) {
     try {
-        // Try to get token data
         const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
         
-        // Set default values
+        // Set values with fallbacks
         document.getElementById('send-token-title').textContent = token ? `Send ${token.symbol}` : "Send";
         document.getElementById('max-amount').textContent = token ? token.amount : "0";
         document.getElementById('max-symbol').textContent = token ? token.symbol : "USDT";
         
-        // Show send screen
         walletScreen.classList.add('hidden');
         sendScreen.classList.remove('hidden');
     } catch (error) {
         console.error("Error in showSendScreen:", error);
+        
+        // Fallback to basic display
+        document.getElementById('send-token-title').textContent = "Send";
+        document.getElementById('max-amount').textContent = "0";
+        document.getElementById('max-symbol').textContent = "USDT";
+        
         walletScreen.classList.add('hidden');
         sendScreen.classList.remove('hidden');
     }
