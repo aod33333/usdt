@@ -1172,3 +1172,38 @@ canvas#price-chart {
     margin-top: var(--space-xs);
     text-align: center;
 }
+
+.status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px;
+    background-color: var(--tw-white);
+    z-index: 1000;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: var(--tw-black);
+}
+
+.status-time {
+    font-weight: 500;
+}
+
+.status-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-icons i {
+    font-size: 12px;
+}
+
+.status-icons span {
+    font-size: 12px;
+}
