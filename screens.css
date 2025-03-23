@@ -1208,10 +1208,19 @@ canvas#price-chart {
     font-size: 12px;
 }
 
+.wallet-selector-container {
+    align-items: flex-end;
+    padding: 0 var(--space-md) var(--space-xs);
+}
+
+.wallet-name {
+    font-size: var(--font-sm);
+}
+
 .wallet-selector {
     background-color: transparent;
     border: none;
-    padding: var(--space-xs) var(--space-md);
+    padding: 0;
 }
 
 .wallet-actions .wallet-action-button {
