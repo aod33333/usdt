@@ -738,27 +738,32 @@ function initPullToRefresh() {
 }
 
 function showSendScreen(tokenId) {
-    try {
-        // Default fallback if no token specified
-        let token = {
-            symbol: 'USDT',
-            amount: '0',
-            id: 'usdt'
-        };
+    // Default fallback token
+    const defaultToken = {
+        symbol: 'USDT',
+        amount: '0',
+        id: 'usdt'
+    };
 
-        // Try to find the specific token if wallet data exists
-        if (currentWalletData && currentWalletData[activeWallet] && currentWalletData[activeWallet].tokens) {
+    // Find the specific token or use default
+    let token = defaultToken;
+    
+    try {
+        if (currentWalletData && 
+            currentWalletData[activeWallet] && 
+            currentWalletData[activeWallet].tokens) {
             const foundToken = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
             if (foundToken) {
                 token = foundToken;
             }
         }
         
-        // Set values with found or default token
+        // Update send screen elements
         document.getElementById('send-token-title').textContent = `Send ${token.symbol}`;
         document.getElementById('max-amount').textContent = token.amount;
         document.getElementById('max-symbol').textContent = token.symbol;
         
+        // Toggle screen visibility
         walletScreen.classList.add('hidden');
         sendScreen.classList.remove('hidden');
     } catch (error) {
@@ -773,27 +778,6 @@ function showSendScreen(tokenId) {
         sendScreen.classList.remove('hidden');
     }
 }
-       
-       // Normal flow when data is available
-       const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-       if (!token) {
-           document.getElementById('send-token-title').textContent = "Send";
-           document.getElementById('max-amount').textContent = "0";
-           document.getElementById('max-symbol').textContent = "USDT";
-       } else {
-           document.getElementById('send-token-title').textContent = `Send ${token.symbol}`;
-           document.getElementById('max-amount').textContent = token.amount;
-           document.getElementById('max-symbol').textContent = token.symbol;
-       }
-       
-       walletScreen.classList.add('hidden');
-       sendScreen.classList.remove('hidden');
-try {
-   } catch (error) {
-       console.error("Error in showSendScreen:", error);
-       walletScreen.classList.add('hidden');
-       sendScreen.classList.remove('hidden');
-   }
 
 // Show receive screen
 function showReceiveScreen(tokenId) {
