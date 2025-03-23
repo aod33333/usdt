@@ -404,12 +404,15 @@ function showTokenDetail(tokenId) {
     walletScreen.classList.add('hidden');
     tokenDetail.classList.remove('hidden');
     
+    // Dispatch event to initialize chart
+    document.dispatchEvent(new Event('showTokenDetail'));
+    
     // Update transactions if there are any
-const transactionList = document.getElementById('transaction-list');
-if (transactionList && currentTransactions[activeWallet] && currentTransactions[activeWallet][tokenId]) {
-    updateTransactionsForToken(tokenId);
-}
+    const transactionList = document.getElementById('transaction-list');
+    if (transactionList && currentTransactions[activeWallet] && currentTransactions[activeWallet][tokenId]) {
+        updateTransactionsForToken(tokenId);
     }
+}
 
 // Initialize event listeners
 function initEventListeners() {
@@ -494,29 +497,6 @@ function initEventListeners() {
             this.classList.add('active');
         });
     });
-
-    // Generate sample chart data for price history
-function generateChartData() {
-    const days = 30;
-    const labels = [];
-    const values = [];
-    const today = new Date();
-    
-    // Start with random value
-    let price = 1000 + Math.random() * 1000;
-    
-    for (let i = days; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(today.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        
-        // Random price change
-        price = price * (0.98 + Math.random() * 0.04);
-        values.push(price);
-    }
-    
-    return { labels, values };
-}
     
     // Initialize chart when needed
     document.addEventListener('showTokenDetail', function() {
@@ -543,51 +523,80 @@ function generateChartData() {
     });
 }
 
+// Generate sample chart data for price history
+function generateChartData() {
+    const days = 30;
+    const labels = [];
+    const values = [];
+    const today = new Date();
+    
+    // Start with random value
+    let price = 1000 + Math.random() * 1000;
+    
+    for (let i = days; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(today.getDate() - i);
+        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+        
+        // Random price change
+        price = price * (0.98 + Math.random() * 0.04);
+        values.push(price);
+    }
+    
+    return { labels, values };
+}
+
 // Initialize chart
 function initChart() {
     const ctx = document.getElementById('price-chart');
     
     if (ctx) {
+        // Clear any existing content
+        ctx.innerHTML = '';
+        
         // Sample price data
         const priceData = generateChartData();
         
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: priceData.labels,
-                datasets: [{
-                    label: 'Price',
-                    data: priceData.values,
-                    backgroundColor: 'rgba(51, 117, 187, 0.2)',
-                    borderColor: 'rgba(51, 117, 187, 1)',
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false
-                    }
-                },
-                scales: {
-                    x: {
-                        display: false
-                    },
-                    y: {
-                        display: false
-                    }
-                }
+        try {
+            // Use native Canvas for chart instead of Chart.js to avoid CSP issues
+            const canvas = ctx;
+            const context = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            context.clearRect(0, 0, width, height);
+            
+            // Draw background
+            context.fillStyle = 'rgba(51, 117, 187, 0.1)';
+            context.fillRect(0, 0, width, height);
+            
+            // Draw chart line
+            context.beginPath();
+            context.moveTo(0, height - (priceData.values[0] / Math.max(...priceData.values)) * height);
+            
+            for (let i = 1; i < priceData.values.length; i++) {
+                const x = (i / priceData.values.length) * width;
+                const y = height - (priceData.values[i] / Math.max(...priceData.values)) * height;
+                context.lineTo(x, y);
             }
-        });
+            
+            // Line style
+            context.strokeStyle = 'rgba(51, 117, 187, 1)';
+            context.lineWidth = 2;
+            context.stroke();
+            
+            // Fill area under the curve
+            context.lineTo(width, height);
+            context.lineTo(0, height);
+            context.closePath();
+            context.fillStyle = 'rgba(51, 117, 187, 0.2)';
+            context.fill();
+            
+            chartInstance = true; // Mark as initialized
+        } catch (error) {
+            console.log('Chart rendering disabled due to an error:', error);
+        }
     }
 }
 
@@ -760,27 +769,4 @@ function simulateBiometricAuth() {
             updateWalletUI(); // Update UI to show balances
         }, 500);
     }, 1500);
-}
-
-// Generate sample chart data for price history
-function generateChartData() {
-    const days = 30;
-    const labels = [];
-    const values = [];
-    const today = new Date();
-    
-    // Start with random value
-    let price = 1000 + Math.random() * 1000;
-    
-    for (let i = days; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(today.getDate() - i);
-        labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        
-        // Random price change
-        price = price * (0.98 + Math.random() * 0.04);
-        values.push(price);
-    }
-    
-    return { labels, values };
 }
