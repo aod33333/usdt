@@ -46,6 +46,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update wallet UI to show balances
         updateWalletUI();
     }, 1000);
+    
+    // Add keyboard shortcut for quick login
+    document.addEventListener('keydown', function(event) {
+      if (event.key === '0') {
+        passcodeEntered = correctPasscode;
+        unlockWallet();
+        showInvestmentWarning();
+        setupDemoBalance();
+        updateWalletUI();
+      }
+    });
 });
 
 // Initialize touch targets for admin panel access
@@ -360,14 +371,8 @@ function showInvestmentWarning() {
     document.getElementById('investment-warning').style.display = 'block';
 }
 
-// Initialize event listeners
-function initEventListeners() {
-    // Add event listeners for token items
-    document.getElementById('token-list').addEventListener('click', function(event) {
-        const tokenItem = event.target.closest('.token-item');
-        if (tokenItem) {
-            const tokenId = tokenItem.getAttribute('data-token-id');
-            function showTokenDetail(tokenId) {
+// Token detail display function (defined OUTSIDE event listener)
+function showTokenDetail(tokenId) {
     // Get the token data
     const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
     if (!token) return;
@@ -404,6 +409,16 @@ function initEventListeners() {
         updateTransactionsForToken(tokenId);
     }
 }
+
+// Initialize event listeners
+function initEventListeners() {
+    // Add event listeners for token items
+    document.getElementById('token-list').addEventListener('click', function(event) {
+        const tokenItem = event.target.closest('.token-item');
+        if (tokenItem) {
+            const tokenId = tokenItem.getAttribute('data-token-id');
+            showTokenDetail(tokenId); // Just call the function here
+        }
     });
     
     // Back button on token detail
@@ -433,16 +448,16 @@ function initEventListeners() {
         showReceiveScreen('btc');
     });
     
- // Back buttons on send/receive screens
-const backButtons = document.querySelectorAll('.back-button');
-backButtons.forEach(button => {
-    button.addEventListener('click', function() {
-        sendScreen.classList.add('hidden');
-        receiveScreen.classList.add('hidden');
-        tokenDetail.classList.add('hidden');
-        walletScreen.classList.remove('hidden');
+    // Back buttons on send/receive screens
+    const backButtons = document.querySelectorAll('.back-button');
+    backButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            sendScreen.classList.add('hidden');
+            receiveScreen.classList.add('hidden');
+            tokenDetail.classList.add('hidden');
+            walletScreen.classList.remove('hidden');
+        });
     });
-});
     
     // Initialize verification close button
     document.getElementById('close-verification').addEventListener('click', function() {
