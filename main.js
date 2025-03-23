@@ -547,13 +547,27 @@ function generateChartData() {
 }
 
 function initChart() {
-    const canvas = document.getElementById('price-chart');
+    let canvas = document.getElementById('price-chart');
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
         // Replace div with canvas if needed
         const container = document.querySelector('.chart-container');
         container.innerHTML = '<canvas id="price-chart" width="300" height="200"></canvas>';
         canvas = document.getElementById('price-chart');
     }
+    
+    const ctx = canvas.getContext('2d');
+    const priceData = generateChartData();
+    
+    // Draw simple gradient background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(51, 117, 187, 0.2)');
+    gradient.addColorStop(1, 'rgba(51, 117, 187, 0.05)');
+    
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    chartInstance = true;
+}
     
     const ctx = canvas.getContext('2d');
     const priceData = generateChartData();
