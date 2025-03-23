@@ -546,51 +546,25 @@ function generateChartData() {
     return { labels, values };
 }
 
-// Initialize chart
 function initChart() {
     const canvas = document.getElementById('price-chart');
-    if (!canvas || !canvas.getContext) return;
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        // Replace div with canvas if needed
+        const container = document.querySelector('.chart-container');
+        container.innerHTML = '<canvas id="price-chart" width="300" height="200"></canvas>';
+        canvas = document.getElementById('price-chart');
+    }
     
     const ctx = canvas.getContext('2d');
     const priceData = generateChartData();
-    const values = priceData.values;
     
-    // Set canvas dimensions
-    canvas.width = canvas.offsetWidth || 300;
-    canvas.height = 200;
+    // Draw simple gradient background
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0, 'rgba(51, 117, 187, 0.2)');
+    gradient.addColorStop(1, 'rgba(51, 117, 187, 0.05)');
     
-    // Find min/max for scaling
-    const min = Math.min(...values) * 0.9;
-    const max = Math.max(...values) * 1.1;
-    const range = max - min;
-    
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Draw line
-    ctx.beginPath();
-    values.forEach((value, index) => {
-        const x = (index / (values.length - 1)) * canvas.width;
-        const y = canvas.height - ((value - min) / range) * canvas.height;
-        
-        if (index === 0) {
-            ctx.moveTo(x, y);
-        } else {
-            ctx.lineTo(x, y);
-        }
-    });
-    
-    // Style line
-    ctx.strokeStyle = '#3375BB';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    
-    // Fill area under line
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.lineTo(0, canvas.height);
-    ctx.closePath();
-    ctx.fillStyle = 'rgba(51, 117, 187, 0.2)';
-    ctx.fill();
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     
     chartInstance = true;
 }
