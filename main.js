@@ -801,7 +801,6 @@ function showReceiveScreen(tokenId) {
     // Generate QR code
     generateQRCode();
 }
-}
 
 // Generate QR code for receive address
 function generateQRCode() {
