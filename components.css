@@ -37,9 +37,8 @@
     color: var(--tw-dark-gray);
 }
 
-/* Balance Display */
 .balance-display {
-    text-align: center;
+    text-align: left;
     padding: var(--space-sm) var(--space-md) var(--space-md);
 }
 
@@ -49,7 +48,7 @@
     color: var(--tw-black);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: var(--space-xs);
 }
 
