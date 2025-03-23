@@ -1221,6 +1221,7 @@ canvas#price-chart {
 
 .main-header {
     padding: var(--space-xs) var(--space-md);
+    margin-top: var(--space-md);
 }
 .page-title {
     font-size: var(--font-lg);
