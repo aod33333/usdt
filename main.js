@@ -558,24 +558,112 @@ function initChart() {
     // Generate chart data
     const chartData = generateChartData();
     
-    // Create chart instance
-    chartInstance = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: chartData.labels,
-            datasets: [{
-                label: 'Price',
-                data: chartData.values,
-                borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+    try {
+        // Check if Chart is defined
+        if (typeof Chart === 'undefined') {
+            throw new Error('Chart.js library is not loaded');
         }
-    });
+        
+        // Create chart instance
+        chartInstance = new Chart(canvas.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Price',
+                    data: chartData.values,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    } catch (error) {
+        console.error('Error initializing chart:', error);
+        
+        // Draw a simple fallback chart
+        drawFallbackChart(canvas, chartData);
+    }
+}
+
+// Draw a simple fallback chart when Chart.js is not available
+function drawFallbackChart(canvas, data) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Set background
+    ctx.fillStyle = '#f5f5f5';
+    ctx.fillRect(0, 0, width, height);
+    
+    // Find min and max values
+    const values = data.values;
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = max - min;
+    
+    // Draw axes
+    ctx.strokeStyle = '#333';
+    ctx.beginPath();
+    ctx.moveTo(40, 20);
+    ctx.lineTo(40, height - 40);
+    ctx.lineTo(width - 20, height - 40);
+    ctx.stroke();
+    
+    // Draw data points and lines
+    if (values.length > 0) {
+        const xStep = (width - 60) / (values.length - 1);
+        
+        ctx.strokeStyle = 'rgb(75, 192, 192)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        
+        for (let i = 0; i < values.length; i++) {
+            const x = 40 + i * xStep;
+            const y = height - 40 - ((values[i] - min) / range) * (height - 60);
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+            
+            // Draw point
+            ctx.fillStyle = 'rgb(75, 192, 192)';
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        ctx.stroke();
+        
+        // Draw labels
+        ctx.fillStyle = '#666';
+        ctx.font = '10px Arial';
+        ctx.textAlign = 'center';
+        
+        // Draw first and last date labels
+        ctx.fillText(data.labels[0], 40, height - 25);
+        ctx.fillText(data.labels[data.labels.length - 1], width - 20, height - 25);
+        
+        // Draw min and max value labels
+        ctx.textAlign = 'right';
+        ctx.fillText('$' + Math.round(min).toLocaleString(), 35, height - 40);
+        ctx.fillText('$' + Math.round(max).toLocaleString(), 35, 25);
+    } else {
+        // No data
+        ctx.fillStyle = '#666';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No data available', width/2, height/2);
+    }
 }
 
 // Initialize pull to refresh
