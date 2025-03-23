@@ -267,14 +267,23 @@
                     </div>
                 </div>
                 
-                <!-- Transactions -->
-                <div class="no-transactions">
-                    <div class="no-tx-icon">
-                        <img src="https://assets.trustwalletapp.com/empty-transactions.svg" alt="No transactions">
-                    </div>
-                    <p>Transactions will appear here.</p>
-                    <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
-                </div>
+            <!-- Transactions -->
+<div class="transaction-header">
+    <h3>Transactions</h3>
+    <button class="filter-button">
+        <i class="fas fa-filter"></i>
+    </button>
+</div>
+<div class="transaction-list" id="transaction-list">
+    <!-- Transactions will be inserted here by JS -->
+</div>
+<div class="no-transactions">
+    <div class="no-tx-icon">
+        <img src="https://assets.trustwalletapp.com/empty-transactions.svg" alt="No transactions">
+    </div>
+    <p>Transactions will appear here.</p>
+    <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
+</div>
                 
                 <!-- Price Information -->
                 <div class="token-price-info">
