@@ -836,3 +836,41 @@ function simulateBiometricAuth() {
         }, 500);
     }, 1500);
 }
+
+// Verification process function
+function showVerificationProcess() {
+    verifyOverlay.style.display = 'flex';
+    
+    // Progress animation
+    const progressFill = document.getElementById('progress-fill');
+    const verificationStatus = document.getElementById('verification-status');
+    const verificationResult = document.getElementById('verification-result');
+    
+    progressFill.style.width = '0%';
+    verificationStatus.textContent = 'Connecting to blockchain...';
+    verificationResult.classList.add('hidden');
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 5;
+        progressFill.style.width = `${progress}%`;
+        
+        if (progress >= 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                verificationResult.classList.remove('hidden');
+            }, 500);
+        }
+    }, 50);
+}
+
+// Process send transaction
+function processSendTransaction() {
+    sendScreen.classList.add('hidden');
+    txStatusModal.style.display = 'flex';
+    
+    setTimeout(() => {
+        document.getElementById('tx-pending').classList.add('hidden');
+        document.getElementById('tx-success').classList.remove('hidden');
+    }, 2000);
+}
