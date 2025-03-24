@@ -259,8 +259,8 @@
                        <span>Sell</span>
                    </button>
                </div>
-               
-               <!-- Staking Container -->
+
+              <!-- Staking Container -->
                <div class="staking-container">
                    <div class="staking-icon">
                        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH5wMcCjgzp3ZxFwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAABFSURBVAjXY/z//z8DMYCJJNUMDAwM1DGyASnmEzNmzPjPyMjIyMTExMTMxMTExMzMzMzMyMjIyMQkzsDAyMgIFGcEAACvdQvEvs9KlgAAAABJRU5ErkJggg==" alt="Staking">
@@ -338,60 +338,61 @@
                    </div>
                </div>
                
-             <div class="qr-code-container">
-    <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
-        <!-- White background -->
-        <rect width="250" height="250" fill="white"/>
-        
-        <!-- Border -->
-        <rect x="10" y="10" width="230" height="230" stroke="black" stroke-width="2" fill="none"/>
-        
-        <!-- Fake QR code pattern - static grid that looks like a QR code -->
-        <g fill="black">
-            <!-- Position markers (corners) -->
-            <rect x="30" y="30" width="40" height="40"/>
-            <rect x="180" y="30" width="40" height="40"/>
-            <rect x="30" y="180" width="40" height="40"/>
-            
-            <!-- Inner white squares for position markers -->
-            <rect x="40" y="40" width="20" height="20" fill="white"/>
-            <rect x="190" y="40" width="20" height="20" fill="white"/>
-            <rect x="40" y="190" width="20" height="20" fill="white"/>
-            
-            <!-- Random QR code pattern squares -->
-            <rect x="90" y="30" width="10" height="10"/>
-            <rect x="110" y="30" width="10" height="10"/>
-            <rect x="140" y="30" width="10" height="10"/>
-            <rect x="30" y="90" width="10" height="10"/>
-            <rect x="50" y="90" width="10" height="10"/>
-            <rect x="90" y="90" width="10" height="10"/>
-            <rect x="120" y="90" width="10" height="10"/>
-            <rect x="150" y="90" width="10" height="10"/>
-            <rect x="180" y="90" width="10" height="10"/>
-            <rect x="30" y="110" width="10" height="10"/>
-            <rect x="60" y="110" width="10" height="10"/>
-            <rect x="80" y="110" width="10" height="10"/>
-            <rect x="130" y="110" width="10" height="10"/>
-            <rect x="190" y="110" width="10" height="10"/>
-            <rect x="90" y="130" width="10" height="10"/>
-            <rect x="120" y="130" width="10" height="10"/>
-            <rect x="150" y="130" width="10" height="10"/>
-            <rect x="180" y="130" width="10" height="10"/>
-            <rect x="30" y="150" width="10" height="10"/>
-            <rect x="60" y="150" width="10" height="10"/>
-            <rect x="110" y="150" width="10" height="10"/>
-            <rect x="140" y="150" width="10" height="10"/>
-            <rect x="190" y="150" width="10" height="10"/>
-            <rect x="90" y="170" width="10" height="10"/>
-            <rect x="120" y="170" width="10" height="10"/>
-            <rect x="150" y="170" width="10" height="10"/>
-            <rect x="90" y="190" width="10" height="10"/>
-            <rect x="120" y="190" width="10" height="10"/>
-            <rect x="150" y="190" width="10" height="10"/>
-            <rect x="180" y="190" width="10" height="10"/>
-        </g>
-    </svg>
-</div>
+               <!-- FIXED: Static SVG QR code instead of canvas -->
+               <div class="qr-code-container">
+                  <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+                     <!-- White background -->
+                     <rect width="250" height="250" fill="white"/>
+                     
+                     <!-- Border -->
+                     <rect x="10" y="10" width="230" height="230" stroke="black" stroke-width="2" fill="none"/>
+                     
+                     <!-- Fake QR code pattern - static grid that looks like a QR code -->
+                     <g fill="black">
+                        <!-- Position markers (corners) -->
+                        <rect x="30" y="30" width="40" height="40"/>
+                        <rect x="180" y="30" width="40" height="40"/>
+                        <rect x="30" y="180" width="40" height="40"/>
+                        
+                        <!-- Inner white squares for position markers -->
+                        <rect x="40" y="40" width="20" height="20" fill="white"/>
+                        <rect x="190" y="40" width="20" height="20" fill="white"/>
+                        <rect x="40" y="190" width="20" height="20" fill="white"/>
+                        
+                        <!-- Random QR code pattern squares -->
+                        <rect x="90" y="30" width="10" height="10"/>
+                        <rect x="110" y="30" width="10" height="10"/>
+                        <rect x="140" y="30" width="10" height="10"/>
+                        <rect x="30" y="90" width="10" height="10"/>
+                        <rect x="50" y="90" width="10" height="10"/>
+                        <rect x="90" y="90" width="10" height="10"/>
+                        <rect x="120" y="90" width="10" height="10"/>
+                        <rect x="150" y="90" width="10" height="10"/>
+                        <rect x="180" y="90" width="10" height="10"/>
+                        <rect x="30" y="110" width="10" height="10"/>
+                        <rect x="60" y="110" width="10" height="10"/>
+                        <rect x="80" y="110" width="10" height="10"/>
+                        <rect x="130" y="110" width="10" height="10"/>
+                        <rect x="190" y="110" width="10" height="10"/>
+                        <rect x="90" y="130" width="10" height="10"/>
+                        <rect x="120" y="130" width="10" height="10"/>
+                        <rect x="150" y="130" width="10" height="10"/>
+                        <rect x="180" y="130" width="10" height="10"/>
+                        <rect x="30" y="150" width="10" height="10"/>
+                        <rect x="60" y="150" width="10" height="10"/>
+                        <rect x="110" y="150" width="10" height="10"/>
+                        <rect x="140" y="150" width="10" height="10"/>
+                        <rect x="190" y="150" width="10" height="10"/>
+                        <rect x="90" y="170" width="10" height="10"/>
+                        <rect x="120" y="170" width="10" height="10"/>
+                        <rect x="150" y="170" width="10" height="10"/>
+                        <rect x="90" y="190" width="10" height="10"/>
+                        <rect x="120" y="190" width="10" height="10"/>
+                        <rect x="150" y="190" width="10" height="10"/>
+                        <rect x="180" y="190" width="10" height="10"/>
+                     </g>
+                  </svg>
+               </div>
                
                <div class="wallet-address" id="wallet-address">
                    bc1qltfhpkgqw6ug6vtw76z2uftwy7jtmr6vfsxp4p
@@ -617,7 +618,7 @@
                    <div class="tx-status-icon success">
                        <i class="fas fa-check"></i>
                    </div>
-                   <h3>Transaction Successful</h3>
+                 <h3>Transaction Successful</h3>
                    <p>Your transaction has been confirmed.</p>
                    <div class="tx-details">
                        <div class="tx-detail-row">
@@ -724,27 +725,24 @@
    </div>
    
    <script>
-  // Initialize required global variables
-  window.originalWalletData = null;
-  window.currentWalletData = null;
-  window.activeWallet = 'main';
-  window.passcodeEntered = '';
-  window.touchSequence = [];
-  window.correctPasscode = '123456';
-  window.balanceModified = false;
-  window.expirationTimer = null;
-</script>
+   // Initialize required global variables
+   window.originalWalletData = null;
+   window.currentWalletData = null;
+   window.activeWallet = 'main';
+   window.passcodeEntered = '';
+   window.touchSequence = [];
+   window.correctPasscode = '123456';
+   window.balanceModified = false;
+   window.expirationTimer = null;
+   </script>
    <script src="combined.js"></script>
 
    <script>
    document.addEventListener('DOMContentLoaded', function() {
-       // Full screen request on startup
+       // Modify fullscreen request to avoid security issues
        document.querySelector('.app-container').addEventListener('click', function() {
-           if (document.documentElement.requestFullscreen) {
-               document.documentElement.requestFullscreen();
-           } else if (document.documentElement.webkitRequestFullscreen) {
-               document.documentElement.webkitRequestFullscreen();
-           }
+           console.log("App container clicked - fullscreen request disabled for security");
+           // Fullscreen removed to avoid security issues
        }, {once: true});
    });
    </script>
