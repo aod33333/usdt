@@ -2051,27 +2051,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    try {
-        // Comprehensive validation
-        validateGlobals();
-        validateDOMElements();
-
-        // Systematic initialization
-        safeInit('Screen Initialization', initializeAllScreens);
-        safeInit('Touch Targets', initTouchTargets);
-        safeInit('Passcode', initPasscode);
-        safeInit('Admin Panel', initAdminPanel);
-        safeInit('Wallet Selector', initWalletSelector);
-        safeInit('Event Listeners', initEventListeners);
-        safeInit('Investment Warning', initInvestmentWarning);
-        safeInit('Pull to Refresh', initPullToRefresh);
-
-        // Final UI updates
-        safeInit('Demo Balance', setupDemoBalance);
-        updateWalletUI();
-
-        console.log('✅ ALL INITIALIZATION COMPLETE');
-    } catch (globalError) {
-        console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
-    }
-});
+  // Systematic initialization with DOM element verification
+try {
+    // First, ensure critical DOM elements exist
+    const criticalElements = {
+        adminPanel: document.getElementById('admin-panel'),
+        lockScreen: document.getElementById('lock-screen'),
+        walletScreen: document.getElementById('wallet-screen'),
+        tokenDetail: document.getElementById('token-detail')
+    };
+    
+    // Log available elements
+    console.log('DOM Elements Status:', 
+        Object.entries(criticalElements)
+              .map(([k,v]) => `${k}: ${v ? '✓' : '❌'}`)
+              .join(', ')
+    );
+    
+    // Store references in window for global access
+    Object.assign(window, criticalElements);
+    
+    // Proceed with initialization in correct sequence
+    safeInit('Screen Initialization', initializeAllScreens);
+    safeInit('Touch Targets', initTouchTargets);
+    safeInit('Passcode', initPasscode);
+    safeInit('Admin Panel', initAdminPanel);
+    safeInit('Wallet Selector', initWalletSelector);
+    safeInit('Event Listeners', initEventListeners);
+    safeInit('Investment Warning', initInvestmentWarning);
+    safeInit('Pull to Refresh', initPullToRefresh);
+    
+    // Final UI updates
+    safeInit('Demo Balance', setupDemoBalance);
+    updateWalletUI();
+    console.log('✅ ALL INITIALIZATION COMPLETE');
+} catch (globalError) {
+    console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
+}
