@@ -746,9 +746,26 @@ function showTransactionDetails(transaction) {
 }
 
 // Process send transaction
-function processSendTransaction() {
-    const amount = parseFloat(document.getElementById('send-amount').value);
-    const recipient = document.getElementById('recipient-address').value.trim();
+async function processSendTransaction() {
+    const sendButton = document.getElementById('continue-send');
+    try {
+        // Add loading state
+        sendButton.classList.add('loading');
+        
+        // Your existing transaction logic
+        const amount = parseFloat(document.getElementById('send-amount').value);
+        const recipient = document.getElementById('recipient-address').value.trim();
+        
+        // ... rest of your transaction processing code ...
+        
+    } catch (error) {
+        console.error('Transaction failed:', error);
+        alert('Transaction failed: ' + error.message);
+    } finally {
+        // Remove loading state
+        sendButton.classList.remove('loading');
+    }
+}
     
     // Basic validation
     if (isNaN(amount) || amount <= 0) {
@@ -1135,36 +1152,50 @@ function unlockWallet() {
     }
 }
 
-// Simulate biometric authentication
+// Updated code with loading state
 function simulateBiometricAuth() {
-    if (!biometricOverlay) {
-        console.error('Biometric overlay not found');
-        return;
-    }
+    const biometricButton = document.querySelector('.numpad-key.biometric'); // Get the fingerprint button
     
-    biometricOverlay.style.display = 'flex';
-    
-    const fingerprintIcon = document.getElementById('fingerprint-icon');
-    const biometricStatus = document.getElementById('biometric-status');
-    
-    if (!fingerprintIcon || !biometricStatus) return;
-    
-    // Start scanning animation
-    fingerprintIcon.style.color = 'var(--tw-blue)';
-    
-    // Simulate success after delay
-    setTimeout(() => {
-        biometricStatus.textContent = 'Fingerprint recognized';
-        biometricStatus.style.color = 'var(--tw-green)';
+    try {
+        biometricButton.classList.add('loading'); // Add loading spinner
         
-        // Hide overlay and show wallet after success
+        // --- Existing biometric logic ---
+        if (!biometricOverlay) {
+            throw new Error('Biometric overlay not found');
+        }
+        
+        biometricOverlay.style.display = 'flex';
+        
+        const fingerprintIcon = document.getElementById('fingerprint-icon');
+        const biometricStatus = document.getElementById('biometric-status');
+        
+        if (!fingerprintIcon || !biometricStatus) {
+            throw new Error('Biometric elements missing');
+        }
+        
+        // Simulate scanning animation
+        fingerprintIcon.style.color = 'var(--tw-blue)';
+        
+        // --- Rest of your existing timeout logic ---
         setTimeout(() => {
-            biometricOverlay.style.display = 'none';
-            unlockWallet();
-            setupDemoBalance(); // Add demo balances
-            updateWalletUI(); // Update UI to show balances
-        }, 500);
-    }, 1500);
+            biometricStatus.textContent = 'Fingerprint recognized';
+            biometricStatus.style.color = 'var(--tw-green)';
+            
+            setTimeout(() => {
+                biometricOverlay.style.display = 'none';
+                unlockWallet();
+            }, 500);
+        }, 1500);
+
+    } catch (error) {
+        console.error('Biometric failed:', error);
+        if (biometricStatus) {
+            biometricStatus.textContent = 'Authentication failed';
+            biometricStatus.style.color = 'var(--tw-red)';
+        }
+    } finally {
+        biometricButton.classList.remove('loading'); // Always remove loading state
+    }
 }
 
 // Verification process function
