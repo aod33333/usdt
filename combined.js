@@ -1807,7 +1807,12 @@ function initEventListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('CRITICAL: Comprehensive Initialization Start');
+    console.error('Forcing screen initialization');
+    initializeAllScreens();
+    initPasscode();
+    setupDemoBalance();
+    updateWalletUI();
+});
 
     function safeInit(name, initFunction) {
         try {
