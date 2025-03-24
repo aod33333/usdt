@@ -1,3 +1,5 @@
+console.log('wallet.js loaded successfully');
+
 // Define wallet data structure
 const walletData = {
     main: {
