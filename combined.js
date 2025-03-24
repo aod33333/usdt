@@ -821,6 +821,7 @@ function drawFallbackChart(canvas, data) {
         ctx.textAlign = 'center';
         ctx.fillText('No data available', width/2, height/2);
     }
+}
 
 /**
  * Crypto Wallet Application
@@ -1153,15 +1154,6 @@ function resetTransactionsToOriginal(walletId) {
     }
 }
 
-/**
- * Crypto Wallet Application
- * 
- * Part 4: Security and Authentication
- * - Passcode handling
- * - Biometric authentication
- * - Balance verification
- */
-
 // ========================================================
 // SECURITY & AUTHENTICATION FUNCTIONS
 // ========================================================
@@ -1328,43 +1320,6 @@ function simulateBiometricAuth() {
 
 // Verification process function
 function showVerificationProcess() {
-    if (!verifyOverlay) {
-        console.error('Verification overlay not found');
-        return;
-    }
-    
-    verifyOverlay.style.display = 'flex';
-    
-    // Progress animation
-    const progressFill = document.getElementById('progress-fill');
-    const verificationStatus = document.getElementById('verification-status');
-    const verificationResult = document.getElementById('verification-result');
-    
-    if (!progressFill || !verificationStatus || !verificationResult) {
-        console.error('Verification elements not found');
-        return;
-    }
-    
-    progressFill.style.width = '0%';
-    verificationStatus.textContent = 'Connecting to blockchain...';
-    verificationResult.classList.add('hidden');
-    
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 5;
-        progressFill.style.width = `${progress}%`;
-        
-        if (progress >= 100) {
-            clearInterval(interval);
-            setTimeout(() => {
-                verificationResult.classList.remove('hidden');
-            }, 500);
-        }
-    }, 50);
-}
-
-// Show verification process with detailed status updates
-function showVerificationProcess() {
     const verificationOverlay = document.getElementById('verification-overlay');
     if (verificationOverlay) {
         verificationOverlay.style.display = 'flex';
@@ -1500,16 +1455,6 @@ function handleTouchSequence(event) {
         adminPanel.style.display = 'flex';
     }
 }
-
-/**
- * Crypto Wallet Application
- * 
- * Part 5: Admin Panel and Balance Manipulation
- * - Admin panel initialization
- * - Fake balance application
- * - Expiration timer
- * - Balance management
- */
 
 // ========================================================
 // ADMIN PANEL & BALANCE MANIPULATION
@@ -1742,16 +1687,6 @@ function setupDemoBalance() {
     // Update UI
     updateWalletUI();
 }
-
-/**
- * Crypto Wallet Application
- * 
- * Part 6: Event Listeners and Main Initialization
- * - Event listeners setup
- * - DOM ready handler
- * - Warning banner
- * - Pull to refresh
- */
 
 // ========================================================
 // EVENT LISTENERS AND UTILITY FUNCTIONS
