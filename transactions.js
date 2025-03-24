@@ -288,7 +288,7 @@ function processSendTransaction() {
     }
     
     // Close send modal
-    document.getElementById('send-modal').style.display = 'none';
+    document.getElementById('send-screen').style.display = 'none';
     
     // Show transaction pending
     document.getElementById('tx-status-modal').style.display = 'flex';
