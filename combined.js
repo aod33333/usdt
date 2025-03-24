@@ -2088,3 +2088,4 @@ try {
 } catch (globalError) {
     console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
 }
+}); 
