@@ -1864,4 +1864,4 @@ document.addEventListener('DOMContentLoaded', function() {
     } catch (globalError) {
         console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
     }
-});
+);
