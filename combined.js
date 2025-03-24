@@ -1,3 +1,21 @@
+// Add this at the VERY TOP of combined.js (before any other code)
+window.onerror = function(msg, url, line) {
+    console.error(`Global Error: ${msg}\nURL: ${url}\nLine: ${line}`);
+    
+    // Show user-friendly error
+    const errorContainer = document.createElement('div');
+    errorContainer.style = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff4444;color:white;padding:15px;z-index:9999;';
+    errorContainer.innerHTML = `
+        ⚠️ Application Error - Please refresh
+        <button onclick="this.parentElement.remove()" style="margin-left:10px;background:none;border:none;color:white;cursor:pointer">
+            ×
+        </button>
+    `;
+    
+    document.body.appendChild(errorContainer);
+    return true; // Prevent default browser error handling
+};
+
 console.error('Script loading started');
 document.addEventListener('DOMContentLoaded', function() {
     console.error('DOMContentLoaded fired');
