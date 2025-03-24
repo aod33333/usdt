@@ -60,55 +60,88 @@ function debugWalletData() {
     })));
 }
 
-// Modify existing DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
-    console.error('CRITICAL: DOM Loaded - Checking Global Variables');
-    
-    try {
-        console.error('Global Variables:', {
-            currentWalletData: typeof currentWalletData,
-            originalWalletData: typeof originalWalletData,
-            activeWallet: typeof activeWallet
-        });
+    console.error('CRITICAL: Comprehensive Initialization Start');
 
-        // Add screen initialization
-        initializeAllScreens();
-        
-        console.error('Starting Initialization Steps');
-        
-        initTouchTargets();
-        console.error('Touch Targets Initialized');
-        
-        initPasscode();
-        console.error('Passcode Initialized');
-        
-        initAdminPanel();
-        console.error('Admin Panel Initialized');
-        
-        initWalletSelector();
-        console.error('Wallet Selector Initialized');
-        
-        initEventListeners();
-        console.error('Event Listeners Initialized');
-        
-        initInvestmentWarning();
-        console.error('Investment Warning Initialized');
-        
-        initPullToRefresh();
-        console.error('Pull to Refresh Initialized');
-        
-        setupDemoBalance();
-        console.error('Demo Balance Setup');
-        
-        // Debug wallet data before UI update
-        debugWalletData();
-        
+    // Diagnostic function to log and handle initialization errors
+    function safeInit(name, initFunction) {
+        try {
+            console.group(`Initializing: ${name}`);
+            const startTime = performance.now();
+            
+            // Validate function exists
+            if (typeof initFunction !== 'function') {
+                throw new Error(`${name} is not a valid function`);
+            }
+
+            // Execute initialization
+            initFunction();
+
+            const endTime = performance.now();
+            console.log(`✅ ${name} initialized (${(endTime - startTime).toFixed(2)}ms)`);
+            console.groupEnd();
+        } catch (error) {
+            console.error(`❌ Initialization failed: ${name}`, error);
+            console.groupEnd();
+        }
+    }
+
+    // Validate critical global objects
+    function validateGlobals() {
+        const criticalGlobals = [
+            'currentWalletData', 
+            'originalWalletData', 
+            'activeWallet'
+        ];
+
+        criticalGlobals.forEach(global => {
+            if (typeof window[global] === 'undefined') {
+                console.error(`CRITICAL: ${global} is undefined`);
+            }
+        });
+    }
+
+    // Validate DOM elements
+    function validateDOMElements() {
+        const criticalElements = [
+            'lock-screen', 
+            'wallet-screen', 
+            'token-detail', 
+            'send-screen', 
+            'receive-screen',
+            'admin-panel'
+        ];
+
+        criticalElements.forEach(elementId => {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                console.error(`❌ Critical element missing: ${elementId}`);
+            }
+        });
+    }
+
+    try {
+        // Comprehensive validation
+        validateGlobals();
+        validateDOMElements();
+
+        // Systematic initialization
+        safeInit('Screen Initialization', initializeAllScreens);
+        safeInit('Touch Targets', initTouchTargets);
+        safeInit('Passcode', initPasscode);
+        safeInit('Admin Panel', initAdminPanel);
+        safeInit('Wallet Selector', initWalletSelector);
+        safeInit('Event Listeners', initEventListeners);
+        safeInit('Investment Warning', initInvestmentWarning);
+        safeInit('Pull to Refresh', initPullToRefresh);
+
+        // Final UI updates
+        safeInit('Demo Balance', setupDemoBalance);
         updateWalletUI();
-        console.error('Wallet UI Updated');
-        console.error('ALL INITIALIZATION COMPLETE');
-    } catch (error) {
-        console.error('CRITICAL INITIALIZATION ERROR:', error);
-        console.error('Error Stack:', error.stack);
+
+        console.error('✅ ALL INITIALIZATION COMPLETE');
+    } catch (globalError) {
+        console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
     }
 });
 
@@ -136,34 +169,43 @@ const txStatusModal = document.getElementById('tx-status-modal');
 
 // Initialize touch targets for admin panel access
 function initTouchTargets() {
-    const touchPoints = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-    const appContainer = document.querySelector('.app-container');
-    
-    // Create invisible touch targets
-    touchPoints.forEach(point => {
-        const touchTarget = document.createElement('div');
-        touchTarget.className = `touch-target ${point}`;
-        touchTarget.setAttribute('data-point', point);
-        appContainer.appendChild(touchTarget);
-        
-        // Add touch event listener
-        touchTarget.addEventListener('click', handleTouchSequence);
-    });
-    
-    // Add direct admin panel access button for testing
-    const adminButton = document.createElement('button');
-    adminButton.textContent = "Admin";
-    adminButton.style.position = "fixed";
-    adminButton.style.bottom = "80px";
-    adminButton.style.right = "10px";
-    adminButton.style.zIndex = "2000";
-    adminButton.style.opacity = "0.7";
-    adminButton.style.padding = "5px";
-    adminButton.style.fontSize = "12px";
-    adminButton.addEventListener('click', () => {
-        adminPanel.style.display = 'flex';
-    });
-    document.body.appendChild(adminButton);
+   const touchPoints = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
+   const appContainer = document.querySelector('.app-container');
+   
+   // Create invisible touch targets
+   touchPoints.forEach(point => {
+       const touchTarget = document.createElement('div');
+       touchTarget.className = `touch-target ${point}`;
+       touchTarget.setAttribute('data-point', point);
+       appContainer.appendChild(touchTarget);
+       
+       // Add touch event listener
+       touchTarget.addEventListener('click', handleTouchSequence);
+   });
+   
+   // Add direct admin panel access button for testing
+   const adminButton = document.createElement('button');
+   adminButton.textContent = "Admin";
+   adminButton.style.position = "fixed";
+   adminButton.style.bottom = "80px";
+   adminButton.style.right = "10px";
+   adminButton.style.zIndex = "2000";
+   adminButton.style.opacity = "0.7";
+   adminButton.style.padding = "5px";
+   adminButton.style.fontSize = "12px";
+   adminButton.addEventListener('click', () => {
+       if (adminPanel) {
+           adminPanel.style.display = 'flex';
+       } else {
+           console.error('Admin panel element not found');
+       }
+   });
+
+   // Prevent duplicate button creation
+   if (!document.body.querySelector('.admin-test-button')) {
+       adminButton.classList.add('admin-test-button');
+       document.body.appendChild(adminButton);
+   }
 }
 
 // Handle admin panel access sequence
@@ -322,7 +364,7 @@ function initAdminPanel() {
     const closeAdminBtn = document.getElementById('close-admin');
     if (closeAdminBtn) {
         closeAdminBtn.addEventListener('click', function() {
-            adminPanel.style.display = 'none';
+            adminPanel.style.display = 'flex';
         });
     }
     
