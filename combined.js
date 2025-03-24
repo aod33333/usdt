@@ -1546,7 +1546,6 @@ function initAdminPanel() {
            adminPanel.style.display = 'none';
        });
    }
-}
 
 // Apply fake balance
 function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, walletId) {
