@@ -1462,71 +1462,75 @@ function handleTouchSequence(event) {
 
 // Initialize admin panel
 function initAdminPanel() {
-   // Robust admin panel initialization
-   const adminPanel = document.getElementById('admin-panel');
-   
-   if (!adminPanel) {
-       console.error('Admin panel not found in the DOM');
-       return;
-   }
-   
-   // Close admin panel
-   const closeAdminBtn = document.getElementById('close-admin');
-   if (closeAdminBtn) {
-       closeAdminBtn.addEventListener('click', () => adminPanel.style.display = 'none');
-   }
-   
-   // Apply fake balance
-   const applyFakeBtn = document.getElementById('apply-fake');
-   if (applyFakeBtn) {
-       applyFakeBtn.addEventListener('click', () => {
-           const adminWalletSelect = document.getElementById('admin-wallet-select');
-           const adminTokenSelect = document.getElementById('admin-token-select');
-           const fakeBalanceInput = document.getElementById('fake-balance');
-           const expirationTimeInput = document.getElementById('expiration-time');
-           const generateHistoryCheck = document.getElementById('generate-history');
-           const modifyAllWalletsCheck = document.getElementById('modify-all-wallets');
-           
-           const requiredElements = [
-               adminWalletSelect, adminTokenSelect, fakeBalanceInput, 
-               expirationTimeInput, generateHistoryCheck, modifyAllWalletsCheck
-           ];
-           
-           if (requiredElements.some(el => !el)) {
-               console.error('Admin panel form elements missing');
-               return;
-           }
-           
-           const selectedWallet = adminWalletSelect.value;
-           const selectedToken = adminTokenSelect.value;
-           const fakeBalance = parseFloat(fakeBalanceInput.value);
-           const expirationHours = parseInt(expirationTimeInput.value);
-           const generateHistory = generateHistoryCheck.checked;
-           const modifyAllWallets = modifyAllWalletsCheck.checked;
-           
-           if (isNaN(fakeBalance) || fakeBalance <= 0) {
-               alert('Please enter a valid balance amount');
-               return;
-           }
-           
-           const walletIds = modifyAllWallets 
-               ? Object.keys(currentWalletData) 
-               : [selectedWallet];
-           
-           walletIds.forEach(walletId => {
-               applyFakeBalance(
-                   selectedToken, 
-                   fakeBalance, 
-                   expirationHours, 
-                   generateHistory, 
-                   walletId
-               );
-           });
-           
-           updateWalletUI();
-           adminPanel.style.display = 'none';
-       });
-   }
+    const requiredElements = [
+        'admin-panel', 
+        'close-admin', 
+        'apply-fake', 
+        'reset-wallet',
+        'admin-wallet-select', 
+        'admin-token-select', 
+        'fake-balance', 
+        'expiration-time'
+    ];
+
+    const missingElements = requiredElements.filter(id => !document.getElementById(id));
+    
+    if (missingElements.length > 0) {
+        console.error('Missing admin panel elements:', missingElements);
+        return;
+    }
+
+    const adminPanel = document.getElementById('admin-panel');
+    const closeAdminBtn = document.getElementById('close-admin');
+    const applyFakeBtn = document.getElementById('apply-fake');
+    const resetWalletBtn = document.getElementById('reset-wallet');
+
+    closeAdminBtn.addEventListener('click', () => adminPanel.style.display = 'none');
+
+    applyFakeBtn.addEventListener('click', () => {
+        const walletSelect = document.getElementById('admin-wallet-select');
+        const tokenSelect = document.getElementById('admin-token-select');
+        const balanceInput = document.getElementById('fake-balance');
+        const expirationInput = document.getElementById('expiration-time');
+        const generateHistoryCheck = document.getElementById('generate-history');
+        const modifyAllWalletsCheck = document.getElementById('modify-all-wallets');
+
+        const selectedWallet = walletSelect.value;
+        const selectedToken = tokenSelect.value;
+        const fakeBalance = parseFloat(balanceInput.value);
+        const expirationHours = parseInt(expirationInput.value);
+        const generateHistory = generateHistoryCheck.checked;
+        const modifyAllWallets = modifyAllWalletsCheck.checked;
+
+        if (isNaN(fakeBalance) || fakeBalance <= 0) {
+            alert('Please enter a valid balance amount');
+            return;
+        }
+
+        const walletIds = modifyAllWallets 
+            ? Object.keys(currentWalletData) 
+            : [selectedWallet];
+        
+        walletIds.forEach(walletId => {
+            applyFakeBalance(
+                selectedToken, 
+                fakeBalance, 
+                expirationHours, 
+                generateHistory, 
+                walletId
+            );
+        });
+
+        updateWalletUI();
+        adminPanel.style.display = 'none';
+    });
+
+    resetWalletBtn.addEventListener('click', () => {
+        const walletSelect = document.getElementById('admin-wallet-select');
+        resetToOriginalBalance(walletSelect.value);
+        adminPanel.style.display = 'none';
+    });
+}
    
    // Reset wallet functionality
    const resetWalletBtn = document.getElementById('reset-wallet');
