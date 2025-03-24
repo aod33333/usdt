@@ -1,3 +1,13 @@
+console.error('Script loading started');
+document.addEventListener('DOMContentLoaded', function() {
+    console.error('DOMContentLoaded fired');
+    console.error('Critical elements:', {
+        lockScreen: document.getElementById('lock-screen'),
+        walletScreen: document.getElementById('wallet-screen'),
+        tokenDetail: document.getElementById('token-detail')
+    });
+});
+
 /**
  * Crypto Wallet Application
  * 
