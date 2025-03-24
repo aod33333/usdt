@@ -1,5 +1,34 @@
-// Disable Chart.js if it was loaded previously
-window.Chart = null;
+console.log('main.js starting execution');
+// Check if wallet data is available
+if (typeof currentWalletData === 'undefined' || typeof originalWalletData === 'undefined' || typeof activeWallet === 'undefined') {
+    console.error('CRITICAL ERROR: Wallet data is not loaded. Defining emergency fallback data.');
+    
+    // Define emergency fallback data
+    const walletData = {
+        main: {
+            totalBalance: 0,
+            tokens: [
+                {
+                    id: 'usdt',
+                    name: 'Tether',
+                    symbol: 'USDT',
+                    network: 'BNB Smart Chain',
+                    icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+                    amount: 100000,
+                    value: 100000,
+                    price: 1.00,
+                    change: 0.00,
+                    chainBadge: null
+                }
+            ]
+        }
+    };
+    
+    // Set the global variables
+    window.originalWalletData = JSON.parse(JSON.stringify(walletData));
+    window.currentWalletData = JSON.parse(JSON.stringify(walletData));
+    window.activeWallet = 'main';
+}
 
 function hideAllScreens() {
     const screens = [
