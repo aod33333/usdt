@@ -679,6 +679,18 @@
    </div>
    
    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+   <script>
+  // Initialize required global variables
+  window.originalWalletData = null;
+  window.currentWalletData = null;
+  window.activeWallet = 'main';
+  window.passcodeEntered = '';
+  window.touchSequence = [];
+  window.correctPasscode = '123456';
+  window.balanceModified = false;
+  window.expirationTimer = null;
+  window.chartInstance = null;
+</script>
    <script src="combined.js"></script>
 
    <script>
