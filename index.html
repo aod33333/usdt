@@ -338,9 +338,60 @@
                    </div>
                </div>
                
-               <div class="qr-code-container">
-                   <canvas id="qr-code" width="250" height="250"></canvas>
-               </div>
+             <div class="qr-code-container">
+    <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+        <!-- White background -->
+        <rect width="250" height="250" fill="white"/>
+        
+        <!-- Border -->
+        <rect x="10" y="10" width="230" height="230" stroke="black" stroke-width="2" fill="none"/>
+        
+        <!-- Fake QR code pattern - static grid that looks like a QR code -->
+        <g fill="black">
+            <!-- Position markers (corners) -->
+            <rect x="30" y="30" width="40" height="40"/>
+            <rect x="180" y="30" width="40" height="40"/>
+            <rect x="30" y="180" width="40" height="40"/>
+            
+            <!-- Inner white squares for position markers -->
+            <rect x="40" y="40" width="20" height="20" fill="white"/>
+            <rect x="190" y="40" width="20" height="20" fill="white"/>
+            <rect x="40" y="190" width="20" height="20" fill="white"/>
+            
+            <!-- Random QR code pattern squares -->
+            <rect x="90" y="30" width="10" height="10"/>
+            <rect x="110" y="30" width="10" height="10"/>
+            <rect x="140" y="30" width="10" height="10"/>
+            <rect x="30" y="90" width="10" height="10"/>
+            <rect x="50" y="90" width="10" height="10"/>
+            <rect x="90" y="90" width="10" height="10"/>
+            <rect x="120" y="90" width="10" height="10"/>
+            <rect x="150" y="90" width="10" height="10"/>
+            <rect x="180" y="90" width="10" height="10"/>
+            <rect x="30" y="110" width="10" height="10"/>
+            <rect x="60" y="110" width="10" height="10"/>
+            <rect x="80" y="110" width="10" height="10"/>
+            <rect x="130" y="110" width="10" height="10"/>
+            <rect x="190" y="110" width="10" height="10"/>
+            <rect x="90" y="130" width="10" height="10"/>
+            <rect x="120" y="130" width="10" height="10"/>
+            <rect x="150" y="130" width="10" height="10"/>
+            <rect x="180" y="130" width="10" height="10"/>
+            <rect x="30" y="150" width="10" height="10"/>
+            <rect x="60" y="150" width="10" height="10"/>
+            <rect x="110" y="150" width="10" height="10"/>
+            <rect x="140" y="150" width="10" height="10"/>
+            <rect x="190" y="150" width="10" height="10"/>
+            <rect x="90" y="170" width="10" height="10"/>
+            <rect x="120" y="170" width="10" height="10"/>
+            <rect x="150" y="170" width="10" height="10"/>
+            <rect x="90" y="190" width="10" height="10"/>
+            <rect x="120" y="190" width="10" height="10"/>
+            <rect x="150" y="190" width="10" height="10"/>
+            <rect x="180" y="190" width="10" height="10"/>
+        </g>
+    </svg>
+</div>
                
                <div class="wallet-address" id="wallet-address">
                    bc1qltfhpkgqw6ug6vtw76z2uftwy7jtmr6vfsxp4p
