@@ -812,8 +812,8 @@ function drawFallbackChart(canvas, data) {
         
         // Draw min and max value labels
         ctx.textAlign = 'right';
-        ctx.fillText(' + Math.round(min).toLocaleString(), 35, height - 40);
-        ctx.fillText(' + Math.round(max).toLocaleString(), 35, 25);
+        ctx.fillText('$' + Math.round(min).toLocaleString(), 35, height - 40);
+        ctx.fillText('$' + Math.round(max).toLocaleString(), 35, 25);
     } else {
         // No data
         ctx.fillStyle = '#666';
