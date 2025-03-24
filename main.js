@@ -1001,12 +1001,6 @@ function showSendScreen(tokenId) {
         window.showScreen('send-screen');
 }
 
-        // Ensure wallet data exists
-        if (!currentWalletData || !currentWalletData[activeWallet]) {
-            console.error('Wallet data not available');
-               return;
-        }
-
         // Find the specific token or use default
         let token = defaultToken;
         
