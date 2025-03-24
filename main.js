@@ -1007,15 +1007,14 @@ function showSendScreen(tokenId) {
             return;
         }
 
-        // Find the specific token or use default
-        let token = defaultToken;
-        
-        const tokens = currentWalletData[activeWallet].tokens;
-        const foundToken = tokens.find(t => t.id === tokenId);
-        
-        if (foundToken) {
-            token = foundToken;
-        }
+       // Find the specific token or use USDT as default
+const tokens = currentWalletData[activeWallet].tokens;
+let token = tokens.find(t => t.id === tokenId) || tokens.find(t => t.id === 'usdt');
+
+if (!token) {
+    console.error(`Token ${tokenId} not found and USDT fallback not available`);
+    return;
+}
         
         // Update send screen elements
         const sendTokenTitle = document.getElementById('send-token-title');
