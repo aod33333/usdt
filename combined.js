@@ -233,65 +233,19 @@ const originalTransactions = {
     }
 };
 
-// Store original wallet data for reset functionality - FIXED: no JSON.parse/stringify
+// FIXED: Store original wallet data for reset functionality - no JSON.parse/stringify
 const originalWalletData = walletData;
 
-// Current wallet data (can be modified by admin panel) - FIXED: no JSON.parse/stringify
+// FIXED: Current wallet data (can be modified by admin panel) - no JSON.parse/stringify
 let currentWalletData = walletData;
 
-// Current transaction data (can be modified by admin panel) - FIXED: no JSON.parse/stringify
+// FIXED: Current transaction data (can be modified by admin panel) - no JSON.parse/stringify
 let currentTransactions = originalTransactions;
 
 // DOM Elements (Initialized in DOMContentLoaded)
 let lockScreen, walletScreen, tokenDetail, sendScreen, receiveScreen, 
     adminPanel, verifyOverlay, biometricOverlay, explorerOverlay, 
     txStatusModal, dots, numpadKeys;
-
-// ========================================================
-// CORE UTILITY FUNCTIONS
-// ========================================================
-
-// Format currency
-function formatCurrency(value) {
-    return '$' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-}
-
-// Generate random wallet address
-function generateRandomAddress() {
-    let address = '0x';
-    const characters = '0123456789abcdef';
-    
-    for (let i = 0; i < 40; i++) {
-        address += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    
-    return address;
-}
-
-// Generate random transaction hash
-function generateRandomTransactionHash() {
-    let hash = '0x';
-    const characters = '0123456789abcdef';
-    
-    for (let i = 0; i < 64; i++) {
-        hash += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    
-    return hash;
-}
-
-// Format date for display
-function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric', 
-        year: 'numeric' 
-    }) + ' ' + date.toLocaleTimeString('en-US', { 
-        hour: '2-digit', 
-        minute: '2-digit'
-    });
-}
 
 // ========================================================
 // CORE UTILITY FUNCTIONS
