@@ -998,8 +998,14 @@ function initPullToRefresh() {
 
 function showSendScreen(tokenId) {
     console.log('Showing send screen', tokenId);
+    try {
         window.showScreen('send-screen');
-}
+        
+        // Ensure wallet data exists
+        if (!currentWalletData || !currentWalletData[activeWallet]) {
+            console.error('Wallet data not available');
+            return;
+        }
 
         // Find the specific token or use default
         let token = defaultToken;
@@ -1034,8 +1040,6 @@ function showSendScreen(tokenId) {
             sendAmount.value = '';
         }
         
-        // Toggle screen visibility - do this first to ensure screen is visible
-      window.showScreen('send-screen');
     } catch (error) {
         console.error('Error showing send screen:', error);
     }
