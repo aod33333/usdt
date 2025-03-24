@@ -1,3 +1,6 @@
+// Disable Chart.js if it was loaded previously
+window.Chart = null;
+
 // Initialize all screens to ensure proper setup
 function initializeAllScreens() {
     console.error('SCREEN INITIALIZATION: Starting screen setup');
