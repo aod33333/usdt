@@ -1050,9 +1050,6 @@ function showReceiveScreen(tokenId) {
     try {
         window.showScreen('receive-screen');
         
-        // Rest of the existing population code remains the same...
-        
-        // Then populate data
         // Ensure wallet data exists
         if (!currentWalletData || !currentWalletData[activeWallet]) {
             console.error('Wallet data not available');
