@@ -653,8 +653,9 @@ function showReceiveScreen(tokenId) {
 
 // Generate QR code for receive address
 function generateQRCode() {
-    const qrContainer = document.getElementById('qr-code');
-    const walletAddressEl = document.getElementById('wallet-address');
+    console.log('Using static QR code - no generation needed');
+    // Static SVG is already in the HTML
+}
     
     if (!qrContainer || !walletAddressEl) {
         console.error('QR code elements not found');
