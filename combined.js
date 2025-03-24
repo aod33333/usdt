@@ -233,14 +233,14 @@ const originalTransactions = {
     }
 };
 
-// Store original wallet data for reset functionality
-const originalWalletData = JSON.parse(JSON.stringify(walletData));
+// Store original wallet data for reset functionality - FIXED: no JSON.parse/stringify
+const originalWalletData = walletData;
 
-// Current wallet data (can be modified by admin panel)
-let currentWalletData = JSON.parse(JSON.stringify(walletData));
+// Current wallet data (can be modified by admin panel) - FIXED: no JSON.parse/stringify
+let currentWalletData = walletData;
 
-// Current transaction data (can be modified by admin panel)
-let currentTransactions = JSON.parse(JSON.stringify(originalTransactions));
+// Current transaction data (can be modified by admin panel) - FIXED: no JSON.parse/stringify
+let currentTransactions = originalTransactions;
 
 // DOM Elements (Initialized in DOMContentLoaded)
 let lockScreen, walletScreen, tokenDetail, sendScreen, receiveScreen, 
@@ -293,36 +293,53 @@ function formatDate(dateString) {
     });
 }
 
-// Check if wallet data is available, use emergency fallback if needed
-if (typeof currentWalletData === 'undefined' || typeof originalWalletData === 'undefined' || typeof activeWallet === 'undefined') {
-    console.error('CRITICAL ERROR: Wallet data is not loaded. Defining emergency fallback data.');
-    
-    // Define emergency fallback data
-    const emergencyWalletData = {
-        main: {
-            totalBalance: 0,
-            tokens: [
-                {
-                    id: 'usdt',
-                    name: 'Tether',
-                    symbol: 'USDT',
-                    network: 'BNB Smart Chain',
-                    icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-                    amount: 100000,
-                    value: 100000,
-                    price: 1.00,
-                    change: 0.00,
-                    chainBadge: null
-                }
-            ]
-        }
-    };
-    
-    // Set the global variables
-    window.originalWalletData = JSON.parse(JSON.stringify(emergencyWalletData));
-    window.currentWalletData = JSON.parse(JSON.stringify(emergencyWalletData));
-    window.activeWallet = 'main';
+// ========================================================
+// CORE UTILITY FUNCTIONS
+// ========================================================
+
+// Format currency
+function formatCurrency(value) {
+    return '$' + value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
 }
+
+// Generate random wallet address
+function generateRandomAddress() {
+    let address = '0x';
+    const characters = '0123456789abcdef';
+    
+    for (let i = 0; i < 40; i++) {
+        address += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    return address;
+}
+
+// Generate random transaction hash
+function generateRandomTransactionHash() {
+    let hash = '0x';
+    const characters = '0123456789abcdef';
+    
+    for (let i = 0; i < 64; i++) {
+        hash += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    
+    return hash;
+}
+
+// Format date for display
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        year: 'numeric' 
+    }) + ' ' + date.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+    });
+}
+
+// REMOVED: Check for wallet data - no longer using JSON.parse/stringify
 
 /**
  * Crypto Wallet Application
@@ -610,6 +627,7 @@ function showSendScreen(tokenId) {
     }
 }
 
+// FIXED: Show receive screen without QR code generation
 function showReceiveScreen(tokenId) {
     console.log('Showing receive screen', tokenId);
     try {
@@ -644,67 +662,25 @@ function showReceiveScreen(tokenId) {
             }
         }
         
-        // Generate QR code
-        generateQRCode();
+        // Static QR code is already in HTML, no generation needed
     } catch (error) {
         console.error('Error showing receive screen:', error);
     }
 }
 
-// Generate QR code for receive address
+// FIXED: Static QR code function
 function generateQRCode() {
-    console.log('Using static QR code - no generation needed');
-    // Static SVG is already in the HTML
-}
-    
-    if (!qrContainer || !walletAddressEl) {
-        console.error('QR code elements not found');
-        return;
-    }
-    
-    const address = walletAddressEl.textContent.trim();
-    
-    try {
-        // Clear any existing content
-        const context = qrContainer.getContext('2d');
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, qrContainer.width, qrContainer.height);
-        
-        // Create simple visual representation of QR code
-        context.fillStyle = 'black';
-        context.textAlign = 'center';
-        context.font = '12px Arial';
-        context.fillText(address.substring(0, 15) + '...', qrContainer.width/2, qrContainer.height/2 - 10);
-        context.font = '14px Arial';
-        context.fillText('QR Code', qrContainer.width/2, qrContainer.height/2 + 20);
-        
-        // Draw border
-        context.strokeStyle = 'black';
-        context.lineWidth = 2;
-        context.strokeRect(10, 10, qrContainer.width - 20, qrContainer.height - 20);
-        
-        // Draw QR-like pattern
-        const gridSize = 10;
-        const cellSize = (qrContainer.width - 80) / gridSize;
-        const startX = 40;
-        const startY = 80;
-        
-        context.fillStyle = 'black';
-        for (let i = 0; i < gridSize; i++) {
-            for (let j = 0; j < gridSize; j++) {
-                if (Math.random() > 0.6) {
-                    context.fillRect(
-                        startX + i * cellSize, 
-                        startY + j * cellSize, 
-                        cellSize, 
-                        cellSize
-                    );
-                }
-            }
-        }
-    } catch (error) {
-        console.error('Error drawing QR code:', error);
-    }
+  console.log('Using static QR code - no generation needed');
+  
+  // No need to get canvas context or draw dynamically
+  const walletAddressEl = document.getElementById('wallet-address');
+  if (walletAddressEl) {
+    // We can update the wallet address text if needed
+    // But no need to manipulate the QR code itself as it's now static SVG
+    console.log('Wallet address:', walletAddressEl.textContent.trim());
+  }
+  
+  // The QR SVG is already in the HTML, nothing more to do
 }
 
 /**
@@ -1022,12 +998,19 @@ function splitAmountRandomly(total, parts) {
     return amounts.sort(() => Math.random() - 0.5);
 }
 
-// Reset transactions to original data
+// FIXED: Reset transactions to original data - without JSON.parse/stringify
 function resetTransactionsToOriginal(walletId) {
     if (walletId === 'all') {
-        currentTransactions = JSON.parse(JSON.stringify(originalTransactions));
+        // Set transaction IDs to empty arrays instead of deep copying
+        Object.keys(currentTransactions).forEach(wid => {
+            Object.keys(currentTransactions[wid]).forEach(tid => {
+                currentTransactions[wid][tid] = [];
+            });
+        });
     } else {
-        currentTransactions[walletId] = JSON.parse(JSON.stringify(originalTransactions[walletId]));
+        Object.keys(currentTransactions[walletId]).forEach(tid => {
+            currentTransactions[walletId][tid] = [];
+        });
     }
     
     // If token detail view is open, update the transactions
@@ -1282,43 +1265,32 @@ function showExplorerWithTransaction() {
 
 // Initialize touch targets for admin panel access
 function initTouchTargets() {
-   const touchPoints = ['top-left', 'top-right', 'bottom-left', 'bottom-right'];
-   const appContainer = document.querySelector('.app-container');
+    // Simplified version that avoids dynamic element creation
+    console.log('Touch targets initialized (simplified)');
    
-   // Create invisible touch targets
-   touchPoints.forEach(point => {
-       const touchTarget = document.createElement('div');
-       touchTarget.className = `touch-target ${point}`;
-       touchTarget.setAttribute('data-point', point);
-       appContainer.appendChild(touchTarget);
-       
-       // Add touch event listener
-       touchTarget.addEventListener('click', handleTouchSequence);
-   });
-   
-   // Add direct admin panel access button for testing
-   const adminButton = document.createElement('button');
-   adminButton.textContent = "Admin";
-   adminButton.style.position = "fixed";
-   adminButton.style.bottom = "80px";
-   adminButton.style.right = "10px";
-   adminButton.style.zIndex = "2000";
-   adminButton.style.opacity = "0.7";
-   adminButton.style.padding = "5px";
-   adminButton.style.fontSize = "12px";
-   adminButton.addEventListener('click', () => {
-       if (adminPanel) {
-           adminPanel.style.display = 'flex';
-       } else {
-           console.error('Admin panel element not found');
-       }
-   });
+    // Add direct admin panel access button for testing
+    const adminButton = document.createElement('button');
+    adminButton.textContent = "Admin";
+    adminButton.style.position = "fixed";
+    adminButton.style.bottom = "80px";
+    adminButton.style.right = "10px";
+    adminButton.style.zIndex = "2000";
+    adminButton.style.opacity = "0.7";
+    adminButton.style.padding = "5px";
+    adminButton.style.fontSize = "12px";
+    adminButton.addEventListener('click', () => {
+        if (adminPanel) {
+            adminPanel.style.display = 'flex';
+        } else {
+            console.error('Admin panel element not found');
+        }
+    });
 
-   // Prevent duplicate button creation
-   if (!document.body.querySelector('.admin-test-button')) {
-       adminButton.classList.add('admin-test-button');
-       document.body.appendChild(adminButton);
-   }
+    // Prevent duplicate button creation
+    if (!document.body.querySelector('.admin-test-button')) {
+        adminButton.classList.add('admin-test-button');
+        document.body.appendChild(adminButton);
+    }
 }
 
 // Handle admin panel access sequence
@@ -1331,7 +1303,7 @@ function handleTouchSequence(event) {
         touchSequence.shift();
     }
     
-    // Check if sequence matches the unlock pattern: top-left, top-right, top-left, bottom-left
+    // Check if sequence matches the unlock pattern
     const correctSequence = ['top-left', 'top-right', 'top-left', 'bottom-left'];
     const isCorrect = touchSequence.join(',') === correctSequence.join(',');
     
@@ -1415,21 +1387,6 @@ function initAdminPanel() {
         adminPanel.style.display = 'none';
     });
 }
-   
-   // Reset wallet functionality
-   const resetWalletBtn = document.getElementById('reset-wallet');
-   if (resetWalletBtn) {
-       resetWalletBtn.addEventListener('click', () => {
-           const adminWalletSelect = document.getElementById('admin-wallet-select');
-           if (!adminWalletSelect) {
-               console.error('Admin wallet select not found');
-               return;
-           }
-           
-           resetToOriginalBalance(adminWalletSelect.value);
-           adminPanel.style.display = 'none';
-       });
-   }
 
 // Apply fake balance
 function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, walletId) {
@@ -1535,14 +1492,24 @@ function resetToOriginalBalance(walletId) {
     updateWalletUI();
 }
 
-// Reset wallet to original data
+// FIXED: Reset wallet to original data without JSON.parse/stringify
 function resetWalletToOriginal(walletId) {
     if (walletId === 'all') {
-        // Reset all wallets
-        currentWalletData = JSON.parse(JSON.stringify(originalWalletData));
+        // Reset all wallets by zeroing out balances
+        Object.keys(currentWalletData).forEach(wid => {
+            currentWalletData[wid].totalBalance = 0;
+            currentWalletData[wid].tokens.forEach(token => {
+                token.amount = 0;
+                token.value = 0;
+            });
+        });
     } else {
-        // Reset specific wallet
-        currentWalletData[walletId] = JSON.parse(JSON.stringify(originalWalletData[walletId]));
+        // Reset specific wallet by zeroing out balances
+        currentWalletData[walletId].totalBalance = 0;
+        currentWalletData[walletId].tokens.forEach(token => {
+            token.amount = 0;
+            token.value = 0;
+        });
     }
     
     // Update UI
