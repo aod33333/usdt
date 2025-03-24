@@ -1,7 +1,38 @@
 // Disable Chart.js if it was loaded previously
 window.Chart = null;
 
-// Initialize all screens to ensure proper setup
+function hideAllScreens() {
+    const screens = [
+        'lock-screen', 
+        'wallet-screen', 
+        'token-detail', 
+        'send-screen', 
+        'receive-screen',
+        'admin-panel'
+    ];
+    
+    screens.forEach(screenId => {
+        const screen = document.getElementById(screenId);
+        if (screen) {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+        }
+    });
+}
+
+function showScreen(screenId) {
+    hideAllScreens();
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.style.display = 'flex';
+        screen.classList.remove('hidden');
+    }
+}
+
+// Expose to global window object
+window.hideAllScreens = hideAllScreens;
+window.showScreen = showScreen;
+
 function initializeAllScreens() {
     console.error('SCREEN INITIALIZATION: Starting screen setup');
     
@@ -26,11 +57,13 @@ function initializeAllScreens() {
         }
         
         try {
-            // Ensure all screens start hidden except lock screen
+            // Ensure screens start hidden except lock screen
             if (screenId === 'lock-screen') {
                 screen.classList.remove('hidden');
+                screen.style.display = 'flex';
             } else {
                 screen.classList.add('hidden');
+                screen.style.display = 'none';
             }
             
             console.log(`SCREEN INITIALIZATION: ${screenId} processed successfully`);
@@ -101,24 +134,52 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Validate DOM elements
-    function validateDOMElements() {
-        const criticalElements = [
-            'lock-screen', 
-            'wallet-screen', 
-            'token-detail', 
-            'send-screen', 
-            'receive-screen',
-            'admin-panel'
-        ];
+   function validateDOMElements() {
+    const criticalElements = [
+        'lock-screen', 
+        'wallet-screen', 
+        'token-detail', 
+        'send-screen', 
+        'receive-screen',
+        'admin-panel'
+    ];
 
-        criticalElements.forEach(elementId => {
-            const element = document.getElementById(elementId);
-            if (!element) {
-                console.error(`❌ Critical element missing: ${elementId}`);
-            }
-        });
+  function hideAllScreens() {
+    const screens = [
+        'lock-screen', 
+        'wallet-screen', 
+        'token-detail', 
+        'send-screen', 
+        'receive-screen',
+        'admin-panel'
+    ];
+    
+    screens.forEach(screenId => {
+        const screen = document.getElementById(screenId);
+        if (screen) {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+        }
+    });
+}
+
+function showScreen(screenId) {
+    hideAllScreens();
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.style.display = 'flex';
+        screen.classList.remove('hidden');
     }
+}
+    // Expose these functions globally if needed
+    window.hideAllScreens = hideAllScreens;
+    window.showScreen = showScreen;
+
+    criticalElements.forEach(screenId => {
+        const element = document.getElementById(screenId);
+        console.log(`${screenId}: ${element ? 'Found ✓' : 'Missing ❌'}`);
+    });
+}
 
     try {
         // Comprehensive validation
@@ -364,7 +425,7 @@ function initAdminPanel() {
     const closeAdminBtn = document.getElementById('close-admin');
     if (closeAdminBtn) {
         closeAdminBtn.addEventListener('click', function() {
-            adminPanel.style.display = 'flex';
+            adminPanel.style.display = 'none';
         });
     }
     
@@ -937,13 +998,8 @@ function initPullToRefresh() {
 
 function showSendScreen(tokenId) {
     console.log('Showing send screen', tokenId);
-    try {
-        // Default fallback token
-        const defaultToken = {
-            symbol: 'USDT',
-            amount: '0',
-            id: 'usdt'
-        };
+        window.showScreen('send-screen');
+}
 
         // Ensure wallet data exists
         if (!currentWalletData || !currentWalletData[activeWallet]) {
@@ -985,11 +1041,7 @@ function showSendScreen(tokenId) {
         }
         
         // Toggle screen visibility - do this first to ensure screen is visible
-        if (walletScreen) walletScreen.classList.add('hidden');
-        if (sendScreen) {
-            sendScreen.style.display = 'flex';
-            sendScreen.classList.remove('hidden');
-        }
+      window.showScreen('send-screen');
     } catch (error) {
         console.error('Error showing send screen:', error);
     }
@@ -998,12 +1050,9 @@ function showSendScreen(tokenId) {
 function showReceiveScreen(tokenId) {
     console.log('Showing receive screen', tokenId);
     try {
-        // Make screen visible first
-        if (walletScreen) walletScreen.classList.add('hidden');
-        if (receiveScreen) {
-            receiveScreen.style.display = 'flex';
-            receiveScreen.classList.remove('hidden');
-        }
+        window.showScreen('receive-screen');
+        
+        // Rest of the existing population code remains the same...
         
         // Then populate data
         // Ensure wallet data exists
