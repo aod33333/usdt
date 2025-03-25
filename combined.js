@@ -2056,16 +2056,35 @@ function initEventListeners() {
                 }
             });
         }
-
-        // Back button
+        
+        // Back button on token detail
         const backButton = document.getElementById('back-button');
         if (backButton) {
             backButton.addEventListener('click', function() {
-                if (tokenDetail) tokenDetail.classList.add('hidden');
-                if (walletScreen) walletScreen.classList.remove('hidden');
+                console.log('Back button clicked on token detail');
+                hideAllScreens();
+                const walletScreen = document.getElementById('wallet-screen');
+                if (walletScreen) {
+                    walletScreen.style.display = 'flex';
+                    walletScreen.classList.remove('hidden');
+                }
             });
         }
-
+        
+        // All other back buttons in send/receive screens
+        const backButtons = document.querySelectorAll('.back-button');
+        backButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                console.log('Back button clicked on send/receive screen');
+                hideAllScreens();
+                const walletScreen = document.getElementById('wallet-screen');
+                if (walletScreen) {
+                    walletScreen.style.display = 'flex';
+                    walletScreen.classList.remove('hidden');
+                }
+            });
+        });
+        
         // Send/Receive buttons
         const sendButton = document.getElementById('send-button');
         if (sendButton) {
@@ -2073,17 +2092,18 @@ function initEventListeners() {
                 showSendScreen('usdt');
             });
         }
-
+        
         const receiveButton = document.getElementById('receive-button');
         if (receiveButton) {
             receiveButton.addEventListener('click', function() {
                 showReceiveScreen('btc');
             });
         }
-
-        // Add other event listeners...
+        
+        // Add other event listeners if needed...
+        
     } catch (error) {
-        console.error('Event listener init failed:', error);
+        console.error('Error initializing event listeners:', error);
     }
 }
 
@@ -2187,7 +2207,6 @@ function safeInit(name, initFunction) {
         if (typeof initFunction !== 'function') {
             throw new Error(`${name} is not a valid function`);
         }
-
         initFunction();
         const endTime = performance.now();
         console.log(`✅ ${name} initialized (${(endTime - startTime).toFixed(2)}ms)`);
@@ -2195,6 +2214,65 @@ function safeInit(name, initFunction) {
     } catch (error) {
         console.error(`❌ Initialization failed: ${name}`, error);
         console.groupEnd();
+    }
+}
+
+// Function to adjust bottom buttons to avoid footer overlap
+function adjustBottomButtons() {
+    try {
+        console.log('Adjusting bottom buttons to avoid footer overlap');
+        
+        // For the Send button on send screen
+        const sendButton = document.getElementById('continue-send');
+        if (sendButton) {
+            sendButton.style.marginBottom = '70px';
+        }
+        
+        // For Receive screen actions
+        const receiveActions = document.querySelector('.receive-actions');
+        if (receiveActions) {
+            receiveActions.style.marginBottom = '70px';
+        }
+        
+        console.log('Bottom buttons adjusted');
+    } catch (error) {
+        console.error('Error adjusting bottom buttons:', error);
+    }
+}
+
+// Function to standardize all investment warning banners
+function standardizeWarningBanners() {
+    try {
+        console.log('Standardizing warning banners across the app');
+        
+        // Get the main warning banner content
+        const mainWarning = document.querySelector('#investment-warning .investment-warning-content');
+        if (!mainWarning) {
+            console.error('Main warning banner not found');
+            return;
+        }
+        
+        // Clone the main warning content HTML
+        const warningHTML = mainWarning.innerHTML;
+        
+        // Get the token detail warning banner
+        const tokenWarning = document.querySelector('.token-warning .investment-warning-content');
+        if (tokenWarning) {
+            tokenWarning.innerHTML = warningHTML;
+            console.log('Token detail warning banner updated');
+        }
+        
+        // Get any other warning banners
+        const allWarnings = document.querySelectorAll('.investment-warning-content');
+        allWarnings.forEach(warning => {
+            if (warning !== mainWarning) {
+                warning.innerHTML = warningHTML;
+            }
+        });
+        
+        console.log('All warning banners standardized');
+    } catch (error) {
+        console.error('Error standardizing warning banners:', error);
     }
 }
 
@@ -2233,54 +2311,57 @@ document.addEventListener('DOMContentLoaded', function() {
         safeInit('Investment Warning', initInvestmentWarning);
         safeInit('Pull to Refresh', initPullToRefresh);
         
-   // Setup demo data
-safeInit('Demo Balance', setupDemoBalance);
-updateWalletUI();
-
-console.log('✅ INITIALIZATION COMPLETE');
-} catch (globalError) {
-    console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
-}
-
-// Add the diagnostic function
-function runDiagnostics() {
-  console.log('=== DIAGNOSTICS ===');
-  
-  // Check critical elements
-  const elements = [
-    'token-detail', 
-    'detail-symbol', 
-    'wallet-screen', 
-    'admin-panel',
-    'token-list'
-  ];
-  
-  elements.forEach(id => {
-    const element = document.getElementById(id);
-    console.log(`Element "${id}" exists:`, !!element);
-    if (element) {
-      console.log(`- Display:`, getComputedStyle(element).display);
-      console.log(`- Visibility:`, getComputedStyle(element).visibility);
-      console.log(`- Z-index:`, getComputedStyle(element).zIndex);
+        // Add our new fixes
+        safeInit('Adjust Bottom Buttons', adjustBottomButtons);
+        safeInit('Standardize Warnings', standardizeWarningBanners);
+        
+        // Setup demo data
+        safeInit('Demo Balance', setupDemoBalance);
+        updateWalletUI();
+        
+        console.log('✅ INITIALIZATION COMPLETE');
+    } catch (globalError) {
+        console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
     }
-  });
-  
-  // Check event listeners
-  const tokenList = document.getElementById('token-list');
-  if (tokenList) {
-    console.log('Token list has children:', tokenList.children.length > 0);
-  }
-  
-  // Check global variables
-  console.log('Current wallet data:', !!window.currentWalletData);
-  console.log('Active wallet:', window.activeWallet);
-  
-  console.log('=== END DIAGNOSTICS ===');
-}
-
-// Run diagnostics after a delay
-setTimeout(runDiagnostics, 2000);
-
+    
+    // Add the diagnostic function
+    function runDiagnostics() {
+      console.log('=== DIAGNOSTICS ===');
+      
+      // Check critical elements
+      const elements = [
+        'token-detail', 
+        'detail-symbol', 
+        'wallet-screen', 
+        'admin-panel',
+        'token-list'
+      ];
+      
+      elements.forEach(id => {
+        const element = document.getElementById(id);
+        console.log(`Element "${id}" exists:`, !!element);
+        if (element) {
+          console.log(`- Display:`, getComputedStyle(element).display);
+          console.log(`- Visibility:`, getComputedStyle(element).visibility);
+          console.log(`- Z-index:`, getComputedStyle(element).zIndex);
+        }
+      });
+      
+      // Check event listeners
+      const tokenList = document.getElementById('token-list');
+      if (tokenList) {
+        console.log('Token list has children:', tokenList.children.length > 0);
+      }
+      
+      // Check global variables
+      console.log('Current wallet data:', !!window.currentWalletData);
+      console.log('Active wallet:', window.activeWallet);
+      
+      console.log('=== END DIAGNOSTICS ===');
+    }
+    
+    // Run diagnostics after a delay
+    setTimeout(runDiagnostics, 2000);
 });
 
 // Export key functions to window for global access
