@@ -2271,25 +2271,27 @@ function standardizeWarningBanners() {
         if (tokenWarning) {
             tokenWarning.innerHTML = warningHTML;
             // Add a close button if it exists in the original
-           if (closeButton) {
-    // Check if tokenWarning already has a close button
-    const existingClose = tokenWarning.querySelector('.close-warning');
-    if (!existingClose) {
-        const newCloseButton = closeButton.cloneNode(true);
-        tokenWarning.appendChild(newCloseButton);
-        newCloseButton.addEventListener('click', function() {
-            tokenWarning.parentElement.style.display = 'none';
-        });
-    }
-}
+            if (closeButton) {
+                // Check if tokenWarning already has a close button
+                const existingClose = tokenWarning.querySelector('.close-warning');
+                if (!existingClose) {
+                    const newCloseButton = closeButton.cloneNode(true);
+                    tokenWarning.appendChild(newCloseButton);
+                    newCloseButton.addEventListener('click', function() {
+                        tokenWarning.parentElement.style.display = 'none';
+                    });
+                }
+            }
+        }
         
-        // Add consistent styling
+        // Add consistent styling to ALL warnings
         const allWarnings = document.querySelectorAll('.investment-warning');
         allWarnings.forEach(warning => {
             warning.style.width = 'calc(100% - 32px)';
             warning.style.margin = '16px';
             warning.style.borderLeft = '4px solid var(--tw-warning-text)';
         });
+        
     } catch (error) {
         console.error('Error standardizing warning banners:', error);
     }
