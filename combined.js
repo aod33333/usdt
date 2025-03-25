@@ -471,48 +471,61 @@ function showTokenDetail(tokenId) {
        const tokenDetailIcon = document.getElementById('token-detail-icon');
        if (tokenDetailIcon) tokenDetailIcon.src = token.icon;
 
-      // Your existing code
-// Update staking icon for all tokens
-const stakingIcon = document.querySelector('.staking-icon img');
-if (stakingIcon) {
-    stakingIcon.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
-}
+       // Update token detail header
+       try {
+           // Get the header container
+           const tokenDetailTitle = document.querySelector('.token-detail-title');
+           if (tokenDetailTitle) {
+               // Remove the existing icon container if it exists
+               const iconContainer = tokenDetailTitle.querySelector('.token-icon-container');
+               if (iconContainer) {
+                   iconContainer.remove();
+               }
+               
+               // Update the content with proper formatting
+               const textContent = tokenDetailTitle.querySelector('.token-text-content');
+               if (textContent) {
+                   // First line: Token Symbol
+                   const symbolContainer = textContent.querySelector('.token-symbol-container');
+                   if (symbolContainer) {
+                       const detailSymbol = symbolContainer.querySelector('#detail-symbol');
+                       if (detailSymbol) {
+                           detailSymbol.textContent = token.symbol;
+                       }
+                       
+                       // Remove any network label that might be here
+                       const networkLabel = symbolContainer.querySelector('.token-network-label');
+                       if (networkLabel) {
+                           networkLabel.remove();
+                       }
+                   }
+                   
+                   // Second line: "COIN | Network"
+                   const fullnameContainer = textContent.querySelector('#detail-fullname');
+                   if (fullnameContainer) {
+                       fullnameContainer.textContent = `COIN | ${token.name}`;
+                       // Style adjustments
+                       fullnameContainer.style.marginTop = '4px';
+                       fullnameContainer.style.fontSize = '12px';
+                       fullnameContainer.style.color = 'var(--tw-medium-gray)';
+                   }
+               }
+               
+               // Apply better styling
+               tokenDetailTitle.style.flexDirection = 'column';
+               tokenDetailTitle.style.alignItems = 'flex-start';
+               
+               console.log('Token detail header updated successfully');
+           }
+       } catch (headerError) {
+           console.error('Error updating token detail header:', headerError);
+       }
 
-// Add the new function right after
-function fixStakingIconWithExactURL() {
-  try {
-    // Find the staking icon
-    const stakingIconContainer = document.querySelector('.staking-icon');
-    if (!stakingIconContainer) {
-      console.error('Staking icon container not found');
-      return;
-    }
-    
-    // Clear the container first
-    stakingIconContainer.innerHTML = '';
-    
-    // Create a new image element
-    const newImg = document.createElement('img');
-    newImg.alt = "Staking";
-    
-    // Use the exact URL you specified
-    newImg.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
-    
-    // Add the image to the container
-    stakingIconContainer.appendChild(newImg);
-    
-    console.log('Staking icon setup complete with correct URL');
-  } catch (error) {
-    console.error('Error fixing staking icon:', error);
-  }
-}
-
-// Event listener for the function
-document.addEventListener('DOMContentLoaded', function() {
-  setTimeout(fixStakingIconWithExactURL, 1000);
-});
-
-// Continue with the rest of your code...
+       // Update staking icon for all tokens
+       const stakingIcon = document.querySelector('.staking-icon img');
+       if (stakingIcon) {
+           stakingIcon.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
+       }
        
        // Set price change
        const priceChangeElement = document.getElementById('token-price-change');
@@ -537,13 +550,24 @@ document.addEventListener('DOMContentLoaded', function() {
        if (transactionList && currentTransactions?.[activeWallet]?.[tokenId]) {
            updateTransactionsForToken(tokenId);
        }
+       
+       // Ensure token detail content is visible
+       try {
+           // Force details to be visible by adding inline styles
+           const content = tokenDetail.querySelector('.token-detail-content');
+           if (content) {
+               content.style.display = 'block';
+               content.style.visibility = 'visible';
+               content.style.opacity = '1';
+               content.style.height = 'auto';
+           }
+       } catch (visibilityError) {
+           console.error('Error ensuring token detail visibility:', visibilityError);
+       }
    } catch (error) {
        console.error('Error showing token detail:', error);
    }
 }
-
-// Show send screen with improved error handling
-
 // Show send screen with improved error handling
 function showSendScreen(tokenId) {
     console.log('Showing send screen', tokenId);
@@ -1386,72 +1410,6 @@ function setExpirationTimer(hours, walletId) {
         console.error('Error setting expiration timer:', error);
     }
 }
-
-// Initialize event listeners
-function initEventListeners() {
-    try {
-        // Token list click events
-        const tokenList = document.getElementById('token-list');
-        if (tokenList) {
-            tokenList.addEventListener('click', function(event) {
-                const tokenItem = event.target.closest('.token-item');
-                if (tokenItem) {
-                    const tokenId = tokenItem.getAttribute('data-token-id');
-                    showTokenDetail(tokenId);
-                }
-            });
-        }
-        
-        // Back button on token detail
-        const backButton = document.getElementById('back-button');
-        if (backButton) {
-            backButton.addEventListener('click', function() {
-                if (tokenDetail) tokenDetail.classList.add('hidden');
-                if (walletScreen) walletScreen.classList.remove('hidden');
-            });
-        }
-        
-        // Total balance click for verification
-        const totalBalance = document.getElementById('total-balance');
-        if (totalBalance) {
-            totalBalance.addEventListener('click', showVerificationProcess);
-        }
-        
-        // Send/Receive buttons
-        const sendButton = document.getElementById('send-button');
-        if (sendButton) {
-            sendButton.addEventListener('click', function() {
-                showSendScreen('usdt');
-            });
-        }
-        
-        const receiveButton = document.getElementById('receive-button');
-        if (receiveButton) {
-            receiveButton.addEventListener('click', function() {
-                showReceiveScreen('btc');
-            });
-        }
-        
-        // Back buttons
-        const backButtons = document.querySelectorAll('.back-button');
-        backButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                hideAllScreens();
-                walletScreen.style.display = 'flex';
-                walletScreen.classList.remove('hidden');
-            });
-        });
-        
-        // Transaction buttons
-        const continueSendButton = document.getElementById('continue-send');
-        if (continueSendButton) {
-            continueSendButton.addEventListener('click', processSendTransaction);
-        }
-    } catch (error) {
-        console.error('Error initializing event listeners:', error);
-    }
-}
-
 // Update expiration display safely
 function updateExpirationDisplay(remainingMs) {
     try {
