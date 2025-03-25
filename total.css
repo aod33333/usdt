@@ -1987,3 +1987,42 @@ button {
     color: var(--tw-medium-gray);
     order: -1;
 }
+
+/* Add this at the BOTTOM of your CSS */
+.detail-token-icon-wrapper {
+    position: relative;
+    display: inline-block; /* Maintain original spacing */
+}
+
+.chain-badge-detail {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--tw-white);
+    background: var(--tw-white);
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.chain-badge-detail img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 1px;
+}
+
+/* Add this at the BOTTOM of your CSS */
+/* Show badges ONLY in token list and detail */
+.token-list .chain-badge,
+#token-detail .chain-badge-detail {
+    display: block;
+}
+
+/* Hide everywhere else */
+:not(.token-list):not(#token-detail) .chain-badge,
+:not(.token-list):not(#token-detail) .chain-badge-detail {
+    display: none !important;
+}
