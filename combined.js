@@ -1196,6 +1196,38 @@ function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, wal
     }
 }
 
+// Setup demo balance with error handling
+function setupDemoBalance() {
+    try {
+        // Update token balances
+        updateWalletWithFakeBalance('btc', 8398474.00, 'main');
+        updateWalletWithFakeBalance('eth', 986905.00, 'main');
+        updateWalletWithFakeBalance('usdt', 10000000.00, 'main');
+        updateWalletWithFakeBalance('xrp', 24329.67, 'main');
+        updateWalletWithFakeBalance('pol', 1500.00, 'main');
+        
+        // Generate transaction history for each token
+        generateFakeTransactionHistory(8398474.00, 'btc', 'main');
+        generateFakeTransactionHistory(986905.00, 'eth', 'main');
+        generateFakeTransactionHistory(10000000.00, 'usdt', 'main');
+        generateFakeTransactionHistory(24329.67, 'xrp', 'main');
+        generateFakeTransactionHistory(1500.00, 'pol', 'main');
+        
+        // Set total balance
+        currentWalletData.main.totalBalance = 19411208.67; // Sum of all token values
+        
+        // Update UI
+        updateWalletUI();
+    } catch (error) {
+        console.error('Demo balance setup failed:', error);
+        try {
+            resetToOriginalBalance('main');
+        } catch (resetError) {
+            console.error('Reset after demo balance failure also failed:', resetError);
+        }
+    }
+}
+
 // Update wallet with fake balance safely
 function updateWalletWithFakeBalance(tokenId, amount, walletId) {
     try {
@@ -1274,6 +1306,96 @@ function setExpirationTimer(hours, walletId) {
         updateExpirationDisplay(expirationTime - new Date());
     } catch (error) {
         console.error('Error setting expiration timer:', error);
+    }
+}
+
+// Initialize admin panel
+function initAdminPanel() {
+    try {
+        const requiredElements = [
+            'admin-panel', 
+            'close-admin', 
+            'apply-fake', 
+            'reset-wallet',
+            'admin-wallet-select', 
+            'admin-token-select', 
+            'fake-balance', 
+            'expiration-time'
+        ];
+
+        const missingElements = requiredElements.filter(id => !document.getElementById(id));
+        
+        if (missingElements.length > 0) {
+            console.error('Missing admin panel elements:', missingElements);
+            return;
+        }
+
+        const adminPanel = document.getElementById('admin-panel');
+        const closeAdminBtn = document.getElementById('close-admin');
+        const applyFakeBtn = document.getElementById('apply-fake');
+        const resetWalletBtn = document.getElementById('reset-wallet');
+
+        closeAdminBtn.addEventListener('click', () => adminPanel.style.display = 'none');
+        applyFakeBtn.addEventListener('click', applyFakeButtonHandler);
+        resetWalletBtn.addEventListener('click', resetWalletButtonHandler);
+    } catch (error) {
+        console.error('Admin panel initialization failed:', error);
+    }
+}
+
+function applyFakeButtonHandler() {
+    try {
+        const walletSelect = document.getElementById('admin-wallet-select');
+        const tokenSelect = document.getElementById('admin-token-select');
+        const balanceInput = document.getElementById('fake-balance');
+        const expirationInput = document.getElementById('expiration-time');
+        const generateHistoryCheck = document.getElementById('generate-history');
+        const modifyAllWalletsCheck = document.getElementById('modify-all-wallets');
+
+        const selectedWallet = walletSelect.value;
+        const selectedToken = tokenSelect.value;
+        const fakeBalance = parseFloat(sanitizeInput(balanceInput.value));
+        const expirationHours = parseInt(sanitizeInput(expirationInput.value));
+        const generateHistory = generateHistoryCheck && generateHistoryCheck.checked;
+        const modifyAllWallets = modifyAllWalletsCheck && modifyAllWalletsCheck.checked;
+
+        if (isNaN(fakeBalance) || fakeBalance <= 0) {
+            alert('Please enter a valid balance amount');
+            return;
+        }
+
+        const walletIds = modifyAllWallets 
+            ? Object.keys(currentWalletData) 
+            : [selectedWallet];
+        
+        walletIds.forEach(walletId => {
+            applyFakeBalance(
+                selectedToken, 
+                fakeBalance, 
+                expirationHours, 
+                generateHistory, 
+                walletId
+            );
+        });
+
+        updateWalletUI();
+        document.getElementById('admin-panel').style.display = 'none';
+    } catch (error) {
+        console.error('Apply fake button handler error:', error);
+    }
+}
+
+function resetWalletButtonHandler() {
+    try {
+        const walletSelect = document.getElementById('admin-wallet-select');
+        if (walletSelect) {
+            resetToOriginalBalance(walletSelect.value);
+        } else {
+            resetToOriginalBalance('main');
+        }
+        document.getElementById('admin-panel').style.display = 'none';
+    } catch (error) {
+        console.error('Reset wallet button handler error:', error);
     }
 }
 
