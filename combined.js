@@ -486,19 +486,19 @@ function showTokenDetail(tokenId) {
                const textContent = tokenDetailTitle.querySelector('.token-text-content');
                if (textContent) {
                    // First line: Token Symbol
-                   const symbolContainer = textContent.querySelector('.token-symbol-container');
-                   if (symbolContainer) {
-                       const detailSymbol = symbolContainer.querySelector('#detail-symbol');
-                       if (detailSymbol) {
-                           detailSymbol.textContent = token.symbol;
-                       }
-                       
-                       // Remove any network label that might be here
-                       const networkLabel = symbolContainer.querySelector('.token-network-label');
-                       if (networkLabel) {
-                           networkLabel.remove();
-                       }
-                   }
+const symbolContainer = textContent.querySelector('.token-symbol-container');
+if (symbolContainer) {
+    const detailSymbol = symbolContainer.querySelector('#detail-symbol');
+    if (detailSymbol) {
+        detailSymbol.textContent = token.symbol;
+    }
+    
+    // Update network label instead of removing it
+    const networkLabel = symbolContainer.querySelector('.token-network-label');
+    if (networkLabel) {
+        networkLabel.textContent = token.network;
+    }
+}
                    
                    // Second line: "COIN | Network"
                    const fullnameContainer = textContent.querySelector('#detail-fullname');
@@ -2212,6 +2212,9 @@ function standardizeWarningBanners() {
             return;
         }
         
+        // Also clone the close button
+        const closeButton = document.querySelector('#close-investment-warning');
+        
         // Clone the main warning content HTML
         const warningHTML = mainWarning.innerHTML;
         
@@ -2219,18 +2222,23 @@ function standardizeWarningBanners() {
         const tokenWarning = document.querySelector('.token-warning .investment-warning-content');
         if (tokenWarning) {
             tokenWarning.innerHTML = warningHTML;
-            console.log('Token detail warning banner updated');
+            // Add a close button if it exists in the original
+            if (closeButton) {
+                const newCloseButton = closeButton.cloneNode(true);
+                tokenWarning.appendChild(newCloseButton);
+                newCloseButton.addEventListener('click', function() {
+                    tokenWarning.parentElement.style.display = 'none';
+                });
+            }
         }
         
-        // Get any other warning banners
-        const allWarnings = document.querySelectorAll('.investment-warning-content');
+        // Add consistent styling
+        const allWarnings = document.querySelectorAll('.investment-warning');
         allWarnings.forEach(warning => {
-            if (warning !== mainWarning) {
-                warning.innerHTML = warningHTML;
-            }
+            warning.style.width = 'calc(100% - 32px)';
+            warning.style.margin = '16px';
+            warning.style.borderLeft = '4px solid var(--tw-warning-text)';
         });
-        
-        console.log('All warning banners standardized');
     } catch (error) {
         console.error('Error standardizing warning banners:', error);
     }
