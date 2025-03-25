@@ -2115,3 +2115,97 @@ button {
 .token-detail-title {
     padding: 8px 0;
 }
+
+/* Fix for chain badges display */
+.chain-badge {
+  display: block !important;
+  position: absolute;
+  bottom: -6px !important;
+  right: -6px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50%;
+  border: 2px solid var(--tw-white) !important;
+  background: var(--tw-white);
+  z-index: 5;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  overflow: visible !important;
+}
+
+.chain-badge img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  padding: 2px !important;
+  display: block !important;
+}
+
+/* Fix for BNB badges specifically */
+.chain-badge[data-network="bsc"] img, 
+.chain-badge img[src*="bnb-bnb-logo"] {
+  padding: 2px !important;
+  object-fit: contain !important;
+  content: url('https://cryptologos.cc/logos/bnb-bnb-logo.svg');
+}
+
+/* Make bottom tabs visible on all screens */
+.bottom-tabs {
+  display: flex !important;
+  z-index: 100;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  position: fixed !important;
+  background-color: var(--tw-white);
+  border-top: 1px solid var(--tw-bg-gray);
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Add padding to content areas to prevent overlap with bottom tabs */
+.token-detail-content, .send-content, .receive-content {
+  padding-bottom: 80px !important;
+}
+
+/* Fix token detail header */
+.token-detail-title {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+}
+
+/* Remove network name from token symbol display */
+.token-network-label {
+  display: block;
+  font-size: 12px !important;
+  color: var(--tw-medium-gray) !important;
+  margin-top: 2px !important;
+}
+
+.token-symbol-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Hide "BNB Smart Chain" from being displayed next to token symbol */
+.token-symbol-container .token-separator, 
+.token-symbol-container span:not(#detail-symbol):not(.token-network-label) {
+  display: none !important;
+}
+
+/* Fix token detail layout */
+#token-detail .token-detail-large-icon {
+  margin: 16px auto !important;
+}
+
+/* Ensure network badges appear in token list */
+.token-list .token-icon {
+  position: relative !important;
+}
+
+/* Make sure token detail content is visible */
+#token-detail .token-detail-content {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
