@@ -648,14 +648,16 @@ function createTokenElement(token) {
        tokenItem.className = 'token-item';
        tokenItem.setAttribute('data-token-id', token.id);
        
-       let chainBadgeHTML = '';
-       if (token.chainBadge) {
-           chainBadgeHTML = `
-               <div class="chain-badge">
-                   <img src="${getTokenLogoUrl(token.chainBadge)}" alt="${token.network}">
-               </div>
-           `;
-       }
+      let chainBadgeHTML = '';
+if (token.chainBadge) {
+    // Use the chainBadge directly if it's a URL, otherwise get the logo URL
+    const badgeUrl = token.chainBadge.startsWith('http') ? token.chainBadge : getTokenLogoUrl(token.chainBadge);
+    chainBadgeHTML = `
+        <div class="chain-badge">
+            <img src="${badgeUrl}" alt="${token.network}">
+        </div>
+    `;
+}
        
        const formattedPrice = token.price >= 1 
            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
