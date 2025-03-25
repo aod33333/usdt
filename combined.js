@@ -483,12 +483,15 @@ function showTokenDetail(tokenId) {
                const symbolContainer = document.createElement('div');
                symbolContainer.className = 'token-symbol-container';
                symbolContainer.style.marginBottom = '2px';
+               symbolContainer.style.textAlign = 'center';
+               symbolContainer.style.width = '100%';
                
                const detailSymbol = document.createElement('span');
                detailSymbol.id = 'detail-symbol';
                detailSymbol.textContent = token.symbol;
                detailSymbol.style.fontWeight = '600';
                detailSymbol.style.fontSize = '18px';
+               detailSymbol.style.textAlign = 'center';
                symbolContainer.appendChild(detailSymbol);
                
                // Create second line: "COIN | Token Name"
@@ -2094,6 +2097,24 @@ function initEventListeners() {
     }
 }
 
+// Token detail Send/Receive buttons
+const detailSendButton = document.querySelector('#token-detail .detail-action:nth-child(1)');
+const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
+
+if (detailSendButton) {
+    detailSendButton.addEventListener('click', function() {
+        const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'usdt';
+        showSendScreen(tokenId);
+    });
+}
+
+if (detailReceiveButton) {
+    detailReceiveButton.addEventListener('click', function() {
+        const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'btc';
+        showReceiveScreen(tokenId);
+    });
+}
+
 // Setup demo balance with error handling
 function setupDemoBalance() {
     try {
@@ -2250,14 +2271,17 @@ function standardizeWarningBanners() {
         if (tokenWarning) {
             tokenWarning.innerHTML = warningHTML;
             // Add a close button if it exists in the original
-            if (closeButton) {
-                const newCloseButton = closeButton.cloneNode(true);
-                tokenWarning.appendChild(newCloseButton);
-                newCloseButton.addEventListener('click', function() {
-                    tokenWarning.parentElement.style.display = 'none';
-                });
-            }
-        }
+           if (closeButton) {
+    // Check if tokenWarning already has a close button
+    const existingClose = tokenWarning.querySelector('.close-warning');
+    if (!existingClose) {
+        const newCloseButton = closeButton.cloneNode(true);
+        tokenWarning.appendChild(newCloseButton);
+        newCloseButton.addEventListener('click', function() {
+            tokenWarning.parentElement.style.display = 'none';
+        });
+    }
+}
         
         // Add consistent styling
         const allWarnings = document.querySelectorAll('.investment-warning');
