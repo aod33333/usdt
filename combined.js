@@ -1203,6 +1203,51 @@ function resetTransactionsToOriginal(walletId) {
 // ADMIN PANEL & BALANCE MANIPULATION
 // ========================================================
 
+// Function to specifically show the admin panel (can be called from anywhere)
+function showAdminPanel() {
+  try {
+    const adminPanel = document.getElementById('admin-panel');
+    if (!adminPanel) {
+      console.error('Admin panel element not found');
+      return;
+    }
+    
+    console.log('Showing admin panel...');
+    
+    // First remove the hidden class
+    adminPanel.classList.remove('hidden');
+    
+    // This is critical: The modal parent needs to be flex to display correctly
+    adminPanel.style.display = 'flex';
+    
+    // Make sure it's visible and on top
+    adminPanel.style.opacity = '1';
+    adminPanel.style.zIndex = '9999';
+    adminPanel.style.visibility = 'visible';
+    
+    console.log('Admin panel display style set to:', adminPanel.style.display);
+    
+    // Handle close button event
+    const closeButton = document.getElementById('close-admin');
+    if (closeButton) {
+      // Remove any existing listeners to avoid duplicates
+      const newCloseBtn = closeButton.cloneNode(true);
+      if (closeButton.parentNode) {
+        closeButton.parentNode.replaceChild(newCloseBtn, closeButton);
+      }
+      
+      // Add new listener
+      newCloseBtn.addEventListener('click', function() {
+        console.log('Close button clicked');
+        adminPanel.style.display = 'none';
+        adminPanel.classList.add('hidden');
+      });
+    }
+  } catch (error) {
+    console.error('Error showing admin panel:', error);
+  }
+}
+
 // Apply fake balance with error handling
 function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, walletId) {
     try {
@@ -1707,48 +1752,76 @@ function initTouchTargets() {
             existingButton.remove();
         }
 
-        // Create an invisible touch target in the top right corner
+        // Create visible touch target in top right for debugging (will be invisible in final)
         const touchTarget = document.createElement('div');
+        touchTarget.id = 'admin-touch-target';
         touchTarget.style.position = 'fixed';
         touchTarget.style.top = '0';
         touchTarget.style.right = '0';
-        touchTarget.style.width = '50px';
-        touchTarget.style.height = '50px';
+        touchTarget.style.width = '80px'; // Larger target area
+        touchTarget.style.height = '80px'; // Larger target area
         touchTarget.style.zIndex = '9999';
-        touchTarget.style.backgroundColor = 'transparent'; // Fully transparent
+        touchTarget.style.backgroundColor = 'rgba(0,0,0,0.1)'; // Slightly visible for testing
+        // touchTarget.style.backgroundColor = 'transparent'; // Use this in final version
+        
+        // Ensure the touch target is added directly to the body
         document.body.appendChild(touchTarget);
+        console.log('Touch target created and added to DOM');
 
-        // Track taps
+        // Track taps for both touch and click
         let tapCount = 0;
         let lastTapTime = 0;
         
-        touchTarget.addEventListener('click', function(e) {
+        // Handle both touch and click events for maximum compatibility
+        const handleTap = function(e) {
+            e.preventDefault(); // Prevent default behavior
+            console.log('Tap detected on touch target');
+            
             const currentTime = new Date().getTime();
             const timeDiff = currentTime - lastTapTime;
             
-            // Reset counter if too much time has passed between taps
             if (timeDiff > 1000) {
                 tapCount = 1;
             } else {
                 tapCount++;
             }
             
+            console.log('Current tap count:', tapCount);
             lastTapTime = currentTime;
             
-            // If three taps detected, show admin panel
             if (tapCount >= 3) {
                 tapCount = 0;
+                console.log('3 taps detected! Opening admin panel...');
+                
+                // Get the admin panel directly from document
                 const adminPanel = document.getElementById('admin-panel');
+                console.log('Admin panel element found:', !!adminPanel);
+                
                 if (adminPanel) {
-                    console.log('Admin panel triggered by 3-tap gesture');
+                    // Force the modal to display with multiple techniques
                     adminPanel.style.display = 'flex';
+                    adminPanel.classList.remove('hidden');
+                    
+                    // Apply inline styles with !important to override any CSS
+                    adminPanel.setAttribute('style', 
+                        'display: flex !important; ' +
+                        'opacity: 1 !important; ' +
+                        'visibility: visible !important; ' +
+                        'pointer-events: auto !important; ' +
+                        'z-index: 10000 !important;');
+                    
+                    console.log('Admin panel display style set to:', adminPanel.style.display);
                 } else {
-                    console.error('Admin panel element not found');
+                    console.error('Admin panel element not found in the DOM');
                 }
             }
-        });
+        };
         
-        console.log('Admin access setup complete - use 3 quick taps in top right corner');
+        // Add both touch and click handlers
+        touchTarget.addEventListener('click', handleTap);
+        touchTarget.addEventListener('touchend', handleTap);
+        
+        console.log('Admin access setup complete - tap top right corner 3 times quickly');
     } catch (error) {
         console.error('Touch target initialization failed:', error);
     }
