@@ -471,11 +471,48 @@ function showTokenDetail(tokenId) {
        const tokenDetailIcon = document.getElementById('token-detail-icon');
        if (tokenDetailIcon) tokenDetailIcon.src = token.icon;
 
-       // Update staking icon for all tokens
-       const stakingIcon = document.querySelector('.staking-icon img');
-       if (stakingIcon) {
-           stakingIcon.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
-       }
+      // Your existing code
+// Update staking icon for all tokens
+const stakingIcon = document.querySelector('.staking-icon img');
+if (stakingIcon) {
+    stakingIcon.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
+}
+
+// Add the new function right after
+function fixStakingIconWithExactURL() {
+  try {
+    // Find the staking icon
+    const stakingIconContainer = document.querySelector('.staking-icon');
+    if (!stakingIconContainer) {
+      console.error('Staking icon container not found');
+      return;
+    }
+    
+    // Clear the container first
+    stakingIconContainer.innerHTML = '';
+    
+    // Create a new image element
+    const newImg = document.createElement('img');
+    newImg.alt = "Staking";
+    
+    // Use the exact URL you specified
+    newImg.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
+    
+    // Add the image to the container
+    stakingIconContainer.appendChild(newImg);
+    
+    console.log('Staking icon setup complete with correct URL');
+  } catch (error) {
+    console.error('Error fixing staking icon:', error);
+  }
+}
+
+// Event listener for the function
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(fixStakingIconWithExactURL, 1000);
+});
+
+// Continue with the rest of your code...
        
        // Set price change
        const priceChangeElement = document.getElementById('token-price-change');
@@ -503,57 +540,6 @@ function showTokenDetail(tokenId) {
    } catch (error) {
        console.error('Error showing token detail:', error);
    }
-}
-
-     function showTokenDetail(tokenId) {
-    try {
-        const token = getTokenDetails(tokenId); // Assuming this function exists and retrieves token details
-        const tokenDetail = document.getElementById('token-detail');
-        const walletScreen = document.getElementById('wallet-screen');
-        const detailSymbol = document.getElementById('detail-symbol');
-        const detailFullname = document.getElementById('detail-fullname');
-        const tokenDetailIcon = document.getElementById('token-detail-icon');
-        const tokenBalanceAmount = document.getElementById('token-balance-amount');
-        const tokenBalanceValue = document.getElementById('token-balance-value');
-        const tokenStakingSymbol = document.getElementById('token-staking-symbol');
-        const gasFeeAmount = document.getElementById('gas-fee-amount'); // Corrected line
-
-        if (!token) {
-            console.error('Token not found');
-            return;
-        }
-
-        // Update token details on the page
-        if (detailSymbol) detailSymbol.textContent = token.symbol;
-        if (detailFullname) detailFullname.textContent = token.fullName;
-        if (tokenDetailIcon) tokenDetailIcon.src = token.iconSrc;
-        if (tokenBalanceAmount) tokenBalanceAmount.textContent = token.balance + ' ' + token.symbol;
-        if (tokenBalanceValue) tokenBalanceValue.textContent = '$' + token.balanceValue;
-        if (tokenStakingSymbol) tokenStakingSymbol.textContent = token.symbol;
-
-        // Update gas fee display for this token
-        if (gasFeeAmount) {
-            gasFeeAmount.textContent = token.id === 'eth' ? '$0.01' : '$0.00';
-        }
-
-        // Show token detail and hide wallet screen
-        if (walletScreen) walletScreen.classList.add('hidden');
-        if (tokenDetail) {
-          tokenDetail.classList.remove('hidden');
-          tokenDetail.style.display = 'flex';
-        }
-
-
-        // Update transactions if there are any
-        const transactionList = document.getElementById('transaction-list');
-        if (transactionList && currentTransactions &&
-            currentTransactions[activeWallet] &&
-            currentTransactions[activeWallet][tokenId]) {
-            updateTransactionsForToken(tokenId);
-        }
-    } catch (error) {
-        console.error('Error showing token detail:', error);
-    }
 }
 
 // Show send screen with improved error handling
@@ -1713,37 +1699,56 @@ function simulateBiometricAuth() {
     }
 }
 
-// Initialize touch targets for admin panel access
 function initTouchTargets() {
     try {
-        if (!document.body) {
-            console.error('Document body not ready');
-            return;
+        // First, remove any existing admin button
+        const existingButton = document.querySelector('.admin-test-button');
+        if (existingButton) {
+            existingButton.remove();
         }
 
-        const existingButton = document.body.querySelector('.admin-test-button');
-        if (existingButton) return;
+        // Create an invisible touch target in the top right corner
+        const touchTarget = document.createElement('div');
+        touchTarget.style.position = 'fixed';
+        touchTarget.style.top = '0';
+        touchTarget.style.right = '0';
+        touchTarget.style.width = '50px';
+        touchTarget.style.height = '50px';
+        touchTarget.style.zIndex = '9999';
+        touchTarget.style.backgroundColor = 'transparent'; // Fully transparent
+        document.body.appendChild(touchTarget);
 
-        const adminButton = document.createElement('button');
-        adminButton.className = 'admin-test-button';
-        adminButton.textContent = "Admin";
-        adminButton.style.position = 'fixed';
-        adminButton.style.bottom = '10px';
-        adminButton.style.right = '10px';
-        adminButton.style.zIndex = '9999';
-        adminButton.style.padding = '8px 12px';
-        adminButton.style.backgroundColor = '#007bff';
-        adminButton.style.color = 'white';
-        adminButton.style.border = 'none';
-        adminButton.style.borderRadius = '4px';
-        adminButton.style.cursor = 'pointer';
+        // Track taps
+        let tapCount = 0;
+        let lastTapTime = 0;
         
-        adminButton.addEventListener('click', () => {
-            adminPanel = document.getElementById('admin-panel');
-            if (adminPanel) adminPanel.style.display = 'flex';
+        touchTarget.addEventListener('click', function(e) {
+            const currentTime = new Date().getTime();
+            const timeDiff = currentTime - lastTapTime;
+            
+            // Reset counter if too much time has passed between taps
+            if (timeDiff > 1000) {
+                tapCount = 1;
+            } else {
+                tapCount++;
+            }
+            
+            lastTapTime = currentTime;
+            
+            // If three taps detected, show admin panel
+            if (tapCount >= 3) {
+                tapCount = 0;
+                const adminPanel = document.getElementById('admin-panel');
+                if (adminPanel) {
+                    console.log('Admin panel triggered by 3-tap gesture');
+                    adminPanel.style.display = 'flex';
+                } else {
+                    console.error('Admin panel element not found');
+                }
+            }
         });
         
-        document.body.appendChild(adminButton);
+        console.log('Admin access setup complete - use 3 quick taps in top right corner');
     } catch (error) {
         console.error('Touch target initialization failed:', error);
     }
