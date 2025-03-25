@@ -550,6 +550,21 @@ if (symbolContainer) {
        if (transactionList && currentTransactions?.[activeWallet]?.[tokenId]) {
            updateTransactionsForToken(tokenId);
        }
+
+       // Add this in the showTokenDetail function, near the end:
+setTimeout(() => {
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (bottomTabs) {
+    bottomTabs.setAttribute('style', 
+      'display: flex !important; ' +
+      'visibility: visible !important; ' +
+      'opacity: 1 !important; ' + 
+      'z-index: 9999 !important; ' +
+      'pointer-events: auto !important;');
+    
+    console.log('Bottom tabs forcibly shown');
+  }
+}, 100);
        
        // Ensure token detail content is visible
        try {
