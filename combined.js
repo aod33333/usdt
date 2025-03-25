@@ -434,78 +434,6 @@ function updateWalletUI() {
     }
 }
 
-// Create token element with improved security
-function createTokenElement(token) {
-    try {
-        const tokenItem = document.createElement('div');
-        tokenItem.className = 'token-item';
-        tokenItem.setAttribute('data-token-id', token.id);
-        
-        let chainBadgeHTML = '';
-        if (token.chainBadge) {
-            // Sanitize URL
-            const sanitizedUrl = token.chainBadge.startsWith('https://') ? 
-                token.chainBadge : 'https://cryptologos.cc/logos/placeholder-logo.png';
-                
-            chainBadgeHTML = `
-                <div class="chain-badge">
-                    <img src="${sanitizedUrl}" alt="${token.network}">
-                </div>
-            `;
-        }
-        
-        // Format price with thousands separator
-        const formattedPrice = token.price >= 1 
-            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : token.price.toFixed(2);
-        
-        // Format change with + or - sign
-        const changeClass = token.change >= 0 ? 'positive' : 'negative';
-        const changeSign = token.change >= 0 ? '+' : '';
-        
-        // Format the token amount display
-        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
-        
-        // Format token value with appropriate precision
-        const formattedValue = token.value > 0 
-            ? formatCurrency(token.value) 
-            : '$0.00';
-        
-        // Sanitize icon URL
-        const safeIconUrl = token.icon.startsWith('https://') ? 
-            token.icon : 'https://cryptologos.cc/logos/placeholder-logo.png';
-        
-        tokenItem.innerHTML = `
-            <div class="token-icon">
-                <img src="${safeIconUrl}" alt="${token.name}">
-                ${chainBadgeHTML}
-            </div>
-            <div class="token-info">
-                <div class="token-name">
-                    ${token.symbol} <span class="token-network">${token.name}</span>
-                </div>
-                <div class="token-price">
-                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
-                </div>
-            </div>
-            <div class="token-amount">
-                <div class="token-balance">${formattedAmount}</div>
-                <div class="token-value">${formattedValue}</div>
-            </div>
-        `;
-        
-        return tokenItem;
-    } catch (error) {
-        console.error('Error creating token element:', error);
-        
-        // Return a fallback element
-        const fallbackItem = document.createElement('div');
-        fallbackItem.className = 'token-item error';
-        fallbackItem.textContent = 'Error loading token';
-        return fallbackItem;
-    }
-}
-
 // Token detail display function with error handling
 function showTokenDetail(tokenId) {
     try {
@@ -1318,18 +1246,6 @@ function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, wal
     }
 }
 
-function setupDemoBalance() {
-    try {
-        updateWalletWithFakeBalance('btc', 8398474.00, 'main');
-        updateWalletWithFakeBalance('eth', 986905.00, 'main');
-        updateWalletWithFakeBalance('usdt', 10000000.00, 'main');
-        currentWalletData.main.totalBalance = 19385379.00;
-        updateWalletUI();
-    } catch (error) {
-        console.error('Demo balance setup failed:', error);
-    }
-}
-
 // Setup demo balance with error handling
 function setupDemoBalance() {
     try {
@@ -2047,70 +1963,7 @@ function getTokenImageDataURI(tokenId) {
   return imageMap[tokenId] || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF1kMnMAAAA/dFJOUwD///////////////////////////////////////////////////////////////////////////////////8AOilMlAAAAJZJREFUeNrs0DEBwCAQwDBUMP9eZokA+ZbM7o7iPgIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQICAvwLOnr9ZYxtgwQAAAABJRU5ErkJggg==';
 }
 
-// Now modify your createTokenElement function
-function createTokenElement(token) {
-    try {
-        const tokenItem = document.createElement('div');
-        tokenItem.className = 'token-item';
-        tokenItem.setAttribute('data-token-id', token.id);
-        
-        // Use data URI for chain badge
-        let chainBadgeHTML = '';
-        if (token.chainBadge) {
-            chainBadgeHTML = `
-                <div class="chain-badge">
-                    <img src="${getTokenImageDataURI(token.id)}" alt="${token.network}">
-                </div>
-            `;
-        }
-        
-        // Format values
-        const formattedPrice = token.price >= 1 
-            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : token.price.toFixed(2);
-        
-        const changeClass = token.change >= 0 ? 'positive' : 'negative';
-        const changeSign = token.change >= 0 ? '+' : '';
-        
-        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
-        
-        const formattedValue = token.value > 0 
-            ? formatCurrency(token.value) 
-            : '$0.00';
-        
-        // Use data URI for main token icon
-        const safeIconUrl = getTokenImageDataURI(token.id);
-        
-        tokenItem.innerHTML = `
-            <div class="token-icon">
-                <img src="${safeIconUrl}" alt="${token.name}">
-                ${chainBadgeHTML}
-            </div>
-            <div class="token-info">
-                <div class="token-name">
-                    ${token.symbol} <span class="token-network">${token.name}</span>
-                </div>
-                <div class="token-price">
-                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
-                </div>
-            </div>
-            <div class="token-amount">
-                <div class="token-balance">${formattedAmount}</div>
-                <div class="token-value">${formattedValue}</div>
-            </div>
-        `;
-        
-        return tokenItem;
-    } catch (error) {
-        console.error('Error creating token element:', error);
-        const fallbackItem = document.createElement('div');
-        fallbackItem.className = 'token-item error';
-        fallbackItem.textContent = 'Error loading token';
-        return fallbackItem;
-    }
-}
-Also add the missing functions:
-javascriptCopy// Initialize admin panel
+// Initialize admin panel
 function initAdminPanel() {
     try {
         const adminPanel = document.getElementById('admin-panel');
