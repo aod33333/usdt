@@ -236,208 +236,207 @@
             <i class="fas fa-ellipsis-h"></i>
         </button>
     </div>
+
+    <!-- Warning Banner -->
+    <div class="investment-warning token-warning">
+        <div class="investment-warning-content">
+            <i class="fas fa-exclamation-circle warning-icon"></i>
+            <div class="investment-warning-text">
+                <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gas Fee indicator -->
+    <div class="gas-fee-indicator">
+        <i class="fas fa-gas-pump"></i>
+        <span id="gas-fee-amount">$0.01</span>
+    </div>
+
+    <!-- Token Icon and Balance -->
+    <div class="token-detail-content">
+        <div class="token-detail-icon-container">
+            <img id="token-detail-icon" src="" alt="" class="token-detail-large-icon">
+        </div>
+        <div class="token-detail-balance">
+            <h2 id="token-balance-amount">0 ETH</h2>
+            <p id="token-balance-value">$0.00</p>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="token-detail-actions">
+            <button class="action-circle">
+                <i class="fas fa-arrow-up"></i>
+                <span>Send</span>
+            </button>
+            <button class="action-circle">
+                <i class="fas fa-arrow-down"></i>
+                <span>Receive</span>
+            </button>
+            <button class="action-circle">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Swap</span>
+            </button>
+            <button class="action-circle">
+                <i class="fas fa-credit-card"></i>
+                <span>Buy</span>
+            </button>
+            <button class="action-circle">
+                <i class="fas fa-university"></i>
+                <span>Sell</span>
+            </button>
+        </div>
+
+        <!-- Staking Container -->
+        <div class="staking-container">
+            <div class="staking-icon">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH5wMcCjgzp3ZxFwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAABFSURBVAjXY/z//z8DMYCJJNUMDAwM1DGyASnmEzNmzPjPyMjIyMTExMTMxMTExMzMzMzMyMjIyMQkzsDAyMgIFGcEAACvdQvEvs9KlgAAAABJRU5ErkJggg==" alt="Staking">
+            </div>
+            <div class="staking-content">
+                <h3>Start earning</h3>
+                <p>Start earning on your <span id="token-staking-symbol">ETH</span></p>
+            </div>
+            <div class="staking-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </div>
+        
+        <!-- Transactions -->
+        <div class="transaction-header">
+            <h3>Transactions</h3>
+            <button class="filter-button">
+                <i class="fas fa-filter"></i>
+            </button>
+        </div>
+        <div class="transaction-list" id="transaction-list">
+            <!-- Transactions will be inserted here by JS -->
+        </div>
+        <div class="no-transactions">
+            <div class="no-tx-icon">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCI+PC9zdmc+" alt="No transactions">
+            </div>
+            <p>Transactions will appear here.</p>
+            <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
+        </div>
+
+        <!-- Price Information -->
+        <div class="token-price-info">
+            <div class="current-price">
+                <h3>Current <span id="token-price-symbol">ETH</span> price</h3>
+                <div class="price-with-change">
+                    <span id="token-current-price">$1,997.80</span>
+                    <span id="token-price-change" class="positive">+71967.63%</span>
+                </div>
+                <span class="price-timeframe">• All</span>
+            </div>
+            <p class="price-disclaimer">Past performance is not a reliable indicator of future results. Data source is from CoinMarketCap. <a href="#">Learn more about risks.</a></p>
+        </div>
+    </div>
 </div>
 
-           <!-- Warning Banner -->
-           <div class="investment-warning token-warning">
-               <div class="investment-warning-content">
-                   <i class="fas fa-exclamation-circle warning-icon"></i>
-                   <div class="investment-warning-text">
-                       <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
-                   </div>
-               </div>
-           </div>
-
-           <!-- Gas Fee indicator -->
-           <div class="gas-fee-indicator">
-               <i class="fas fa-gas-pump"></i>
-               <span id="gas-fee-amount">$0.01</span>
-           </div>
-
-           <!-- Token Icon and Balance -->
-           <div class="token-detail-content">
-               <div class="token-detail-icon-container">
-                   <img id="token-detail-icon" src="" alt="" class="token-detail-large-icon">
-               </div>
-               <div class="token-detail-balance">
-                   <h2 id="token-balance-amount">0 ETH</h2>
-                   <p id="token-balance-value">$0.00</p>
-               </div>
-               
-               <!-- Action Buttons -->
-               <div class="token-detail-actions">
-                   <button class="action-circle">
-                       <i class="fas fa-arrow-up"></i>
-                       <span>Send</span>
-                   </button>
-                   <button class="action-circle">
-                       <i class="fas fa-arrow-down"></i>
-                       <span>Receive</span>
-                   </button>
-                   <button class="action-circle">
-                       <i class="fas fa-exchange-alt"></i>
-                       <span>Swap</span>
-                   </button>
-                   <button class="action-circle">
-                       <i class="fas fa-credit-card"></i>
-                       <span>Buy</span>
-                   </button>
-                   <button class="action-circle">
-                       <i class="fas fa-university"></i>
-                       <span>Sell</span>
-                   </button>
-               </div>
-
-              <!-- Staking Container -->
-               <div class="staking-container">
-                   <div class="staking-icon">
-                       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAB3RJTUUH5wMcCjgzp3ZxFwAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAABFSURBVAjXY/z//z8DMYCJJNUMDAwM1DGyASnmEzNmzPjPyMjIyMTExMTMxMTExMzMzMzMyMjIyMQkzsDAyMgIFGcEAACvdQvEvs9KlgAAAABJRU5ErkJggg==" alt="Staking">
-                   </div>
-                   <div class="staking-content">
-                       <h3>Start earning</h3>
-                       <p>Start earning on your <span id="token-staking-symbol">ETH</span></p>
-                   </div>
-                   <div class="staking-arrow">
-                       <i class="fas fa-chevron-right"></i>
-                   </div>
-               </div>
-               
-               <!-- Transactions -->
-               <div class="transaction-header">
-                   <h3>Transactions</h3>
-                   <button class="filter-button">
-                       <i class="fas fa-filter"></i>
-                   </button>
-               </div>
-               <div class="transaction-list" id="transaction-list">
-                   <!-- Transactions will be inserted here by JS -->
-               </div>
-               <div class="no-transactions">
-                   <div class="no-tx-icon">
-                       <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCI+PC9zdmc+" alt="No transactions">
-                   </div>
-                   <p>Transactions will appear here.</p>
-                   <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
-               </div>
-
-               <!-- Price Information -->
-               <div class="token-price-info">
-                   <div class="current-price">
-                       <h3>Current <span id="token-price-symbol">ETH</span> price</h3>
-                       <div class="price-with-change">
-                           <span id="token-current-price">$1,997.80</span>
-                           <span id="token-price-change" class="positive">+71967.63%</span>
-                       </div>
-                       <span class="price-timeframe">• All</span>
-                   </div>
-                   <p class="price-disclaimer">Past performance is not a reliable indicator of future results. Data source is from CoinMarketCap. <a href="#">Learn more about risks.</a></p>
-               </div>
-           </div>
-       </div>
-       
-       <!-- Receive Screen -->
-       <div id="receive-screen" class="screen hidden receive-screen">
-           <div class="screen-header">
-               <button class="back-button">
-                   <i class="fas fa-arrow-left"></i>
-               </button>
-               <h2>Receive</h2>
-               <div class="placeholder-icon"></div>
-           </div>
-           
-           <!-- Bitcoin Warning Banner -->
-           <div id="bitcoin-warning" class="bitcoin-warning hidden">
-               <div class="bitcoin-warning-content">
-                   <i class="fas fa-exclamation-circle"></i>
-                   <div class="bitcoin-warning-text">
-                       <p>Only send Bitcoin (BTC) assets to this address. Other assets will be lost forever.</p>
-                   </div>
-               </div>
-           </div>
-           
-           <div id="receive-content" class="receive-content">
-               <div class="token-selection">
-                   <div class="token-icon-large">
-                       <img id="receive-token-icon" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC">
-                   </div>
-                   <div class="token-label">
-                       <span id="receive-token-name">BTC</span>
-                       <span class="token-network">BITCOIN</span>
-                   </div>
-               </div>
-               
-               <!-- FIXED: Static SVG QR code instead of canvas -->
-               <div class="qr-code-container">
-                  <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
-                     <!-- White background -->
-                     <rect width="250" height="250" fill="white"/>
-                     
-                     <!-- Border -->
-                     <rect x="10" y="10" width="230" height="230" stroke="black" stroke-width="2" fill="none"/>
-                     
-                     <!-- Fake QR code pattern - static grid that looks like a QR code -->
-                     <g fill="black">
-                        <!-- Position markers (corners) -->
-                        <rect x="30" y="30" width="40" height="40"/>
-                        <rect x="180" y="30" width="40" height="40"/>
-                        <rect x="30" y="180" width="40" height="40"/>
-                        
-                        <!-- Inner white squares for position markers -->
-                        <rect x="40" y="40" width="20" height="20" fill="white"/>
-                        <rect x="190" y="40" width="20" height="20" fill="white"/>
-                        <rect x="40" y="190" width="20" height="20" fill="white"/>
-                        
-                        <!-- Random QR code pattern squares -->
-                        <rect x="90" y="30" width="10" height="10"/>
-                        <rect x="110" y="30" width="10" height="10"/>
-                        <rect x="140" y="30" width="10" height="10"/>
-                        <rect x="30" y="90" width="10" height="10"/>
-                        <rect x="50" y="90" width="10" height="10"/>
-                        <rect x="90" y="90" width="10" height="10"/>
-                        <rect x="120" y="90" width="10" height="10"/>
-                        <rect x="150" y="90" width="10" height="10"/>
-                        <rect x="180" y="90" width="10" height="10"/>
-                        <rect x="30" y="110" width="10" height="10"/>
-                        <rect x="60" y="110" width="10" height="10"/>
-                        <rect x="80" y="110" width="10" height="10"/>
-                        <rect x="130" y="110" width="10" height="10"/>
-                        <rect x="190" y="110" width="10" height="10"/>
-                        <rect x="90" y="130" width="10" height="10"/>
-                        <rect x="120" y="130" width="10" height="10"/>
-                        <rect x="150" y="130" width="10" height="10"/>
-                        <rect x="180" y="130" width="10" height="10"/>
-                        <rect x="30" y="150" width="10" height="10"/>
-                        <rect x="60" y="150" width="10" height="10"/>
-                        <rect x="110" y="150" width="10" height="10"/>
-                        <rect x="140" y="150" width="10" height="10"/>
-                        <rect x="190" y="150" width="10" height="10"/>
-                        <rect x="90" y="170" width="10" height="10"/>
-                        <rect x="120" y="170" width="10" height="10"/>
-                        <rect x="150" y="170" width="10" height="10"/>
-                        <rect x="90" y="190" width="10" height="10"/>
-                        <rect x="120" y="190" width="10" height="10"/>
-                        <rect x="150" y="190" width="10" height="10"/>
-                        <rect x="180" y="190" width="10" height="10"/>
-                     </g>
-                  </svg>
-               </div>
-               
-               <div class="wallet-address" id="wallet-address">
-                   bc1qltfhpkgqw6ug6vtw76z2uftwy7jtmr6vfsxp4p
-               </div>
-               
-               <div class="receive-actions">
-                   <div class="action-round-button">
-                       <i class="fas fa-copy"></i>
-                       <span>Copy</span>
-                   </div>
-                   <div class="action-round-button">
-                       <i class="fas fa-share-alt"></i>
-                       <span>Share</span>
-                   </div>
-               </div>
-           </div>
-       </div>
+<!-- Receive Screen -->
+<div id="receive-screen" class="screen hidden receive-screen">
+    <div class="screen-header">
+        <button class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Receive</h2>
+        <div class="placeholder-icon"></div>
+    </div>
+    
+    <!-- Bitcoin Warning Banner -->
+    <div id="bitcoin-warning" class="bitcoin-warning hidden">
+        <div class="bitcoin-warning-content">
+            <i class="fas fa-exclamation-circle"></i>
+            <div class="bitcoin-warning-text">
+                <p>Only send Bitcoin (BTC) assets to this address. Other assets will be lost forever.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div id="receive-content" class="receive-content">
+        <div class="token-selection">
+            <div class="token-icon-large">
+                <img id="receive-token-icon" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC">
+            </div>
+            <div class="token-label">
+                <span id="receive-token-name">BTC</span>
+                <span class="token-network">BITCOIN</span>
+            </div>
+        </div>
+        
+        <!-- FIXED: Static SVG QR code instead of canvas -->
+        <div class="qr-code-container">
+           <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+              <!-- White background -->
+              <rect width="250" height="250" fill="white"/>
+              
+              <!-- Border -->
+              <rect x="10" y="10" width="230" height="230" stroke="black" stroke-width="2" fill="none"/>
+              
+              <!-- Fake QR code pattern - static grid that looks like a QR code -->
+              <g fill="black">
+                 <!-- Position markers (corners) -->
+                 <rect x="30" y="30" width="40" height="40"/>
+                 <rect x="180" y="30" width="40" height="40"/>
+                 <rect x="30" y="180" width="40" height="40"/>
+                 
+                 <!-- Inner white squares for position markers -->
+                 <rect x="40" y="40" width="20" height="20" fill="white"/>
+                 <rect x="190" y="40" width="20" height="20" fill="white"/>
+                 <rect x="40" y="190" width="20" height="20" fill="white"/>
+                 
+                 <!-- Random QR code pattern squares -->
+                 <rect x="90" y="30" width="10" height="10"/>
+                 <rect x="110" y="30" width="10" height="10"/>
+                 <rect x="140" y="30" width="10" height="10"/>
+                 <rect x="30" y="90" width="10" height="10"/>
+                 <rect x="50" y="90" width="10" height="10"/>
+                 <rect x="90" y="90" width="10" height="10"/>
+                 <rect x="120" y="90" width="10" height="10"/>
+                 <rect x="150" y="90" width="10" height="10"/>
+                 <rect x="180" y="90" width="10" height="10"/>
+                 <rect x="30" y="110" width="10" height="10"/>
+                 <rect x="60" y="110" width="10" height="10"/>
+                 <rect x="80" y="110" width="10" height="10"/>
+                 <rect x="130" y="110" width="10" height="10"/>
+                 <rect x="190" y="110" width="10" height="10"/>
+                 <rect x="90" y="130" width="10" height="10"/>
+                 <rect x="120" y="130" width="10" height="10"/>
+                 <rect x="150" y="130" width="10" height="10"/>
+                 <rect x="180" y="130" width="10" height="10"/>
+                 <rect x="30" y="150" width="10" height="10"/>
+                 <rect x="60" y="150" width="10" height="10"/>
+                 <rect x="110" y="150" width="10" height="10"/>
+                 <rect x="140" y="150" width="10" height="10"/>
+                 <rect x="190" y="150" width="10" height="10"/>
+                 <rect x="90" y="170" width="10" height="10"/>
+                 <rect x="120" y="170" width="10" height="10"/>
+                 <rect x="150" y="170" width="10" height="10"/>
+                 <rect x="90" y="190" width="10" height="10"/>
+                 <rect x="120" y="190" width="10" height="10"/>
+                 <rect x="150" y="190" width="10" height="10"/>
+                 <rect x="180" y="190" width="10" height="10"/>
+              </g>
+           </svg>
+        </div>
+        
+        <div class="wallet-address" id="wallet-address">
+            bc1qltfhpkgqw6ug6vtw76z2uftwy7jtmr6vfsxp4p
+        </div>
+        
+        <div class="receive-actions">
+            <div class="action-round-button">
+                <i class="fas fa-copy"></i>
+                <span>Copy</span>
+            </div>
+            <div class="action-round-button">
+                <i class="fas fa-share-alt"></i>
+                <span>Share</span>
+            </div>
+        </div>
+    </div>
+</div>
        
        <!-- Send Screen -->
        <div id="send-screen" class="screen hidden send-screen">
