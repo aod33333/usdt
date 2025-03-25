@@ -772,5 +772,121 @@
        }, {once: true});
    });
    </script>
+
+ // Direct DOM manipulation to fix wallet UI issues
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to apply fixes
+  function applyFixes() {
+    console.log("Applying wallet UI fixes...");
+    
+    // Fix 1: Fix chain badges display
+    const chainBadges = document.querySelectorAll('.chain-badge');
+    chainBadges.forEach(badge => {
+      // Fix visibility
+      badge.style.display = 'block';
+      badge.style.position = 'absolute';
+      badge.style.bottom = '-6px';
+      badge.style.right = '-6px';
+      badge.style.width = '20px';
+      badge.style.height = '20px';
+      badge.style.borderRadius = '50%';
+      badge.style.border = '2px solid #FFFFFF';
+      badge.style.background = '#FFFFFF';
+      badge.style.zIndex = '5';
+      badge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+      
+      // Fix image inside badge
+      const img = badge.querySelector('img');
+      if (img) {
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'contain';
+        img.style.padding = '2px';
+        img.style.display = 'block';
+        
+        // Fix BNB logo if needed
+        if (img.src.includes('bnb-bnb-logo') || badge.getAttribute('data-network') === 'bsc') {
+          img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.svg';
+        }
+      }
+    });
+    
+    // Fix 2: Remove "BNB Smart Chain" from token symbol display
+    const tokenSymbol = document.getElementById('detail-symbol');
+    if (tokenSymbol) {
+      const symbolText = tokenSymbol.textContent;
+      if (symbolText.includes('BNB Smart Chain') || symbolText.includes('|')) {
+        tokenSymbol.textContent = symbolText.split(' ')[0]; // Keep only the token symbol
+      }
+    }
+    
+    // Fix network label display
+    const networkLabel = document.querySelector('.token-network-label');
+    if (networkLabel) {
+      networkLabel.style.display = 'block';
+      networkLabel.style.fontSize = '12px';
+      networkLabel.style.color = 'var(--tw-medium-gray)';
+      networkLabel.style.marginTop = '2px';
+    }
+    
+    // Fix token detail title layout
+    const detailTitle = document.querySelector('.token-detail-title');
+    if (detailTitle) {
+      detailTitle.style.flexDirection = 'column';
+      detailTitle.style.alignItems = 'flex-start';
+    }
+    
+    // Hide separator and unwanted spans
+    const separators = document.querySelectorAll('.token-separator');
+    separators.forEach(sep => sep.style.display = 'none');
+    
+    // Fix 3: Make bottom tabs visible
+    const bottomTabs = document.querySelector('.bottom-tabs');
+    if (bottomTabs) {
+      bottomTabs.style.display = 'flex';
+      bottomTabs.style.position = 'fixed';
+      bottomTabs.style.bottom = '0';
+      bottomTabs.style.left = '0';
+      bottomTabs.style.width = '100%';
+      bottomTabs.style.zIndex = '100';
+      bottomTabs.style.backgroundColor = '#FFFFFF';
+      bottomTabs.style.borderTop = '1px solid #F5F5F5';
+      bottomTabs.style.visibility = 'visible';
+      bottomTabs.style.opacity = '1';
+    }
+    
+    // Add padding to content areas to prevent overlap with bottom tabs
+    const contentAreas = document.querySelectorAll('.token-detail-content, .send-content, .receive-content');
+    contentAreas.forEach(area => {
+      area.style.paddingBottom = '80px';
+    });
+    
+    console.log("UI fixes applied");
+  }
+  
+  // Apply fixes immediately
+  applyFixes();
+  
+  // Set up a mutation observer to apply fixes when DOM changes
+  const observer = new MutationObserver(function(mutations) {
+    // Check if any relevant elements were added or modified
+    mutations.forEach(mutation => {
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        applyFixes();
+      }
+    });
+  });
+  
+  // Observe changes to the body and its descendants
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  // Also apply fixes after a slight delay to catch any dynamic content
+  setTimeout(applyFixes, 1000);
+  setTimeout(applyFixes, 3000);
+});
+ 
 </body>
 </html>
