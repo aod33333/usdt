@@ -505,21 +505,49 @@ function showTokenDetail(tokenId) {
    }
 }
 
+     function showTokenDetail(tokenId) {
+    try {
+        const token = getTokenDetails(tokenId); // Assuming this function exists and retrieves token details
+        const tokenDetail = document.getElementById('token-detail');
+        const walletScreen = document.getElementById('wallet-screen');
+        const detailSymbol = document.getElementById('detail-symbol');
+        const detailFullname = document.getElementById('detail-fullname');
+        const tokenDetailIcon = document.getElementById('token-detail-icon');
+        const tokenBalanceAmount = document.getElementById('token-balance-amount');
+        const tokenBalanceValue = document.getElementById('token-balance-value');
+        const tokenStakingSymbol = document.getElementById('token-staking-symbol');
+        const gasFeeAmount = document.getElementById('gas-fee-amount'); // Corrected line
+
+        if (!token) {
+            console.error('Token not found');
+            return;
+        }
+
+        // Update token details on the page
+        if (detailSymbol) detailSymbol.textContent = token.symbol;
+        if (detailFullname) detailFullname.textContent = token.fullName;
+        if (tokenDetailIcon) tokenDetailIcon.src = token.iconSrc;
+        if (tokenBalanceAmount) tokenBalanceAmount.textContent = token.balance + ' ' + token.symbol;
+        if (tokenBalanceValue) tokenBalanceValue.textContent = '$' + token.balanceValue;
+        if (tokenStakingSymbol) tokenStakingSymbol.textContent = token.symbol;
+
         // Update gas fee display for this token
-        const gasFeeAmount = document.getElementById('gas-fee-amount');
         if (gasFeeAmount) {
             gasFeeAmount.textContent = token.id === 'eth' ? '$0.01' : '$0.00';
         }
-        
+
         // Show token detail and hide wallet screen
         if (walletScreen) walletScreen.classList.add('hidden');
-        tokenDetail.classList.remove('hidden');
-        tokenDetail.style.display = 'flex';
-        
+        if (tokenDetail) {
+          tokenDetail.classList.remove('hidden');
+          tokenDetail.style.display = 'flex';
+        }
+
+
         // Update transactions if there are any
         const transactionList = document.getElementById('transaction-list');
-        if (transactionList && currentTransactions && 
-            currentTransactions[activeWallet] && 
+        if (transactionList && currentTransactions &&
+            currentTransactions[activeWallet] &&
             currentTransactions[activeWallet][tokenId]) {
             updateTransactionsForToken(tokenId);
         }
@@ -527,6 +555,8 @@ function showTokenDetail(tokenId) {
         console.error('Error showing token detail:', error);
     }
 }
+
+// Show send screen with improved error handling
 
 // Show send screen with improved error handling
 function showSendScreen(tokenId) {
