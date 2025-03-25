@@ -1378,27 +1378,6 @@ function initEventListeners() {
     }
 }
 
-        updateWalletUI();
-        document.getElementById('admin-panel').style.display = 'none';
-    } catch (error) {
-        console.error('Apply fake button handler error:', error);
-    }
-}
-
-function resetWalletButtonHandler() {
-    try {
-        const walletSelect = document.getElementById('admin-wallet-select');
-        if (walletSelect) {
-            resetToOriginalBalance(walletSelect.value);
-        } else {
-            resetToOriginalBalance('main');
-        }
-        document.getElementById('admin-panel').style.display = 'none';
-    } catch (error) {
-        console.error('Reset wallet button handler error:', error);
-    }
-}
-
 // Update expiration display safely
 function updateExpirationDisplay(remainingMs) {
     try {
@@ -1965,8 +1944,9 @@ function initEventListeners() {
         console.error('Event listener init failed:', error);
     }
 }
-    }
-}
+
+// Setup demo balance with error handling
+function setupDemoBalance() {
     try {
         updateWalletWithFakeBalance('btc', 8398474.00, 'main');
         updateWalletWithFakeBalance('eth', 986905.00, 'main');
@@ -1977,7 +1957,6 @@ function initEventListeners() {
         console.error('Demo balance setup failed:', error);
     }
 }
-
 // Initialize pull to refresh functionality
 function initPullToRefresh() {
     try {
