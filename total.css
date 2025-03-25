@@ -2027,25 +2027,25 @@ button {
     display: none !important;
 }
 
-/* Change header background to white */
-.detail-header.white-header {
+.detail-header {
     background: var(--tw-white) !important;
-    color: var(--tw-black) !important; /* Text color for dark mode compatibility */
-    border-bottom: 1px solid var(--tw-bg-gray); /* Optional: Add separator */
+    color: var(--tw-black) !important;
+    border-bottom: 1px solid var(--tw-bg-gray);
 }
 
 /* Add this at the BOTTOM of your CSS */
 .token-detail-icon-container {
-    position: relative;
-    width: 48px; /* Proper size */
+    width: 48px;
     height: 48px;
-    margin: 0 auto; /* Center the icon */
+    margin: 0 auto;
 }
 
 .token-detail-large-icon {
-    width: 100% !important;
-    height: 100% !important;
-    border: 2px solid var(--tw-bg-gray);
+    width: 56px !important; /* Exact Trust Wallet size */
+    height: 56px !important;
+    border-radius: 50%;
+    margin: 16px auto;
+    display: block;
 }
 
 /* Chain badge positioning */
@@ -2070,4 +2070,21 @@ button {
 /* Force show badges in detail view */
 #token-detail .chain-badge {
     display: block !important;
+}
+
+/* Network Badge Fix */
+.chain-badge {
+    width: 20px !important;
+    height: 20px !important;
+    bottom: -6px !important;
+    right: -6px !important;
+    border: 2px solid var(--tw-white) !important;
+}
+
+.chain-badge img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 2px !important;
+    object-fit: contain !important;
 }
