@@ -1934,3 +1934,56 @@ button {
     color: var(--tw-black);
     margin-left: var(--space-xs);
 }
+
+/* Add these at the BOTTOM of your CSS file */
+/* ===== Fix 1: BNB Smart Chain Icons ===== */
+.chain-badge[data-network="bsc"] img {
+    content: url('https://cryptologos.cc/logos/bnb-bnb-logo.svg');
+    padding: 2px;
+    object-fit: contain;
+}
+
+/* ===== Fix 2: Restrict badges to token list ===== */
+.token-list .chain-badge {
+    display: block;
+}
+
+:not(.token-list) .chain-badge {
+    display: none !important;
+}
+
+/* ===== Fix 3: Token Detail Header ===== */
+.token-detail-header {
+    background: var(--tw-white) !important;
+    color: var(--tw-black) !important;
+    padding: var(--space-sm) var(--space-md);
+}
+
+.token-detail-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.token-symbol-container {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.token-symbol {
+    font-size: var(--font-md) !important;
+    font-weight: 600;
+}
+
+.token-network-label {
+    font-size: var(--font-sm) !important;
+    color: var(--tw-medium-gray);
+    margin-top: 2px;
+}
+
+.token-fullname {
+    font-size: var(--font-xs) !important;
+    color: var(--tw-medium-gray);
+    order: -1;
+}
