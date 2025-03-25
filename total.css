@@ -583,29 +583,63 @@ button {
     color: var(--tw-medium-gray);
 }
 
-/* Add these 3 rules ONLY */
+/* Chain Badge Styles */
 .token-icon {
-    overflow: visible; /* Changed from hidden */
+    overflow: visible; /* Allow badge overflow */
+    position: relative; /* Anchor for absolute positioning */
 }
 
 .chain-badge {
     position: absolute;
-    bottom: -6px;
-    right: -6px;
-    width: 20px;
-    height: 20px;
+    bottom: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     border: 2px solid var(--tw-white);
     background: var(--tw-white);
     z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.chain-badge:hover {
+    transform: scale(1.15);
+    z-index: 3;
 }
 
 .chain-badge img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    padding: 2px;
+    object-fit: cover;
+    border-radius: 50%;
+    padding: 1px;
+    background: var(--tw-white);
+}
+
+/* Optional: Badge status indicators */
+.chain-badge[data-status="active"]::after {
+    content: "";
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #00ff00;
+    border-radius: 50%;
+    border: 2px solid var(--tw-white);
+}
+
+.chain-badge[data-status="inactive"] {
+    opacity: 0.7;
+    filter: grayscale(1);
+}
+
+/* Focus state for accessibility */
+.chain-badge:focus {
+    outline: 2px solid var(--tw-primary-color);
+    outline-offset: 2px;
 }
 
 /* Bottom Tabs */
