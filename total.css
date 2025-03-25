@@ -1948,10 +1948,6 @@ button {
     display: block;
 }
 
-:not(.token-list) .chain-badge {
-    display: none !important;
-}
-
 /* ===== Fix 3: Token Detail Header ===== */
 .token-detail-header {
     background: var(--tw-white) !important;
@@ -2072,19 +2068,30 @@ button {
     display: block !important;
 }
 
-/* Network Badge Fix */
 .chain-badge {
-    width: 20px !important;
-    height: 20px !important;
+    position: absolute;
     bottom: -6px !important;
     right: -6px !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50%;
     border: 2px solid var(--tw-white) !important;
+    background: var(--tw-white);
+    z-index: 2;
+    display: block !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .chain-badge img {
-    display: block !important;
     width: 100% !important;
     height: 100% !important;
+    object-fit: contain !important;
+    padding: 2px !important;
+    display: block !important;
+}
+
+/* Fix for BNB badges specifically */
+.chain-badge img[src*="bnb-bnb-logo"] {
     padding: 2px !important;
     object-fit: contain !important;
 }
