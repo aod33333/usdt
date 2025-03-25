@@ -204,40 +204,39 @@
            </div>
        </div>
        
-<!-- Updated Token Detail Screen Header -->
 <div id="token-detail" class="screen hidden">
     <div class="detail-header white-header">
         <button id="back-button" class="icon-button">
             <i class="fas fa-arrow-left"></i>
         </button>
-       <div class="token-detail-title">
-    <!-- Add wrapper div for positioning -->
-    <div class="detail-token-icon-wrapper">
-        <img id="token-detail-icon" src="" class="token-icon-small">
-        <!-- Network badge -->
-        <div class="chain-badge-detail">
-            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg">
+
+        <div class="token-detail-title">
+            <!-- Fixed Icon Container -->
+            <div class="token-icon-container">
+                <img id="token-detail-icon" src="" 
+                     class="token-icon" 
+                     style="width: 48px; height: 48px">
+                <div class="chain-badge">
+                    <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg">
+                </div>
+            </div>
+
+            <!-- Text Content -->
+            <div class="token-text-content">
+                <div class="token-symbol-container">
+                    <span id="detail-symbol">ETH</span>
+                    <span class="token-network-label">Ethereum</span>
+                </div>
+                <div id="detail-fullname" class="token-fullname">Ethereum</div>
+            </div>
         </div>
-    </div>
-    
-    <div class="token-title-text">
-        <div class="token-symbol-container">
-            <span id="detail-symbol">ETH</span>
-            <!-- Keep network label if needed -->
-            <span class="token-network-label" id="detail-network">Ethereum</span>
-        </div>
-        <div id="detail-fullname" class="token-fullname">Ethereum</div>
+
+        <!-- SINGLE menu button -->
+        <button class="icon-button menu-button">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
     </div>
 </div>
-        <button class="icon-button menu-button">
-            <i class="fas fa-ellipsis-h"></i>
-        </button>
-    </div>
-        
-        <button class="icon-button menu-button">
-            <i class="fas fa-ellipsis-h"></i>
-        </button>
-    </div>
 
            <!-- Warning Banner -->
            <div class="investment-warning token-warning">
