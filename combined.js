@@ -587,65 +587,62 @@ function getTokenLogoUrl(tokenId) {
 }
 // Now modify your createTokenElement function
 function createTokenElement(token) {
-    try {
-        const tokenItem = document.createElement('div');
-        tokenItem.className = 'token-item';
-        tokenItem.setAttribute('data-token-id', token.id);
-        
-        // Use data URI for chain badge
-        let chainBadgeHTML = '';
-        if (token.chainBadge) {
-            chainBadgeHTML = `
-                <div class="chain-badge">
-                    <img src="${getTokenLogoUrl()(token.id)}" alt="${token.network}">
-                </div>
-            `;
-        }
-        
-        // Format values
-        const formattedPrice = token.price >= 1 
-            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : token.price.toFixed(2);
-        
-        const changeClass = token.change >= 0 ? 'positive' : 'negative';
-        const changeSign = token.change >= 0 ? '+' : '';
-        
-        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
-        
-        const formattedValue = token.value > 0 
-            ? formatCurrency(token.value) 
-            : '$0.00';
-        
-        // Use data URI for main token icon
-        const safeIconUrl = getTokenLogoUrl(token.id);
-        
-        tokenItem.innerHTML = `
-            <div class="token-icon">
-                <img src="${safeIconUrl}" alt="${token.name}">
-                ${chainBadgeHTML}
-            </div>
-            <div class="token-info">
-                <div class="token-name">
-                    ${token.symbol} <span class="token-network">${token.name}</span>
-                </div>
-                <div class="token-price">
-                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
-                </div>
-            </div>
-            <div class="token-amount">
-                <div class="token-balance">${formattedAmount}</div>
-                <div class="token-value">${formattedValue}</div>
-            </div>
-        `;
-        
-        return tokenItem;
-    } catch (error) {
-        console.error('Error creating token element:', error);
-        const fallbackItem = document.createElement('div');
-        fallbackItem.className = 'token-item error';
-        fallbackItem.textContent = 'Error loading token';
-        return fallbackItem;
-    }
+   try {
+       const tokenItem = document.createElement('div');
+       tokenItem.className = 'token-item';
+       tokenItem.setAttribute('data-token-id', token.id);
+       
+       let chainBadgeHTML = '';
+       if (token.chainBadge) {
+           chainBadgeHTML = `
+               <div class="chain-badge">
+                   <img src="${getTokenLogoUrl(token.chainBadge)}" alt="${token.network}">
+               </div>
+           `;
+       }
+       
+       const formattedPrice = token.price >= 1 
+           ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+           : token.price.toFixed(2);
+       
+       const changeClass = token.change >= 0 ? 'positive' : 'negative';
+       const changeSign = token.change >= 0 ? '+' : '';
+       
+       const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
+       
+       const formattedValue = token.value > 0 
+           ? formatCurrency(token.value) 
+           : '$0.00';
+       
+       const safeIconUrl = getTokenLogoUrl(token.id);
+       
+       tokenItem.innerHTML = `
+           <div class="token-icon">
+               <img src="${safeIconUrl}" alt="${token.name}">
+               ${chainBadgeHTML}
+           </div>
+           <div class="token-info">
+               <div class="token-name">
+                   ${token.symbol} <span class="token-network">${token.name}</span>
+               </div>
+               <div class="token-price">
+                   $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
+               </div>
+           </div>
+           <div class="token-amount">
+               <div class="token-balance">${formattedAmount}</div>
+               <div class="token-value">${formattedValue}</div>
+           </div>
+       `;
+       
+       return tokenItem;
+   } catch (error) {
+       console.error('Error creating token element:', error);
+       const fallbackItem = document.createElement('div');
+       fallbackItem.className = 'token-item error';
+       fallbackItem.textContent = 'Error loading token';
+       return fallbackItem;
+   }
 }
 
 // Show receive screen with improved security
