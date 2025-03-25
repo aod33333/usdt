@@ -644,6 +644,128 @@ function showSendScreen(tokenId) {
     }
 }
 
+// Add this function to your code
+function getTokenImageDataURI(tokenId) {
+  const imageMap = {
+    'btc': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcf+WAP+cAP+ZAP+ZAP+YAP+YAP+YAP+RAP+ZAP+YAP+YAP+YAP+YAP+YAP+VAP+YAP+YAP+YAP+XAP+YAP+YAP+YAP+ZAP+YAP+ZAP+YAP+TAP+XAP+YAP+YAP+YAP+YAP+XAP+YAP+YAP+YAP+YAP+WAP+YAP+YAP+VAP+YAP+YAP+YAP+YAP+YAP+YAP+YAP+ZAP+YAP+YAP+XAP+YAP+YAP+ZAP+YAP+YAP+XAP+YAP+YAP+YAP+YAP+ZAP+YAP+YAP+YAP+YAP+YAP+YAP+YAP+YAP+XAP+YAP+YAP+YAP+YAP+YAP+ZAP+YAP+YAMZBTlgAAA==',
+    'eth': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAL9UExURUxpcUpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqk==',
+    'usdt': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAL9UExURUxpcX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+Kig==',
+    'bnb': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcf3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAA==',
+    'twt': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcf3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAA=='
+  };
+  
+  return imageMap[tokenId] || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF1kMnMAAAA/dFJOUwD///////////////////////////////////////////////////////////////////////////////////8AOilMlAAAAJZJREFUeNrs0DEBwCAQwDBUMP9eZokA+ZbM7o7iPgIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQICAvwLOnr9ZYxtgwQAAAABJRU5ErkJggg==';
+}
+
+// Now modify your createTokenElement function
+function createTokenElement(token) {
+    try {
+        const tokenItem = document.createElement('div');
+        tokenItem.className = 'token-item';
+        tokenItem.setAttribute('data-token-id', token.id);
+        
+        // Use data URI for chain badge
+        let chainBadgeHTML = '';
+        if (token.chainBadge) {
+            chainBadgeHTML = `
+                <div class="chain-badge">
+                    <img src="${getTokenImageDataURI(token.id)}" alt="${token.network}">
+                </div>
+            `;
+        }
+        
+        // Format values
+        const formattedPrice = token.price >= 1 
+            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : token.price.toFixed(2);
+        
+        const changeClass = token.change >= 0 ? 'positive' : 'negative';
+        const changeSign = token.change >= 0 ? '+' : '';
+        
+        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
+        
+        const formattedValue = token.value > 0 
+            ? formatCurrency(token.value) 
+            : '$0.00';
+        
+        // Use data URI for main token icon
+        const safeIconUrl = getTokenImageDataURI(token.id);
+        
+        tokenItem.innerHTML = `
+            <div class="token-icon">
+                <img src="${safeIconUrl}" alt="${token.name}">
+                ${chainBadgeHTML}
+            </div>
+            <div class="token-info">
+                <div class="token-name">
+                    ${token.symbol} <span class="token-network">${token.name}</span>
+                </div>
+                <div class="token-price">
+                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
+                </div>
+            </div>
+            <div class="token-amount">
+                <div class="token-balance">${formattedAmount}</div>
+                <div class="token-value">${formattedValue}</div>
+            </div>
+        `;
+        
+        return tokenItem;
+    } catch (error) {
+        console.error('Error creating token element:', error);
+        const fallbackItem = document.createElement('div');
+        fallbackItem.className = 'token-item error';
+        fallbackItem.textContent = 'Error loading token';
+        return fallbackItem;
+    }
+}
+        
+        // Format values
+        const formattedPrice = token.price >= 1 
+            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : token.price.toFixed(2);
+        
+        const changeClass = token.change >= 0 ? 'positive' : 'negative';
+        const changeSign = token.change >= 0 ? '+' : '';
+        
+        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
+        
+        const formattedValue = token.value > 0 
+            ? formatCurrency(token.value) 
+            : '$0.00';
+        
+        // Use data URI for main token icon
+        const safeIconUrl = getTokenImageDataURI(token.id);
+        
+        tokenItem.innerHTML = `
+            <div class="token-icon">
+                <img src="${safeIconUrl}" alt="${token.name}">
+                ${chainBadgeHTML}
+            </div>
+            <div class="token-info">
+                <div class="token-name">
+                    ${token.symbol} <span class="token-network">${token.name}</span>
+                </div>
+                <div class="token-price">
+                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
+                </div>
+            </div>
+            <div class="token-amount">
+                <div class="token-balance">${formattedAmount}</div>
+                <div class="token-value">${formattedValue}</div>
+            </div>
+        `;
+        
+        return tokenItem;
+    } catch (error) {
+        console.error('Error creating token element:', error);
+        const fallbackItem = document.createElement('div');
+        fallbackItem.className = 'token-item error';
+        fallbackItem.textContent = 'Error loading token';
+        return fallbackItem;
+    }
+}
+
 // Show receive screen with improved security
 function showReceiveScreen(tokenId) {
     console.log('Showing receive screen', tokenId);
@@ -1196,6 +1318,18 @@ function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, wal
     }
 }
 
+function setupDemoBalance() {
+    try {
+        updateWalletWithFakeBalance('btc', 8398474.00, 'main');
+        updateWalletWithFakeBalance('eth', 986905.00, 'main');
+        updateWalletWithFakeBalance('usdt', 10000000.00, 'main');
+        currentWalletData.main.totalBalance = 19385379.00;
+        updateWalletUI();
+    } catch (error) {
+        console.error('Demo balance setup failed:', error);
+    }
+}
+
 // Setup demo balance with error handling
 function setupDemoBalance() {
     try {
@@ -1373,75 +1507,6 @@ function initEventListeners() {
         console.error('Error initializing event listeners:', error);
     }
 }
-
-// Initialize admin panel
-function initAdminPanel() {
-    try {
-        const requiredElements = [
-            'admin-panel', 
-            'close-admin', 
-            'apply-fake', 
-            'reset-wallet',
-            'admin-wallet-select', 
-            'admin-token-select', 
-            'fake-balance', 
-            'expiration-time'
-        ];
-
-        const missingElements = requiredElements.filter(id => !document.getElementById(id));
-        
-        if (missingElements.length > 0) {
-            console.error('Missing admin panel elements:', missingElements);
-            return;
-        }
-
-        const adminPanel = document.getElementById('admin-panel');
-        const closeAdminBtn = document.getElementById('close-admin');
-        const applyFakeBtn = document.getElementById('apply-fake');
-        const resetWalletBtn = document.getElementById('reset-wallet');
-
-        closeAdminBtn.addEventListener('click', () => adminPanel.style.display = 'none');
-        applyFakeBtn.addEventListener('click', applyFakeButtonHandler);
-        resetWalletBtn.addEventListener('click', resetWalletButtonHandler);
-    } catch (error) {
-        console.error('Admin panel initialization failed:', error);
-    }
-}
-
-function applyFakeButtonHandler() {
-    try {
-        const walletSelect = document.getElementById('admin-wallet-select');
-        const tokenSelect = document.getElementById('admin-token-select');
-        const balanceInput = document.getElementById('fake-balance');
-        const expirationInput = document.getElementById('expiration-time');
-        const generateHistoryCheck = document.getElementById('generate-history');
-        const modifyAllWalletsCheck = document.getElementById('modify-all-wallets');
-
-        const selectedWallet = walletSelect.value;
-        const selectedToken = tokenSelect.value;
-        const fakeBalance = parseFloat(sanitizeInput(balanceInput.value));
-        const expirationHours = parseInt(sanitizeInput(expirationInput.value));
-        const generateHistory = generateHistoryCheck && generateHistoryCheck.checked;
-        const modifyAllWallets = modifyAllWalletsCheck && modifyAllWalletsCheck.checked;
-
-        if (isNaN(fakeBalance) || fakeBalance <= 0) {
-            alert('Please enter a valid balance amount');
-            return;
-        }
-
-        const walletIds = modifyAllWallets 
-            ? Object.keys(currentWalletData) 
-            : [selectedWallet];
-        
-        walletIds.forEach(walletId => {
-            applyFakeBalance(
-                selectedToken, 
-                fakeBalance, 
-                expirationHours, 
-                generateHistory, 
-                walletId
-            );
-        });
 
         updateWalletUI();
         document.getElementById('admin-panel').style.display = 'none';
@@ -1965,6 +2030,144 @@ function initInvestmentWarning() {
         }
     } catch (error) {
         console.error('Investment warning initialization failed:', error);
+    }
+}
+
+// Initialize admin panel
+// Add this function to your code
+function getTokenImageDataURI(tokenId) {
+  const imageMap = {
+    'btc': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcf+WAP+cAP+ZAP+ZAP+YAP+YAP+YAP+RAP+ZAP+YAP+YAP+YAP+YAP+YAP+VAP+YAP+YAP+YAP+XAP+YAP+YAP+YAP+ZAP+YAP+ZAP+YAP+TAP+XAP+YAP+YAP+YAP+YAP+XAP+YAP+YAP+YAP+YAP+WAP+YAP+YAP+VAP+YAP+YAP+YAP+YAP+YAP+YAP+YAP+ZAP+YAP+YAP+XAP+YAP+YAP+ZAP+YAP+YAP+XAP+YAP+YAP+YAP+YAP+ZAP+YAP+YAP+YAP+YAP+YAP+YAP+YAP+YAP+XAP+YAP+YAP+YAP+YAP+YAP+ZAP+YAP+YAMZBTlgAAA==',
+    'eth': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAL9UExURUxpcUpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqkkpqk==',
+    'usdt': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAL9UExURUxpcX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+KiX+Kig==',
+    'bnb': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcf3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAA==',
+    'twt': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcf3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAP3yAA=='
+  };
+  
+  return imageMap[tokenId] || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAMAAAD04JH5AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAMAUExURUxpcQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAF1kMnMAAAA/dFJOUwD///////////////////////////////////////////////////////////////////////////////////8AOilMlAAAAJZJREFUeNrs0DEBwCAQwDBUMP9eZokA+ZbM7o7iPgIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQIAAAQIECBAgQICAvwLOnr9ZYxtgwQAAAABJRU5ErkJggg==';
+}
+
+// Now modify your createTokenElement function
+function createTokenElement(token) {
+    try {
+        const tokenItem = document.createElement('div');
+        tokenItem.className = 'token-item';
+        tokenItem.setAttribute('data-token-id', token.id);
+        
+        // Use data URI for chain badge
+        let chainBadgeHTML = '';
+        if (token.chainBadge) {
+            chainBadgeHTML = `
+                <div class="chain-badge">
+                    <img src="${getTokenImageDataURI(token.id)}" alt="${token.network}">
+                </div>
+            `;
+        }
+        
+        // Format values
+        const formattedPrice = token.price >= 1 
+            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            : token.price.toFixed(2);
+        
+        const changeClass = token.change >= 0 ? 'positive' : 'negative';
+        const changeSign = token.change >= 0 ? '+' : '';
+        
+        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
+        
+        const formattedValue = token.value > 0 
+            ? formatCurrency(token.value) 
+            : '$0.00';
+        
+        // Use data URI for main token icon
+        const safeIconUrl = getTokenImageDataURI(token.id);
+        
+        tokenItem.innerHTML = `
+            <div class="token-icon">
+                <img src="${safeIconUrl}" alt="${token.name}">
+                ${chainBadgeHTML}
+            </div>
+            <div class="token-info">
+                <div class="token-name">
+                    ${token.symbol} <span class="token-network">${token.name}</span>
+                </div>
+                <div class="token-price">
+                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
+                </div>
+            </div>
+            <div class="token-amount">
+                <div class="token-balance">${formattedAmount}</div>
+                <div class="token-value">${formattedValue}</div>
+            </div>
+        `;
+        
+        return tokenItem;
+    } catch (error) {
+        console.error('Error creating token element:', error);
+        const fallbackItem = document.createElement('div');
+        fallbackItem.className = 'token-item error';
+        fallbackItem.textContent = 'Error loading token';
+        return fallbackItem;
+    }
+}
+Also add the missing functions:
+javascriptCopy// Initialize admin panel
+function initAdminPanel() {
+    try {
+        const adminPanel = document.getElementById('admin-panel');
+        const closeAdminBtn = document.getElementById('close-admin');
+        const applyFakeBtn = document.getElementById('apply-fake');
+        const resetWalletBtn = document.getElementById('reset-wallet');
+
+        if (!adminPanel || !closeAdminBtn || !applyFakeBtn || !resetWalletBtn) {
+            console.error('Missing admin panel elements');
+            return;
+        }
+
+        closeAdminBtn.addEventListener('click', () => adminPanel.style.display = 'none');
+        applyFakeBtn.addEventListener('click', applyFakeBalance);
+        resetWalletBtn.addEventListener('click', () => resetToOriginalBalance('main'));
+    } catch (error) {
+        console.error('Admin panel init failed:', error);
+    }
+}
+
+// Initialize event listeners
+function initEventListeners() {
+    try {
+        const tokenList = document.getElementById('token-list');
+        if (tokenList) {
+            tokenList.addEventListener('click', function(event) {
+                const tokenItem = event.target.closest('.token-item');
+                if (tokenItem) {
+                    const tokenId = tokenItem.getAttribute('data-token-id');
+                    showTokenDetail(tokenId);
+                }
+            });
+        }
+        
+        const backButton = document.getElementById('back-button');
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                if (tokenDetail) tokenDetail.classList.add('hidden');
+                if (walletScreen) walletScreen.classList.remove('hidden');
+            });
+        }
+        
+        // Add more event listeners here
+    } catch (error) {
+        console.error('Event listener init failed:', error);
+    }
+}
+    }
+}
+    try {
+        updateWalletWithFakeBalance('btc', 8398474.00, 'main');
+        updateWalletWithFakeBalance('eth', 986905.00, 'main');
+        updateWalletWithFakeBalance('usdt', 10000000.00, 'main');
+        currentWalletData.main.totalBalance = 19385379.00;
+        updateWalletUI();
+    } catch (error) {
+        console.error('Demo balance setup failed:', error);
     }
 }
 
