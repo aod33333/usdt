@@ -263,38 +263,39 @@ button {
     padding-top: 24px; /* For status bar */
 }
 
-/* Warning banners */
+/* Updated Warning banners with fixes */
 .investment-warning {
-    width: 100%;
+    width: calc(100% - (2 * var(--space-md)));
     background-color: var(--tw-warning-bg);
     color: var(--tw-warning-text);
-    padding: var(--space-sm) var(--space-md);
-    margin-bottom: var(--space-sm);
-    border-radius: 0;
-    margin-top: -var(--space-md);
-    margin-left: var(--space-md);
-    margin-right: var(--space-md);
+    padding: 12px;
+    margin: 16px;
     border-radius: 8px;
-    max-width: calc(100% - (2 * var(--space-md)));
-    width: calc(100% - (2 * var(--space-md)));
+    border-left: 4px solid var(--tw-warning-text);
+    display: flex;
+    align-items: flex-start;
     box-sizing: border-box;
 }
 
 .investment-warning-content {
     display: flex;
     align-items: flex-start;
-    justify-content: center;
+    justify-content: flex-start; /* Changed from center */
+    width: 100%;
 }
 
 .warning-icon {
     font-size: 20px;
-    margin-right: var(--space-sm);
     color: var(--tw-warning-text);
     flex-shrink: 0;
+    margin-right: 12px; /* Increased from var(--space-sm) */
+    align-self: flex-start; /* Added for icon alignment */
+    margin-top: 4px; /* Better vertical alignment */
 }
 
 .investment-warning-text {
     flex: 1;
+    padding-right: 8px; /* Prevent text from touching close button */
 }
 
 .investment-warning-text p {
@@ -307,6 +308,8 @@ button {
 .learn-more {
     color: var(--tw-blue);
     text-decoration: underline;
+    display: inline-block; /* Better for text flow */
+    margin-top: 4px;
 }
 
 .close-warning {
@@ -315,7 +318,8 @@ button {
     background: none;
     border: none;
     padding: 0;
-    margin-left: var(--space-sm);
+    margin-left: auto; /* Pushes close button to right */
+    align-self: flex-start; /* Top alignment */
 }
 
 /* Main header */
