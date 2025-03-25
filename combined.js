@@ -436,59 +436,75 @@ function updateWalletUI() {
 
 // Token detail display function with error handling
 function showTokenDetail(tokenId) {
-    try {
-        // Get DOM elements with safety checks
-        tokenDetail = document.getElementById('token-detail');
-        walletScreen = document.getElementById('wallet-screen');
-        
-        if (!tokenDetail || !currentWalletData[activeWallet]) {
-            console.error('Token detail initialization failed');
-            return;
-        }
-        
-        // Get the token data
-        if (!currentWalletData || !currentWalletData[activeWallet]) {
-            console.error('Current wallet data not available');
-            return;
-        }
-        
-        const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-        if (!token) {
-            console.error('Token not found:', tokenId);
-            return;
-        }
-        
-        // Update all token details
-        const detailSymbol = document.getElementById('detail-symbol');
-        const detailFullname = document.getElementById('detail-fullname');
-        const tokenDetailIcon = document.getElementById('token-detail-icon');
-        const tokenBalanceAmount = document.getElementById('token-balance-amount');
-        const tokenBalanceValue = document.getElementById('token-balance-value');
-        const tokenStakingSymbol = document.getElementById('token-staking-symbol');
-        const tokenPriceSymbol = document.getElementById('token-price-symbol');
-        const tokenCurrentPrice = document.getElementById('token-current-price');
-        
-        if (detailSymbol) detailSymbol.textContent = token.symbol;
-        if (detailFullname) detailFullname.textContent = token.name;
-        if (tokenDetailIcon) tokenDetailIcon.src = token.icon;
-        if (tokenBalanceAmount) tokenBalanceAmount.textContent = `${token.amount.toFixed(6)} ${token.symbol}`;
-        if (tokenBalanceValue) tokenBalanceValue.textContent = formatCurrency(token.value);
-        if (tokenStakingSymbol) tokenStakingSymbol.textContent = token.symbol;
-        if (tokenPriceSymbol) tokenPriceSymbol.textContent = token.symbol;
-        if (tokenCurrentPrice) tokenCurrentPrice.textContent = `$${token.price.toLocaleString()}`;
-        
-        // Set price change class and value
-        const priceChangeElement = document.getElementById('token-price-change');
-        if (priceChangeElement) {
-            if (token.change >= 0) {
-                priceChangeElement.className = 'positive';
-                priceChangeElement.textContent = `+${token.change}%`;
-            } else {
-                priceChangeElement.className = 'negative';
-                priceChangeElement.textContent = `${token.change}%`;
-            }
-        }
-        
+   try {
+       tokenDetail = document.getElementById('token-detail');
+       walletScreen = document.getElementById('wallet-screen');
+       
+       if (!tokenDetail || !currentWalletData[activeWallet]) {
+           console.error('Token detail initialization failed');
+           return;
+       }
+       
+       const token = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+       if (!token) {
+           console.error('Token not found:', tokenId);
+           return;
+       }
+       
+       // Update token details
+       const elements = {
+           'detail-symbol': token.symbol,
+           'detail-fullname': token.name,
+           'token-balance-amount': `${token.amount.toFixed(6)} ${token.symbol}`,
+           'token-balance-value': formatCurrency(token.value),
+           'token-staking-symbol': token.symbol,
+           'token-price-symbol': token.symbol,
+           'token-current-price': `$${token.price.toLocaleString()}`
+       };
+       
+       Object.entries(elements).forEach(([id, value]) => {
+           const element = document.getElementById(id);
+           if (element) element.textContent = value;
+       });
+
+       // Update token icon
+       const tokenDetailIcon = document.getElementById('token-detail-icon');
+       if (tokenDetailIcon) tokenDetailIcon.src = token.icon;
+
+       // Update staking icon for all tokens
+       const stakingIcon = document.querySelector('.staking-icon img');
+       if (stakingIcon) {
+           stakingIcon.src = 'https://i.ibb.co/Ps8mYXGS/Screenshot-20250325-033954-Trust-Wallet.jpg';
+       }
+       
+       // Set price change
+       const priceChangeElement = document.getElementById('token-price-change');
+       if (priceChangeElement) {
+           priceChangeElement.className = token.change >= 0 ? 'positive' : 'negative';
+           priceChangeElement.textContent = `${token.change >= 0 ? '+' : ''}${token.change}%`;
+       }
+       
+       // Update gas fee
+       const gasFeeAmount = document.getElementById('gas-fee-amount');
+       if (gasFeeAmount) {
+           gasFeeAmount.textContent = token.id === 'eth' ? '$0.01' : '$0.00';
+       }
+       
+       // Show token detail
+       if (walletScreen) walletScreen.classList.add('hidden');
+       tokenDetail.classList.remove('hidden');
+       tokenDetail.style.display = 'flex';
+       
+       // Update transactions
+       const transactionList = document.getElementById('transaction-list');
+       if (transactionList && currentTransactions?.[activeWallet]?.[tokenId]) {
+           updateTransactionsForToken(tokenId);
+       }
+   } catch (error) {
+       console.error('Error showing token detail:', error);
+   }
+}
+
         // Update gas fee display for this token
         const gasFeeAmount = document.getElementById('gas-fee-amount');
         if (gasFeeAmount) {
