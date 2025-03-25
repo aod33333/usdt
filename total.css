@@ -2095,3 +2095,23 @@ button {
     padding: 2px !important;
     object-fit: contain !important;
 }
+
+/* Make bottom tabs visible on all screens */
+.bottom-tabs {
+    display: flex !important;
+    z-index: 100;
+}
+
+/* Add padding to content to prevent overlap with tabs */
+.token-detail-content {
+    padding-bottom: 70px;
+}
+
+.detail-header {
+    margin-top: 24px;
+    padding-top: 12px;
+}
+
+.token-detail-title {
+    padding: 8px 0;
+}
