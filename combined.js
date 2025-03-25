@@ -597,7 +597,7 @@ function createTokenElement(token) {
         if (token.chainBadge) {
             chainBadgeHTML = `
                 <div class="chain-badge">
-                    <img src="${getTokenImageDataURI(token.id)}" alt="${token.network}">
+                    <img src="${getTokenLogoUrl()(token.id)}" alt="${token.network}">
                 </div>
             `;
         }
