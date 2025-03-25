@@ -887,6 +887,34 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(applyFixes, 1000);
   setTimeout(applyFixes, 3000);
 });
- 
+
+ <script>
+// Force fix critical UI elements
+document.addEventListener('DOMContentLoaded', function() {
+  // Fix bottom tabs
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (bottomTabs) {
+    bottomTabs.style.display = 'flex';
+    bottomTabs.style.position = 'fixed';
+    bottomTabs.style.bottom = '0';
+    bottomTabs.style.width = '100%';
+    bottomTabs.style.zIndex = '999';
+    bottomTabs.style.visibility = 'visible';
+  }
+  
+  // Fix token detail header
+  const detailHeader = document.querySelector('.detail-header');
+  if (detailHeader) {
+    detailHeader.style.display = 'flex';
+    detailHeader.style.backgroundColor = '#FFFFFF';
+  }
+  
+  // Remove "BNB Smart Chain" text from token symbol
+  const detailSymbol = document.getElementById('detail-symbol');
+  if (detailSymbol && detailSymbol.textContent.includes('Smart Chain')) {
+    detailSymbol.textContent = detailSymbol.textContent.split(' ')[0];
+  }
+});
+</script>
 </body>
 </html>
