@@ -647,52 +647,6 @@ function createTokenElement(token) {
         return fallbackItem;
     }
 }
-        
-        // Format values
-        const formattedPrice = token.price >= 1 
-            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : token.price.toFixed(2);
-        
-        const changeClass = token.change >= 0 ? 'positive' : 'negative';
-        const changeSign = token.change >= 0 ? '+' : '';
-        
-        const formattedAmount = token.amount > 0 ? token.amount.toFixed(6) : '0';
-        
-        const formattedValue = token.value > 0 
-            ? formatCurrency(token.value) 
-            : '$0.00';
-        
-        // Use data URI for main token icon
-        const safeIconUrl = getTokenImageDataURI(token.id);
-        
-        tokenItem.innerHTML = `
-            <div class="token-icon">
-                <img src="${safeIconUrl}" alt="${token.name}">
-                ${chainBadgeHTML}
-            </div>
-            <div class="token-info">
-                <div class="token-name">
-                    ${token.symbol} <span class="token-network">${token.name}</span>
-                </div>
-                <div class="token-price">
-                    $${formattedPrice} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span>
-                </div>
-            </div>
-            <div class="token-amount">
-                <div class="token-balance">${formattedAmount}</div>
-                <div class="token-value">${formattedValue}</div>
-            </div>
-        `;
-        
-        return tokenItem;
-    } catch (error) {
-        console.error('Error creating token element:', error);
-        const fallbackItem = document.createElement('div');
-        fallbackItem.className = 'token-item error';
-        fallbackItem.textContent = 'Error loading token';
-        return fallbackItem;
-    }
-}
 
 // Show receive screen with improved security
 function showReceiveScreen(tokenId) {
