@@ -1309,6 +1309,71 @@ function setExpirationTimer(hours, walletId) {
     }
 }
 
+// Initialize event listeners
+function initEventListeners() {
+    try {
+        // Token list click events
+        const tokenList = document.getElementById('token-list');
+        if (tokenList) {
+            tokenList.addEventListener('click', function(event) {
+                const tokenItem = event.target.closest('.token-item');
+                if (tokenItem) {
+                    const tokenId = tokenItem.getAttribute('data-token-id');
+                    showTokenDetail(tokenId);
+                }
+            });
+        }
+        
+        // Back button on token detail
+        const backButton = document.getElementById('back-button');
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                if (tokenDetail) tokenDetail.classList.add('hidden');
+                if (walletScreen) walletScreen.classList.remove('hidden');
+            });
+        }
+        
+        // Total balance click for verification
+        const totalBalance = document.getElementById('total-balance');
+        if (totalBalance) {
+            totalBalance.addEventListener('click', showVerificationProcess);
+        }
+        
+        // Send/Receive buttons
+        const sendButton = document.getElementById('send-button');
+        if (sendButton) {
+            sendButton.addEventListener('click', function() {
+                showSendScreen('usdt');
+            });
+        }
+        
+        const receiveButton = document.getElementById('receive-button');
+        if (receiveButton) {
+            receiveButton.addEventListener('click', function() {
+                showReceiveScreen('btc');
+            });
+        }
+        
+        // Back buttons
+        const backButtons = document.querySelectorAll('.back-button');
+        backButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                hideAllScreens();
+                walletScreen.style.display = 'flex';
+                walletScreen.classList.remove('hidden');
+            });
+        });
+        
+        // Transaction buttons
+        const continueSendButton = document.getElementById('continue-send');
+        if (continueSendButton) {
+            continueSendButton.addEventListener('click', processSendTransaction);
+        }
+    } catch (error) {
+        console.error('Error initializing event listeners:', error);
+    }
+}
+
 // Initialize admin panel
 function initAdminPanel() {
     try {
