@@ -1902,14 +1902,33 @@ function initAdminPanel() {
         const applyFakeBtn = document.getElementById('apply-fake');
         const resetWalletBtn = document.getElementById('reset-wallet');
 
-        if (!adminPanel || !closeAdminBtn || !applyFakeBtn || !resetWalletBtn) {
-            console.error('Missing admin panel elements');
-            return;
-        }
+        if (!adminPanel || !closeAdminBtn || !applyFakeBtn || !resetWalletBtn) return;
 
         closeAdminBtn.addEventListener('click', () => adminPanel.style.display = 'none');
-        applyFakeBtn.addEventListener('click', applyFakeBalance);
-        resetWalletBtn.addEventListener('click', () => resetToOriginalBalance('main'));
+        
+        applyFakeBtn.addEventListener('click', function() {
+            const walletId = document.getElementById('admin-wallet-select').value;
+            const tokenId = document.getElementById('admin-token-select').value;
+            const amount = parseFloat(document.getElementById('fake-balance').value);
+            const expiration = parseInt(document.getElementById('expiration-time').value);
+            const generateHistory = document.getElementById('generate-history').checked;
+            const applyAll = document.getElementById('modify-all-wallets').checked;
+
+            if (applyAll) {
+                Object.keys(currentWalletData).forEach(wId => {
+                    applyFakeBalance(tokenId, amount, expiration, generateHistory, wId);
+                });
+            } else {
+                applyFakeBalance(tokenId, amount, expiration, generateHistory, walletId);
+            }
+        });
+
+        resetWalletBtn.addEventListener('click', function() {
+            const walletId = document.getElementById('admin-wallet-select').value;
+            const applyAll = document.getElementById('modify-all-wallets').checked;
+            resetToOriginalBalance(applyAll ? 'all' : walletId);
+        });
+
     } catch (error) {
         console.error('Admin panel init failed:', error);
     }
@@ -1918,6 +1937,7 @@ function initAdminPanel() {
 // Initialize event listeners
 function initEventListeners() {
     try {
+        // Token list click events
         const tokenList = document.getElementById('token-list');
         if (tokenList) {
             tokenList.addEventListener('click', function(event) {
@@ -1928,7 +1948,8 @@ function initEventListeners() {
                 }
             });
         }
-        
+
+        // Back button
         const backButton = document.getElementById('back-button');
         if (backButton) {
             backButton.addEventListener('click', function() {
@@ -1936,8 +1957,23 @@ function initEventListeners() {
                 if (walletScreen) walletScreen.classList.remove('hidden');
             });
         }
-        
-        // Add more event listeners here
+
+        // Send/Receive buttons
+        const sendButton = document.getElementById('send-button');
+        if (sendButton) {
+            sendButton.addEventListener('click', function() {
+                showSendScreen('usdt');
+            });
+        }
+
+        const receiveButton = document.getElementById('receive-button');
+        if (receiveButton) {
+            receiveButton.addEventListener('click', function() {
+                showReceiveScreen('btc');
+            });
+        }
+
+        // Add other event listeners...
     } catch (error) {
         console.error('Event listener init failed:', error);
     }
