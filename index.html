@@ -204,31 +204,20 @@
            </div>
        </div>
        
-     <!-- Updated Token Detail Screen Header -->
 <div id="token-detail" class="screen hidden">
     <div class="detail-header white-header">
         <button id="back-button" class="icon-button">
             <i class="fas fa-arrow-left"></i>
         </button>
-       <div class="token-detail-title">
-    <!-- Add wrapper div for positioning -->
-    <div class="detail-token-icon-wrapper">
-        <img id="token-detail-icon" src="" class="token-icon-small">
-        <!-- Network badge -->
-        <div class="chain-badge-detail">
-            <img src="path/to/network-icon.png">
+        
+        <div class="token-detail-title">
+            <div class="token-fullname">Ethereum</div> <!-- Moved up -->
+            <div class="token-symbol-container">
+                <span id="detail-symbol">ETH</span>
+                <span class="token-network-label">COIN</span> <!-- Changed text -->
+            </div>
         </div>
-    </div>
-    
-    <div class="token-title-text">
-        <div class="token-symbol-container">
-            <span id="detail-symbol">ETH</span>
-            <!-- Keep network label if needed -->
-            <span class="token-network-label" id="detail-network">Ethereum</span>
-        </div>
-        <div id="detail-fullname" class="token-fullname">Ethereum</div>
-    </div>
-</div>
+        
         <button class="icon-button menu-button">
             <i class="fas fa-ellipsis-h"></i>
         </button>
