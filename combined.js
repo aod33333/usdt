@@ -476,44 +476,36 @@ function showTokenDetail(tokenId) {
            // Get the header container
            const tokenDetailTitle = document.querySelector('.token-detail-title');
            if (tokenDetailTitle) {
-               // Remove the existing icon container if it exists
-               const iconContainer = tokenDetailTitle.querySelector('.token-icon-container');
-               if (iconContainer) {
-                   iconContainer.remove();
-               }
+               // Clear existing content
+               tokenDetailTitle.innerHTML = '';
                
-               // Update the content with proper formatting
-               const textContent = tokenDetailTitle.querySelector('.token-text-content');
-               if (textContent) {
-                   // First line: Token Symbol
-const symbolContainer = textContent.querySelector('.token-symbol-container');
-if (symbolContainer) {
-    const detailSymbol = symbolContainer.querySelector('#detail-symbol');
-    if (detailSymbol) {
-        detailSymbol.textContent = token.symbol;
-    }
-    
-    // Update network label instead of removing it
-    const networkLabel = symbolContainer.querySelector('.token-network-label');
-    if (networkLabel) {
-        networkLabel.textContent = token.network;
-    }
-}
-                   
-                   // Second line: "COIN | Network"
-                   const fullnameContainer = textContent.querySelector('#detail-fullname');
-                   if (fullnameContainer) {
-                       fullnameContainer.textContent = `COIN | ${token.name}`;
-                       // Style adjustments
-                       fullnameContainer.style.marginTop = '4px';
-                       fullnameContainer.style.fontSize = '12px';
-                       fullnameContainer.style.color = 'var(--tw-medium-gray)';
-                   }
-               }
+               // Create top line: Token Symbol only
+               const symbolContainer = document.createElement('div');
+               symbolContainer.className = 'token-symbol-container';
+               symbolContainer.style.marginBottom = '2px';
                
-               // Apply better styling
+               const detailSymbol = document.createElement('span');
+               detailSymbol.id = 'detail-symbol';
+               detailSymbol.textContent = token.symbol;
+               detailSymbol.style.fontWeight = '600';
+               detailSymbol.style.fontSize = '18px';
+               symbolContainer.appendChild(detailSymbol);
+               
+               // Create second line: "COIN | Token Name"
+               const fullnameContainer = document.createElement('div');
+               fullnameContainer.id = 'detail-fullname';
+               fullnameContainer.textContent = `COIN | ${token.name}`;
+               fullnameContainer.style.fontSize = '12px';
+               fullnameContainer.style.color = 'var(--tw-medium-gray)';
+               
+               // Add both elements to the title container
+               tokenDetailTitle.appendChild(symbolContainer);
+               tokenDetailTitle.appendChild(fullnameContainer);
+               
+               // Apply better styling to container
                tokenDetailTitle.style.flexDirection = 'column';
                tokenDetailTitle.style.alignItems = 'flex-start';
+               tokenDetailTitle.style.padding = '0';
                
                console.log('Token detail header updated successfully');
            }
@@ -551,20 +543,39 @@ if (symbolContainer) {
            updateTransactionsForToken(tokenId);
        }
 
-       // Add this in the showTokenDetail function, near the end:
-setTimeout(() => {
-  const bottomTabs = document.querySelector('.bottom-tabs');
-  if (bottomTabs) {
-    bottomTabs.setAttribute('style', 
-      'display: flex !important; ' +
-      'visibility: visible !important; ' +
-      'opacity: 1 !important; ' + 
-      'z-index: 9999 !important; ' +
-      'pointer-events: auto !important;');
-    
-    console.log('Bottom tabs forcibly shown');
-  }
-}, 100);
+       // Force bottom tabs to remain visible
+       setTimeout(() => {
+           const bottomTabs = document.querySelector('.bottom-tabs');
+           if (bottomTabs) {
+               // Move to end of document to ensure proper stacking
+               document.body.appendChild(bottomTabs);
+               
+               // Apply extensive forced styling
+               bottomTabs.setAttribute('style', 
+                   'display: flex !important; ' +
+                   'position: fixed !important; ' +
+                   'bottom: 0 !important; ' +
+                   'left: 0 !important; ' +
+                   'width: 100% !important; ' +
+                   'height: 60px !important; ' +
+                   'visibility: visible !important; ' +
+                   'opacity: 1 !important; ' + 
+                   'z-index: 10000 !important; ' +
+                   'pointer-events: auto !important; ' +
+                   'background-color: #FFFFFF !important; ' +
+                   'border-top: 1px solid #F5F5F5 !important;');
+               
+               // Ensure all tab items are also visible
+               const tabItems = bottomTabs.querySelectorAll('.tab-item');
+               tabItems.forEach(item => {
+                   item.style.display = 'flex';
+                   item.style.visibility = 'visible';
+                   item.style.opacity = '1';
+               });
+               
+               console.log('Bottom tabs forcibly shown and repositioned');
+           }
+       }, 100);
        
        // Ensure token detail content is visible
        try {
@@ -583,6 +594,7 @@ setTimeout(() => {
        console.error('Error showing token detail:', error);
    }
 }
+
 // Show send screen with improved error handling
 function showSendScreen(tokenId) {
     console.log('Showing send screen', tokenId);
