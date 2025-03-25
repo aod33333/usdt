@@ -2160,14 +2160,54 @@ document.addEventListener('DOMContentLoaded', function() {
         safeInit('Investment Warning', initInvestmentWarning);
         safeInit('Pull to Refresh', initPullToRefresh);
         
-        // Setup demo data
-        safeInit('Demo Balance', setupDemoBalance);
-        updateWalletUI();
-        
-        console.log('✅ INITIALIZATION COMPLETE');
-    } catch (globalError) {
-        console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
+   // Setup demo data
+safeInit('Demo Balance', setupDemoBalance);
+updateWalletUI();
+
+console.log('✅ INITIALIZATION COMPLETE');
+} catch (globalError) {
+    console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
+}
+
+// Add the diagnostic function
+function runDiagnostics() {
+  console.log('=== DIAGNOSTICS ===');
+  
+  // Check critical elements
+  const elements = [
+    'token-detail', 
+    'detail-symbol', 
+    'wallet-screen', 
+    'admin-panel',
+    'token-list'
+  ];
+  
+  elements.forEach(id => {
+    const element = document.getElementById(id);
+    console.log(`Element "${id}" exists:`, !!element);
+    if (element) {
+      console.log(`- Display:`, getComputedStyle(element).display);
+      console.log(`- Visibility:`, getComputedStyle(element).visibility);
+      console.log(`- Z-index:`, getComputedStyle(element).zIndex);
     }
+  });
+  
+  // Check event listeners
+  const tokenList = document.getElementById('token-list');
+  if (tokenList) {
+    console.log('Token list has children:', tokenList.children.length > 0);
+  }
+  
+  // Check global variables
+  console.log('Current wallet data:', !!window.currentWalletData);
+  console.log('Active wallet:', window.activeWallet);
+  
+  console.log('=== END DIAGNOSTICS ===');
+}
+
+// Run diagnostics after a delay
+setTimeout(runDiagnostics, 2000);
+
 });
 
 // Export key functions to window for global access
