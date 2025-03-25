@@ -2026,3 +2026,10 @@ button {
 :not(.token-list):not(#token-detail) .chain-badge-detail {
     display: none !important;
 }
+
+/* Change header background to white */
+.detail-header.white-header {
+    background: var(--tw-white) !important;
+    color: var(--tw-black) !important; /* Text color for dark mode compatibility */
+    border-bottom: 1px solid var(--tw-bg-gray); /* Optional: Add separator */
+}
