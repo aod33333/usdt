@@ -204,21 +204,26 @@
            </div>
        </div>
        
-       <!-- Token Detail Screen -->
-       <div id="token-detail" class="screen hidden">
-           <div class="detail-header">
-               <button id="back-button" class="icon-button">
-                   <i class="fas fa-arrow-left"></i>
-               </button>
-               <div class="token-detail-title">
-                   <span id="detail-symbol">ETH</span>
-                   <span class="token-separator">|</span>
-                   <span id="detail-fullname">Ethereum</span>
-               </div>
-               <button class="icon-button">
-                   <i class="fas fa-ellipsis-h"></i>
-               </button>
-           </div>
+     <!-- Updated Token Detail Screen Header -->
+<div id="token-detail" class="screen hidden">
+    <div class="detail-header white-header">
+        <button id="back-button" class="icon-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="token-detail-title">
+            <img id="token-detail-icon" src="" class="token-icon-small">
+            <div class="token-title-text">
+                <div class="token-symbol-container">
+                    <span id="detail-symbol">ETH</span>
+                    <span class="token-network-label" id="detail-network">Ethereum</span>
+                </div>
+                <div id="detail-fullname" class="token-fullname">Ethereum</div>
+            </div>
+        </div>
+        <button class="icon-button menu-button">
+            <i class="fas fa-ellipsis-h"></i>
+        </button>
+    </div>
 
            <!-- Warning Banner -->
            <div class="investment-warning token-warning">
