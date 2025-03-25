@@ -574,18 +574,17 @@ function showSendScreen(tokenId) {
 
 function getTokenLogoUrl(tokenId) {
     const logoUrls = {
-        'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-        'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-        'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-        'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
-        'twt': 'https://i.ibb.co/xPTTcgd/Trust-Wallet-Core-Logo-Blue.png',
-        'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-        'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
-        'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png'
+        'btc': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+        'eth': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+        'usdt': 'https://assets.coingecko.com/coins/images/325/large/tether.png',
+        'bnb': 'https://assets.coingecko.com/coins/images/825/large/binance-coin-logo.png',
+        'twt': 'https://i.ibb.co/5Wj0FKZX/Trust-Stacked-Logo-Blue.png',
+        'pol': 'https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png',
+        'xrp': 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png',
+        'trx': 'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png'
     };
-    return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
+    return logoUrls[tokenId] || 'https://assets.coingecko.com/coins/images/default.png';
 }
-
 // Now modify your createTokenElement function
 function createTokenElement(token) {
     try {
@@ -618,7 +617,7 @@ function createTokenElement(token) {
             : '$0.00';
         
         // Use data URI for main token icon
-        const safeIconUrl = getTokenImageDataURI(token.id);
+        const safeIconUrl = getTokenLogoUrl(token.id);
         
         tokenItem.innerHTML = `
             <div class="token-icon">
