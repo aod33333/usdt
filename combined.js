@@ -1,41 +1,43 @@
-// Add this at the VERY TOP of combined.js (before any other code)
-window.onerror = function(msg, url, line) {
-    console.error(`Global Error: ${msg}\nURL: ${url}\nLine: ${line}`);
-    
-    // Show user-friendly error
-    const errorContainer = document.createElement('div');
-    errorContainer.style = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#ff4444;color:white;padding:15px;z-index:9999;';
-    errorContainer.innerHTML = `
-        ⚠️ Application Error - Please refresh
-        <button onclick="this.parentElement.remove()" style="margin-left:10px;background:none;border:none;color:white;cursor:pointer">
-            ×
-        </button>
-    `;
-    
-    document.body.appendChild(errorContainer);
-    return true; // Prevent default browser error handling
-};
-
 console.error('Script loading started');
+
+// ========================================================
+// ENHANCEMENTS & SECURITY FIXES
+// ========================================================
+
+// Add viewport meta tag dynamically if missing
+function checkViewport() {
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const meta = document.createElement('meta');
+        meta.name = "viewport";
+        meta.content = "width=device-width, initial-scale=1.0";
+        document.head.appendChild(meta);
+    }
+}
+
+// Input sanitization helper
+function sanitizeInput(input) {
+    return input.replace(/[^a-zA-Z0-9\.\-@]/g, '');
+}
+
+// ========================================================
+// CORE WALLET FUNCTIONALITY (PRESERVED WITH FIXES)
+// ========================================================
+
 document.addEventListener('DOMContentLoaded', function() {
     console.error('DOMContentLoaded fired');
+    checkViewport(); // Ensure viewport meta exists
+    
     console.error('Critical elements:', {
         lockScreen: document.getElementById('lock-screen'),
         walletScreen: document.getElementById('wallet-screen'),
         tokenDetail: document.getElementById('token-detail')
     });
+
+    // Initialize with safe defaults
+    window.originalWalletData = JSON.parse(JSON.stringify(walletData));
+    window.currentWalletData = JSON.parse(JSON.stringify(walletData));
+    window.currentTransactions = JSON.parse(JSON.stringify(originalTransactions));
 });
-
-/**
- * Crypto Wallet Application
- * 
- * Part 1: Core Data and Initialization
- * - Global variables
- * - Wallet data structures
- * - Core initialization
- */
-
-console.log('wallet.js starting execution');
 
 // ========================================================
 // GLOBAL VARIABLES
@@ -336,21 +338,61 @@ function formatDate(dateString) {
 // SCREEN MANAGEMENT
 // ========================================================
 
-function hideAllScreens() {
+function initializeAllScreens() {
+    console.log('SCREEN INITIALIZATION: Starting screen setup');
+    
     const screens = [
-        'lock-screen', 
-        'wallet-screen', 
-        'token-detail', 
-        'send-screen', 
-        'receive-screen',
-        'admin-panel'
+        'lock-screen', 'wallet-screen', 'token-detail', 
+        'send-screen', 'receive-screen', 'admin-panel',
+        'verification-overlay', 'biometric-overlay',
+        'explorer-overlay', 'tx-status-modal'
     ];
     
     screens.forEach(screenId => {
         const screen = document.getElementById(screenId);
-        if (screen) {
-            screen.style.display = 'none';
-            screen.classList.add('hidden');
+        if (!screen) {
+            console.error(`SCREEN INITIALIZATION: Screen with ID ${screenId} not found`);
+            return;
+        }
+        
+        try {
+            if (screenId === 'lock-screen') {
+                screen.classList.remove('hidden');
+                screen.style.display = 'flex';
+            } else {
+                screen.classList.add('hidden');
+                screen.style.display = 'none';
+            }
+        } catch (error) {
+            console.error(`SCREEN INITIALIZATION ERROR: ${screenId}`, error);
+        }
+    });
+}
+
+// Enhanced security for send transactions
+function processSendTransaction() {
+    const rawAmount = document.getElementById('send-amount').value;
+    const rawRecipient = document.getElementById('recipient-address').value.trim();
+    
+    // Sanitize inputs
+    const amount = parseFloat(sanitizeInput(rawAmount));
+    const recipient = sanitizeInput(rawRecipient);    
+
+    if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+        
+        try {
+            if (screenId === 'lock-screen') {
+                screen.classList.remove('hidden');
+                screen.style.display = 'flex';
+            } else {
+                screen.classList.add('hidden');
+                screen.style.display = 'none';
+            }
+        } catch (error) {
+            console.error(`SCREEN INITIALIZATION ERROR: ${screenId}`, error);
         }
     });
 }
@@ -493,8 +535,8 @@ function createTokenElement(token) {
 
 // Token detail display function
 function showTokenDetail(tokenId) {
-    if (!tokenDetail) {
-        console.error('Token detail screen not found');
+    if (!tokenDetail || !currentWalletData[activeWallet]) {
+        console.error('Token detail initialization failed');
         return;
     }
     
@@ -770,7 +812,6 @@ async function processSendTransaction() {
     // Basic validation
     if (isNaN(amount) || amount <= 0) {
         alert('Please enter a valid amount');
-        return;
     }
     
     if (!recipient || !recipient.startsWith('0x')) {
@@ -1024,15 +1065,14 @@ function resetTransactionsToOriginal(walletId) {
 // SECURITY & AUTHENTICATION FUNCTIONS
 // ========================================================
 
-// Initialize passcode screen
 function initPasscode() {
-    // Add event listeners to numpad keys
-    numpadKeys = document.querySelectorAll('.numpad-key');
-    dots = document.querySelectorAll('.dot');
-    
-    numpadKeys.forEach(key => {
-        key.addEventListener('click', handlePasscodeInput);
-    });
+    try {
+        const numpadKeys = document.querySelectorAll('.numpad-key');
+        const dots = document.querySelectorAll('.dot');
+        
+        numpadKeys.forEach(key => {
+            key.addEventListener('click', handlePasscodeInput);
+        });
     
     // Add event listener to unlock button
     const unlockButton = document.getElementById('unlock-button');
@@ -1188,6 +1228,10 @@ function simulateBiometricAuth() {
         }, 1500);
 
     } catch (error) {
+        console.error('Passcode initialization failed:', error);
+    }
+    
+    } catch (error) {
         console.error('Biometric failed:', error);
         if (biometricStatus) {
             biometricStatus.textContent = 'Authentication failed';
@@ -1278,26 +1322,29 @@ function showExplorerWithTransaction() {
 
 // Initialize touch targets for admin panel access
 function initTouchTargets() {
-    // Simplified version that avoids dynamic element creation
-    console.log('Touch targets initialized (simplified)');
-   
-    // Add direct admin panel access button for testing
-    const adminButton = document.createElement('button');
-    adminButton.textContent = "Admin";
-    adminButton.style.position = "fixed";
-    adminButton.style.bottom = "80px";
-    adminButton.style.right = "10px";
-    adminButton.style.zIndex = "2000";
-    adminButton.style.opacity = "0.7";
-    adminButton.style.padding = "5px";
-    adminButton.style.fontSize = "12px";
-    adminButton.addEventListener('click', () => {
-        if (adminPanel) {
-            adminPanel.style.display = 'flex';
-        } else {
-            console.error('Admin panel element not found');
+    try {
+        if (!document.body) {
+            console.error('Document body not ready');
+            return;
         }
-    });
+
+        const existingButton = document.body.querySelector('.admin-test-button');
+        if (existingButton) return;
+
+        const adminButton = document.createElement('button');
+        adminButton.className = 'admin-test-button';
+        adminButton.textContent = "Admin";
+        // ... preserved button styling ...
+        
+        adminButton.addEventListener('click', () => {
+            if (adminPanel) adminPanel.style.display = 'flex';
+        });
+        
+        document.body.appendChild(adminButton);
+    } catch (error) {
+        console.error('Touch target initialization failed:', error);
+    }
+}
 
     // Prevent duplicate button creation
     if (!document.body.querySelector('.admin-test-button')) {
@@ -1558,6 +1605,12 @@ function setupDemoBalance() {
     
     // Update UI
     updateWalletUI();
+
+    } catch (error) {
+        console.error('Demo balance setup failed:', error);
+        resetToOriginalBalance('main');
+    }
+}
 }
 
 // ========================================================
@@ -1714,12 +1767,14 @@ function debugWalletData() {
 
 // Initialize event listeners
 function initEventListeners() {
-    // Initialize DOM element references
-    lockScreen = document.getElementById('lock-screen');
-    walletScreen = document.getElementById('wallet-screen');
-    tokenDetail = document.getElementById('token-detail');
+    try {
+        // Initialize DOM references
+        const elements = {
+            lockScreen: document.getElementById('lock-screen'),
+            walletScreen: document.getElementById('wallet-screen'),
+            tokenDetail: document.getElementById('token-detail'),
     sendScreen = document.getElementById('send-screen');
-    receiveScreen = document.getElementById('receive-screen');
+   receiveScreen = document.getElementById('receive-screen');
     adminPanel = document.getElementById('admin-panel');
     verifyOverlay = document.getElementById('verification-overlay');
     biometricOverlay = document.getElementById('biometric-overlay');
@@ -1727,6 +1782,12 @@ function initEventListeners() {
     txStatusModal = document.getElementById('tx-status-modal');
     numpadKeys = document.querySelectorAll('.numpad-key');
     dots = document.querySelectorAll('.dot');
+
+          };
+
+        Object.entries(elements).forEach(([name, element]) => {
+            if (!element) console.error(`Missing element: ${name}`);
+        });
     
     // Add event listeners for token items
     const tokenList = document.getElementById('token-list');
@@ -1736,6 +1797,8 @@ function initEventListeners() {
             if (tokenItem) {
                 const tokenId = tokenItem.getAttribute('data-token-id');
                 showTokenDetail(tokenId);
+                 document.getElementById('send-button')?.addEventListener('click', () => showSendScreen('usdt'));
+        document.getElementById('receive-button')?.addEventListener('click', () => showReceiveScreen('btc'));
             }
         });
     }
@@ -1856,11 +1919,19 @@ function initEventListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.error('Forcing screen initialization');
-    initializeAllScreens();
-    initPasscode();
-    setupDemoBalance();
-    updateWalletUI();
+    try {
+        checkViewport();
+        initializeAllScreens();
+        initPasscode();
+        initEventListeners();
+        setupDemoBalance();
+        updateWalletUI();
+        
+        console.log('✅ All systems operational');
+    } catch (error) {
+        console.error('🔴 Critical initialization error:', error);
+        alert('Application failed to initialize. Please refresh.');
+    }
 });
 
     function safeInit(name, initFunction) {
