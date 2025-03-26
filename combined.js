@@ -473,45 +473,6 @@ if (tokenDetailIcon) {
     // Use the same URL getter function that works on the main page
     tokenDetailIcon.src = getTokenLogoUrl(token.id);
 }
-
-       // Add this code after updating the token icon in showTokenDetail function
-
-// Handle network badge display for token detail page
-const tokenDetailIconContainer = document.querySelector('.token-detail-icon-container');
-if (tokenDetailIconContainer) {
-    // First, remove any existing badges
-    const existingBadges = tokenDetailIconContainer.querySelectorAll('.chain-badge');
-    existingBadges.forEach(badge => badge.remove());
-    
-    // Only add badge for specific tokens (TWT, BNB, USDT)
-    if (['twt', 'bnb', 'usdt'].includes(token.id)) {
-        // Create badge element
-        const badge = document.createElement('div');
-        badge.className = 'chain-badge';
-        
-        // Use BNB logo from allowed domain
-        badge.innerHTML = `<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Smart Chain">`;
-        
-        // Style the badge for proper overlay positioning
-        badge.style.position = 'absolute';
-        badge.style.bottom = '-6px';
-        badge.style.right = '-6px';
-        badge.style.width = '20px';
-        badge.style.height = '20px';
-        badge.style.borderRadius = '50%';
-        badge.style.border = '2px solid white';
-        badge.style.background = 'white';
-        badge.style.zIndex = '5';
-        badge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
-        
-        // Ensure container allows proper badge positioning
-        tokenDetailIconContainer.style.position = 'relative';
-        tokenDetailIconContainer.style.overflow = 'visible';
-        
-        // Add badge to the container
-        tokenDetailIconContainer.appendChild(badge);
-    }
-}
        
        // Update token detail header
        try {
@@ -639,6 +600,72 @@ if (tokenDetailIconContainer) {
        console.error('Error showing token detail:', error);
    }
 }
+
+// Add this to the VERY END of the showTokenDetail function:
+
+// Force add network badge with delay to ensure DOM is ready
+setTimeout(() => {
+    try {
+        // Get the token detail icon directly
+        const tokenDetailIcon = document.getElementById('token-detail-icon');
+        
+        if (tokenDetailIcon && ['twt', 'bnb', 'usdt'].includes(token.id)) {
+            // Get or create parent container with position relative
+            const parent = tokenDetailIcon.parentElement;
+            if (parent) {
+                console.log('Found token icon parent:', parent);
+                
+                // Remove any existing badges
+                const existingBadges = parent.querySelectorAll('.chain-badge');
+                existingBadges.forEach(badge => badge.remove());
+                
+                // Force parent to have position relative
+                parent.style.cssText += 'position: relative !important; overflow: visible !important;';
+                
+                // Create badge with IMPORTANT styles
+                const badge = document.createElement('div');
+                badge.className = 'chain-badge forced-badge';
+                badge.innerHTML = `<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">`;
+                
+                // Use !important for all styles to override anything else
+                badge.style.cssText = `
+                    position: absolute !important;
+                    bottom: -6px !important;
+                    right: -6px !important;
+                    width: 20px !important;
+                    height: 20px !important;
+                    border-radius: 50% !important;
+                    border: 2px solid white !important;
+                    background-color: white !important;
+                    z-index: 9999 !important;
+                    display: block !important;
+                    visibility: visible !important;
+                    pointer-events: none !important;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+                    opacity: 1 !important;
+                `;
+                
+                // Style the image inside badge
+                const badgeImg = badge.querySelector('img');
+                if (badgeImg) {
+                    badgeImg.style.cssText = `
+                        width: 100% !important;
+                        height: 100% !important;
+                        object-fit: contain !important;
+                        padding: 2px !important;
+                        display: block !important;
+                    `;
+                }
+                
+                // Force add to parent
+                parent.appendChild(badge);
+                console.log('Badge added successfully');
+            }
+        }
+    } catch (error) {
+        console.error('Error adding network badge:', error);
+    }
+}, 100); // Short delay to ensure DOM is ready
 
 // Show send screen with improved error handling
 function showSendScreen(tokenId) {
