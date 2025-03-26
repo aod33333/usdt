@@ -3640,3 +3640,15 @@ Here's the CSS to fix the USDT background issue in the history page:
   background: #c4c9cc;
   border-radius: 4px;
 }
+
+/* Add only this to total.css */
+#token-detail .token-detail-icon-container {
+  position: relative;
+}
+
+#token-detail .chain-badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  z-index: 10;
+}
