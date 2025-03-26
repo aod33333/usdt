@@ -2583,7 +2583,28 @@ button {
     height: 80px;
 }
 
-/* Token Detail Header Refinements */
+.investment-warning-text p {
+    font-size: 11px; /* Slightly smaller font size */
+    margin: 0;
+    line-height: 1.2; /* Tighter line height */
+    color: var(--tw-black);
+    text-align: left;
+}
+
+.investment-warning-text .learn-more {
+    margin-top: 2px; /* Reduce space above learn more link */
+    font-size: 11px; /* Match text size */
+}
+
+.investment-warning-content {
+    align-items: flex-start;
+    gap: 8px; /* Tighter gap between icon and text */
+}
+
+.warning-icon {
+    margin-top: 2px; /* Slight vertical alignment adjustment */
+    font-size: 16px; /* Slightly smaller icon */
+}/* Token Detail Header Refinements */
 .token-detail-title {
     display: flex;
     flex-direction: column;
@@ -2637,8 +2658,9 @@ button {
 
 .investment-warning-content {
     display: flex;
-    align-items: center;
+    align-items: flex-start; /* Align to top for better text alignment */
     width: 100%;
+    gap: 12px; /* Consistent spacing between icon and text */
 }
 
 .investment-warning-text {
