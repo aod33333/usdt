@@ -2455,3 +2455,29 @@ button {
   margin: 16px auto !important;
   max-width: 600px !important;
 }
+
+/* Push down balance section */
+.token-balance-container {
+  padding-top: 32px !important; /* Original: 0-16px */
+  margin-top: 24px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Adjust action buttons */
+.token-actions {
+  margin-top: 24px !important; /* Original: 16px */
+  gap: 12px !important; /* TW spacing */
+}
+
+/* Staking section positioning */
+.staking-promo {
+  margin: 24px 0 !important;
+  padding: 16px !important;
+  border-radius: 16px !important; /* TW card style */
+}
+
+/* Transaction list spacing */
+.transaction-list {
+  margin-top: 32px !important; /* Original: 24px */
+}
