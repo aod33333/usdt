@@ -1255,6 +1255,615 @@ function resetTransactionsToOriginal(walletId) {
     }
 }
 
+// Global transaction store - add this near the top of combined.js
+const globalTransactions = {
+    main: [],
+    secondary: [],
+    business: []
+};
+
+// Format date for transaction display
+function formatTransactionDate() {
+    const now = new Date();
+    const date = now.toISOString().split('T')[0];
+    const time = now.toTimeString().split(' ')[0].substring(0, 5);
+    return `${date} ${time}`;
+}
+
+// Add transaction to global store
+function addTransactionToGlobalStore(transaction, walletId) {
+    if (!globalTransactions[walletId]) {
+        globalTransactions[walletId] = [];
+    }
+    
+    // Add timestamp for sorting
+    const txWithTimestamp = {
+        ...transaction,
+        timestamp: new Date().getTime()
+    };
+    
+    // Add to beginning of array (newest first)
+    globalTransactions[walletId].unshift(txWithTimestamp);
+    
+    // Sort by timestamp (newest first)
+    globalTransactions[walletId].sort((a, b) => b.timestamp - a.timestamp);
+    
+    console.log(`Transaction added to ${walletId} wallet:`, txWithTimestamp);
+}
+
+// Modify processSendTransaction to use global store
+function processSendTransaction() {
+    try {
+        // Get elements with safety checks
+        const sendButton = document.getElementById('continue-send');
+        const sendScreen = document.getElementById('send-screen');
+        const txStatusModal = document.getElementById('tx-status-modal');
+        
+        if (!sendButton || !sendScreen || !txStatusModal) {
+            console.error('Missing required elements for transaction');
+            return;
+        }
+        
+        // Add loading state
+        sendButton.classList.add('loading');
+        
+        // Get and validate input values
+        const amountInput = document.getElementById('send-amount');
+        const recipientInput = document.getElementById('recipient-address');
+        
+        if (!amountInput || !recipientInput) {
+            alert('Form fields not found');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Sanitize inputs
+        const amount = parseFloat(sanitizeInput(amountInput.value));
+        const recipient = sanitizeInput(recipientInput.value.trim());
+        
+        // Basic validation
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        if (!recipient || !recipient.startsWith('0x')) {
+            alert('Please enter a valid recipient address');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Get the current token from active wallet
+        const currentWallet = currentWalletData[activeWallet];
+        const usdtToken = currentWallet.tokens.find(t => t.id === 'usdt');
+        
+        if (!usdtToken) {
+            alert('Token not found');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Check if we have enough balance
+        if (amount > usdtToken.amount) {
+            alert('Insufficient balance');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Close send modal
+        sendScreen.style.display = 'none';
+        
+        // Show transaction pending
+        txStatusModal.style.display = 'flex';
+        document.getElementById('tx-pending').classList.remove('hidden');
+        document.getElementById('tx-success').classList.add('hidden');
+        
+        // Generate random tx hash
+        const txHash = generateRandomTransactionHash();
+        
+        // Update UI elements
+        const txHashEl = document.getElementById('tx-hash');
+        const txAmountEl = document.getElementById('tx-amount');
+        const txToEl = document.getElementById('tx-to');
+        
+        if (txHashEl) txHashEl.textContent = txHash.substring(0, 10) + '...';
+        if (txAmountEl) txAmountEl.textContent = `${amount} USDT`;
+        if (txToEl) txToEl.textContent = `${recipient.substring(0, 6)}...`;
+        
+        // Find recipient wallet if it's one of our wallets
+        const walletAddresses = {
+            main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+            secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
+            business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
+        };
+        
+        let recipientWalletId = null;
+        for (const [walletId, address] of Object.entries(walletAddresses)) {
+            if (recipient === address) {
+                recipientWalletId = walletId;
+                break;
+            }
+        }
+        
+        // Transaction date
+        const txDate = formatTransactionDate();
+        
+        // Simulate blockchain confirmation (3-5 seconds)
+        setTimeout(() => {
+            try {
+                // Remove loading state
+                sendButton.classList.remove('loading');
+                
+                // Show success view
+                document.getElementById('tx-pending').classList.add('hidden');
+                document.getElementById('tx-success').classList.remove('hidden');
+                
+                // Update sender wallet balance
+                const newAmount = usdtToken.amount - amount;
+                usdtToken.amount = newAmount;
+                usdtToken.value = newAmount;
+                
+                // Update total balance
+                currentWallet.totalBalance -= amount;
+                
+                // Update recipient wallet if it's one of our wallets
+                if (recipientWalletId) {
+                    const recipientWallet = currentWalletData[recipientWalletId];
+                    const recipientToken = recipientWallet.tokens.find(t => t.id === 'usdt');
+                    
+                    if (recipientToken) {
+                        recipientToken.amount += amount;
+                        recipientToken.value += amount;
+                        recipientWallet.totalBalance += amount;
+                    }
+                }
+                
+                // Update UI
+                updateWalletUI();
+                
+                // Add transaction to sender history (both global and current)
+                const newSendTx = {
+                    id: 'tx-' + Date.now(),
+                    type: 'send',
+                    amount: amount,
+                    symbol: 'USDT',
+                    value: amount,
+                    date: txDate,
+                    from: walletAddresses[activeWallet],
+                    to: recipient,
+                    hash: txHash,
+                    token: 'usdt',
+                    tokenName: 'Tether',
+                    icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                };
+                
+                // Add to global transactions
+                addTransactionToGlobalStore(newSendTx, activeWallet);
+                
+                // Also add to current transactions for compatibility
+                if (!currentTransactions[activeWallet].usdt) {
+                    currentTransactions[activeWallet].usdt = [];
+                }
+                currentTransactions[activeWallet].usdt.unshift(newSendTx);
+                
+                // Add to recipient transactions if it's one of our wallets
+                if (recipientWalletId) {
+                    const newReceiveTx = {
+                        id: 'tx-' + (Date.now() + 1),
+                        type: 'receive',
+                        amount: amount,
+                        symbol: 'USDT',
+                        value: amount,
+                        date: txDate,
+                        from: walletAddresses[activeWallet],
+                        to: recipient,
+                        hash: txHash,
+                        token: 'usdt',
+                        tokenName: 'Tether',
+                        icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+                    };
+                    
+                    // Add to global transactions
+                    addTransactionToGlobalStore(newReceiveTx, recipientWalletId);
+                    
+                    // Also add to current transactions for compatibility
+                    if (!currentTransactions[recipientWalletId].usdt) {
+                        currentTransactions[recipientWalletId].usdt = [];
+                    }
+                    currentTransactions[recipientWalletId].usdt.unshift(newReceiveTx);
+                }
+                
+                // If detail view is open, update transactions
+                const tokenDetail = document.getElementById('token-detail');
+                if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
+                    updateTransactionsForToken('usdt');
+                }
+                
+                // If history view is open, update transactions
+                updateHistoryTransactionList();
+            } catch (finalError) {
+                console.error('Error completing transaction:', finalError);
+                alert('Transaction processing error');
+            }
+        }, 3000 + Math.random() * 2000); // Random time between 3-5 seconds
+    } catch (error) {
+        console.error('Transaction failed:', error);
+        alert('Transaction failed: ' + error.message);
+        
+        const sendButton = document.getElementById('continue-send');
+        if (sendButton) {
+            sendButton.classList.remove('loading');
+        }
+    }
+}
+
+// Modified generateFakeTransactionHistory to use global store
+function generateFakeTransactionHistory(totalAmount, tokenId, walletId) {
+    try {
+        // Validate parameters
+        if (isNaN(totalAmount) || totalAmount <= 0 || !tokenId || !walletId) {
+            console.error('Invalid parameters for fake transaction history');
+            return;
+        }
+        
+        // Clear existing transactions safely
+        if (!currentTransactions[walletId]) {
+            currentTransactions[walletId] = {};
+        }
+        
+        if (!currentTransactions[walletId][tokenId]) {
+            currentTransactions[walletId][tokenId] = [];
+        } else {
+            currentTransactions[walletId][tokenId] = [];
+        }
+        
+        // Safety for very large amounts
+        const safeAmount = Math.min(totalAmount, 999999999);
+        
+        // Create a series of fake incoming transactions to match the requested amount
+        const transactionCount = Math.min(10, Math.max(3, Math.floor(Math.log10(safeAmount) * 2)));
+        
+        // Generate random splits of the total amount
+        const amounts = splitAmountRandomly(safeAmount, transactionCount);
+        
+        // Get wallet addresses
+        const walletAddresses = {
+            main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+            secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
+            business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
+        };
+        
+        const currentWalletAddress = walletAddresses[walletId] || generateRandomAddress();
+        
+        // Get token information
+        const tokenInfo = getTokenInfo(tokenId);
+        
+        // Create fake transactions with realistic data
+        for (let i = 0; i < amounts.length; i++) {
+            const amount = amounts[i];
+            
+            // Calculate random date within the last 30 days, with newer transactions for larger amounts
+            const daysAgo = Math.floor((i / amounts.length) * 30) + Math.floor(Math.random() * 5);
+            const transactionDate = new Date();
+            transactionDate.setDate(transactionDate.getDate() - daysAgo);
+            
+            const formattedDate = transactionDate.toISOString().split('T')[0] + ' ' +
+                                  transactionDate.toTimeString().split(' ')[0].substring(0, 5);
+            
+            // Generate random addresses and transaction hash
+            const fromAddress = generateRandomAddress();
+            const hash = generateRandomTransactionHash();
+            
+            // Create transaction object
+            const transaction = {
+                id: 'fake-tx-' + Date.now() + i,
+                type: 'receive',
+                amount: parseFloat(amount.toFixed(6)),
+                symbol: tokenId.toUpperCase(),
+                value: parseFloat(amount.toFixed(2)),
+                date: formattedDate,
+                from: fromAddress,
+                to: currentWalletAddress,
+                hash: hash,
+                token: tokenId,
+                tokenName: tokenInfo.name,
+                icon: tokenInfo.icon,
+                timestamp: transactionDate.getTime()
+            };
+            
+            // Add to current transactions for compatibility
+            currentTransactions[walletId][tokenId].unshift(transaction);
+            
+            // Add to global transactions store
+            addTransactionToGlobalStore(transaction, walletId);
+        }
+        
+        // Sort transactions by date (newest first)
+        currentTransactions[walletId][tokenId].sort((a, b) => {
+            return new Date(b.date) - new Date(a.date);
+        });
+        
+        // Update UI if this is the active token in the active wallet
+        if (activeWallet === walletId) {
+            const tokenDetail = document.getElementById('token-detail');
+            if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
+                updateTransactionsForToken(tokenId);
+            }
+            
+            // Also update history page if it's visible
+            updateHistoryTransactionList();
+        }
+    } catch (error) {
+        console.error('Error generating fake transaction history:', error);
+    }
+}
+
+// Get token information
+function getTokenInfo(tokenId) {
+    const tokenInfo = {
+        'btc': {
+            name: 'Bitcoin',
+            icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
+        },
+        'eth': {
+            name: 'Ethereum',
+            icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
+        },
+        'usdt': {
+            name: 'Tether',
+            icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+        },
+        'bnb': {
+            name: 'BNB',
+            icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+        },
+        'pol': {
+            name: 'Polygon',
+            icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+        },
+        'trx': {
+            name: 'TRON',
+            icon: 'https://cryptologos.cc/logos/tron-trx-logo.png'
+        },
+        'twt': {
+            name: 'Trust Wallet Token',
+            icon: 'https://assets.trustwalletapp.com/blockchains/smartchain/assets/0x4B0F1812e5Df2A09796481Ff14017e6005508003/logo.png'
+        },
+        'xrp': {
+            name: 'XRP',
+            icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png'
+        }
+    };
+    
+    return tokenInfo[tokenId] || {
+        name: tokenId.toUpperCase(),
+        icon: 'https://cryptologos.cc/logos/default-logo.png'
+    };
+}
+
+// Reset transactions to original data with safety
+function resetTransactionsToOriginal(walletId) {
+    try {
+        if (walletId === 'all') {
+            // Reset all wallets to empty transactions
+            Object.keys(currentTransactions).forEach(wid => {
+                Object.keys(currentTransactions[wid]).forEach(tid => {
+                    currentTransactions[wid][tid] = [];
+                });
+            });
+            
+            // Also reset global transactions
+            Object.keys(globalTransactions).forEach(wid => {
+                globalTransactions[wid] = [];
+            });
+        } else {
+            // Reset specific wallet
+            if (currentTransactions[walletId]) {
+                Object.keys(currentTransactions[walletId]).forEach(tid => {
+                    currentTransactions[walletId][tid] = [];
+                });
+            }
+            
+            // Also reset global transactions for this wallet
+            if (globalTransactions[walletId]) {
+                globalTransactions[walletId] = [];
+            }
+        }
+        
+        // If token detail view is open, update the transactions
+        const tokenDetail = document.getElementById('token-detail');
+        if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
+            const detailSymbol = document.getElementById('detail-symbol');
+            if (detailSymbol) {
+                const activeTokenId = detailSymbol.textContent.toLowerCase();
+                updateTransactionsForToken(activeTokenId);
+            }
+        }
+        
+        // Also update history page if it's visible
+        updateHistoryTransactionList();
+    } catch (error) {
+        console.error('Error resetting transactions:', error);
+    }
+}
+
+// Function to update the history page transaction list
+function updateHistoryTransactionList(filter = 'all') {
+    const historyList = document.getElementById('history-transaction-list');
+    if (!historyList) return;
+    
+    // Clear existing transactions
+    historyList.innerHTML = '';
+    
+    // Get transactions for the active wallet
+    let transactions = globalTransactions[activeWallet] || [];
+    
+    // Apply filter if needed
+    if (filter !== 'all') {
+        transactions = transactions.filter(tx => tx.type === filter);
+    }
+    
+    // If no transactions, show empty state
+    if (transactions.length === 0) {
+        const emptyState = document.querySelector('.no-history');
+        if (emptyState) {
+            emptyState.classList.remove('hidden');
+        }
+        return;
+    } else {
+        const emptyState = document.querySelector('.no-history');
+        if (emptyState) {
+            emptyState.classList.add('hidden');
+        }
+    }
+    
+    // Create transaction elements
+    transactions.forEach(tx => {
+        const item = document.createElement('div');
+        item.className = `transaction-item transaction-${tx.type}`;
+        
+        item.innerHTML = `
+            <div class="transaction-token-icon">
+                <img src="${tx.icon || getTokenInfo(tx.token).icon}" alt="${tx.symbol}">
+            </div>
+            <div class="transaction-info">
+                <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.symbol}</div>
+                <div class="transaction-date">${tx.date}</div>
+            </div>
+            <div class="transaction-amount">
+                <div class="transaction-value ${tx.type === 'receive' ? 'positive' : 'negative'}">
+                    ${tx.type === 'receive' ? '+' : '-'}${tx.amount} ${tx.symbol}
+                </div>
+                <div class="transaction-usd">${formatCurrency(tx.value)}</div>
+            </div>
+        `;
+        
+        // Add click event to show transaction details
+        item.addEventListener('click', () => {
+            showTransactionDetails(tx);
+        });
+        
+        historyList.appendChild(item);
+    });
+}
+
+// Initialize history screen connections
+function initHistoryScreen() {
+    // Connect history tabs
+    const historyTabs = document.querySelectorAll('.history-tab');
+    historyTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            historyTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            const filterType = tab.getAttribute('data-tab');
+            updateHistoryTransactionList(filterType);
+        });
+    });
+    
+    // Connect wallet selector in history
+    const walletSelector = document.querySelector('.wallet-selector-small');
+    if (walletSelector) {
+        walletSelector.addEventListener('click', function() {
+            // Cycle through wallets
+            const walletNameEl = document.querySelector('.wallet-name-small');
+            
+            switch(activeWallet) {
+                case 'main':
+                    activeWallet = 'secondary';
+                    if (walletNameEl) walletNameEl.textContent = 'Mnemonic 2';
+                    break;
+                case 'secondary':
+                    activeWallet = 'business';
+                    if (walletNameEl) walletNameEl.textContent = 'Mnemonic 3';
+                    break;
+                default:
+                    activeWallet = 'main';
+                    if (walletNameEl) walletNameEl.textContent = 'Mnemonic 1';
+            }
+            
+            // Update active tab
+            const activeTab = document.querySelector('.history-tab.active');
+            const filterType = activeTab ? activeTab.getAttribute('data-tab') : 'all';
+            
+            // Update transactions
+            updateHistoryTransactionList(filterType);
+        });
+    }
+    
+    // Connect back button
+    const historyBackButton = document.querySelector('#history-screen .back-button');
+    if (historyBackButton) {
+        historyBackButton.addEventListener('click', function() {
+            document.getElementById('history-screen').style.display = 'none';
+            document.getElementById('history-screen').classList.add('hidden');
+            document.getElementById('wallet-screen').style.display = 'flex';
+            document.getElementById('wallet-screen').classList.remove('hidden');
+        });
+    }
+}
+
+// Connect the history button in quick actions
+function connectHistoryButton() {
+    const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+    if (historyBtn) {
+        historyBtn.addEventListener('click', function() {
+            // Hide wallet screen
+            document.getElementById('wallet-screen').style.display = 'none';
+            document.getElementById('wallet-screen').classList.add('hidden');
+            
+            // Show history screen
+            const historyScreen = document.getElementById('history-screen');
+            historyScreen.style.display = 'flex';
+            historyScreen.classList.remove('hidden');
+            
+            // Update transactions
+            updateHistoryTransactionList('all');
+        });
+    }
+}
+
+// Add initialization to document ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize history screen
+    initHistoryScreen();
+    
+    // Connect history button
+    connectHistoryButton();
+    
+    // Migrate existing transactions to global store (optional)
+    migrateExistingTransactions();
+});
+
+// Function to migrate existing transactions to global store
+function migrateExistingTransactions() {
+    try {
+        Object.keys(currentTransactions).forEach(walletId => {
+            Object.keys(currentTransactions[walletId]).forEach(tokenId => {
+                currentTransactions[walletId][tokenId].forEach(tx => {
+                    // Add token information to transaction
+                    const tokenInfo = getTokenInfo(tokenId);
+                    const transaction = {
+                        ...tx,
+                        token: tokenId,
+                        tokenName: tokenInfo.name,
+                        icon: tokenInfo.icon,
+                        timestamp: new Date(tx.date).getTime()
+                    };
+                    
+                    // Add to global store
+                    addTransactionToGlobalStore(transaction, walletId);
+                });
+            });
+        });
+        
+        console.log('Existing transactions migrated to global store');
+    } catch (error) {
+        console.error('Error migrating existing transactions:', error);
+    }
+}
+
 // ========================================================
 // ADMIN PANEL & BALANCE MANIPULATION
 // ========================================================
@@ -2339,6 +2948,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Setup demo data
         safeInit('Demo Balance', setupDemoBalance);
         updateWalletUI();
+
+        // Initialize transaction system
+safeInit('History Screen', initHistoryScreen);
+safeInit('History Button', connectHistoryButton);
+safeInit('Transaction Migration', migrateExistingTransactions);
         
         console.log('✅ INITIALIZATION COMPLETE');
     } catch (globalError) {
