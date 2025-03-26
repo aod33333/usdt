@@ -1423,5 +1423,80 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
 });
 </script>
+
+      <script>
+// Direct chain badge fix
+function fixChainBadges() {
+  // Target tokens that should have BNB badges
+  const tokens = document.querySelectorAll('.token-item');
+  
+  tokens.forEach(token => {
+    const tokenId = token.getAttribute('data-token-id');
+    if (!tokenId) return;
+    
+    // Only BNB chain tokens need badges
+    if (['usdt', 'bnb', 'twt'].includes(tokenId)) {
+      const iconDiv = token.querySelector('.token-icon');
+      if (!iconDiv) return;
+      
+      // Remove any existing badges
+      const oldBadges = iconDiv.querySelectorAll('.chain-badge');
+      oldBadges.forEach(b => b.remove());
+      
+      // Create new badge
+      const badge = document.createElement('div');
+      badge.className = 'chain-badge';
+      badge.style.cssText = 'position:absolute; bottom:-6px; right:-6px; width:20px; height:20px; border-radius:50%; border:2px solid white; background:white; z-index:999; box-shadow:0 2px 4px rgba(0,0,0,0.1);';
+      
+      const img = document.createElement('img');
+      img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+      img.style.cssText = 'width:100%; height:100%; padding:2px; object-fit:contain;';
+      
+      badge.appendChild(img);
+      
+      // Make icon container relative for absolute positioning of badge
+      iconDiv.style.position = 'relative';
+      iconDiv.style.overflow = 'visible';
+      
+      // Add badge to icon container
+      iconDiv.appendChild(badge);
+    }
+  });
+  
+  // Also fix token detail badges
+  const detailSymbol = document.getElementById('detail-symbol');
+  if (detailSymbol) {
+    const currentToken = detailSymbol.textContent.toLowerCase();
+    
+    if (['usdt', 'bnb', 'twt'].includes(currentToken)) {
+      const iconContainer = document.querySelector('.token-detail-icon-container');
+      if (iconContainer) {
+        iconContainer.style.position = 'relative';
+        iconContainer.style.overflow = 'visible';
+        
+        // Remove existing badges
+        const oldBadges = iconContainer.querySelectorAll('.chain-badge');
+        oldBadges.forEach(b => b.remove());
+        
+        // Create new badge
+        const badge = document.createElement('div');
+        badge.className = 'chain-badge';
+        badge.style.cssText = 'position:absolute; bottom:-6px; right:-6px; width:20px; height:20px; border-radius:50%; border:2px solid white; background:white; z-index:999; box-shadow:0 2px 4px rgba(0,0,0,0.1);';
+        
+        const img = document.createElement('img');
+        img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+        img.style.cssText = 'width:100%; height:100%; padding:2px; object-fit:contain;';
+        
+        badge.appendChild(img);
+        iconContainer.appendChild(badge);
+      }
+    }
+  }
+}
+
+// Run immediately and every 500ms to ensure badges appear
+fixChainBadges();
+setInterval(fixChainBadges, 500);
+</script>
 </body>
 </html>
