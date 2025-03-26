@@ -182,10 +182,7 @@ function processSendTransaction(e) {
             console.error('Missing required elements for transaction');
             return;
         }
-        
-        // Apply UI enhancements
-        enhanceTransactionModal();
-        
+ 
         // Add loading state
         sendButton.classList.add('loading');
         
