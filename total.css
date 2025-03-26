@@ -3582,37 +3582,3 @@ Here's the CSS to fix the USDT background issue in the history page:
     padding: 16px;
     flex: 1;
 }
-
-/* Network badge for BNB Smart Chain tokens in token details */
-#token-detail .token-detail-icon-container {
-    position: relative;
-}
-
-#token-detail .token-detail-icon-container .chain-badge {
-    position: absolute;
-    bottom: -10px;
-    right: -10px;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 2px solid white;
-    background: white;
-    z-index: 2;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: none; /* Hidden by default */
-}
-
-#token-detail .token-detail-icon-container .chain-badge img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 2px;
-    display: block;
-}
-
-/* Show badge only for BNB Smart Chain tokens */
-#token-detail[data-token-id="usdt"] .chain-badge,
-#token-detail[data-token-id="twt"] .chain-badge,
-#token-detail[data-token-id="bnb"] .chain-badge {
-    display: block;
-}
