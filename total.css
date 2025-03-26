@@ -2403,31 +2403,24 @@ button {
   background: rgba(0,0,0,0.05) !important;
 }
 
-/* Trust Wallet Header Standardization */
-.app-header {
-  max-width: 1200px !important; /* TW's exact max-width */
+/* 1. Header Dimensions (Trust Wallet Spec) */
+.header {
+  height: 64px !important; /* Exact TW height */
+  max-width: 1200px !important;
   margin: 0 auto !important;
-  padding: 0 24px !important; /* TW's side spacing */
-  height: 64px !important; /* TW's header height */
-  
-  /* Main page header styling replica */
-  border-bottom: 1px solid #e5e7eb !important;
-  background: rgba(255,255,255,0.95) !important;
-  backdrop-filter: blur(12px) !important;
+  padding: 0 24px !important;
 }
 
-/* Logo and Navigation Alignment */
-.header-content {
-  gap: 32px !important; /* TW's exact nav spacing */
-  padding: 0 12px !important;
+/* 2. Investment Banner Spacing */
+.investment-warning {
+  margin-top: 72px !important; /* 64px header + 8px gap */
+  border-radius: 12px !important;
+  max-width: 1200px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
-/* Wallet Name/Selector */
-.wallet-selector {
-  font-size: 16px !important; /* TW's base text */
-  font-weight: 500 !important;
-  color: #1f2937 !important; /* TW gray-800 */
-  padding: 8px 12px !important;
-  border-radius: 8px !important;
-  transition: all 0.2s !important;
+/* 3. Page Content Padding */
+.main-content {
+  padding-top: 24px !important; /* Space below banner */
 }
