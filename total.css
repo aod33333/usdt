@@ -3004,3 +3004,611 @@ Here's the CSS to fix the USDT background issue in the history page:
   position: relative !important;
   overflow: visible !important;
 }
+
+/* Trust Wallet UI Improvements - Add to the end of your CSS file */
+
+/* ===== 1. Global Styling ===== */
+:root {
+  /* Updated Trust Wallet Colors */
+  --tw-blue: #3375BB;
+  --tw-blue-light: #4D91DD;
+  --tw-blue-dark: #1F5BB6;
+  --tw-green: #05C46B;
+  --tw-red: #EB5757;
+  --tw-black: #1A2024;
+  --tw-dark-gray: #5F6C75;
+  --tw-medium-gray: #8A939D;
+  --tw-light-gray: #C4C9CC;
+  --tw-bg-gray: #F5F5F5;
+  --tw-off-white: #F8F8F8;
+  --tw-white: #FFFFFF;
+  
+  /* Enhanced Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== 2. Header & Navigation ===== */
+.status-bar {
+  background-color: transparent;
+  height: 28px;
+  padding-top: 4px;
+}
+
+.bottom-tabs {
+  height: 64px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  box-shadow: 0 -1px 2px rgba(0,0,0,0.05);
+}
+
+.tab-item {
+  padding: var(--space-sm) 0 var(--space-xs);
+}
+
+.tab-item i {
+  font-size: 24px;
+  margin-bottom: 6px;
+  transition: transform 0.2s ease;
+}
+
+.tab-item.active i {
+  transform: scale(1.1);
+}
+
+.tab-item span {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tab-item.active span {
+  font-weight: 600;
+}
+
+/* ===== 3. Main Wallet Screen ===== */
+.main-header {
+  height: 56px;
+  padding-top: 8px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.wallet-selector-container {
+  padding: var(--space-md) var(--space-md) var(--space-xs);
+}
+
+.wallet-name {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+}
+
+.balance-display {
+  padding: var(--space-sm) var(--space-md) var(--space-lg);
+  align-items: center;
+}
+
+.balance-amount {
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--tw-black);
+  transition: all 0.3s ease;
+}
+
+.visibility-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.03);
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
+/* ===== 4. Action Buttons ===== */
+.quick-actions {
+  padding: 0 var(--space-md) var(--space-lg);
+}
+
+.action-circle i {
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  background-color: rgba(51, 117, 187, 0.1);
+  color: var(--tw-blue);
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(51, 117, 187, 0.1);
+}
+
+.action-circle:active i {
+  transform: scale(0.95);
+}
+
+.action-circle span {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 8px;
+  color: var(--tw-black);
+}
+
+/* ===== 5. Token List Styling ===== */
+.token-list {
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+  background-color: var(--tw-white);
+  box-shadow: 0 -1px 0 rgba(0,0,0,0.05);
+}
+
+.token-item {
+  padding: var(--space-md) var(--space-md);
+  border-bottom: 1px solid rgba(0,0,0,0.03);
+  transition: background-color 0.15s ease;
+}
+
+.token-item:active {
+  background-color: rgba(0,0,0,0.02);
+}
+
+.token-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.token-name {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.token-network {
+  font-size: 12px;
+  color: var(--tw-medium-gray);
+  font-weight: 400;
+}
+
+.token-price {
+  font-size: 13px;
+  color: var(--tw-medium-gray);
+}
+
+.token-price-change {
+  font-weight: 600;
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+
+.token-price-change.positive {
+  background-color: rgba(5, 196, 107, 0.1);
+}
+
+.token-price-change.negative {
+  background-color: rgba(235, 87, 87, 0.1);
+}
+
+.token-balance {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.token-value {
+  font-size: 13px;
+  color: var(--tw-medium-gray);
+}
+
+/* ===== 6. Chain Badge Improvements ===== */
+.chain-badge {
+  display: block !important;
+  position: absolute !important;
+  bottom: -4px !important;
+  right: -4px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  border: 2px solid var(--tw-white) !important;
+  background-color: var(--tw-white) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  z-index: 5 !important;
+}
+
+.chain-badge img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  padding: 2px !important;
+}
+
+/* ===== 7. Investment Warning Banner ===== */
+.investment-warning {
+  background-color: rgba(212, 172, 13, 0.08);
+  border-left: 4px solid var(--tw-warning-text);
+  border-radius: 8px;
+  margin: 16px;
+  padding: 12px;
+}
+
+.warning-icon {
+  color: var(--tw-warning-text);
+  font-size: 16px;
+  margin-top: 2px;
+}
+
+.investment-warning-text p {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--tw-black);
+}
+
+.learn-more {
+  color: var(--tw-blue);
+  font-weight: 500;
+}
+
+/* ===== 8. Token Detail Screen ===== */
+#token-detail .detail-header {
+  background-color: var(--tw-white) !important;
+  color: var(--tw-black) !important;
+  border-bottom: 1px solid var(--tw-bg-gray);
+  padding: 12px 16px;
+  align-items: center;
+}
+
+.token-detail-icon-container {
+  margin: 24px auto 16px;
+  position: relative;
+}
+
+.token-detail-large-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.token-detail-balance h2 {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  letter-spacing: -0.3px;
+}
+
+.token-detail-balance p {
+  font-size: 18px;
+  color: var(--tw-dark-gray);
+}
+
+.token-detail-actions {
+  margin: 20px 0 16px;
+}
+
+.token-detail-actions .action-circle i {
+  width: 52px;
+  height: 52px;
+}
+
+.staking-container {
+  background-color: rgba(51, 117, 187, 0.06);
+  border-radius: 16px;
+  margin-bottom: 32px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.staking-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: var(--tw-blue);
+  opacity: 0.6;
+}
+
+.staking-content h3 {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.staking-content p {
+  font-size: 13px;
+  color: var(--tw-dark-gray);
+}
+
+.transaction-header {
+  padding: 0 var(--space-md) var(--space-sm);
+}
+
+.transaction-header h3 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.transaction-item {
+  padding: 16px;
+  border-radius: 8px;
+  margin: 0 var(--space-md) 8px;
+  border: 1px solid rgba(0,0,0,0.03);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+
+.transaction-type {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.transaction-date {
+  font-size: 12px;
+  color: var(--tw-medium-gray);
+}
+
+.transaction-value {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.transaction-usd {
+  font-size: 12px;
+  color: var(--tw-medium-gray);
+}
+
+/* ===== 9. Send & Receive Screens ===== */
+.screen-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-md);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.screen-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.back-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qr-code-container {
+  background-color: var(--tw-white);
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  margin: 24px 0;
+}
+
+.wallet-address {
+  background-color: rgba(0,0,0,0.02);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: monospace;
+  margin-bottom: 32px;
+  word-break: break-all;
+  text-align: center;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.action-round-button i {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(51, 117, 187, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--tw-blue);
+  font-size: 18px;
+  margin-bottom: 6px;
+  transition: all 0.2s ease;
+}
+
+.action-round-button:active i {
+  transform: scale(0.95);
+}
+
+.send-content, .receive-content {
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tw-black);
+  margin-bottom: 8px;
+}
+
+.address-input, .amount-input {
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,0.1);
+  height: 44px;
+  overflow: hidden;
+}
+
+.address-input input, .amount-input input {
+  font-size: 16px;
+  padding: 0 16px;
+  height: 100%;
+}
+
+.paste-button, .max-button {
+  color: var(--tw-blue);
+  font-weight: 600;
+  padding: 0 16px;
+}
+
+.scan-button {
+  width: 56px;
+  color: var(--tw-blue);
+  font-size: 20px;
+}
+
+.fee-options {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.fee-option {
+  flex: 1;
+  padding: 12px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.fee-option.active {
+  border-color: var(--tw-blue);
+  background-color: rgba(51, 117, 187, 0.08);
+}
+
+.fee-name {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.fee-value {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--tw-black);
+  margin-bottom: 4px;
+}
+
+.fee-time {
+  font-size: 12px;
+  color: var(--tw-medium-gray);
+}
+
+.send-button {
+  height: 44px;
+  border-radius: 8px;
+  background-color: var(--tw-blue);
+  color: var(--tw-white);
+  font-size: 15px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-align: center;
+  margin-top: 24px;
+}
+
+.send-button:active {
+  transform: scale(0.98);
+}
+
+/* ===== 10. Animations ===== */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.balance-amount.update {
+  animation: pulse 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.token-item {
+  animation: fadeIn 0.3s ease-out forwards;
+  animation-delay: calc(var(--index) * 0.05s);
+  opacity: 0;
+}
+
+/* ===== 11. Other Enhancements ===== */
+.search-bar {
+  border-radius: 12px;
+  height: 44px;
+  background-color: rgba(0,0,0,0.03);
+}
+
+.search-bar input {
+  font-size: 15px;
+}
+
+/* Make the token detail view cleaner */
+.token-detail-content {
+  padding: 0 var(--space-md) var(--space-lg);
+}
+
+.token-price-info {
+  border-top: 8px solid var(--tw-bg-gray);
+  margin-top: 32px;
+  padding-top: 24px;
+}
+
+#token-current-price {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+#token-price-change {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+#token-price-change.positive {
+  background-color: rgba(5, 196, 107, 0.1);
+}
+
+#token-price-change.negative {
+  background-color: rgba(235, 87, 87, 0.1);
+}
+
+.price-disclaimer {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--tw-medium-gray);
+  margin-top: 16px;
+}
+
+/* Add pull to refresh animation */
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.pull-indicator {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--tw-blue);
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  margin: 16px auto;
+  animation: rotate 1s linear infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.pull-indicator.visible {
+  opacity: 1;
+}
