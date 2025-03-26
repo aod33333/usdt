@@ -467,9 +467,12 @@ function showTokenDetail(tokenId) {
            if (element) element.textContent = value;
        });
 
-       // Update token icon
-       const tokenDetailIcon = document.getElementById('token-detail-icon');
-       if (tokenDetailIcon) tokenDetailIcon.src = token.icon;
+      // Update token icon
+const tokenDetailIcon = document.getElementById('token-detail-icon');
+if (tokenDetailIcon) {
+    // Use the same URL getter function that works on the main page
+    tokenDetailIcon.src = getTokenLogoUrl(token.id);
+}
 
        // Update token detail header
        try {
