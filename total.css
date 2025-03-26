@@ -955,7 +955,7 @@ button {
 
 /* Token Detail Screen */
 .detail-header {
-    background: linear-gradient(135deg, var(--tw-blue-dark), var(--tw-blue-light));
+    background: var(--tw-white) !important;
     padding: var(--space-md);
     display: flex;
     justify-content: space-between;
