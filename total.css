@@ -2755,3 +2755,63 @@ button {
     color: var(--tw-blue);
     margin-right: 5px;
 }
+
+.token-detail-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.token-detail-icon-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 32px;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.token-detail-large-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.chain-badge {
+    position: absolute;
+    bottom: -6px;
+    right: calc(50% - 40px);
+    width: 24px;
+    height: 24px;
+    z-index: 2;
+    border: 2px solid white;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.token-detail-balance {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 16px;
+    width: 100%;
+}
+
+.token-detail-balance h2 {
+    font-size: 28px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+.token-detail-balance p {
+    font-size: 16px;
+    color: var(--tw-dark-gray);
+    text-align: center;
+}
