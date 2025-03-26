@@ -1233,408 +1233,195 @@ fixBadges();
 setInterval(fixBadges, 1000);
 </script>0);
 
-      // Fix for token detail Send/Receive buttons and History page
+<script>
+// Simple direct fix - no complexity
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("Loading wallet interface fixes...");
-    
-    // Fix 1: Add proper event listeners to token detail Send/Receive buttons
-    function fixTokenDetailButtons() {
-        // Find all action buttons in token detail page
-        const tokenDetailActions = document.querySelectorAll('#token-detail .token-detail-actions .action-circle');
+    // FIXED APPROACH: Get elements once, use direct event handlers
+    setTimeout(function() {
+        // 1. Fix token detail send/receive buttons
+        const detailSendBtn = document.querySelector('#token-detail .token-detail-actions .action-circle:nth-child(1)');
+        const detailReceiveBtn = document.querySelector('#token-detail .token-detail-actions .action-circle:nth-child(2)');
         
-        if (tokenDetailActions && tokenDetailActions.length >= 5) {
-            console.log("Found token detail action buttons, attaching event listeners");
-            
-            // Send button (first button)
-            tokenDetailActions[0].addEventListener('click', function() {
-                const tokenSymbol = document.getElementById('detail-symbol');
-                const tokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : 'usdt';
-                console.log(`Send button clicked for token: ${tokenId}`);
+        if (detailSendBtn) {
+            detailSendBtn.onclick = function() {
+                // Hide token detail
+                document.getElementById('token-detail').style.display = 'none';
                 
-                if (typeof showSendScreen === 'function') {
-                    showSendScreen(tokenId);
-                } else {
-                    console.error("showSendScreen function not found");
-                    // Fallback implementation
-                    const sendScreen = document.getElementById('send-screen');
-                    if (sendScreen) {
-                        // Hide all screens
-                        document.querySelectorAll('.screen').forEach(screen => {
-                            screen.style.display = 'none';
-                            screen.classList.add('hidden');
-                        });
-                        
-                        // Update send screen title
-                        const sendTokenTitle = document.getElementById('send-token-title');
-                        if (sendTokenTitle) {
-                            sendTokenTitle.textContent = `Send ${tokenSymbol.textContent}`;
-                        }
-                        
-                        // Show send screen
-                        sendScreen.style.display = 'flex';
-                        sendScreen.classList.remove('hidden');
-                    }
-                }
-            });
-            
-            // Receive button (second button)
-            tokenDetailActions[1].addEventListener('click', function() {
-                const tokenSymbol = document.getElementById('detail-symbol');
-                const tokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : 'btc';
-                console.log(`Receive button clicked for token: ${tokenId}`);
+                // Show send screen
+                const sendScreen = document.getElementById('send-screen');
+                sendScreen.style.display = 'flex';
+                sendScreen.classList.remove('hidden');
                 
-                if (typeof showReceiveScreen === 'function') {
-                    showReceiveScreen(tokenId);
-                } else {
-                    console.error("showReceiveScreen function not found");
-                    // Fallback implementation
-                    const receiveScreen = document.getElementById('receive-screen');
-                    if (receiveScreen) {
-                        // Hide all screens
-                        document.querySelectorAll('.screen').forEach(screen => {
-                            screen.style.display = 'none';
-                            screen.classList.add('hidden');
-                        });
-                        
-                        // Show receive screen
-                        receiveScreen.style.display = 'flex';
-                        receiveScreen.classList.remove('hidden');
-                        
-                        // Update receive token name
-                        const receiveTokenName = document.getElementById('receive-token-name');
-                        if (receiveTokenName) {
-                            receiveTokenName.textContent = tokenSymbol.textContent;
-                        }
-                    }
+                // Update title if possible
+                const tokenSymbol = document.getElementById('detail-symbol');
+                const sendTitle = document.getElementById('send-token-title');
+                if (tokenSymbol && sendTitle) {
+                    sendTitle.textContent = `Send ${tokenSymbol.textContent}`;
                 }
-            });
-            
-            console.log("Token detail buttons configured successfully");
-        } else {
-            console.error("Token detail action buttons not found or incomplete");
+            };
         }
-    }
-    
-    // Fix 2: Set up History page functionality
-    function setupHistoryPage() {
-        // Find history button in quick actions
-        const historyButtons = document.querySelectorAll('.quick-actions .action-circle');
-        let historyButton = null;
         
-        historyButtons.forEach(button => {
-            const buttonText = button.querySelector('span')?.textContent?.trim();
-            if (buttonText === 'History') {
-                historyButton = button;
-            }
-        });
+        if (detailReceiveBtn) {
+            detailReceiveBtn.onclick = function() {
+                // Hide token detail
+                document.getElementById('token-detail').style.display = 'none';
+                
+                // Show receive screen
+                const receiveScreen = document.getElementById('receive-screen');
+                receiveScreen.style.display = 'flex';
+                receiveScreen.classList.remove('hidden');
+                
+                // Update name if possible
+                const tokenSymbol = document.getElementById('detail-symbol');
+                const receiveName = document.getElementById('receive-token-name');
+                if (tokenSymbol && receiveName) {
+                    receiveName.textContent = tokenSymbol.textContent;
+                }
+            };
+        }
         
-        if (historyButton) {
-            console.log("Found history button, attaching event listener");
-            
-            historyButton.addEventListener('click', function() {
-                console.log("History button clicked");
+        // 2. Fix history button
+        const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+        if (historyBtn) {
+            historyBtn.onclick = function() {
+                // Hide wallet screen
+                document.getElementById('wallet-screen').style.display = 'none';
+                
+                // Show history screen
                 const historyScreen = document.getElementById('history-screen');
+                historyScreen.style.display = 'flex';
+                historyScreen.classList.remove('hidden');
                 
-                if (historyScreen) {
-                    // Hide all other screens
-                    const screens = document.querySelectorAll('.screen');
-                    screens.forEach(screen => {
-                        screen.style.display = 'none';
-                        screen.classList.add('hidden');
-                    });
-                    
-                    // Create some sample transactions if the list is empty
-                    const historyList = document.getElementById('history-transaction-list');
-                    if (historyList && historyList.children.length === 0) {
-                        createSampleTransactions(historyList);
-                    }
-                    
-                    // Show history screen
-                    historyScreen.style.display = 'flex';
-                    historyScreen.classList.remove('hidden');
-                    
-                    // Set up history page navigation
-                    const historyBackButton = historyScreen.querySelector('.history-back-button');
-                    if (historyBackButton) {
-                        historyBackButton.addEventListener('click', function() {
-                            historyScreen.style.display = 'none';
-                            historyScreen.classList.add('hidden');
-                            document.getElementById('wallet-screen').style.display = 'flex';
-                            document.getElementById('wallet-screen').classList.remove('hidden');
-                        });
-                    }
-                    
-                    // Set up history tabs functionality
-                    const historyTabs = historyScreen.querySelectorAll('.history-tab');
-                    historyTabs.forEach(tab => {
-                        tab.addEventListener('click', function() {
-                            // Remove active class from all tabs
-                            historyTabs.forEach(t => t.classList.remove('active'));
-                            
-                            // Add active class to clicked tab
-                            tab.classList.add('active');
-                            
-                            // Filter transactions based on selected tab
-                            const filterType = tab.getAttribute('data-tab');
-                            const transactions = historyList.querySelectorAll('.transaction-item');
-                            
-                            transactions.forEach(tx => {
-                                if (filterType === 'all') {
-                                    tx.style.display = 'flex';
-                                } else if (filterType === 'sent' && tx.classList.contains('transaction-send')) {
-                                    tx.style.display = 'flex';
-                                } else if (filterType === 'received' && tx.classList.contains('transaction-receive')) {
-                                    tx.style.display = 'flex';
-                                } else {
-                                    tx.style.display = 'none';
-                                }
-                            });
-                        });
-                    });
-                } else {
-                    console.error("History screen element not found");
+                // Add sample transaction if empty
+                const historyList = document.getElementById('history-transaction-list');
+                if (historyList && historyList.children.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="transaction-item transaction-receive">
+                            <div class="transaction-token-icon">
+                                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-type">Received USDT</div>
+                                <div class="transaction-date">2024-03-15 14:32</div>
+                            </div>
+                            <div class="transaction-amount">
+                                <div class="transaction-value positive">+500 USDT</div>
+                                <div class="transaction-usd">$500.00</div>
+                            </div>
+                        </div>
+                        <div class="transaction-item transaction-send">
+                            <div class="transaction-token-icon">
+                                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+                            </div>
+                            <div class="transaction-info">
+                                <div class="transaction-type">Sent USDT</div>
+                                <div class="transaction-date">2024-03-12 09:15</div>
+                            </div>
+                            <div class="transaction-amount">
+                                <div class="transaction-value negative">-200 USDT</div>
+                                <div class="transaction-usd">$200.00</div>
+                            </div>
+                        </div>
+                    `;
                 }
-            });
-        } else {
-            console.error("History button not found");
+            };
         }
-    }
-    
-    // Create sample transactions for the history page
-    function createSampleTransactions(container) {
-        // Define some sample transactions
-        const transactions = [
-            {
-                type: 'receive',
-                token: 'USDT',
-                amount: 500,
-                value: 500.00,
-                date: '2024-03-15 14:32',
-                logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-            },
-            {
-                type: 'send',
-                token: 'USDT',
-                amount: 200,
-                value: 200.00,
-                date: '2024-03-12 09:15',
-                logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-            },
-            {
-                type: 'receive',
-                token: 'BTC',
-                amount: 0.05,
-                value: 4199.24,
-                date: '2024-03-10 16:45',
-                logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
-            },
-            {
-                type: 'receive',
-                token: 'BNB',
-                amount: 0.25,
-                value: 95.67,
-                date: '2024-03-05 11:23',
-                logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-            },
-            {
-                type: 'send',
-                token: 'ETH',
-                amount: 0.5,
-                value: 986.91,
-                date: '2024-03-01 08:05',
-                logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
-            }
-        ];
         
-        // Clear any existing transactions
-        container.innerHTML = '';
-        
-        // Add each transaction to the container
-        transactions.forEach(tx => {
-            const item = document.createElement('div');
-            item.className = `transaction-item transaction-${tx.type}`;
-            
-            item.innerHTML = `
-                <div class="transaction-token-icon">
-                    <img src="${tx.logo}" alt="${tx.token}">
-                </div>
-                <div class="transaction-info">
-                    <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.token}</div>
-                    <div class="transaction-date">${tx.date}</div>
-                </div>
-                <div class="transaction-amount">
-                    <div class="transaction-value ${tx.type === 'receive' ? 'positive' : 'negative'}">
-                        ${tx.type === 'receive' ? '+' : '-'}${tx.amount} ${tx.token}
-                    </div>
-                    <div class="transaction-usd">$${tx.value.toFixed(2)}</div>
-                </div>
-            `;
-            
-            // Add the transaction to the container
-            container.appendChild(item);
-        });
-        
-        console.log(`Created ${transactions.length} sample transactions`);
-    }
-    
-    // Fix 3: Fix send and receive screens navigation
-    function fixSendReceiveNavigation() {
-        // Fix back buttons in send/receive screens
-        const backButtons = document.querySelectorAll('.back-button');
-        backButtons.forEach(button => {
-            // Remove existing listeners to avoid duplicates
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            
-            newButton.addEventListener('click', function() {
-                console.log("Back button clicked");
+        // 3. Fix history back button
+        const historyBackBtn = document.querySelector('#history-screen .back-button');
+        if (historyBackBtn) {
+            historyBackBtn.onclick = function() {
+                // Hide history screen
+                document.getElementById('history-screen').style.display = 'none';
                 
-                // Hide all screens
-                const screens = document.querySelectorAll('.screen');
-                screens.forEach(screen => {
-                    screen.style.display = 'none';
-                    screen.classList.add('hidden');
-                });
-                
-                // If we're in token detail view, go back to token detail
-                const tokenDetail = document.getElementById('token-detail');
-                const tokenDetailDisplay = getComputedStyle(tokenDetail).display;
-                
-                if (tokenDetailDisplay !== 'none' && !tokenDetail.classList.contains('hidden')) {
-                    console.log("Returning to token detail view");
-                    tokenDetail.style.display = 'flex';
-                    tokenDetail.classList.remove('hidden');
-                } else {
-                    // Otherwise go back to wallet screen
-                    console.log("Returning to wallet screen");
-                    const walletScreen = document.getElementById('wallet-screen');
-                    walletScreen.style.display = 'flex';
-                    walletScreen.classList.remove('hidden');
-                }
-            });
-        });
-        
-        // Fix "Done" button in transaction success modal
-        const doneButton = document.getElementById('close-tx-success');
-        if (doneButton) {
-            doneButton.addEventListener('click', function() {
-                console.log("Transaction success close button clicked");
-                const txStatusModal = document.getElementById('tx-status-modal');
-                if (txStatusModal) {
-                    txStatusModal.style.display = 'none';
-                }
-                
-                // Return to wallet screen
-                const screens = document.querySelectorAll('.screen');
-                screens.forEach(screen => {
-                    screen.style.display = 'none';
-                    screen.classList.add('hidden');
-                });
-                
+                // Show wallet screen
                 const walletScreen = document.getElementById('wallet-screen');
                 walletScreen.style.display = 'flex';
                 walletScreen.classList.remove('hidden');
-            });
+            };
         }
         
-        // Fix explorer close button
-        const closeExplorer = document.getElementById('close-explorer');
-        if (closeExplorer) {
-            closeExplorer.addEventListener('click', function() {
-                const explorerOverlay = document.getElementById('explorer-overlay');
-                if (explorerOverlay) {
-                    explorerOverlay.style.display = 'none';
-                }
-            });
-        }
+        // 4. Fix send/receive back buttons
+        const backButtons = document.querySelectorAll('.back-button');
+        backButtons.forEach(btn => {
+            btn.onclick = function() {
+                // Get current screen
+                const currentScreen = btn.closest('.screen');
+                if (!currentScreen) return;
+                
+                // Hide current screen
+                currentScreen.style.display = 'none';
+                
+                // Show wallet screen
+                const walletScreen = document.getElementById('wallet-screen');
+                walletScreen.style.display = 'flex';
+                walletScreen.classList.remove('hidden');
+            };
+        });
         
-        // Fix verification close button
-        const closeVerification = document.getElementById('close-verification');
-        if (closeVerification) {
-            closeVerification.addEventListener('click', function() {
-                const verificationOverlay = document.getElementById('verification-overlay');
-                if (verificationOverlay) {
-                    verificationOverlay.style.display = 'none';
-                }
-            });
-        }
-    }
-    
-    // Fix 4: Fix continue button in send screen
-    function fixSendContinueButton() {
-        const continueButton = document.getElementById('continue-send');
-        if (continueButton) {
-            continueButton.addEventListener('click', function() {
-                console.log("Continue send button clicked");
-                
-                // If the original function exists, use it
-                if (typeof processSendTransaction === 'function') {
-                    processSendTransaction();
-                    return;
-                }
-                
-                // Otherwise use this fallback implementation
+        // 5. Fix "Continue" button in send screen
+        const continueBtn = document.getElementById('continue-send');
+        if (continueBtn) {
+            continueBtn.onclick = function() {
+                // Hide send screen
                 const sendScreen = document.getElementById('send-screen');
-                const txStatusModal = document.getElementById('tx-status-modal');
+                sendScreen.style.display = 'none';
                 
-                if (sendScreen && txStatusModal) {
-                    // Hide send screen
-                    sendScreen.style.display = 'none';
-                    
-                    // Show transaction pending
-                    txStatusModal.style.display = 'flex';
-                    document.getElementById('tx-pending').classList.remove('hidden');
-                    document.getElementById('tx-success').classList.add('hidden');
-                    
-                    // Generate a mock transaction hash
-                    const txHash = '0x' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                    
-                    // Update UI elements
-                    const txHashEl = document.getElementById('tx-hash');
-                    const txAmountEl = document.getElementById('tx-amount');
-                    const txToEl = document.getElementById('tx-to');
-                    
-                    if (txHashEl) txHashEl.textContent = txHash.substring(0, 10) + '...';
-                    
-                    const amountInput = document.getElementById('send-amount');
-                    const amount = amountInput ? parseFloat(amountInput.value) || 100 : 100;
-                    
-                    if (txAmountEl) txAmountEl.textContent = `${amount} USDT`;
-                    
-                    const recipientInput = document.getElementById('recipient-address');
-                    const recipient = recipientInput ? recipientInput.value.trim() : '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
-                    
-                    if (txToEl) txToEl.textContent = `${recipient.substring(0, 6)}...`;
-                    
-                    // Simulate blockchain confirmation (3 seconds)
-                    setTimeout(() => {
-                        // Show success view
-                        document.getElementById('tx-pending').classList.add('hidden');
-                        document.getElementById('tx-success').classList.remove('hidden');
-                        
-                        // Update token list to reflect the transaction
-                        try {
-                            const walletData = window.currentWalletData;
-                            const activeWallet = window.activeWallet || 'main';
-                            
-                            if (walletData && walletData[activeWallet]) {
-                                // Update USDT token data
-                                const token = walletData[activeWallet].tokens.find(t => t.id === 'usdt');
-                                if (token) {
-                                    token.amount = Math.max(0, token.amount - amount);
-                                    token.value = token.amount * token.price;
-                                }
-                                
-                                // Update total balance
-                                walletData[activeWallet].totalBalance = Math.max(0, walletData[activeWallet].totalBalance - amount);
-                                
-                                // If updateWalletUI function exists, call it
-                                if (typeof updateWalletUI === 'function') {
-                                    updateWalletUI();
-                                }
-                            }
-                        } catch (e) {
-                            console.error('Error updating wallet data:', e);
-                        }
+                // Show transaction status modal
+                const txModal = document.getElementById('tx-status-modal');
+                txModal.style.display = 'flex';
+                
+                // Show pending first
+                document.getElementById('tx-pending').classList.remove('hidden');
+                document.getElementById('tx-success').classList.add('hidden');
+                
+                // Set some values
+                document.getElementById('tx-hash').textContent = '0x8a65d...';
+                document.getElementById('tx-amount').textContent = '100 USDT';
+                document.getElementById('tx-to').textContent = '0x742d...';
+                
+                // After 3 seconds, show success
+                setTimeout(function() {
+                    document.getElementById('tx-pending').classList.add('hidden');
+                    document.getElementById('tx-success').classList.remove('hidden');
+                }, 3000);
+            };
+        }
+        
+        // 6. Fix "Done" button in transaction success
+        const doneBtn = document.getElementById('close-tx-success');
+        if (doneBtn) {
+            doneBtn.onclick = function() {
+                // Hide modal
+                document.getElementById('tx-status-modal').style.display = 'none';
+                
+                // Show wallet screen
+                const walletScreen = document.getElementById('wallet-screen');
+                walletScreen.style.display = 'flex';
+                walletScreen.classList.remove('hidden');
+            };
+        }
+        
+        // 7. Fix copy button in receive screen
+        const copyBtn = document.querySelector('.receive-actions .action-round-button:first-child');
+        if (copyBtn) {
+            copyBtn.onclick = function() {
+                alert('Address copied to clipboard');
+            };
+        }
+        
+        // 8. Fix chain badges on images
+        const badges = document.querySelectorAll('.chain-badge');
+        badges.forEach(badge => {
+            const img = badge.querySelector('img');
+            if (img) {
+                img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+            }
+        });
+        
+        console.log('Simple direct fixes applied successfully');
+    }, 1000);
+});
+</script>
 </body>
 </html>
