@@ -3640,30 +3640,3 @@ Here's the CSS to fix the USDT background issue in the history page:
   background: #c4c9cc;
   border-radius: 4px;
 }
-
-// Add this CSS to the bottom of your total.css file
-
-/* Fix for chain badges on token detail page */
-.token-detail-icon-container {
-  position: relative !important;
-  overflow: visible !important;
-}
-
-.token-detail-icon-container .chain-badge {
-  position: absolute !important;
-  bottom: -6px !important;
-  right: -6px !important;
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 50% !important;
-  border: 2px solid white !important;
-  background: white !important;
-  z-index: 999 !important;
-  display: block !important;
-}
-
-/* Hide badges on token pages that shouldn't have them */
-body:has(#detail-symbol:not([data-value="BNB"]):not([data-value="USDT"]):not([data-value="TWT"])) 
-.token-detail-icon-container .chain-badge {
-  display: none !important;
-}
