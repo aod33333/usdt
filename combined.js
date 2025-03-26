@@ -168,7 +168,8 @@ function processSendTransaction(e) {
     if (e && typeof e.preventDefault === 'function') {
         e.preventDefault();
         e.stopPropagation();
-    
+    }
+
     try {
         // Get elements with safety checks
         const sendButton = document.getElementById('continue-send');
