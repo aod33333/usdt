@@ -2705,3 +2705,53 @@ button {
     width: 80px;
     height: 80px;
 }
+
+/* Token Detail Header Text Sizing */
+.token-detail-title {
+    min-height: 48px;
+}
+
+#detail-symbol {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.token-network-label {
+    font-size: 11px;
+    color: var(--tw-medium-gray);
+}
+
+/* Warning Banner Text Spacing */
+.investment-warning-text p {
+    font-size: 11px;
+    margin: 0;
+    line-height: 1.2;
+    color: var(--tw-black);
+    text-align: left;
+}
+
+.investment-warning-text .learn-more {
+    margin-top: 2px;
+    font-size: 11px;
+}
+
+.investment-warning-content {
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.warning-icon {
+    margin-top: 2px;
+    font-size: 16px;
+}
+
+/* Gas Fee Indicator Styling */
+.gas-fee-indicator {
+    color: var(--tw-blue);
+    font-size: 12px;
+}
+
+.gas-fee-indicator i {
+    color: var(--tw-blue);
+    margin-right: 5px;
+}
