@@ -3582,3 +3582,22 @@ Here's the CSS to fix the USDT background issue in the history page:
     padding: 16px;
     flex: 1;
 }
+
+/* Fix history page header padding - add to bottom of total.css */
+#history-screen .screen-header {
+    margin-top: 24px; /* Match status bar height */
+    padding-top: 12px;
+}
+
+/* Reduce font size for token details description */
+#detail-fullname {
+    font-size: 11px !important;
+    color: var(--tw-medium-gray) !important;
+    margin-top: 2px !important;
+    line-height: 1.2 !important;
+}
+
+/* Add space between grey line and token details */
+.token-detail-title {
+    padding: 8px 0 12px 0 !important;
+}
