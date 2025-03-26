@@ -3002,53 +3002,6 @@ safeInit('Transaction Migration', migrateExistingTransactions);
     setTimeout(runDiagnostics, 2000);
 });
 
-// Add this to the bottom of your JS file as a separate function
-function fixDetailPageBadgesOnce() {
-  // Get all images in the page
-  const allImages = document.querySelectorAll('img');
-  
-  // Look for the large token icon
-  allImages.forEach(img => {
-    if (img.classList.contains('token-detail-large-icon')) {
-      // Found the main token image on detail page
-      console.log('Found token image:', img);
-      
-      // Get parent
-      const parent = img.parentElement;
-      if (!parent) return;
-      
-      // Make parent handle absolute positioning
-      parent.setAttribute('style', 'position: relative !important; overflow: visible !important;');
-      
-      // Current token
-      const symbol = document.getElementById('detail-symbol')?.textContent;
-      console.log('Token symbol:', symbol);
-      
-      // Only add badge for these tokens
-      if (['BNB', 'USDT', 'TWT'].includes(symbol)) {
-        // Create completely new badge
-        const badge = document.createElement('div');
-        badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png">';
-        badge.style.cssText = 'position: absolute; bottom: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid white; background: white; z-index: 9999;';
-        badge.querySelector('img').style.cssText = 'width: 100%; height: 100%; padding: 2px; object-fit: contain;';
-        
-        // Add to parent
-        parent.appendChild(badge);
-        console.log('Badge created from scratch');
-      }
-    }
-  });
-}
-
-// Call this function whenever you want the badge fixed
-document.addEventListener('click', function(e) {
-  // Only run if we're on token detail page and it has a visible large icon
-  if (document.querySelector('.token-detail-large-icon') && 
-      !document.getElementById('token-detail').classList.contains('hidden')) {
-    fixDetailPageBadgesOnce();
-  }
-});
-
 // Export key functions to window for global access
 window.hideAllScreens = hideAllScreens;
 window.showScreen = showScreen;
