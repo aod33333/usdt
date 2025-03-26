@@ -2971,3 +2971,36 @@ Here's the CSS to fix the USDT background issue in the history page:
   height: 2px;
   background-color: #3375BB;
 }
+
+/* Force chain badges to display with correct images */
+.chain-badge {
+  display: block !important;
+  position: absolute !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  border: 2px solid #FFFFFF !important;
+  background: #FFFFFF !important;
+  z-index: 99 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: visible !important;
+}
+
+/* Fix the BNB badge image specifically */
+.chain-badge img[src*="bnb-bnb-logo"], 
+.chain-badge[data-network="bsc"] img,
+.chain-badge[data-network="bnb-smart-chain"] img {
+  content: url('https://cryptologos.cc/logos/bnb-bnb-logo.png') !important;
+  width: 100% !important;
+  height: 100% !important;
+  padding: 2px !important;
+}
+
+/* Ensure parent elements allow badges to display */
+.token-icon, .token-detail-icon-container {
+  position: relative !important;
+  overflow: visible !important;
+}
