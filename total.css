@@ -2402,3 +2402,34 @@ button {
 .close-warning:hover {
   background: rgba(0,0,0,0.05) !important;
 }
+
+/* 1. Header - Exact Trust Wallet Style */
+.header {
+  height: 56px !important;
+  max-width: 100% !important;
+  padding: 0 16px !important;
+  background: #ffffff !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* 2. Investment Warning - Match Main Page */
+.investment-warning {
+  background: #fffbeb !important;
+  color: #92400e !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  margin: 8px 16px !important;
+  font-size: 14px !important;
+  border: 1px solid #fde68a !important;
+}
+
+/* 3. Close Button - Standard Style */
+.close-warning {
+  color: #92400e !important;
+  position: absolute !important;
+  right: 16px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
