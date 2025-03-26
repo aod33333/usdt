@@ -2402,25 +2402,3 @@ button {
 .close-warning:hover {
   background: rgba(0,0,0,0.05) !important;
 }
-
-/* 1. Header Dimensions (Trust Wallet Spec) */
-.header {
-  height: 64px !important; /* Exact TW height */
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 0 24px !important;
-}
-
-/* 2. Investment Banner Spacing */
-.investment-warning {
-  margin-top: 72px !important; /* 64px header + 8px gap */
-  border-radius: 12px !important;
-  max-width: 1200px !important;
-  margin-left: auto !important;
-  margin-right: auto !important;
-}
-
-/* 3. Page Content Padding */
-.main-content {
-  padding-top: 24px !important; /* Space below banner */
-}
