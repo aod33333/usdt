@@ -3311,105 +3311,108 @@ function standardizeWarningBanners() {
     }
 }
 
-// Main entry point - DOMContentLoaded event
 document.addEventListener('DOMContentLoaded', function() {
-    try {
-        console.log('DOM Content Loaded - Starting initialization...');
-        
-        // Log critical elements status
-        const criticalElements = {
-            adminPanel: document.getElementById('admin-panel'),
-            lockScreen: document.getElementById('lock-screen'),
-            walletScreen: document.getElementById('wallet-screen'),
-            tokenDetail: document.getElementById('token-detail')
-        };
-        
-        console.log('DOM Elements Status:', 
-            Object.entries(criticalElements)
-                  .map(([k,v]) => `${k}: ${v ? '✓' : '❌'}`)
-                  .join(', ')
-        );
-        
-        // Assign to window for global access
-        Object.assign(window, criticalElements);
-        
-        // Initialize in sequence with error handling
-        checkViewport();
-        
-        // Initialize all main components safely
-        safeInit('Screen Initialization', initializeAllScreens);
-        safeInit('Touch Targets', initTouchTargets);
-        safeInit('Passcode', initPasscode);
-        safeInit('Admin Panel', initAdminPanel);
-        safeInit('Wallet Selector', initWalletSelector);
-        safeInit('Event Listeners', initEventListeners);
-        safeInit('Investment Warning', initInvestmentWarning);
-        safeInit('Pull to Refresh', initPullToRefresh);
-        
-        // Add our new fixes
-        safeInit('Adjust Bottom Buttons', adjustBottomButtons);
-        safeInit('Standardize Warnings', standardizeWarningBanners);
-        
-        // Setup demo data
-        safeInit('Demo Balance', setupDemoBalance);
-        updateWalletUI();
+   try {
+       console.log('DOM Content Loaded - Starting initialization...');
+       
+       // Log critical elements status
+       const criticalElements = {
+           adminPanel: document.getElementById('admin-panel'),
+           lockScreen: document.getElementById('lock-screen'),
+           walletScreen: document.getElementById('wallet-screen'),
+           tokenDetail: document.getElementById('token-detail')
+       };
+       
+       console.log('DOM Elements Status:', 
+           Object.entries(criticalElements)
+                 .map(([k,v]) => `${k}: ${v ? '✓' : '❌'}`)
+                 .join(', ')
+       );
+       
+       // Assign to window for global access
+       Object.assign(window, criticalElements);
+       
+       // Initialize in sequence with error handling
+       checkViewport();
+       
+       // Initialize all main components safely
+       safeInit('Screen Initialization', initializeAllScreens);
+       safeInit('Touch Targets', initTouchTargets);
+       safeInit('Passcode', initPasscode);
+       safeInit('Admin Panel', initAdminPanel);
+       safeInit('Wallet Selector', initWalletSelector);
+       safeInit('Event Listeners', initEventListeners);
+       safeInit('Investment Warning', initInvestmentWarning);
+       safeInit('Pull to Refresh', initPullToRefresh);
+       
+       // Add our new fixes
+       safeInit('Adjust Bottom Buttons', adjustBottomButtons);
+       safeInit('Standardize Warnings', standardizeWarningBanners);
+       
+       // Setup demo data
+       safeInit('Demo Balance', setupDemoBalance);
+       updateWalletUI();
 
-        // Initialize transaction system
-safeInit('History Screen', initHistoryScreen);
-safeInit('History Button', connectHistoryButton);
-safeInit('Transaction Migration', migrateExistingTransactions);
-
-         // Connect continue send button
-        const continueButton = document.getElementById('continue-send');
-        if (continueButton) {
-            continueButton.addEventListener('click', processSendTransaction);
-        }
+       // Initialize transaction system
+       safeInit('History Screen', initHistoryScreen);
+       safeInit('History Button', connectHistoryButton);
+       safeInit('Transaction Migration', migrateExistingTransactions);
         
-        console.log('✅ INITIALIZATION COMPLETE');
-    } catch (globalError) {
-        console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
-    }
-    
-    // Add the diagnostic function
-    function runDiagnostics() {
-      console.log('=== DIAGNOSTICS ===');
-      
-      // Check critical elements
-      const elements = [
-        'token-detail', 
-        'detail-symbol', 
-        'wallet-screen', 
-        'admin-panel',
-        'token-list'
-      ];
-      
-      elements.forEach(id => {
-        const element = document.getElementById(id);
-        console.log(`Element "${id}" exists:`, !!element);
-        if (element) {
-          console.log(`- Display:`, getComputedStyle(element).display);
-          console.log(`- Visibility:`, getComputedStyle(element).visibility);
-          console.log(`- Z-index:`, getComputedStyle(element).zIndex);
-        }
-      });
-      
-      // Check event listeners
-      const tokenList = document.getElementById('token-list');
-      if (tokenList) {
-        console.log('Token list has children:', tokenList.children.length > 0);
-      }
-      
-      // Check global variables
-      console.log('Current wallet data:', !!window.currentWalletData);
-      console.log('Active wallet:', window.activeWallet);
-      
-      console.log('=== END DIAGNOSTICS ===');
-    }
-    
-    // Run diagnostics after a delay
-    setTimeout(runDiagnostics, 2000);
+       // Connect continue send button with event prevention
+       const continueButton = document.getElementById('continue-send');
+       if (continueButton) {
+           continueButton.addEventListener('click', function(e) {
+               e.preventDefault();
+               e.stopPropagation();
+               processSendTransaction();
+           });
+       }
+       
+       console.log('✅ INITIALIZATION COMPLETE');
+   } catch (globalError) {
+       console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
+   }
+   
+   // Diagnostic function
+   function runDiagnostics() {
+     console.log('=== DIAGNOSTICS ===');
+     
+     // Check critical elements
+     const elements = [
+       'token-detail', 
+       'detail-symbol', 
+       'wallet-screen', 
+       'admin-panel',
+       'token-list'
+     ];
+     
+     elements.forEach(id => {
+       const element = document.getElementById(id);
+       console.log(`Element "${id}" exists:`, !!element);
+       if (element) {
+         console.log(`- Display:`, getComputedStyle(element).display);
+         console.log(`- Visibility:`, getComputedStyle(element).visibility);
+         console.log(`- Z-index:`, getComputedStyle(element).zIndex);
+       }
+     });
+     
+     // Check event listeners
+     const tokenList = document.getElementById('token-list');
+     if (tokenList) {
+       console.log('Token list has children:', tokenList.children.length > 0);
+     }
+     
+     // Check global variables
+     console.log('Current wallet data:', !!window.currentWalletData);
+     console.log('Active wallet:', window.activeWallet);
+     
+     console.log('=== END DIAGNOSTICS ===');
+   }
+   
+   // Run diagnostics after a delay
+   setTimeout(runDiagnostics, 2000);
 
-    fixTransactionModal();
+   fixTransactionModal();
 });
 
 // Export key functions to window for global access
