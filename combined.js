@@ -837,32 +837,108 @@ function updateTransactionsForToken(tokenId) {
     }
 }
 
-// Create transaction element with security protections
-function createTransactionElement(transaction) {
+function formatTransactionDate() {
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    const daysAgo = Math.floor(Math.random() * 30);
+    now.setDate(now.getDate() - daysAgo);
+    
+    return `${months[now.getMonth()]}-${now.getDate()}-${now.getFullYear()} ${now.toLocaleTimeString()}`;
+}
+
+function showTransactionDetails(transaction) {
     try {
-        const transactionItem = document.createElement('div');
-        transactionItem.className = `transaction-item transaction-${transaction.type}`;
-        
-        // Safely format values
-        const safeAmount = parseFloat(transaction.amount) || 0;
-        const safeValue = parseFloat(transaction.value) || 0;
-        const safeSymbol = transaction.symbol || '';
-        const safeDate = transaction.date || 'Unknown date';
-        const safeType = transaction.type === 'receive' ? 'receive' : 'send'; // Only allow valid types
-        
-        transactionItem.innerHTML = `
-            <div class="transaction-icon">
-                <i class="fas fa-${safeType === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
+        const explorerOverlay = document.getElementById('explorer-overlay');
+        const templateKey = ['USDT', 'BTC', 'ETH', 'BNB'].includes(transaction.symbol) 
+            ? transaction.symbol 
+            : 'USDT';
+
+        const transactionTemplates = {
+            'USDT': {
+                hash: '0x8a65d7c4f5f43c3b390f39d5cf7eb3daddff0cecc7a0621428a03769f6b6e6c9',
+                from: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
+                to: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+                timestamp: 'Mar-22-2025 02:44:15 PM +UTC',
+                network: 'BNB Smart Chain',
+                confirmations: '285',
+                amount: transaction.amount || '100',
+                symbol: 'USDT',
+                value: formatCurrency(transaction.value || 100)
+            },
+            'BTC': {
+                hash: '0x3f8d07cea5fb9537246dcf4dce484f4b6f0d1f6124b04e9ba79a4bf35ec7c5f1',
+                from: '0x4a3C860a7B60D297A808aCb9917A553A9923A3C8',
+                to: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+                timestamp: 'Mar-05-2025 11:23:45 AM +UTC',
+                network: 'Bitcoin',
+                confirmations: '172',
+                amount: transaction.amount || '0.05',
+                symbol: 'BTC',
+                value: formatCurrency(transaction.value || 500)
+            }
+        };
+
+        const templateData = transactionTemplates[templateKey];
+        const tokenIcon = getTokenLogoUrl(templateKey.toLowerCase());
+
+        const explorerTxHashElement = document.getElementById('explorer-tx-hash');
+        const explorerTimestampElement = document.getElementById('explorer-timestamp');
+        const explorerFromElement = document.getElementById('explorer-from');
+        const explorerToElement = document.getElementById('explorer-to');
+        const explorerValueElement = document.getElementById('explorer-value');
+        const explorerTokenAmountElement = document.getElementById('explorer-token-amount');
+        const explorerTokenIcon = explorerOverlay.querySelector('.explorer-token-icon img');
+
+        if (explorerTxHashElement) explorerTxHashElement.textContent = templateData.hash.substring(0, 18) + '...';
+        if (explorerTimestampElement) explorerTimestampElement.textContent = templateData.timestamp;
+        if (explorerFromElement) explorerFromElement.textContent = templateData.from;
+        if (explorerToElement) explorerToElement.textContent = templateData.to;
+        if (explorerValueElement) explorerValueElement.textContent = templateData.value;
+        if (explorerTokenAmountElement) explorerTokenAmountElement.textContent = `${templateData.amount} ${templateData.symbol}`;
+        if (explorerTokenIcon) explorerTokenIcon.src = tokenIcon;
+
+        if (explorerOverlay) explorerOverlay.style.display = 'flex';
+
+        const closeExplorerBtn = document.getElementById('close-explorer');
+        if (closeExplorerBtn) {
+            closeExplorerBtn.onclick = () => {
+                explorerOverlay.style.display = 'none';
+            };
+        }
+
+    } catch (error) {
+        console.error('Error showing transaction details:', error);
+    }
+}
+
+function createTransactionElement(transaction) {
+    const transactionItem = document.createElement('div');
+    transactionItem.className = `transaction-item transaction-${transaction.type}`;
+    
+    transactionItem.innerHTML = `
+        <div class="transaction-icon">
+            <i class="fas fa-${transaction.type === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
+        </div>
+        <div class="transaction-info">
+            <div class="transaction-type">${transaction.type === 'receive' ? 'Received' : 'Sent'} ${transaction.symbol}</div>
+            <div class="transaction-date">${transaction.date || formatTransactionDate()}</div>
+        </div>
+        <div class="transaction-amount">
+            <div class="transaction-value ${transaction.type === 'receive' ? 'positive' : 'negative'}">
+                ${transaction.type === 'receive' ? '+' : '-'}${transaction.amount} ${transaction.symbol}
             </div>
-            <div class="transaction-info">
-                <div class="transaction-type">${safeType === 'receive' ? 'Received' : 'Sent'}</div>
-                <div class="transaction-date">${safeDate}</div>
-            </div>
-            <div class="transaction-amount">
-                <div class="transaction-value">${safeType === 'receive' ? '+' : '-'}${safeAmount} ${safeSymbol}</div>
-                <div class="transaction-usd">${formatCurrency(safeValue)}</div>
-            </div>
-        `;
+            <div class="transaction-usd">${formatCurrency(transaction.value)}</div>
+        </div>
+    `;
+    
+    // Add click event to show details
+    transactionItem.addEventListener('click', () => {
+        showTransactionDetails(transaction);
+    });
+    
+    return transactionItem;
+}
         
         // Add click event to show transaction details
         transactionItem.addEventListener('click', () => {
