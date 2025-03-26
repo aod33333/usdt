@@ -19,6 +19,42 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="total.css">
+
+ <!-- Chain Badge & History Page Fixes -->
+<style id="wallet-fix-styles">
+/* Chain Badge Fixes */
+.chain-badge {
+  display: block !important;
+  position: absolute !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  border: 2px solid #FFFFFF !important;
+  background: #FFFFFF !important;
+  z-index: 5 !important;
+  overflow: visible !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+.chain-badge img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  padding: 2px !important;
+  display: block !important;
+}
+
+.chain-badge[data-network="bsc"] img, img[src*="bnb-bnb-logo"] {
+  content: url('https://cryptologos.cc/logos/bnb-bnb-logo.png') !important;
+}
+
+.token-icon, .token-detail-icon-container {
+  position: relative !important;
+  overflow: visible !important;
+}
+</style>
 </head>
 <body>
    <!-- Status Bar -->
@@ -915,6 +951,236 @@ document.addEventListener('DOMContentLoaded', function() {
     detailSymbol.textContent = detailSymbol.textContent.split(' ')[0];
   }
 });
+</script>
+
+ <!-- History Page Template -->
+<div id="history-screen" class="screen hidden">
+    <div class="screen-header">
+        <button class="back-button history-back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Transaction History</h2>
+        <button class="icon-button filter-button">
+            <i class="fas fa-filter"></i>
+        </button>
+    </div>
+    
+    <div class="wallet-selector-small">
+        <span class="wallet-name-small">Mnemonic 1</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+    
+    <div class="history-tabs">
+        <button class="history-tab active" data-tab="all">All</button>
+        <button class="history-tab" data-tab="sent">Sent</button>
+        <button class="history-tab" data-tab="received">Received</button>
+    </div>
+    
+    <div class="history-content">
+        <div class="history-list" id="history-transaction-list">
+            <!-- Transactions will be inserted here by JS -->
+        </div>
+        
+        <div class="no-history hidden">
+            <div class="no-tx-icon">
+                <i class="fas fa-exchange-alt"></i>
+            </div>
+            <p>No transactions yet</p>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-tabs">
+        <div class="tab-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </div>
+        <div class="tab-item">
+            <i class="fas fa-exchange-alt"></i>
+            <span>Swap</span>
+        </div>
+        <div class="tab-item">
+            <i class="fas fa-piggy-bank"></i>
+            <span>Earn</span>
+        </div>
+        <div class="tab-item">
+            <i class="fas fa-compass"></i>
+            <span>Discover</span>
+        </div>
+    </div>
+</div>
+
+ <!-- Wallet Interface Fixes -->
+<script>
+// Fix chain badges display
+function fixChainBadges() {
+    const chainBadges = document.querySelectorAll('.chain-badge');
+    chainBadges.forEach(badge => {
+        const img = badge.querySelector('img');
+        if (img && (img.src.includes('bnb-bnb-logo') || 
+            badge.getAttribute('data-network') === 'bsc' ||
+            badge.getAttribute('data-network') === 'bnb-smart-chain')) {
+            img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+        }
+    });
+    
+    // Fix token detail page badges
+    const tokenDetailIcon = document.getElementById('token-detail-icon');
+    if (tokenDetailIcon && tokenDetailIcon.parentElement) {
+        const containerElement = tokenDetailIcon.parentElement;
+        const detailBadge = containerElement.querySelector('.chain-badge');
+        const tokenSymbol = document.getElementById('detail-symbol');
+        const currentTokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : '';
+        
+        // Tokens that need badges (BNB Smart Chain tokens)
+        const bscTokens = ['usdt', 'bnb', 'twt'];
+        
+        if (bscTokens.includes(currentTokenId) && !detailBadge) {
+            const newBadge = document.createElement('div');
+            newBadge.className = 'chain-badge';
+            newBadge.setAttribute('data-network', 'bsc');
+            
+            const badgeImg = document.createElement('img');
+            badgeImg.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+            badgeImg.alt = 'BNB Smart Chain';
+            
+            newBadge.appendChild(badgeImg);
+            containerElement.style.position = 'relative';
+            containerElement.appendChild(newBadge);
+        }
+    }
+}
+
+// Connect token detail send/receive buttons
+const detailActions = document.querySelectorAll('#token-detail .token-detail-actions .action-circle');
+if (detailActions.length >= 5) {
+    // Send button (first action)
+    detailActions[0].addEventListener('click', function() {
+        const tokenSymbol = document.getElementById('detail-symbol');
+        const currentTokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : 'usdt';
+        if (typeof showSendScreen === 'function') {
+            showSendScreen(currentTokenId);
+        }
+    });
+    
+    // Receive button (second action)
+    detailActions[1].addEventListener('click', function() {
+        const tokenSymbol = document.getElementById('detail-symbol');
+        const currentTokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : 'btc';
+        if (typeof showReceiveScreen === 'function') {
+            showReceiveScreen(currentTokenId);
+        }
+    });
+}
+
+// Connect history buttons
+const historyButtons = document.querySelectorAll('.action-circle');
+historyButtons.forEach(button => {
+    const buttonText = button.querySelector('span')?.textContent?.trim();
+    if (buttonText === 'History') {
+        button.addEventListener('click', function() {
+            const historyScreen = document.getElementById('history-screen');
+            if (historyScreen) {
+                // Hide other screens
+                const screens = document.querySelectorAll('.screen');
+                screens.forEach(screen => {
+                    screen.style.display = 'none';
+                    screen.classList.add('hidden');
+                });
+                
+                // Populate with transactions (basic example)
+                const historyList = document.getElementById('history-transaction-list');
+                if (historyList && historyList.children.length === 0) {
+                    createExampleTransactions(historyList);
+                }
+                
+                // Show history screen
+                historyScreen.style.display = 'flex';
+                historyScreen.classList.remove('hidden');
+            }
+        });
+    }
+});
+
+// Create example transactions for history
+function createExampleTransactions(container) {
+    const transactions = [
+        {type: 'receive', amount: 500, symbol: 'USDT', value: 500, date: '2024-03-15 14:32'},
+        {type: 'send', amount: 200, symbol: 'USDT', value: 200, date: '2024-03-12 09:15'},
+        {type: 'receive', amount: 0.25, symbol: 'BNB', value: 95.67, date: '2024-03-05 11:23'}
+    ];
+    
+    transactions.forEach(tx => {
+        const item = document.createElement('div');
+        item.className = `transaction-item transaction-${tx.type}`;
+        
+        let logo = 'https://cryptologos.cc/logos/default-logo.png';
+        if (tx.symbol === 'USDT') logo = 'https://cryptologos.cc/logos/tether-usdt-logo.png';
+        if (tx.symbol === 'BNB') logo = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+        
+        item.innerHTML = `
+            <div class="transaction-token-icon">
+                <img src="${logo}" alt="${tx.symbol}">
+            </div>
+            <div class="transaction-info">
+                <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.symbol}</div>
+                <div class="transaction-date">${tx.date}</div>
+            </div>
+            <div class="transaction-amount">
+                <div class="transaction-value">${tx.type === 'receive' ? '+' : '-'}${tx.amount} ${tx.symbol}</div>
+                <div class="transaction-usd">$${tx.value.toFixed(2)}</div>
+            </div>
+        `;
+        
+        container.appendChild(item);
+    });
+}
+
+// Handle history page navigation
+const historyBackButton = document.querySelector('.history-back-button');
+if (historyBackButton) {
+    historyBackButton.addEventListener('click', function() {
+        document.getElementById('history-screen').style.display = 'none';
+        document.getElementById('history-screen').classList.add('hidden');
+        document.getElementById('wallet-screen').style.display = 'flex';
+        document.getElementById('wallet-screen').classList.remove('hidden');
+    });
+}
+
+// Add history tab functionality
+const historyTabs = document.querySelectorAll('.history-tab');
+historyTabs.forEach(tab => {
+    tab.addEventListener('click', function() {
+        historyTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        const filterType = tab.getAttribute('data-tab');
+        const transactions = document.querySelectorAll('#history-transaction-list .transaction-item');
+        
+        transactions.forEach(tx => {
+            if (filterType === 'all') {
+                tx.style.display = 'flex';
+            } else if (filterType === 'sent' && tx.classList.contains('transaction-send')) {
+                tx.style.display = 'flex';
+            } else if (filterType === 'received' && tx.classList.contains('transaction-receive')) {
+                tx.style.display = 'flex';
+            } else {
+                tx.style.display = 'none';
+            }
+        });
+    });
+});
+
+// Run fixes when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(fixChainBadges, 500);
+});
+
+// Run fixes now if page already loaded
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setTimeout(fixChainBadges, 100);
+    setInterval(fixChainBadges, 1000); // Keep checking periodically
+}
 </script>
 </body>
 </html>
