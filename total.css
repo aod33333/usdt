@@ -3601,3 +3601,20 @@ Here's the CSS to fix the USDT background issue in the history page:
 .token-detail-title {
     padding: 8px 0 12px 0 !important;
 }
+
+/* Fix warning banner line spacing - add to bottom of total.css */
+.investment-warning-text p {
+  line-height: 1.3 !important;
+  margin: 0 !important;
+}
+
+.investment-warning-text p a {
+  display: inline !important;
+  margin-top: 0 !important;
+  line-height: inherit !important;
+}
+
+.learn-more {
+  margin-top: 0 !important;
+  display: inline !important;
+}
