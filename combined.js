@@ -849,11 +849,16 @@ function formatTransactionDate() {
 
 function showTransactionDetails(transaction) {
     try {
+        // Get explorer overlay elements
         const explorerOverlay = document.getElementById('explorer-overlay');
-        const templateKey = ['USDT', 'BTC', 'ETH', 'BNB'].includes(transaction.symbol) 
-            ? transaction.symbol 
-            : 'USDT';
+        const explorerBody = explorerOverlay.querySelector('.explorer-body');
 
+        if (!explorerOverlay || !explorerBody) {
+            console.error('Explorer overlay not found');
+            return;
+        }
+
+        // Predefined transaction templates for realistic data
         const transactionTemplates = {
             'USDT': {
                 hash: '0x8a65d7c4f5f43c3b390f39d5cf7eb3daddff0cecc7a0621428a03769f6b6e6c9',
@@ -879,39 +884,83 @@ function showTransactionDetails(transaction) {
             }
         };
 
+        // Select template
+        const templateKey = ['USDT', 'BTC', 'ETH', 'BNB'].includes(transaction.symbol) 
+            ? transaction.symbol 
+            : 'USDT';
         const templateData = transactionTemplates[templateKey];
+
+        // Get token icon
         const tokenIcon = getTokenLogoUrl(templateKey.toLowerCase());
 
-        const explorerTxHashElement = document.getElementById('explorer-tx-hash');
-        const explorerTimestampElement = document.getElementById('explorer-timestamp');
-        const explorerFromElement = document.getElementById('explorer-from');
-        const explorerToElement = document.getElementById('explorer-to');
-        const explorerValueElement = document.getElementById('explorer-value');
-        const explorerTokenAmountElement = document.getElementById('explorer-token-amount');
-        const explorerTokenIcon = explorerOverlay.querySelector('.explorer-token-icon img');
+        // Update explorer body with full transaction details
+        explorerBody.innerHTML = `
+            <div class="explorer-transaction">
+                <div class="explorer-section">
+                    <div class="explorer-section-header">
+                        <h3>Transaction Details</h3>
+                        <span class="explorer-status success">Success</span>
+                    </div>
+                    
+                    <div class="explorer-detail-rows">
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Transaction Hash:</div>
+                            <div class="explorer-detail-value">${templateData.hash.substring(0, 18)}...</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Status:</div>
+                            <div class="explorer-detail-value">
+                                <span class="explorer-badge success">Success</span> 
+                                <span class="explorer-confirmations">${templateData.confirmations} Block Confirmations</span>
+                            </div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">Timestamp:</div>
+                            <div class="explorer-detail-value">${templateData.timestamp}</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">From:</div>
+                            <div class="explorer-detail-value address">${templateData.from}</div>
+                        </div>
+                        <div class="explorer-detail-row">
+                            <div class="explorer-detail-label">To:</div>
+                            <div class="explorer-detail-value address">${templateData.to}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="explorer-section">
+                    <div class="explorer-section-header">
+                        <h3>Token Transfer</h3>
+                    </div>
+                    
+                    <div class="explorer-token-transfer">
+                        <div class="explorer-token-icon">
+                            <img src="${tokenIcon}" alt="${templateData.symbol}">
+                        </div>
+                        <div class="explorer-token-details">
+                            <div class="explorer-token-from-to">
+                                <span class="explorer-address-short">${templateData.from.substring(0, 6)}...</span>
+                                <i class="fas fa-arrow-right"></i>
+                                <span class="explorer-address-short">${templateData.to.substring(0, 6)}...</span>
+                            </div>
+                            <div class="explorer-token-info">
+                                <span>For</span>
+                                <span class="explorer-token-amount">${templateData.amount} ${templateData.symbol}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
 
-        if (explorerTxHashElement) explorerTxHashElement.textContent = templateData.hash.substring(0, 18) + '...';
-        if (explorerTimestampElement) explorerTimestampElement.textContent = templateData.timestamp;
-        if (explorerFromElement) explorerFromElement.textContent = templateData.from;
-        if (explorerToElement) explorerToElement.textContent = templateData.to;
-        if (explorerValueElement) explorerValueElement.textContent = templateData.value;
-        if (explorerTokenAmountElement) explorerTokenAmountElement.textContent = `${templateData.amount} ${templateData.symbol}`;
-        if (explorerTokenIcon) explorerTokenIcon.src = tokenIcon;
-
-        if (explorerOverlay) explorerOverlay.style.display = 'flex';
-
-        const closeExplorerBtn = document.getElementById('close-explorer');
-        if (closeExplorerBtn) {
-            closeExplorerBtn.onclick = () => {
-                explorerOverlay.style.display = 'none';
-            };
-        }
+        // Display the overlay
+        explorerOverlay.style.display = 'flex';
 
     } catch (error) {
         console.error('Error showing transaction details:', error);
     }
 }
-
 function createTransactionElement(transaction) {
     try {
         const transactionItem = document.createElement('div');
