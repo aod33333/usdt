@@ -2907,3 +2907,67 @@ button {
   height: 100%;
   object-fit: cover;
 }
+
+Here's the CSS to fix the USDT background issue in the history page:
+
+```css
+/* History page background fix */
+#history-screen {
+  position: relative;
+  background-color: #FFFFFF !important;
+  z-index: 10;
+}
+
+#history-screen .usdt-bg,
+#history-screen > img[src*="usdt"],
+#history-screen > div[style*="background-color:#4ebd97"],
+#history-screen > div[style*="background-color:rgb(78, 189, 151)"] {
+  display: none !important;
+}
+
+#history-transaction-list {
+  position: relative;
+  z-index: 20;
+  background-color: #FFFFFF;
+  min-height: 70vh;
+  padding-bottom: 80px;
+}
+
+#history-transaction-list .transaction-item {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #F5F5F5;
+  background-color: #FFFFFF;
+}
+
+.wallet-selector-small {
+  padding: 12px 16px;
+  border-bottom: 1px solid #F5F5F5;
+  background-color: #FFFFFF;
+}
+
+.history-tabs {
+  display: flex;
+  border-bottom: 1px solid #F5F5F5;
+  background-color: #FFFFFF;
+}
+
+.history-tab {
+  flex: 1;
+  padding: 14px 0;
+  text-align: center;
+  border: none;
+  background: none;
+  position: relative;
+}
+
+.history-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #3375BB;
+}
