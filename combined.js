@@ -467,22 +467,6 @@ function showTokenDetail(tokenId) {
            if (element) element.textContent = value;
        });
 
-       // Add token ID as data attribute for targeting in CSS
-const detailSymbol = document.getElementById('detail-symbol');
-if (detailSymbol) {
-    detailSymbol.setAttribute('data-value', token.symbol);
-}
-
-// Simple hide/show based on token ID
-const chainBadge = document.querySelector('.token-detail-icon-container .chain-badge');
-if (chainBadge) {
-    if (['BNB', 'USDT', 'TWT'].includes(token.symbol)) {
-        chainBadge.style.display = 'block';
-    } else {
-        chainBadge.style.display = 'none';
-    }
-}
-
       // Update token icon
 const tokenDetailIcon = document.getElementById('token-detail-icon');
 if (tokenDetailIcon) {
