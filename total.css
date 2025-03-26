@@ -2346,7 +2346,7 @@ button {
 
 /* Trust Wallet Header Fixes */
 .token-detail-title {
-  min-height: 56px !important; /* TW's exact header height */
+  min-height: 46px !important; /* TW's exact header height */
   padding: 8px 0 !important;
   display: flex !important;
   flex-direction: column !important;
@@ -2355,14 +2355,14 @@ button {
 }
 
 #detail-symbol {
-  font-size: 20px !important; /* TW's symbol size */
+  font-size: 16px !important; /* TW's symbol size */
   text-align: center !important;
   width: 100% !important;
   margin: 0 !important;
 }
 
 #detail-fullname {
-  font-size: 12px !important; /* TW's secondary text size */
+  font-size: 10px !important; /* TW's secondary text size */
   text-align: center !important;
   width: 100% !important;
   margin: 2px 0 0 0 !important;
