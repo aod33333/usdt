@@ -123,6 +123,320 @@ function showScreen(screenId) {
     }
 }
 
+// Fix transaction status modal
+function enhanceTransactionModal() {
+  // Apply proper z-index values
+  const txModal = document.getElementById('tx-status-modal');
+  if (txModal) {
+    txModal.style.zIndex = '2000';
+    txModal.querySelector('.modal-content').style.zIndex = '2001';
+  }
+  
+  // Add animation transitions
+  const stylesheet = document.createElement('style');
+  stylesheet.textContent = `
+    .tx-status-view {
+      transition: opacity 0.5s ease;
+    }
+    .tx-status-view.hidden {
+      opacity: 0;
+      position: absolute;
+    }
+    .tx-status-view.visible {
+      opacity: 1;
+    }
+    .confirmation-counter {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--tw-medium-gray);
+    }
+    .fee-breakdown {
+      background: var(--tw-bg-gray);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 16px;
+      font-size: 12px;
+    }
+    .fee-breakdown h4 {
+      margin-bottom: 8px;
+      font-size: 14px;
+    }
+    .fee-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    .copy-hash {
+      cursor: pointer;
+      color: var(--tw-blue);
+      margin-left: 8px;
+      font-size: 14px;
+    }
+    .copy-hash:hover {
+      text-decoration: underline;
+    }
+  `;
+  document.head.appendChild(stylesheet);
+  
+  // Make hash clickable with copy function
+  const txHash = document.getElementById('tx-hash');
+  if (txHash) {
+    const copyButton = document.createElement('i');
+    copyButton.className = 'fas fa-copy copy-hash';
+    copyButton.title = 'Copy hash';
+    txHash.parentNode.appendChild(copyButton);
+    
+    copyButton.addEventListener('click', function() {
+      const hash = txHash.textContent;
+      navigator.clipboard.writeText(hash).then(function() {
+        alert('Transaction hash copied to clipboard');
+      });
+    });
+  }
+}
+
+// Modified processSendTransaction function with improvements
+// Process send transaction with improved security and UI
+function processSendTransaction() {
+    try {
+        // Get elements with safety checks
+        const sendButton = document.getElementById('continue-send');
+        const sendScreen = document.getElementById('send-screen');
+        const txStatusModal = document.getElementById('tx-status-modal');
+        
+        if (!sendButton || !sendScreen || !txStatusModal) {
+            console.error('Missing required elements for transaction');
+            return;
+        }
+        
+        // Apply UI enhancements
+        enhanceTransactionModal();
+        
+        // Add loading state
+        sendButton.classList.add('loading');
+        
+        // Get and validate input values
+        const amountInput = document.getElementById('send-amount');
+        const recipientInput = document.getElementById('recipient-address');
+        
+        if (!amountInput || !recipientInput) {
+            alert('Form fields not found');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Sanitize inputs
+        const amount = parseFloat(sanitizeInput(amountInput.value));
+        const recipient = sanitizeInput(recipientInput.value.trim());
+        
+        // Basic validation
+        if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        if (!recipient || !recipient.startsWith('0x')) {
+            alert('Please enter a valid recipient address');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Get the current token from active wallet
+        const currentWallet = currentWalletData[activeWallet];
+        const usdtToken = currentWallet.tokens.find(t => t.id === 'usdt');
+        
+        if (!usdtToken) {
+            alert('Token not found');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Check if we have enough balance
+        if (amount > usdtToken.amount) {
+            alert('Insufficient balance');
+            sendButton.classList.remove('loading');
+            return;
+        }
+        
+        // Close send modal
+        sendScreen.style.display = 'none';
+        
+        // Show transaction pending with improved animations
+        txStatusModal.style.display = 'flex';
+        const pendingView = document.getElementById('tx-pending');
+        const successView = document.getElementById('tx-success');
+        pendingView.classList.remove('hidden');
+        pendingView.classList.add('visible');
+        successView.classList.add('hidden');
+        successView.classList.remove('visible');
+        
+        // Generate random tx hash
+        const txHash = generateRandomTransactionHash();
+        
+        // Update UI elements
+        const txHashEl = document.getElementById('tx-hash');
+        const txAmountEl = document.getElementById('tx-amount');
+        const txToEl = document.getElementById('tx-to');
+        
+        if (txHashEl) txHashEl.textContent = txHash.substring(0, 16) + '...';
+        if (txAmountEl) txAmountEl.textContent = `${amount} USDT`;
+        if (txToEl) txToEl.textContent = `${recipient.substring(0, 6)}...`;
+        
+        // Add confirmations counter
+        const confirmationsEl = document.createElement('div');
+        confirmationsEl.className = 'confirmation-counter';
+        confirmationsEl.innerHTML = 'Confirmations: <span id="confirm-count">0</span>';
+        pendingView.appendChild(confirmationsEl);
+        
+        // Find recipient wallet if it's one of our wallets
+        const walletAddresses = {
+            main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+            secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
+            business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
+        };
+        
+        let recipientWalletId = null;
+        for (const [walletId, address] of Object.entries(walletAddresses)) {
+            if (recipient === address) {
+                recipientWalletId = walletId;
+                break;
+            }
+        }
+        
+        // Simulate blockchain confirmation with confirmations counter
+        let confirmations = 0;
+        const confirmInterval = setInterval(() => {
+            confirmations++;
+            const countEl = document.getElementById('confirm-count');
+            if (countEl) countEl.textContent = confirmations;
+        }, 1000);
+        
+        // Simulate blockchain confirmation (3-5 seconds)
+        setTimeout(() => {
+            try {
+                // Clear confirmation interval
+                clearInterval(confirmInterval);
+                
+                // Remove loading state
+                sendButton.classList.remove('loading');
+                
+                // Show success view with transition
+                pendingView.classList.remove('visible');
+                pendingView.classList.add('hidden');
+                
+                // Add fee breakdown to success view
+                const feeBreakdown = document.createElement('div');
+                feeBreakdown.className = 'fee-breakdown';
+                feeBreakdown.innerHTML = `
+                    <h4>Network Fee Breakdown</h4>
+                    <div class="fee-row">
+                        <span>Gas Price:</span>
+                        <span>5 Gwei</span>
+                    </div>
+                    <div class="fee-row">
+                        <span>Gas Used:</span>
+                        <span>21,000 units</span>
+                    </div>
+                    <div class="fee-row">
+                        <span>Total Fee:</span>
+                        <span id="tx-fee-total">0.000105 BNB ($0.05)</span>
+                    </div>
+                `;
+                
+                const txDetails = successView.querySelector('.tx-details');
+                if (txDetails) {
+                    txDetails.appendChild(feeBreakdown);
+                }
+                
+                successView.classList.remove('hidden');
+                successView.classList.add('visible');
+                
+                // Update sender wallet balance
+                const newAmount = usdtToken.amount - amount;
+                usdtToken.amount = newAmount;
+                usdtToken.value = newAmount;
+                
+                // Update total balance
+                currentWallet.totalBalance -= amount;
+                
+                // Update recipient wallet if it's one of our wallets
+                if (recipientWalletId) {
+                    const recipientWallet = currentWalletData[recipientWalletId];
+                    const recipientToken = recipientWallet.tokens.find(t => t.id === 'usdt');
+                    
+                    if (recipientToken) {
+                        recipientToken.amount += amount;
+                        recipientToken.value += amount;
+                        recipientWallet.totalBalance += amount;
+                    }
+                }
+                
+                // Update UI
+                updateWalletUI();
+                
+                // Add transaction to sender history
+                const newSendTx = {
+                    id: 'tx-' + Date.now(),
+                    type: 'send',
+                    amount: amount,
+                    symbol: 'USDT',
+                    value: amount,
+                    date: new Date().toISOString().split('T')[0] + ' ' + 
+                          new Date().toTimeString().split(' ')[0].substring(0, 5),
+                    from: walletAddresses[activeWallet],
+                    to: recipient,
+                    hash: txHash
+                };
+                
+                // Add to sender transactions
+                if (!currentTransactions[activeWallet].usdt) {
+                    currentTransactions[activeWallet].usdt = [];
+                }
+                currentTransactions[activeWallet].usdt.unshift(newSendTx);
+                
+                // Add to recipient transactions if it's one of our wallets
+                if (recipientWalletId) {
+                    const newReceiveTx = {
+                        id: 'tx-' + Date.now() + 1,
+                        type: 'receive',
+                        amount: amount,
+                        symbol: 'USDT',
+                        value: amount,
+                        date: new Date().toISOString().split('T')[0] + ' ' + 
+                              new Date().toTimeString().split(' ')[0].substring(0, 5),
+                        from: walletAddresses[activeWallet],
+                        to: recipient,
+                        hash: txHash
+                    };
+                    
+                    if (!currentTransactions[recipientWalletId].usdt) {
+                        currentTransactions[recipientWalletId].usdt = [];
+                    }
+                    currentTransactions[recipientWalletId].usdt.unshift(newReceiveTx);
+                }
+                
+                // If detail view is open, update transactions
+                const tokenDetail = document.getElementById('token-detail');
+                if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
+                    updateTransactionsForToken('usdt');
+                }
+            } catch (finalError) {
+                console.error('Error completing transaction:', finalError);
+                alert('Transaction processing error');
+            }
+        }, 3000 + Math.random() * 2000); // Random time between 3-5 seconds
+    } catch (error) {
+        console.error('Transaction failed:', error);
+        alert('Transaction failed: ' + error.message);
+        
+        const sendButton = document.getElementById('continue-send');
+        if (sendButton) {
+            sendButton.classList.remove('loading');
+        }
+    }
+}
+
 // Initialize screen visibility with error safety
 function initializeAllScreens() {
     console.log('SCREEN INITIALIZATION: Starting screen setup');
