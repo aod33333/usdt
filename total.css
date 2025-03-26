@@ -3360,7 +3360,9 @@ Here's the CSS to fix the USDT background issue in the history page:
   border-radius: 4px;
 }
 
-/* Hide chain badges on token detail page */
-#token-detail .chain-badge {
+/* Hide chain badges in token details and transaction screens */
+#token-detail .chain-badge,
+#send-screen .chain-badge,
+#receive-screen .chain-badge {
   display: none !important;
 }
