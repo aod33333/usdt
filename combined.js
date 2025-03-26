@@ -3358,6 +3358,12 @@ document.addEventListener('DOMContentLoaded', function() {
 safeInit('History Screen', initHistoryScreen);
 safeInit('History Button', connectHistoryButton);
 safeInit('Transaction Migration', migrateExistingTransactions);
+
+         // Connect continue send button
+        const continueButton = document.getElementById('continue-send');
+        if (continueButton) {
+            continueButton.addEventListener('click', processSendTransaction);
+        }
         
         console.log('✅ INITIALIZATION COMPLETE');
     } catch (globalError) {
