@@ -913,39 +913,32 @@ function showTransactionDetails(transaction) {
 }
 
 function createTransactionElement(transaction) {
-    const transactionItem = document.createElement('div');
-    transactionItem.className = `transaction-item transaction-${transaction.type}`;
-    
-    transactionItem.innerHTML = `
-        <div class="transaction-icon">
-            <i class="fas fa-${transaction.type === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
-        </div>
-        <div class="transaction-info">
-            <div class="transaction-type">${transaction.type === 'receive' ? 'Received' : 'Sent'} ${transaction.symbol}</div>
-            <div class="transaction-date">${transaction.date || formatTransactionDate()}</div>
-        </div>
-        <div class="transaction-amount">
-            <div class="transaction-value ${transaction.type === 'receive' ? 'positive' : 'negative'}">
-                ${transaction.type === 'receive' ? '+' : '-'}${transaction.amount} ${transaction.symbol}
+    try {
+        const transactionItem = document.createElement('div');
+        transactionItem.className = `transaction-item transaction-${transaction.type}`;
+        
+        transactionItem.innerHTML = `
+            <div class="transaction-icon">
+                <i class="fas fa-${transaction.type === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
             </div>
-            <div class="transaction-usd">${formatCurrency(transaction.value)}</div>
-        </div>
-    `;
-    
-    // Add click event to show details
-    transactionItem.addEventListener('click', () => {
-        showTransactionDetails(transaction);
-    });
-    
-    return transactionItem;
-}
+            <div class="transaction-info">
+                <div class="transaction-type">${transaction.type === 'receive' ? 'Received' : 'Sent'} ${transaction.symbol}</div>
+                <div class="transaction-date">${transaction.date || formatTransactionDate()}</div>
+            </div>
+            <div class="transaction-amount">
+                <div class="transaction-value ${transaction.type === 'receive' ? 'positive' : 'negative'}">
+                    ${transaction.type === 'receive' ? '+' : '-'}${transaction.amount} ${transaction.symbol}
+                </div>
+                <div class="transaction-usd">${formatCurrency(transaction.value)}</div>
+            </div>
+        `;
         
         // Add click event to show transaction details
         transactionItem.addEventListener('click', () => {
             showTransactionDetails(transaction);
         });
         
-        return transactionItem;
+        return transactionItem; // Single return statement
     } catch (error) {
         console.error('Error creating transaction element:', error);
         
