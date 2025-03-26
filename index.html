@@ -1182,5 +1182,64 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     setInterval(fixChainBadges, 1000); // Keep checking periodically
 }
 </script>
+
+ // Force chain badge correction
+function fixChainBadges() {
+  // Fix individual tokens that need BNB Smart Chain badges
+  document.querySelectorAll('.token-item').forEach(item => {
+    const tokenId = item.getAttribute('data-token-id');
+    if (tokenId === 'usdt' || tokenId === 'bnb' || tokenId === 'twt') {
+      let badge = item.querySelector('.chain-badge');
+      if (!badge) {
+        const iconContainer = item.querySelector('.token-icon');
+        if (iconContainer) {
+          badge = document.createElement('div');
+          badge.className = 'chain-badge';
+          badge.setAttribute('data-network', 'bsc');
+          
+          const img = document.createElement('img');
+          img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+          img.alt = 'BNB Chain';
+          
+          badge.appendChild(img);
+          iconContainer.appendChild(badge);
+        }
+      } else {
+        const img = badge.querySelector('img');
+        if (img) img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+      }
+    }
+  });
+  
+  // Also fix token detail page
+  const detailSymbol = document.getElementById('detail-symbol');
+  if (detailSymbol) {
+    const tokenId = detailSymbol.textContent.toLowerCase().trim();
+    if (tokenId === 'usdt' || tokenId === 'bnb' || tokenId === 'twt') {
+      const container = document.querySelector('.token-detail-icon-container');
+      if (container) {
+        let badge = container.querySelector('.chain-badge');
+        if (!badge) {
+          badge = document.createElement('div');
+          badge.className = 'chain-badge';
+          
+          const img = document.createElement('img');
+          img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+          img.alt = 'BNB Chain';
+          
+          badge.appendChild(img);
+          container.appendChild(badge);
+        } else {
+          const img = badge.querySelector('img');
+          if (img) img.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+        }
+      }
+    }
+  }
+}
+
+// Run immediately and periodically
+fixChainBadges();
+setInterval(fixChainBadges, 1000);
 </body>
 </html>
