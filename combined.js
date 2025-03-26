@@ -230,6 +230,20 @@ function processSendTransaction(e) {
             return;
         }
         
+        // NEW CSP-FRIENDLY FIXES
+        // Prevent unexpected navigation
+        if (window.history && window.history.pushState) {
+            window.history.pushState(null, null, window.location.pathname);
+            window.addEventListener('popstate', function() {
+                window.history.pushState(null, null, window.location.pathname);
+            });
+        }
+        
+        // Prevent default form submission
+        if (e && e.target && typeof e.target.blur === 'function') {
+            e.target.blur();
+        }
+        
         // Close send modal
         sendScreen.style.display = 'none';
         
