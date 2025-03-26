@@ -123,75 +123,43 @@ function showScreen(screenId) {
     }
 }
 
-// Fix transaction status modal
-function enhanceTransactionModal() {
-  // Apply proper z-index values
-  const txModal = document.getElementById('tx-status-modal');
-  if (txModal) {
-    txModal.style.zIndex = '2000';
-    txModal.querySelector('.modal-content').style.zIndex = '2001';
+// Add this near other utility functions
+function fixTransactionModal() {
+  const modal = document.getElementById('tx-status-modal');
+  if (modal) modal.style.zIndex = '9999';
+  
+  const closeBtn = document.getElementById('close-tx-success');
+  if (closeBtn) {
+    closeBtn.onclick = function() {
+      modal.style.display = 'none';
+      const walletScreen = document.getElementById('wallet-screen');
+      if (walletScreen) {
+        walletScreen.style.display = 'flex';
+        walletScreen.classList.remove('hidden');
+      }
+    };
   }
   
-  // Add animation transitions
-  const stylesheet = document.createElement('style');
-  stylesheet.textContent = `
-    .tx-status-view {
-      transition: opacity 0.5s ease;
-    }
-    .tx-status-view.hidden {
-      opacity: 0;
-      position: absolute;
-    }
-    .tx-status-view.visible {
-      opacity: 1;
-    }
-    .confirmation-counter {
-      margin-top: 8px;
-      font-size: 12px;
-      color: var(--tw-medium-gray);
-    }
-    .fee-breakdown {
-      background: var(--tw-bg-gray);
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 16px;
-      font-size: 12px;
-    }
-    .fee-breakdown h4 {
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-    .fee-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 4px;
-    }
-    .copy-hash {
-      cursor: pointer;
-      color: var(--tw-blue);
-      margin-left: 8px;
-      font-size: 14px;
-    }
-    .copy-hash:hover {
-      text-decoration: underline;
-    }
-  `;
-  document.head.appendChild(stylesheet);
-  
-  // Make hash clickable with copy function
   const txHash = document.getElementById('tx-hash');
-  if (txHash) {
-    const copyButton = document.createElement('i');
-    copyButton.className = 'fas fa-copy copy-hash';
-    copyButton.title = 'Copy hash';
-    txHash.parentNode.appendChild(copyButton);
+  if (txHash && !txHash.querySelector('.fa-copy')) {
+    const copyIcon = document.createElement('i');
+    copyIcon.className = 'fas fa-copy';
+    copyIcon.style.marginLeft = '8px';
+    copyIcon.style.cursor = 'pointer';
+    copyIcon.style.color = '#3375BB';
     
-    copyButton.addEventListener('click', function() {
+    copyIcon.onclick = function(e) {
+      e.stopPropagation();
       const hash = txHash.textContent;
-      navigator.clipboard.writeText(hash).then(function() {
-        alert('Transaction hash copied to clipboard');
-      });
-    });
+      try {
+        navigator.clipboard.writeText(hash);
+        alert('Transaction hash copied');
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
+    };
+    
+    txHash.appendChild(copyIcon);
   }
 }
 
@@ -203,6 +171,8 @@ function processSendTransaction() {
         const sendButton = document.getElementById('continue-send');
         const sendScreen = document.getElementById('send-screen');
         const txStatusModal = document.getElementById('tx-status-modal');
+
+        fixTransactionModal();
         
         if (!sendButton || !sendScreen || !txStatusModal) {
             console.error('Missing required elements for transaction');
@@ -3432,6 +3402,8 @@ safeInit('Transaction Migration', migrateExistingTransactions);
     
     // Run diagnostics after a delay
     setTimeout(runDiagnostics, 2000);
+
+    fixTransactionModal();
 });
 
 // Export key functions to window for global access
