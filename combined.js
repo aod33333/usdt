@@ -3002,6 +3002,63 @@ safeInit('Transaction Migration', migrateExistingTransactions);
     setTimeout(runDiagnostics, 2000);
 });
 
+// Add this to the VERY BOTTOM of combined.js to fix badge positioning:
+
+// Fix chain badge positioning globally with direct styling
+document.addEventListener('DOMContentLoaded', function() {
+  // Apply global CSS fix for chain badges
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Fix token icon containers to allow badge positioning */
+    .token-icon, .token-detail-icon-container {
+      position: relative !important;
+      overflow: visible !important;
+    }
+    
+    /* Position all chain badges consistently */
+    .chain-badge {
+      position: absolute !important;
+      bottom: -6px !important;
+      right: -6px !important;
+      width: 20px !important;
+      height: 20px !important;
+      border-radius: 50% !important;
+      border: 2px solid white !important;
+      background: white !important;
+      z-index: 999 !important;
+      display: block !important;
+    }
+    
+    /* Fix badge images */
+    .chain-badge img {
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: contain !important;
+      padding: 2px !important;
+    }
+  `;
+  document.head.appendChild(style);
+  
+  // Add an observer to hide badges on tokens that shouldn't have them
+  const observer = new MutationObserver(function() {
+    const symbol = document.getElementById('detail-symbol');
+    if (symbol) {
+      const tokenSymbol = symbol.textContent;
+      const badges = document.querySelectorAll('#token-detail .chain-badge');
+      
+      badges.forEach(badge => {
+        if (['BNB', 'USDT', 'TWT'].includes(tokenSymbol)) {
+          badge.style.display = 'block';
+        } else {
+          badge.style.display = 'none';
+        }
+      });
+    }
+  });
+  
+  observer.observe(document.body, { childList: true, subtree: true });
+});
+
 // Export key functions to window for global access
 window.hideAllScreens = hideAllScreens;
 window.showScreen = showScreen;
