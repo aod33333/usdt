@@ -3464,3 +3464,155 @@ Here's the CSS to fix the USDT background issue in the history page:
   font-size: 14px;
   border-radius: 6px;
 }
+
+/* Fix 1: Warning banner line spacing */
+.investment-warning-text p {
+  line-height: 1.5;
+  font-size: 13px;
+  margin: 0;
+  color: var(--tw-black);
+}
+
+/* Make sure all text in the warning is on the same baseline */
+.investment-warning-text {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Fix the "Take 2 mins" link spacing */
+.learn-more {
+  display: inline;
+  white-space: nowrap;
+  color: var(--tw-blue);
+  text-decoration: underline;
+}
+
+/* Fix 2: Change percentage colors to blue instead of green */
+.token-price-change.positive,
+#token-price-change.positive,
+.positive {
+  color: var(--tw-blue) !important; /* Override green color */
+  background-color: rgba(51, 117, 187, 0.1) !important; /* Light blue background */
+}
+
+/* Fix 3: BNB network logos positioning */
+/* Make token icons container position relative for proper badge positioning */
+.token-icon, 
+.token-detail-icon-container {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+/* Position chain badges properly to overlap main token icon */
+.chain-badge {
+  position: absolute !important;
+  bottom: -4px !important;
+  right: -4px !important;
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  border: 1.5px solid #FFFFFF !important;
+  background: #FFFFFF !important;
+  z-index: 5 !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+}
+
+.chain-badge img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  padding: 1px !important;
+  display: block !important;
+}
+
+/* Fix 4: Hide BNB chain logos for non-BNB tokens */
+/* Base rule - hide all chain badges by default */
+.token-item[data-token-id] .chain-badge,
+#token-detail .chain-badge {
+  display: none !important;
+}
+
+/* Only show for BNB-based tokens */
+.token-item[data-token-id="bnb"] .chain-badge,
+.token-item[data-token-id="usdt"] .chain-badge,
+.token-item[data-token-id="twt"] .chain-badge,
+#token-detail[data-token-id="bnb"] .chain-badge,
+#token-detail[data-token-id="usdt"] .chain-badge,
+#token-detail[data-token-id="twt"] .chain-badge {
+  display: block !important;
+}
+
+/* Additional fix: Make sure the warning banner close button is properly aligned */
+.close-warning {
+  vertical-align: top;
+  line-height: 1;
+  margin-left: 8px;
+  color: #92400e;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Fix warning banner colors to match TrustWallet exactly */
+.investment-warning {
+  background-color: #fffbeb !important; /* Exact TrustWallet light yellow */
+  border: 1px solid #fef3c7 !important; /* Exact TrustWallet yellow border */
+  border-radius: 4px !important;
+  padding: 12px !important;
+  margin: 12px !important;
+}
+
+.warning-icon {
+  color: #f59e0b !important; /* Exact TrustWallet orange for warning icon */
+  font-size: 16px !important;
+  margin-right: 10px !important;
+}
+
+.investment-warning-text p {
+  color: #1e293b !important; /* Exact TrustWallet text color */
+}
+
+.learn-more {
+  color: #3b82f6 !important; /* Exact TrustWallet link blue */
+}
+
+/* Make sure the token detail page shows consistent sizing */
+.token-detail-large-icon {
+  width: 48px !important;
+  height: 48px !important;
+}
+
+/* Fix token detail alignment */
+.token-detail-balance h2 {
+  font-size: 20px !important;
+  margin-bottom: 4px !important;
+}
+
+.token-detail-balance p {
+  font-size: 16px !important;
+  color: var(--tw-dark-gray) !important;
+}
+
+/* Adjust the "Send USDT" header on send screen */
+.screen-header h2 {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+/* Fix recipient address input styling */
+.address-input {
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+}
+
+/* Make action buttons match Trust Wallet's size */
+.action-circle i {
+  width: 40px !important;
+  height: 40px !important;
+  font-size: 16px !important;
+}
+
+.action-circle span {
+  font-size: 11px !important;
+}
