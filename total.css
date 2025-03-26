@@ -3618,3 +3618,25 @@ Here's the CSS to fix the USDT background issue in the history page:
   margin-top: 0 !important;
   display: inline !important;
 }
+
+/* Add to total.css - Transaction list scrolling */
+#transaction-list {
+  max-height: 300px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* For iOS */
+  scrollbar-width: thin; /* For Firefox */
+}
+
+#transaction-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+#transaction-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+#transaction-list::-webkit-scrollbar-thumb {
+  background: #c4c9cc;
+  border-radius: 4px;
+}
