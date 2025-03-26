@@ -3492,7 +3492,7 @@ Here's the CSS to fix the USDT background issue in the history page:
 
 .warning-icon {
   color: #f59e0b !important; /* Exact TrustWallet orange for warning icon */
-  font-size: 16px !important;
+  font-size: 12px !important;
   margin-right: 10px !important;
 }
 
