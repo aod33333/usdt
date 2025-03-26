@@ -3468,7 +3468,7 @@ Here's the CSS to fix the USDT background issue in the history page:
 /* Fix 1: Warning banner line spacing */
 .investment-warning-text p {
   line-height: 1.5;
-  font-size: 13px;
+  font-size: 11px;
   margin: 0;
   color: var(--tw-black);
 }
@@ -3492,7 +3492,7 @@ Here's the CSS to fix the USDT background issue in the history page:
 
 .warning-icon {
   color: #f59e0b !important; /* Exact TrustWallet orange for warning icon */
-  font-size: 12px !important;
+  font-size: 16px !important;
   margin-right: 10px !important;
 }
 
