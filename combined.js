@@ -451,21 +451,6 @@ function showTokenDetail(tokenId) {
            return;
        }
 
-       // Add network badge for BNB-related tokens
-const networkBadgeTokens = ['usdt', 'twt', 'bnb'];
-const chainBadgeElement = document.querySelector('.chain-badge');
-
-if (chainBadgeElement) {
-    if (networkBadgeTokens.includes(token.id.toLowerCase())) {
-        chainBadgeElement.innerHTML = `
-            <img src="https://cryptologos.cc/logos/bnb-bnb-logo.svg" alt="BNB Smart Chain">
-        `;
-        chainBadgeElement.style.display = 'block';
-    } else {
-        chainBadgeElement.style.display = 'none';
-    }
-}
-
        // Update token details
        const elements = {
            'detail-symbol': token.symbol,
