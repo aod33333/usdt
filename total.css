@@ -2582,3 +2582,104 @@ button {
     width: 80px;
     height: 80px;
 }
+
+/* Token Detail Header Refinements */
+.token-detail-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 0;
+    min-height: 56px; /* Match standard header height */
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background-color: #FFFFFF;
+    border-bottom: 1px solid #F5F5F5;
+    height: 56px; /* Consistent height */
+}
+
+.token-symbol-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#detail-symbol {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.token-network-label {
+    font-size: 12px;
+    color: var(--tw-medium-gray);
+}
+
+.token-warning {
+    margin: 0;
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+}
+
+.investment-warning.token-warning {
+    width: 100%;
+    margin: 0;
+    padding: 12px 16px;
+}
+
+.investment-warning-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.investment-warning-text {
+    flex: 1;
+    padding-right: 8px;
+}
+
+.warning-icon {
+    margin-right: 12px;
+    align-self: flex-start;
+}
+
+.icon-button.menu-button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+
+/* Ensure back button is consistent */
+#back-button {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+}
+
+/* Tighten up the token detail content spacing */
+.token-detail-content {
+    padding-top: 0;
+}
+
+.token-detail-icon-container {
+    margin: 16px 0;
+}
+
+.token-detail-large-icon {
+    width: 80px;
+    height: 80px;
+}
