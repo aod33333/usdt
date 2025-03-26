@@ -3582,3 +3582,19 @@ Here's the CSS to fix the USDT background issue in the history page:
     padding: 16px;
     flex: 1;
 }
+
+/* Fix for transaction history and token detail pages */
+.screen.with-status-bar {
+    padding-top: 24px !important; /* Matches status bar height */
+}
+
+.transaction-header,
+.detail-header {
+    margin-top: 0 !important;
+    padding-top: 8px !important;
+}
+
+.token-detail-title {
+    margin-top: 0 !important;
+    padding: 8px 0 !important;
+}
