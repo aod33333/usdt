@@ -2402,3 +2402,32 @@ button {
 .close-warning:hover {
   background: rgba(0,0,0,0.05) !important;
 }
+
+/* Trust Wallet Header Standardization */
+.app-header {
+  max-width: 1200px !important; /* TW's exact max-width */
+  margin: 0 auto !important;
+  padding: 0 24px !important; /* TW's side spacing */
+  height: 64px !important; /* TW's header height */
+  
+  /* Main page header styling replica */
+  border-bottom: 1px solid #e5e7eb !important;
+  background: rgba(255,255,255,0.95) !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+/* Logo and Navigation Alignment */
+.header-content {
+  gap: 32px !important; /* TW's exact nav spacing */
+  padding: 0 12px !important;
+}
+
+/* Wallet Name/Selector */
+.wallet-selector {
+  font-size: 16px !important; /* TW's base text */
+  font-weight: 500 !important;
+  color: #1f2937 !important; /* TW gray-800 */
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+  transition: all 0.2s !important;
+}
