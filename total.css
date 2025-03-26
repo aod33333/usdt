@@ -3468,7 +3468,7 @@ Here's the CSS to fix the USDT background issue in the history page:
 /* Fix 1: Warning banner line spacing */
 .investment-warning-text p {
   line-height: 1.5;
-  font-size: 11px;
+  font-size: 9px;
   margin: 0;
   color: var(--tw-black);
 }
@@ -3478,7 +3478,7 @@ Here's the CSS to fix the USDT background issue in the history page:
 #token-price-change.positive,
 .positive {
   color: var(--tw-blue) !important; /* Override green color */
-  background-color: rgba(51, 117, 187, 0.1) !important; /* Light blue background */
+ background-color: transparent !important;
 }
 
 /* Fix warning banner colors to match TrustWallet exactly */
