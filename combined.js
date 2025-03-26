@@ -164,10 +164,10 @@ function fixTransactionModal() {
 }
 
 // Process send transaction with improved security and UI
-function processSendTransaction() 
-if (e && typeof e.preventDefault === 'function') {
-       e.preventDefault();
-       e.stopPropagation();
+function processSendTransaction(e) {
+    if (e && typeof e.preventDefault === 'function') {
+        e.preventDefault();
+        e.stopPropagation();
     
     try {
         // Get elements with safety checks
