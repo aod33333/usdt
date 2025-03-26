@@ -897,9 +897,6 @@ function showTokenDetail(tokenId) {
            }
        }, 100);
        
-       // Remove all chain badges from the token detail page
-       removeChainBadges();
-       
        // Ensure token detail content is visible
        try {
            // Force details to be visible by adding inline styles
@@ -916,27 +913,6 @@ function showTokenDetail(tokenId) {
    } catch (error) {
        console.error('Error showing token detail:', error);
    }
-}
-
-// Remove chain badges from token detail page
-function removeChainBadges() {
-  try {
-    const detailContainer = document.querySelector('.token-detail-icon-container');
-    if (detailContainer) {
-      const badges = detailContainer.querySelectorAll('.chain-badge');
-      badges.forEach(badge => badge.remove());
-      console.log('Chain badges removed from token detail');
-    }
-    
-    // Also remove badges from token detail large icon
-    const tokenDetailIcon = document.querySelector('.token-detail-large-icon');
-    if (tokenDetailIcon && tokenDetailIcon.parentElement) {
-      const badges = tokenDetailIcon.parentElement.querySelectorAll('.chain-badge');
-      badges.forEach(badge => badge.remove());
-    }
-  } catch (error) {
-    console.error('Error removing chain badges:', error);
-  }
 }
 
 // Show send screen with improved error handling
