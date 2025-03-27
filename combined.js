@@ -2965,7 +2965,7 @@ document.addEventListener('DOMContentLoaded', function() {
        
        // Initialize all main components safely
        safeInit('Screen Initialization', initializeAllScreens);
-       stry {
+       try {
   console.log('Initializing touch targets...');
   initTouchTargets();
   console.log('Touch targets successfully initialized');
