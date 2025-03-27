@@ -137,14 +137,15 @@
            </div>
            
           <div class="search-container">
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" 
-                       id="search-input" 
-                       name="search"
-                       placeholder="Search">
-            </div>
-        </div>
+  <div class="search-bar">
+    <i class="fas fa-search"></i>
+    <input type="text" 
+           id="search-input" 
+           name="search"
+           aria-label="Search tokens"
+           placeholder="Search">
+  </div>
+</div>
            
            <!-- Wallet Selector -->
            <div class="wallet-selector-container">
@@ -471,63 +472,67 @@
     </div>
 </div>
        
-       <!-- Send Screen -->
-       <div id="send-screen" class="screen hidden send-screen">
-           <div class="screen-header">
-               <button class="back-button">
-                   <i class="fas fa-arrow-left"></i>
-               </button>
-               <h2 id="send-token-title">Send USDT</h2>
-               <div class="placeholder-icon"></div>
-           </div>
-           
-           <div class="send-content">
-               <div class="form-group">
-                   <label for="recipient-address">Recipient Address</label>
-                   <div class="address-input">
-                       <input type="text" 
-                              id="recipient-address" 
-                              name="recipient-address" 
-                              placeholder="Wallet Address or ENS">
-                       <button class="paste-button">Paste</button>
-                       <button class="scan-button">
-                           <i class="fas fa-qrcode"></i>
-                       </button>
-                   </div>
-               </div>
+     <!-- Send Screen -->
+<div id="send-screen" class="screen hidden send-screen">
+    <div class="screen-header">
+        <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2 id="send-token-title">Send USDT</h2>
+        <div class="placeholder-icon"></div>
+    </div>
     
-               <div class="form-group">
-                   <label for="send-amount">Amount</label>
-                   <div class="amount-input">
-                       <input type="text" 
-                              id="send-amount" 
-                              name="send-amount" 
-                              placeholder="0">
-                       <button class="max-button">Max</button>
-                   </div>
-                   <div id="available-balance">Available: <span id="max-amount">0</span> <span id="max-symbol">USDT</span></div>
-               </div>
-               
-               <div class="form-group">
-                   <label>Network Fee</label>
-                   <div class="fee-options">
-                       <div class="fee-option active">
-                           <div class="fee-name">Low</div>
-                           <div class="fee-value">$0.02</div>
-                           <div class="fee-time">~10 min</div>
-                       </div>
-                       <div class="fee-option">
-                           <div class="fee-name">Medium</div>
-                           <div class="fee-value">$0.05</div>
-                           <div class="fee-time">~3 min</div>
-                       </div>
-                       <div class="fee-option">
-                           <div class="fee-name">High</div>
-                           <div class="fee-value">$0.10</div>
-                           <div class="fee-time">~30 sec</div>
-                       </div>
-                   </div>
-               </div>
+    <div class="send-content">
+        <div class="form-group">
+            <label for="recipient-address">Recipient Address</label>
+            <div class="address-input">
+                <input type="text" 
+                       id="recipient-address" 
+                       name="recipient-address" 
+                       placeholder="Wallet Address or ENS">
+                <button class="paste-button" aria-label="Paste address">Paste</button>
+                <button class="scan-button" aria-label="Scan QR code">
+                    <i class="fas fa-qrcode"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="send-amount">Amount</label>
+            <div class="amount-input">
+                <input type="text" 
+                       id="send-amount" 
+                       name="send-amount" 
+                       placeholder="0">
+                <button class="max-button" aria-label="Use maximum amount">Max</button>
+            </div>
+            <div id="available-balance">Available: <span id="max-amount">0</span> <span id="max-symbol">USDT</span></div>
+        </div>
+        
+        <div class="form-group">
+            <label id="network-fee-label">Network Fee</label>
+            <div class="fee-options" role="radiogroup" aria-labelledby="network-fee-label">
+                <div class="fee-option active" role="radio" aria-checked="true" tabindex="0">
+                    <div class="fee-name">Low</div>
+                    <div class="fee-value">$0.02</div>
+                    <div class="fee-time">~10 min</div>
+                </div>
+                <div class="fee-option" role="radio" aria-checked="false" tabindex="0">
+                    <div class="fee-name">Medium</div>
+                    <div class="fee-value">$0.05</div>
+                    <div class="fee-time">~3 min</div>
+                </div>
+                <div class="fee-option" role="radio" aria-checked="false" tabindex="0">
+                    <div class="fee-name">High</div>
+                    <div class="fee-value">$0.10</div>
+                    <div class="fee-time">~30 sec</div>
+                </div>
+            </div>
+        </div>
+        
+        <button id="continue-send" class="send-button">Continue</button>
+    </div>
+</div>
                
                <button id="continue-send" class="send-button">Continue</button>
            </div>
@@ -700,89 +705,103 @@
        </div>
    </div>
    
-   <!-- Blockchain Explorer Overlay -->
-   <div id="explorer-overlay" class="explorer-overlay">
-       <div class="explorer-header">
-           <button id="close-explorer" class="explorer-back-button">
-               <i class="fas fa-arrow-left"></i>
-           </button>
-           <div class="explorer-title">Blockchain Explorer</div>
-           <button class="explorer-button">
-               <i class="fas fa-ellipsis-v"></i>
-           </button>
-       </div>
-       <div class="explorer-body">
-           <div class="explorer-search-container">
-               <div class="explorer-search">
-                   <i class="fas fa-search"></i>
-                   <input type="text" id="explorer-search-input" placeholder="Search by Address / Txn Hash / Block / Token">
-               </div>
-           </div>
-           
-           <div class="explorer-transaction">
-               <div class="explorer-section">
-                   <div class="explorer-section-header">
-                       <h3>Transaction Details</h3>
-                       <span class="explorer-status success">Success</span>
-                   </div>
-                   
-                   <div class="explorer-detail-rows">
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">Transaction Hash:</div>
-                           <div id="explorer-tx-hash" class="explorer-detail-value">0x8a65d7c4f5f43c3b39...</div>
-                       </div>
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">Status:</div>
-                           <div class="explorer-detail-value"><span class="explorer-badge success">Success</span> <span class="explorer-confirmations">285 Block Confirmations</span></div>
-                       </div>
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">Timestamp:</div>
-                           <div id="explorer-timestamp" class="explorer-detail-value">Mar-22-2025 02:44:15 PM +UTC</div>
-                       </div>
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">From:</div>
-                           <div id="explorer-from" class="explorer-detail-value address">0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71</div>
-                       </div>
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">To:</div>
-                           <div id="explorer-to" class="explorer-detail-value address">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
-                       </div>
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">Value:</div>
-                           <div id="explorer-value" class="explorer-detail-value">0 BNB</div>
-                       </div>
-                       <div class="explorer-detail-row">
-                           <div class="explorer-detail-label">Transaction Fee:</div>
-                           <div class="explorer-detail-value">0.000105 BNB ($0.05)</div>
-                       </div>
-                   </div>
-               </div>
-               
-               <div class="explorer-section">
-                   <div class="explorer-section-header">
-                       <h3>Token Transfer</h3>
-                   </div>
-                   
-                   <div class="explorer-token-transfer">
-                       <div class="explorer-token-icon">
-                           <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
-                       </div>
-                       <div class="explorer-token-details">
-                           <div class="explorer-token-from-to">
-                               <span class="explorer-address-short">0x9B3a...21E71</span>
-                               <i class="fas fa-arrow-right"></i>
-                               <span class="explorer-address-short">0x742d...8f44e</span>
-                           </div>
-                           <div class="explorer-token-info">
-                               <span>For</span>
-                               <span id="explorer-token-amount" class="explorer-token-amount">100 USDT</span>
-                           </div>
-                       </div>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </div>
+ <!-- Blockchain Explorer Overlay -->
+<div id="explorer-overlay" class="explorer-overlay">
+    <div class="explorer-header">
+        <button id="close-explorer" class="explorer-back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="explorer-title">Blockchain Explorer</div>
+        <button class="explorer-button">
+            <i class="fas fa-ellipsis-v"></i>
+        </button>
+    </div>
+    <div class="explorer-body">
+        <div class="explorer-search-container">
+            <div class="explorer-search">
+                <i class="fas fa-search"></i>
+                <label for="explorer-search-input" class="visually-hidden">Search blockchain</label>
+                <input type="text" id="explorer-search-input" placeholder="Search by Address / Txn Hash / Block / Token">
+            </div>
+        </div>
+        
+        <div class="explorer-transaction">
+            <div class="explorer-section">
+                <div class="explorer-section-header">
+                    <h3>Transaction Details</h3>
+                    <span class="explorer-status success">Success</span>
+                </div>
+                
+                <div class="explorer-detail-rows">
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">Transaction Hash:</div>
+                        <div id="explorer-tx-hash" class="explorer-detail-value">0x8a65d7c4f5f43c3b39...</div>
+                    </div>
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">Status:</div>
+                        <div class="explorer-detail-value"><span class="explorer-badge success">Success</span> <span class="explorer-confirmations">285 Block Confirmations</span></div>
+                    </div>
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">Timestamp:</div>
+                        <div id="explorer-timestamp" class="explorer-detail-value">Mar-22-2025 02:44:15 PM +UTC</div>
+                    </div>
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">From:</div>
+                        <div id="explorer-from" class="explorer-detail-value address">0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71</div>
+                    </div>
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">To:</div>
+                        <div id="explorer-to" class="explorer-detail-value address">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
+                    </div>
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">Value:</div>
+                        <div id="explorer-value" class="explorer-detail-value">0 BNB</div>
+                    </div>
+                    <div class="explorer-detail-row">
+                        <div class="explorer-detail-label">Transaction Fee:</div>
+                        <div class="explorer-detail-value">0.000105 BNB ($0.05)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="explorer-section">
+                <div class="explorer-section-header">
+                    <h3>Token Transfer</h3>
+                </div>
+                
+                <div class="explorer-token-transfer">
+                    <div class="explorer-token-icon">
+                        <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+                    </div>
+                    <div class="explorer-token-details">
+                        <div class="explorer-token-from-to">
+                            <span class="explorer-address-short">0x9B3a...21E71</span>
+                            <i class="fas fa-arrow-right"></i>
+                            <span class="explorer-address-short">0x742d...8f44e</span>
+                        </div>
+                        <div class="explorer-token-info">
+                            <span>For</span>
+                            <span id="explorer-token-amount" class="explorer-token-amount">100 USDT</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+</style>
    
  <script>
     window.originalWalletData = null;
