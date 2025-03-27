@@ -3061,246 +3061,674 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(setTokenAttributes, 1000);
 });
 
-    // Enhanced event listener conflict resolution that also fixes other issues
-function resolveWalletAppIssues() {
-  // 1. Fix event listener conflicts
-  function safeReplaceWithClone(selector, clickHandler) {
-    const element = document.querySelector(selector);
-    if (!element || !element.parentNode) return null;
+// Add this code to the bottom of combined.js or as a new <script> tag at the end of index.html
+
+(function() {
+  // Main fix function that will be called at strategic times
+  function fixWalletApp() {
+    console.log("Applying wallet fixes...");
     
-    const clone = element.cloneNode(true);
-    element.parentNode.replaceChild(clone, element);
+    // 1. Fix bottom tabs - most critical UI element
+    fixBottomTabs();
     
-    if (clickHandler) {
-      clone.addEventListener('click', clickHandler);
-    }
+    // 2. Fix token detail header
+    fixTokenDetailHeader();
     
-    return clone;
+    // 3. Fix send/receive screens
+    fixSendReceiveScreens();
+    
+    // 4. Fix transaction flow
+    fixTransactionFlow();
+    
+    // 5. Make all tokens clickable
+    makeTokensClickable();
+    
+    // 6. Fix explorer overlay
+    fixExplorerOverlay();
+    
+    // 7. Fix chain badges
+    fixChainBadges();
+    
+    // 8. Fix history screen
+    fixHistoryScreen();
   }
   
-  // 2. Fix send/receive buttons
-  safeReplaceWithClone('#send-button', function() {
-    showSendScreen('usdt');
-  });
+  // Fix bottom tabs to always be visible
+  function fixBottomTabs() {
+    const bottomTabs = document.querySelector('.bottom-tabs');
+    if (!bottomTabs) return;
+    
+    // Move to end of document to ensure proper stacking
+    document.body.appendChild(bottomTabs);
+    
+    // Apply extensive forced styling
+    bottomTabs.setAttribute('style', 
+      'display: flex !important; ' +
+      'position: fixed !important; ' +
+      'bottom: 0 !important; ' +
+      'left: 0 !important; ' +
+      'width: 100% !important; ' +
+      'height: 60px !important; ' +
+      'visibility: visible !important; ' +
+      'opacity: 1 !important; ' + 
+      'z-index: 10000 !important; ' +
+      'pointer-events: auto !important; ' +
+      'background-color: #FFFFFF !important; ' +
+      'border-top: 1px solid #F5F5F5 !important;');
+    
+    // Ensure all tab items are also visible
+    const tabItems = bottomTabs.querySelectorAll('.tab-item');
+    tabItems.forEach(item => {
+      item.style.display = 'flex';
+      item.style.visibility = 'visible';
+      item.style.opacity = '1';
+    });
+  }
   
-  safeReplaceWithClone('#receive-button', function() {
-    showReceiveScreen('btc');
-  });
+  // Fix token detail header
+  function fixTokenDetailHeader() {
+    const detailHeader = document.querySelector('.token-detail-title');
+    if (!detailHeader) return;
+    
+    // Clear existing content
+    detailHeader.innerHTML = '';
+    
+    // Get the token data
+    const tokenSymbol = document.getElementById('detail-symbol')?.textContent || 'ETH';
+    const tokenFullName = document.getElementById('detail-fullname')?.textContent || 'Ethereum';
+    
+    // Create top line: Token Symbol only
+    const symbolContainer = document.createElement('div');
+    symbolContainer.className = 'token-symbol-container';
+    symbolContainer.style.marginBottom = '2px';
+    symbolContainer.style.textAlign = 'center';
+    symbolContainer.style.width = '100%';
+    
+    const detailSymbol = document.createElement('span');
+    detailSymbol.id = 'detail-symbol';
+    detailSymbol.textContent = tokenSymbol;
+    detailSymbol.style.fontWeight = '600';
+    detailSymbol.style.fontSize = '18px';
+    detailSymbol.style.textAlign = 'center';
+    symbolContainer.appendChild(detailSymbol);
+    
+    // Create second line: "COIN | Token Name"
+    const fullnameContainer = document.createElement('div');
+    fullnameContainer.id = 'detail-fullname';
+    fullnameContainer.textContent = `COIN | ${tokenFullName}`;
+    fullnameContainer.style.fontSize = '12px';
+    fullnameContainer.style.color = 'var(--tw-medium-gray)';
+    
+    // Add both elements to the title container
+    detailHeader.appendChild(symbolContainer);
+    detailHeader.appendChild(fullnameContainer);
+    
+    // Apply better styling to container
+    detailHeader.style.flexDirection = 'column';
+    detailHeader.style.alignItems = 'flex-start';
+    detailHeader.style.padding = '0';
+  }
   
-  // 3. Fix token detail send/receive buttons
-  safeReplaceWithClone('#token-detail .token-detail-actions .action-circle:nth-child(1)', function() {
-    const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'usdt';
-    showSendScreen(tokenId);
-  });
-  
-  safeReplaceWithClone('#token-detail .token-detail-actions .action-circle:nth-child(2)', function() {
-    const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'btc';
-    showReceiveScreen(tokenId);
-  });
-  
-  // 4. Fix continue send button (ALSO ADDRESSES TRANSACTION FLOW ISSUE)
-  const sendButton = safeReplaceWithClone('#continue-send', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Fix send button position
-    if (this) {
-      this.style.marginTop = 'auto';
-      this.style.marginBottom = '80px';
-    }
-    
-    // Show loading state
-    this.classList.add('loading');
-    
-    // Get form values
-    const recipientInput = document.getElementById('recipient-address');
-    const amountInput = document.getElementById('send-amount');
-    
-    if (!recipientInput || !amountInput) {
-      alert('Error: Form fields not found');
-      this.classList.remove('loading');
-      return;
-    }
-    
-    // Basic validation
-    const recipient = recipientInput.value.trim();
-    const amount = parseFloat(amountInput.value);
-    
-    if (!recipient || recipient.length < 5) {
-      alert('Please enter a valid recipient address');
-      this.classList.remove('loading');
-      return;
-    }
-    
-    if (isNaN(amount) || amount <= 0) {
-      alert('Please enter a valid amount');
-      this.classList.remove('loading');
-      return;
-    }
-    
-    // Hide send screen
-    const sendScreen = document.getElementById('send-screen');
-    if (sendScreen) sendScreen.style.display = 'none';
-    
-    // Show transaction modal
-    const txModal = document.getElementById('tx-status-modal');
-    if (txModal) {
-      // Fix transaction modal z-index
-      txModal.style.zIndex = '9999';
-      txModal.style.display = 'flex';
+  // Fix send/receive screens
+  function fixSendReceiveScreens() {
+    // Fix back buttons
+    document.querySelectorAll('.back-button').forEach(button => {
+      // Clone the button to remove all event listeners
+      const newButton = button.cloneNode(true);
+      if (button.parentNode) {
+        button.parentNode.replaceChild(newButton, button);
+      }
       
-      // Set modal elements
-      const pendingView = document.getElementById('tx-pending');
-      const successView = document.getElementById('tx-success');
-      
-      if (pendingView) pendingView.classList.remove('hidden');
-      if (successView) successView.classList.add('hidden');
-      
-      // Set transaction details
-      const txHash = document.getElementById('tx-hash');
-      const txAmount = document.getElementById('tx-amount');
-      const txTo = document.getElementById('tx-to');
-      
-      if (txHash) txHash.textContent = '0x' + Math.random().toString(16).substring(2, 18) + '...';
-      if (txAmount) txAmount.textContent = `${amount} USDT`;
-      if (txTo) txTo.textContent = recipient.substring(0, 6) + '...';
-      
-      // Simulate blockchain confirmation (3 seconds)
-      setTimeout(() => {
-        this.classList.remove('loading');
-        
-        if (pendingView) pendingView.classList.add('hidden');
-        if (successView) successView.classList.remove('hidden');
-        
-        // Fix "Done" button
-        fixTransactionModal();
-      }, 3000);
-    }
-  });
-  
-  // 5. Fix transaction close button
-  safeReplaceWithClone('#close-tx-success', function() {
-    const modal = document.getElementById('tx-status-modal');
-    if (modal) modal.style.display = 'none';
-    
-    const walletScreen = document.getElementById('wallet-screen');
-    if (walletScreen) {
-      walletScreen.style.display = 'flex';
-      walletScreen.classList.remove('hidden');
-    }
-  });
-  
-  // 6. Fix back buttons
-  document.querySelectorAll('.back-button').forEach(button => {
-    const newButton = button.cloneNode(true);
-    if (button.parentNode) {
-      button.parentNode.replaceChild(newButton, button);
-      
+      // Add new event listener
       newButton.addEventListener('click', function() {
+        // Find closest screen
         const currentScreen = newButton.closest('.screen');
         if (!currentScreen) return;
         
         // Hide current screen
         currentScreen.style.display = 'none';
+        currentScreen.classList.add('hidden');
         
         // Show wallet screen
         const walletScreen = document.getElementById('wallet-screen');
-        if (walletScreen) {
-          walletScreen.style.display = 'flex';
-          walletScreen.classList.remove('hidden');
-        }
+        walletScreen.style.display = 'flex';
+        walletScreen.classList.remove('hidden');
       });
-    }
-  });
-  
-  // 7. Fix explorer display for transaction history
-  const transactionItems = document.querySelectorAll('.transaction-item');
-  transactionItems.forEach(item => {
-    const newItem = item.cloneNode(true);
-    if (item.parentNode) {
-      item.parentNode.replaceChild(newItem, item);
-      
-      newItem.addEventListener('click', function() {
-        const explorerOverlay = document.getElementById('explorer-overlay');
-        if (!explorerOverlay) return;
-        
-        // Fix explorer styling
-        explorerOverlay.style.zIndex = '2000';
-        explorerOverlay.style.display = 'flex';
-        
-        // Add back button functionality
-        const backButton = explorerOverlay.querySelector('.explorer-back-button');
-        if (backButton) {
-          backButton.onclick = function() {
-            explorerOverlay.style.display = 'none';
-          };
-        }
-      });
-    }
-  });
-  
-  // 8. Ensure bottom tabs stay visible
-  const bottomTabs = document.querySelector('.bottom-tabs');
-  if (bottomTabs) {
-    bottomTabs.style.display = 'flex';
-    bottomTabs.style.position = 'fixed';
-    bottomTabs.style.bottom = '0';
-    bottomTabs.style.left = '0';
-    bottomTabs.style.width = '100%';
-    bottomTabs.style.zIndex = '9999';
-    bottomTabs.style.visibility = 'visible';
-    bottomTabs.style.opacity = '1';
+    });
     
-    // Keep tabs on top of everything else
-    document.body.appendChild(bottomTabs);
+    // Fix send button position
+    const sendButton = document.getElementById('continue-send');
+    if (sendButton) {
+      sendButton.style.marginTop = 'auto';
+      sendButton.style.marginBottom = '80px';
+    }
   }
   
-  // 9. Fix all token detail pages with proper attribute
-  const tokenList = document.getElementById('token-list');
-  if (tokenList) {
+  // Fix transaction flow
+  function fixTransactionFlow() {
+    // Override processSendTransaction
+    if (typeof window.processSendTransaction === 'function') {
+      const originalProcessSendTransaction = window.processSendTransaction;
+      
+      window.processSendTransaction = function(e) {
+        if (e && typeof e.preventDefault === 'function') {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        
+        try {
+          // Get elements with safety checks
+          const sendButton = document.getElementById('continue-send');
+          const sendScreen = document.getElementById('send-screen');
+          const txStatusModal = document.getElementById('tx-status-modal');
+          
+          if (!sendButton || !sendScreen || !txStatusModal) {
+            console.error('Missing required elements for transaction');
+            return;
+          }
+          
+          // Fix transaction modal
+          txStatusModal.style.zIndex = '9999';
+          
+          // Add loading state
+          sendButton.classList.add('loading');
+          
+          // Get and validate input values
+          const amountInput = document.getElementById('send-amount');
+          const recipientInput = document.getElementById('recipient-address');
+          
+          if (!amountInput || !recipientInput) {
+            alert('Form fields not found');
+            sendButton.classList.remove('loading');
+            return;
+          }
+          
+          // Basic validation
+          const amount = parseFloat(amountInput.value);
+          const recipient = recipientInput.value.trim();
+          
+          if (isNaN(amount) || amount <= 0) {
+            alert('Please enter a valid amount');
+            sendButton.classList.remove('loading');
+            return;
+          }
+          
+          if (!recipient || recipient.length < 10) {
+            alert('Please enter a valid recipient address');
+            sendButton.classList.remove('loading');
+            return;
+          }
+          
+          // Close send modal
+          sendScreen.style.display = 'none';
+          
+          // Show transaction pending
+          txStatusModal.style.display = 'flex';
+          const pendingView = document.getElementById('tx-pending');
+          const successView = document.getElementById('tx-success');
+          
+          if (pendingView) pendingView.classList.remove('hidden');
+          if (successView) successView.classList.add('hidden');
+          
+          // Set transaction details
+          const txHash = document.getElementById('tx-hash');
+          const txAmountEl = document.getElementById('tx-amount');
+          const txToEl = document.getElementById('tx-to');
+          
+          if (txHash) txHash.textContent = '0x' + Math.random().toString(16).substring(2, 18) + '...';
+          if (txAmountEl) txAmountEl.textContent = `${amount} USDT`;
+          if (txToEl) txToEl.textContent = `${recipient.substring(0, 6)}...`;
+          
+          // Add a copy button to the hash if it doesn't exist
+          if (txHash && !txHash.querySelector('.fa-copy')) {
+            const copyIcon = document.createElement('i');
+            copyIcon.className = 'fas fa-copy';
+            copyIcon.style.marginLeft = '8px';
+            copyIcon.style.cursor = 'pointer';
+            copyIcon.style.color = '#3375BB';
+            
+            copyIcon.onclick = function(e) {
+              e.stopPropagation();
+              const hash = txHash.textContent;
+              navigator.clipboard.writeText(hash).then(() => {
+                alert('Transaction hash copied');
+              }).catch(err => {
+                console.error('Failed to copy:', err);
+              });
+            };
+            
+            txHash.appendChild(copyIcon);
+          }
+          
+          // Simulate blockchain confirmation (3-5 seconds)
+          setTimeout(() => {
+            // Remove loading state
+            sendButton.classList.remove('loading');
+            
+            // Show success view
+            if (pendingView) pendingView.classList.add('hidden');
+            if (successView) successView.classList.remove('hidden');
+            
+            // Fix close button
+            const closeBtn = document.getElementById('close-tx-success');
+            if (closeBtn) {
+              closeBtn.onclick = function() {
+                txStatusModal.style.display = 'none';
+                const walletScreen = document.getElementById('wallet-screen');
+                walletScreen.style.display = 'flex';
+                walletScreen.classList.remove('hidden');
+              };
+            }
+          }, 3000);
+        } catch (error) {
+          console.error('Transaction process error:', error);
+          alert('Transaction processing error occurred');
+        }
+      };
+    }
+    
+    // Fix continue send button
+    const continueButton = document.getElementById('continue-send');
+    if (continueButton) {
+      continueButton.onclick = function(e) {
+        e.preventDefault();
+        window.processSendTransaction(e);
+      };
+    }
+    
+    // Fix transaction modal close button
+    const closeBtn = document.getElementById('close-tx-success');
+    if (closeBtn) {
+      closeBtn.onclick = function() {
+        const modal = document.getElementById('tx-status-modal');
+        modal.style.display = 'none';
+        
+        const walletScreen = document.getElementById('wallet-screen');
+        walletScreen.style.display = 'flex';
+        walletScreen.classList.remove('hidden');
+      };
+    }
+  }
+  
+  // Make all tokens clickable
+  function makeTokensClickable() {
+    const tokenList = document.getElementById('token-list');
+    if (!tokenList) return;
+    
     const tokenItems = tokenList.querySelectorAll('.token-item');
     tokenItems.forEach(item => {
+      // Clone to remove existing listeners
       const newItem = item.cloneNode(true);
       if (item.parentNode) {
         item.parentNode.replaceChild(newItem, item);
+      }
+      
+      // Add click event
+      newItem.addEventListener('click', function() {
+        const tokenId = newItem.getAttribute('data-token-id');
+        if (!tokenId) return;
         
-        // Ensure all tokens show token detail
-        newItem.addEventListener('click', function() {
-          const tokenId = newItem.getAttribute('data-token-id');
-          if (tokenId && typeof showTokenDetail === 'function') {
-            showTokenDetail(tokenId);
+        // Get screens
+        const walletScreen = document.getElementById('wallet-screen');
+        const tokenDetail = document.getElementById('token-detail');
+        
+        if (!walletScreen || !tokenDetail) return;
+        
+        // Find token data
+        const token = window.currentWalletData?.[window.activeWallet]?.tokens?.find(t => t.id === tokenId);
+        if (!token) return;
+        
+        // Update token details
+        const elements = {
+          'detail-symbol': token.symbol,
+          'detail-fullname': token.name,
+          'token-balance-amount': `${token.amount.toFixed(6)} ${token.symbol}`,
+          'token-balance-value': `$${token.value.toFixed(2)}`
+        };
+        
+        Object.entries(elements).forEach(([id, value]) => {
+          const element = document.getElementById(id);
+          if (element) element.textContent = value;
+        });
+        
+        // Update token icon
+        const tokenDetailIcon = document.getElementById('token-detail-icon');
+        if (tokenDetailIcon) {
+          tokenDetailIcon.src = getTokenLogoUrl(token.id);
+        }
+        
+        // Fix token detail header
+        fixTokenDetailHeader();
+        
+        // Hide wallet screen, show token detail
+        walletScreen.classList.add('hidden');
+        walletScreen.style.display = 'none';
+        
+        tokenDetail.classList.remove('hidden');
+        tokenDetail.style.display = 'flex';
+        
+        // Update transactions if available
+        if (window.updateTransactionsForToken && typeof window.updateTransactionsForToken === 'function') {
+          window.updateTransactionsForToken(tokenId);
+        }
+      });
+    });
+    
+    // Helper function to get token logo URL
+    function getTokenLogoUrl(tokenId) {
+      const logoUrls = {
+        'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+        'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+        'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+        'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+        'twt': 'https://i.ibb.co/NdQ4xthxS/Screenshot-2025-03-25-031716.png',
+        'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+        'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+        'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png'
+      };
+      
+      return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
+    }
+  }
+  
+  // Fix explorer overlay
+  function fixExplorerOverlay() {
+    const explorerOverlay = document.getElementById('explorer-overlay');
+    if (!explorerOverlay) return;
+    
+    // Fix z-index
+    explorerOverlay.style.zIndex = '9999';
+    
+    // Fix back button
+    const backButton = explorerOverlay.querySelector('.explorer-back-button');
+    if (backButton) {
+      backButton.onclick = function() {
+        explorerOverlay.style.display = 'none';
+      };
+    }
+    
+    // Make all transaction items show explorer
+    document.querySelectorAll('.transaction-item').forEach(item => {
+      // Clone to remove existing listeners
+      const newItem = item.cloneNode(true);
+      if (item.parentNode) {
+        item.parentNode.replaceChild(newItem, item);
+      }
+      
+      // Add click event
+      newItem.addEventListener('click', function() {
+        explorerOverlay.style.display = 'flex';
+      });
+    });
+  }
+  
+  // Fix chain badges
+  function fixChainBadges() {
+    // Define BNB chain tokens
+    const bnbTokens = ['usdt', 'bnb', 'twt'];
+    
+    // Fix badges in token list
+    const tokenItems = document.querySelectorAll('.token-item');
+    tokenItems.forEach(item => {
+      const tokenId = item.getAttribute('data-token-id');
+      if (!bnbTokens.includes(tokenId)) return;
+      
+      const tokenIcon = item.querySelector('.token-icon');
+      if (!tokenIcon) return;
+      
+      // Remove existing badges
+      const existingBadges = tokenIcon.querySelectorAll('.chain-badge');
+      existingBadges.forEach(badge => badge.remove());
+      
+      // Create new badge
+      const badge = document.createElement('div');
+      badge.className = 'chain-badge';
+      badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain">';
+      
+      // Style container and badge
+      tokenIcon.style.position = 'relative';
+      tokenIcon.style.overflow = 'visible';
+      
+      badge.style.display = 'block';
+      badge.style.position = 'absolute';
+      badge.style.bottom = '-6px';
+      badge.style.right = '-6px';
+      badge.style.width = '20px';
+      badge.style.height = '20px';
+      badge.style.borderRadius = '50%';
+      badge.style.border = '2px solid #FFFFFF';
+      badge.style.background = '#FFFFFF';
+      badge.style.zIndex = '5';
+      badge.style.overflow = 'visible';
+      badge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+      
+      const badgeImg = badge.querySelector('img');
+      if (badgeImg) {
+        badgeImg.style.width = '100%';
+        badgeImg.style.height = '100%';
+        badgeImg.style.objectFit = 'contain';
+        badgeImg.style.padding = '2px';
+        badgeImg.style.display = 'block';
+      }
+      
+      tokenIcon.appendChild(badge);
+    });
+    
+    // Fix badge in token detail
+    const detailSymbol = document.getElementById('detail-symbol');
+    const tokenDetailIcon = document.querySelector('.token-detail-icon-container');
+    
+    if (detailSymbol && tokenDetailIcon) {
+      const symbol = detailSymbol.textContent.toLowerCase();
+      
+      if (bnbTokens.includes(symbol)) {
+        // Remove existing badges
+        const existingBadges = tokenDetailIcon.querySelectorAll('.chain-badge');
+        existingBadges.forEach(badge => badge.remove());
+        
+        // Create new badge
+        const badge = document.createElement('div');
+        badge.className = 'chain-badge';
+        badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain">';
+        
+        // Style container and badge
+        tokenDetailIcon.style.position = 'relative';
+        tokenDetailIcon.style.overflow = 'visible';
+        
+        badge.style.display = 'block';
+        badge.style.position = 'absolute';
+        badge.style.bottom = '-6px';
+        badge.style.right = '-6px';
+        badge.style.width = '24px';
+        badge.style.height = '24px';
+        badge.style.borderRadius = '50%';
+        badge.style.border = '2px solid #FFFFFF';
+        badge.style.background = '#FFFFFF';
+        badge.style.zIndex = '5';
+        badge.style.overflow = 'visible';
+        badge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        
+        const badgeImg = badge.querySelector('img');
+        if (badgeImg) {
+          badgeImg.style.width = '100%';
+          badgeImg.style.height = '100%';
+          badgeImg.style.objectFit = 'contain';
+          badgeImg.style.padding = '2px';
+          badgeImg.style.display = 'block';
+        }
+        
+        tokenDetailIcon.appendChild(badge);
+      }
+    }
+  }
+  
+  // Fix history screen
+  function fixHistoryScreen() {
+    const historyScreen = document.getElementById('history-screen');
+    if (!historyScreen) return;
+    
+    // Fix back button
+    const backButton = historyScreen.querySelector('.back-button');
+    if (backButton) {
+      backButton.onclick = function() {
+        historyScreen.style.display = 'none';
+        historyScreen.classList.add('hidden');
+        
+        const walletScreen = document.getElementById('wallet-screen');
+        walletScreen.style.display = 'flex';
+        walletScreen.classList.remove('hidden');
+      };
+    }
+    
+    // Fix history tabs
+    const historyTabs = historyScreen.querySelectorAll('.history-tab');
+    historyTabs.forEach(tab => {
+      tab.onclick = function() {
+        // Remove active class from all tabs
+        historyTabs.forEach(t => t.classList.remove('active'));
+        
+        // Add active class to current tab
+        tab.classList.add('active');
+        
+        // Get filter type
+        const filterType = tab.getAttribute('data-tab');
+        
+        // Filter transactions
+        const transactions = historyScreen.querySelectorAll('.transaction-item');
+        transactions.forEach(tx => {
+          if (filterType === 'all') {
+            tx.style.display = 'flex';
+          } else if (filterType === 'send' && tx.classList.contains('transaction-send')) {
+            tx.style.display = 'flex';
+          } else if (filterType === 'receive' && tx.classList.contains('transaction-receive')) {
+            tx.style.display = 'flex';
+          } else {
+            tx.style.display = 'none';
           }
         });
+      };
+    });
+    
+    // Fix wallet selector
+    const walletSelector = historyScreen.querySelector('.wallet-selector-small');
+    if (walletSelector) {
+      walletSelector.onclick = function() {
+        const walletName = walletSelector.querySelector('.wallet-name-small');
+        if (!walletName) return;
+        
+        // Cycle through wallets
+        if (walletName.textContent.includes('1')) {
+          walletName.textContent = 'Mnemonic 2';
+          window.activeWallet = 'secondary';
+        } else if (walletName.textContent.includes('2')) {
+          walletName.textContent = 'Mnemonic 3';
+          window.activeWallet = 'business';
+        } else {
+          walletName.textContent = 'Mnemonic 1';
+          window.activeWallet = 'main';
+        }
+        
+        // Update history list if applicable
+        if (window.updateHistoryTransactionList && typeof window.updateHistoryTransactionList === 'function') {
+          window.updateHistoryTransactionList();
+        }
+      };
+    }
+  }
+  
+  // Connect history button
+  function connectHistoryButton() {
+    const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+    if (!historyButton) return;
+    
+    // Clone to remove existing listeners
+    const newButton = historyButton.cloneNode(true);
+    if (historyButton.parentNode) {
+      historyButton.parentNode.replaceChild(newButton, historyButton);
+    }
+    
+    // Add click event
+    newButton.addEventListener('click', function() {
+      const walletScreen = document.getElementById('wallet-screen');
+      const historyScreen = document.getElementById('history-screen');
+      
+      if (!walletScreen || !historyScreen) return;
+      
+      // Hide wallet screen
+      walletScreen.style.display = 'none';
+      walletScreen.classList.add('hidden');
+      
+      // Show history screen
+      historyScreen.style.display = 'flex';
+      historyScreen.classList.remove('hidden');
+      
+      // Update history list if applicable
+      if (window.updateHistoryTransactionList && typeof window.updateHistoryTransactionList === 'function') {
+        window.updateHistoryTransactionList();
       }
     });
   }
-}
-
-// Run the enhanced conflict resolution when the DOM loads
-document.addEventListener('DOMContentLoaded', function() {
-  // Run immediately after DOM loads
-  setTimeout(resolveWalletAppIssues, 500);
   
-  // Run again after a delay to catch any dynamically loaded content
-  setTimeout(resolveWalletAppIssues, 2000);
+  // Run fixes at strategic times
   
-  // Also run whenever a screen becomes visible
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
-      if (mutation.type === 'attributes' && 
-          mutation.attributeName === 'style' && 
-          mutation.target.style.display !== 'none') {
-        // Screen became visible, apply fixes
-        setTimeout(resolveWalletAppIssues, 50);
-      }
+  // 1. Run on DOMContentLoaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      fixWalletApp();
+      connectHistoryButton();
     });
-  });
+  } else {
+    // DOM already loaded
+    setTimeout(function() {
+      fixWalletApp();
+      connectHistoryButton();
+    }, 0);
+  }
   
-  // Observe all screens for visibility changes
-  document.querySelectorAll('.screen').forEach(screen => {
-    observer.observe(screen, { attributes: true });
-  });
-});
+  // 2. Run after delays to catch dynamic content
+  setTimeout(fixWalletApp, 500);
+  setTimeout(fixWalletApp, 2000);
+  
+  // 3. Set up mutation observer to watch for screen changes
+  const observeScreens = function() {
+    const screens = document.querySelectorAll('.screen');
+    if (screens.length === 0) {
+      setTimeout(observeScreens, 500);
+      return;
+    }
+    
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(mutation => {
+        if (mutation.attributeName === 'style' || 
+            mutation.attributeName === 'class') {
+          const isVisible = 
+            mutation.target.style.display !== 'none' && 
+            !mutation.target.classList.contains('hidden');
+          
+          if (isVisible) {
+            console.log('Screen visibility changed, reapplying fixes');
+            fixWalletApp();
+          }
+        }
+      });
+    });
+    
+    screens.forEach(screen => {
+      observer.observe(screen, { 
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+    });
+  };
+  
+  observeScreens();
+  
+  // 4. Run periodically to ensure fixes persist
+  setInterval(fixWalletApp, 5000);
+  
+  console.log("Wallet app fix script loaded and initialized");
+})();
+
 
 // Export key functions to window for global access
 window.hideAllScreens = hideAllScreens;
