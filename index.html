@@ -986,15 +986,36 @@
     });
   }
   
-  function createSampleTokens() {
-    const tokenList = document.getElementById('token-list');
-    const tokens = [
-      {id: 'btc', name: 'Bitcoin', symbol: 'BTC', amount: 0.25, value: 21000, price: 84000, change: -0.59},
-      {id: 'eth', name: 'Ethereum', symbol: 'ETH', amount: 10.5, value: 21000, price: 2000, change: -0.71},
-      {id: 'usdt', name: 'Tether', symbol: 'USDT', amount: 10000, value: 10000, price: 1.00, change: 0.00}
-    ];
+ function createSampleTokens() {
+  const tokenList = document.getElementById('token-list');
+  const tokens = [
+    {id: 'btc', name: 'Bitcoin', symbol: 'BTC', amount: 0.25, value: 21000, price: 84000, change: -0.59},
+    {id: 'eth', name: 'Ethereum', symbol: 'ETH', amount: 10.5, value: 21000, price: 2000, change: -0.71},
+    {id: 'usdt', name: 'Tether', symbol: 'USDT', amount: 10000, value: 10000, price: 1.00, change: 0.00}
+  ];
+  
+  tokens.forEach(token => {
+    const element = document.createElement('div');
+    element.className = 'token-item';
+    element.setAttribute('data-token-id', token.id);
     
-   }
+    element.innerHTML = `
+      <div class="token-icon">
+        <img src="https://cryptologos.cc/logos/${token.id}-${token.symbol.toLowerCase()}-logo.png" alt="${token.name}">
+      </div>
+      <div class="token-info">
+        <div class="token-name">${token.symbol} <span class="token-network">${token.name}</span></div>
+        <div class="token-price">$${token.price.toFixed(2)} <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">${token.change >= 0 ? '+' : ''}${token.change}%</span></div>
+      </div>
+      <div class="token-amount">
+        <div class="token-balance">${token.amount.toFixed(6)}</div>
+        <div class="token-value">$${token.value.toFixed(2)}</div>
+      </div>
+    `;
+    
+    tokenList.appendChild(element);
+  });
+}
 })();
 </script>
 
