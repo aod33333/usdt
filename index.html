@@ -1393,19 +1393,48 @@ function loadTransactionsForWallet(walletId) {
   
   if (walletId === 'main') {
     // Main wallet transactions
-    transactions.push(...[
-      // ... (keep your existing transaction array items) ...
-    ]);
+    transactions.push(
+      {
+        type: 'receive',
+        token: 'USDT',
+        amount: 500,
+        value: 500,
+        date: '2024-03-15 14:32',
+        logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+      },
+      {
+        type: 'send',
+        token: 'USDT',
+        amount: 200,
+        value: 200,
+        date: '2024-03-12 09:15',
+        logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+      }
+    );
   } else if (walletId === 'secondary') {
     // Secondary wallet transactions
-    transactions.push(...[
-      // ... (keep your existing transaction array items) ...
-    ]);
+    transactions.push(
+      {
+        type: 'receive',
+        token: 'BNB',
+        amount: 0.25,
+        value: 95.67,
+        date: '2024-03-05 11:23',
+        logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+      }
+    );
   } else if (walletId === 'business') {
     // Business wallet transactions
-    transactions.push(...[
-      // ... (keep your existing transaction array items) ...
-    ]);
+    transactions.push(
+      {
+        type: 'send',
+        token: 'USDT',
+        amount: 100,
+        value: 100,
+        date: '2024-03-20 16:45',
+        logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+      }
+    );
   }
 
   // Add transactions to DOM
