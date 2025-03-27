@@ -1,7 +1,235 @@
- // Complete wallet fix script - restores ALL functionality
-
+// Complete wallet fix script - restores ALL functionality
 // Fix for wallet transaction functionality
 (function() {
+  // Define processSendTransaction function
+  function processSendTransaction() {
+    try {
+      console.log("Processing transaction...");
+      
+      // Get the active token
+      const tokenId = window.activeSendTokenId || 'usdt';
+      const wallet = window.currentWalletData?.[window.activeWallet];
+      if (!wallet) {
+        console.error("No active wallet found");
+        return;
+      }
+      
+      const tokens = Array.isArray(wallet.tokens) 
+        ? wallet.tokens 
+        : Object.values(wallet).filter(t => t.id);
+      
+      const token = tokens.find(t => t.id === tokenId);
+      if (!token) {
+        console.error("Token not found:", tokenId);
+        return;
+      }
+      
+      // Get input values
+      const recipientAddressEl = document.getElementById('recipient-address');
+      const sendAmountEl = document.getElementById('send-amount');
+      
+      if (!recipientAddressEl || !sendAmountEl) {
+        console.error("Form elements not found");
+        return;
+      }
+      
+      const recipient = recipientAddressEl.value?.trim() || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+      const amountStr = sendAmountEl.value?.trim() || '';
+      const amount = parseFloat(amountStr);
+      
+      // Validate input
+      if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+      }
+      
+      if (amount > token.amount) {
+        alert('Insufficient balance');
+        return;
+      }
+      
+      if (!recipient.startsWith('0x') && !recipient.startsWith('bc1') && !recipient.startsWith('1')) {
+        alert('Please enter a valid recipient address');
+        return;
+      }
+      
+      // Hide all screens manually
+      const allScreens = document.querySelectorAll('.screen, .modal, .overlay');
+      allScreens.forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      // Show transaction modal
+      const txStatusModal = document.getElementById('tx-status-modal');
+      if (txStatusModal) {
+        txStatusModal.style.display = 'flex';
+        txStatusModal.classList.remove('hidden');
+        
+        const pendingView = document.getElementById('tx-pending');
+        const successView = document.getElementById('tx-success');
+        
+        if (pendingView) {
+          pendingView.style.display = 'block';
+          pendingView.classList.remove('hidden');
+        }
+        
+        if (successView) {
+          successView.style.display = 'none';
+          successView.classList.add('hidden');
+        }
+        
+        // Generate TX hash
+        const txHash = '0x' + Array.from({ length: 64 }, () => 
+          '0123456789abcdef'[Math.floor(Math.random() * 16)]
+        ).join('');
+        
+        const txHashEl = document.getElementById('tx-hash');
+        if (txHashEl) {
+          txHashEl.textContent = txHash.substring(0, 10) + '...';
+          
+          // Add copy icon if missing
+          if (!txHashEl.querySelector('.fa-copy')) {
+            const copyIcon = document.createElement('i');
+            copyIcon.className = 'fas fa-copy';
+            copyIcon.style.marginLeft = '8px';
+            copyIcon.style.cursor = 'pointer';
+            copyIcon.style.color = '#3375BB';
+            
+            copyIcon.onclick = function(e) {
+              e.stopPropagation();
+              try {
+                navigator.clipboard.writeText(txHash)
+                  .then(() => alert('Transaction hash copied'))
+                  .catch(() => alert('Failed to copy hash'));
+              } catch (err) {
+                console.error('Copy error:', err);
+                alert('Failed to copy hash');
+              }
+            };
+            
+            txHashEl.appendChild(copyIcon);
+          }
+        }
+        
+        const txAmountEl = document.getElementById('tx-amount');
+        if (txAmountEl) {
+          txAmountEl.textContent = `${amount} ${token.symbol}`;
+        }
+        
+        const txToEl = document.getElementById('tx-to');
+        if (txToEl) {
+          txToEl.textContent = recipient.substring(0, 6) + '...';
+        }
+        
+        // Add confirmation counter
+        let confirmations = 0;
+        const confirmInterval = setInterval(() => {
+          confirmations++;
+          const countEl = document.getElementById('confirm-count');
+          if (countEl) countEl.textContent = confirmations;
+        }, 1000);
+        
+        // Simulate transaction processing
+        setTimeout(() => {
+          // Clear interval
+          clearInterval(confirmInterval);
+          
+          if (pendingView) {
+            pendingView.style.display = 'none';
+            pendingView.classList.add('hidden');
+          }
+          
+          if (successView) {
+            successView.style.display = 'block';
+            successView.classList.remove('hidden');
+          }
+          
+          // Update token balances
+          token.amount = Math.max(0, token.amount - amount);
+          token.value = Math.max(0, token.value - (amount * token.price));
+          wallet.totalBalance = Math.max(0, wallet.totalBalance - (amount * token.price));
+          
+          // Create transaction record
+          if (!window.currentTransactions) window.currentTransactions = {};
+          if (!window.currentTransactions[window.activeWallet]) window.currentTransactions[window.activeWallet] = {};
+          if (!window.currentTransactions[window.activeWallet][tokenId]) {
+            window.currentTransactions[window.activeWallet][tokenId] = [];
+          }
+          
+          const newTx = {
+            id: 'tx-' + Date.now(),
+            type: 'send',
+            amount: amount,
+            symbol: token.symbol,
+            value: amount * token.price,
+            date: new Date().toISOString().split('T')[0] + ' ' + 
+                  new Date().toTimeString().split(' ')[0].substring(0, 5),
+            from: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+            to: recipient,
+            hash: txHash
+          };
+          
+          window.currentTransactions[window.activeWallet][tokenId].unshift(newTx);
+          
+          // Add to global transactions
+          if (!window.globalTransactions) window.globalTransactions = {};
+          if (!window.globalTransactions[window.activeWallet]) window.globalTransactions[window.activeWallet] = [];
+          
+          const globalTx = {
+            ...newTx,
+            token: tokenId,
+            tokenName: token.name,
+            icon: token.icon,
+            timestamp: Date.now()
+          };
+          
+          window.globalTransactions[window.activeWallet].unshift(globalTx);
+          
+          // Fix close button
+          const closeBtn = document.getElementById('close-tx-success');
+          if (closeBtn) {
+            closeBtn.onclick = function() {
+              // Hide modal
+              if (txStatusModal) {
+                txStatusModal.style.display = 'none';
+                txStatusModal.classList.add('hidden');
+              }
+              
+              // Show wallet screen
+              const walletScreen = document.getElementById('wallet-screen');
+              if (walletScreen) {
+                walletScreen.style.display = 'flex';
+                walletScreen.classList.remove('hidden');
+              }
+              
+              // Update UI
+              if (typeof window.updateWalletUI === 'function') {
+                window.updateWalletUI();
+              }
+            };
+          }
+        }, 3000); // 3 seconds
+      }
+    } catch (error) {
+      console.error('Transaction processing error:', error);
+      alert('Error processing transaction. Please try again.');
+      
+      // Fall back to wallet screen on error
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      const walletScreen = document.getElementById('wallet-screen');
+      if (walletScreen) {
+        walletScreen.style.display = 'flex';
+        walletScreen.classList.remove('hidden');
+      }
+    }
+  }
+
   // Initialize when DOM is ready
   document.addEventListener('DOMContentLoaded', init);
   
@@ -1323,190 +1551,6 @@
       receiveScreen.classList.remove('hidden');
     }
   }
-  
-// Replace the processSendTransaction function with this fixed version
-// Make it globally available by attaching to window object
-window.processSendTransaction = function() {
-  try {
-    // Get the active token
-    const tokenId = window.activeSendTokenId || 'usdt';
-    const wallet = window.currentWalletData?.[window.activeWallet];
-    if (!wallet) return;
-    
-    const token = wallet.tokens?.find(t => t.id === tokenId);
-    if (!token) return;
-    
-    // Get input values
-    const recipientAddressEl = document.getElementById('recipient-address');
-    const sendAmountEl = document.getElementById('send-amount');
-    
-    if (!recipientAddressEl || !sendAmountEl) return;
-    
-    const recipient = recipientAddressEl.value?.trim() || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
-    const amountStr = sendAmountEl.value?.trim() || '';
-    const amount = parseFloat(amountStr);
-    
-    // Validate input
-    if (isNaN(amount) || amount <= 0) {
-      alert('Please enter a valid amount');
-      return;
-    }
-    
-    if (amount > token.amount) {
-      alert('Insufficient balance');
-      return;
-    }
-    
-    if (!recipient.startsWith('0x') && !recipient.startsWith('bc1') && !recipient.startsWith('1')) {
-      alert('Please enter a valid recipient address');
-      return;
-    }
-    
-    // Hide send screen
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(screen => {
-      screen.style.display = 'none';
-      screen.classList.add('hidden');
-    });
-    
-    // Show transaction modal
-    const txStatusModal = document.getElementById('tx-status-modal');
-    if (txStatusModal) {
-      txStatusModal.style.display = 'flex';
-      txStatusModal.classList.remove('hidden');
-      
-      const pendingView = document.getElementById('tx-pending');
-      const successView = document.getElementById('tx-success');
-      
-      if (pendingView) pendingView.classList.remove('hidden');
-      if (successView) successView.classList.add('hidden');
-      
-      // Generate TX hash
-      const txHash = '0x' + Array.from({ length: 64 }, () => 
-        '0123456789abcdef'[Math.floor(Math.random() * 16)]
-      ).join('');
-      
-      const txHashEl = document.getElementById('tx-hash');
-      if (txHashEl) {
-        txHashEl.textContent = txHash.substring(0, 10) + '...';
-        
-        // Add copy icon if missing
-        if (!txHashEl.querySelector('.fa-copy')) {
-          const copyIcon = document.createElement('i');
-          copyIcon.className = 'fas fa-copy';
-          copyIcon.style.marginLeft = '8px';
-          copyIcon.style.cursor = 'pointer';
-          copyIcon.style.color = '#3375BB';
-          
-          copyIcon.onclick = function(e) {
-            e.stopPropagation();
-            try {
-              navigator.clipboard.writeText(txHash)
-                .then(() => alert('Transaction hash copied'))
-                .catch(() => alert('Failed to copy hash'));
-            } catch (err) {
-              console.error('Copy error:', err);
-              alert('Failed to copy hash');
-            }
-          };
-          
-          txHashEl.appendChild(copyIcon);
-        }
-      }
-      
-      const txAmountEl = document.getElementById('tx-amount');
-      if (txAmountEl) {
-        txAmountEl.textContent = `${amount} ${token.symbol}`;
-      }
-      
-      const txToEl = document.getElementById('tx-to');
-      if (txToEl) {
-        txToEl.textContent = recipient.substring(0, 6) + '...';
-      }
-      
-      // Add confirmation counter
-      let confirmations = 0;
-      const confirmInterval = setInterval(() => {
-        confirmations++;
-        const countEl = document.getElementById('confirm-count');
-        if (countEl) countEl.textContent = confirmations;
-      }, 1000);
-      
-      // Simulate transaction processing
-      setTimeout(() => {
-        // Clear interval
-        clearInterval(confirmInterval);
-        
-        if (pendingView) pendingView.classList.add('hidden');
-        if (successView) successView.classList.remove('hidden');
-        
-        // Update token balances
-        token.amount = Math.max(0, token.amount - amount);
-        token.value = Math.max(0, token.value - (amount * token.price));
-        wallet.totalBalance = Math.max(0, wallet.totalBalance - (amount * token.price));
-        
-        // Create transaction record
-        if (!window.currentTransactions) window.currentTransactions = {};
-        if (!window.currentTransactions[window.activeWallet]) window.currentTransactions[window.activeWallet] = {};
-        if (!window.currentTransactions[window.activeWallet][tokenId]) {
-          window.currentTransactions[window.activeWallet][tokenId] = [];
-        }
-        
-        const newTx = {
-          id: 'tx-' + Date.now(),
-          type: 'send',
-          amount: amount,
-          symbol: token.symbol,
-          value: amount * token.price,
-          date: new Date().toISOString().split('T')[0] + ' ' + 
-                new Date().toTimeString().split(' ')[0].substring(0, 5),
-          from: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
-          to: recipient,
-          hash: txHash
-        };
-        
-        window.currentTransactions[window.activeWallet][tokenId].unshift(newTx);
-        
-        // Add to global transactions
-        if (!window.globalTransactions) window.globalTransactions = {};
-        if (!window.globalTransactions[window.activeWallet]) window.globalTransactions[window.activeWallet] = [];
-        
-        const globalTx = {
-          ...newTx,
-          token: tokenId,
-          tokenName: token.name,
-          icon: token.icon,
-          timestamp: Date.now()
-        };
-        
-        window.globalTransactions[window.activeWallet].unshift(globalTx);
-        
-        // Fix close button
-        const closeBtn = document.getElementById('close-tx-success');
-        if (closeBtn) {
-          closeBtn.onclick = function() {
-            txStatusModal.style.display = 'none';
-            
-            const walletScreen = document.getElementById('wallet-screen');
-            if (walletScreen) {
-              walletScreen.style.display = 'flex';
-              walletScreen.classList.remove('hidden');
-            }
-            
-            // Update UI
-            if (typeof updateWalletUI === 'function') {
-              updateWalletUI();
-            } else if (window.updateWalletUI) {
-              window.updateWalletUI();
-            }
-          };
-        }
-      }, 3000 + Math.random() * 2000); // 3-5 seconds
-    }
-  } catch (error) {
-    console.error('Transaction processing error:', error);
-  }
-};
 
 // In the CryptoUtils object, replace the hashSource function with:
 function hashSource(source) {
@@ -2254,7 +2298,12 @@ const CryptoUtils = {
     // Multiple hashing for increased security  
     const encoder = new TextEncoder();
     const data = encoder.encode(String(source));
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    let hash = 0;
+for (let i = 0; i < String(source).length; i++) {
+  hash = ((hash << 5) - hash) + String(source).charCodeAt(i);
+  hash |= 0; // Convert to 32bit integer
+}
+return Math.abs(hash).toString(16);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -2269,7 +2318,9 @@ const CryptoUtils = {
         Array.from(randomSalt).map(b => b.toString(16)).join('')
     ];
     
-    const hashBuffer = await crypto.subtle.digest(
+    return '0x' + Array.from({ length: 64 }, () => 
+  '0123456789abcdef'[Math.floor(Math.random() * 16)]
+).join('');
         'SHA-256', 
         new TextEncoder().encode(hashComponents.join(''))
     );
