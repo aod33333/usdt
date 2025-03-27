@@ -1882,43 +1882,6 @@ const PerformanceManager = {
     }
 };
 
-// Enhanced Error Handling
-const EnhancedErrorHandler = {
-    _errorLog: [],
-    
-    log(error, context = {}) {
-        const errorEntry = {
-            timestamp: new Date().toISOString(),
-            message: error.message,
-            stack: error.stack,
-            context: context
-        };
-        
-        this._errorLog.push(errorEntry);
-        
-        // Optional: Send to remote logging service
-        this._sendErrorToRemoteLogging(errorEntry);
-        
-        console.error('Wallet Error:', errorEntry);
-    },
-    
-    // Predictive error prevention
-    predictErrorRisk(operation) {
-        const riskFactors = {
-            'transaction': this._calculateTransactionRisk(operation),
-            'authentication': this._calculateAuthRisk(operation)
-        };
-        
-        return riskFactors;
-    },
-    
-    // Remote logging placeholder
-    _sendErrorToRemoteLogging(errorEntry) {
-        // Implement secure error logging mechanism
-        // Could use fetch to send to a secure endpoint
-    }
-};
-
    // Advanced Transaction and Blockchain Integration Module
 
 const TransactionManager = {
