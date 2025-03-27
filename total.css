@@ -583,26 +583,23 @@ button {
     color: var(--tw-medium-gray);
 }
 
-/* Chain Badge Styles */
+.token-wrapper {
+    position: relative;
+    padding-bottom: 8px;
+    padding-right: 8px;
+}
+
 .token-icon {
-    overflow: visible; /* Allow badge overflow */
-    position: relative; /* Anchor for absolute positioning */
+    overflow: hidden; /* Change to hidden */
+    position: relative;
 }
 
 .chain-badge {
     position: absolute;
-    bottom: -8px;
-    right: -8px;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    border: 2px solid var(--tw-white);
-    background: var(--tw-white);
-    z-index: 2;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-    transition: transform 0.2s ease-in-out;
-    cursor: pointer;
-}
+    bottom: 0;
+    right: 0;
+
+    }
 
 .chain-badge:hover {
     transform: scale(1.15);
