@@ -3697,40 +3697,6 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log("Wallet app fix script loaded and initialized");
 })();
 
-   
-
-   
-  // Fix transaction clicks - COMPLETELY override their behavior
-function fixTransactionClicks() {
-  const transactions = document.querySelectorAll('.transaction-item');
-  transactions.forEach(tx => {
-    // Replace with a clone to remove ALL event listeners
-    const clone = tx.cloneNode(true);
-    if (tx.parentNode) tx.parentNode.replaceChild(clone, tx);
-    
-    // Add direct onclick property (highest priority)
-    clone.onclick = function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const explorer = document.getElementById('explorer-overlay');
-      if (explorer) {
-        explorer.style.display = 'flex';
-        explorer.style.zIndex = '9999';
-        
-        // Also fix explorer back button
-        const backBtn = explorer.querySelector('.explorer-back-button');
-        if (backBtn) {
-          backBtn.onclick = function() {
-            explorer.style.display = 'none';
-          };
-        }
-      }
-      return false;
-    };
-  });
-}
-
 // Fix network badges on token detail
 function fixTokenDetailBadges() {
   // Get current token ID
