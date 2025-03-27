@@ -3822,12 +3822,15 @@ document.addEventListener('DOMContentLoaded', function() {
       iconContainer.style.overflow = 'visible';
       iconContainer.style.zIndex = '1';
       
-  // Add badge to container
-iconContainer.appendChild(badge);
-
-// Run all fixes
-fixTransactionClicks();
-fixTokenDetailBadges();
+// Add badge to container
+      iconContainer.appendChild(badge);
+    }
+  }
+  
+  // Run all fixes
+  fixTransactionClicks();
+  fixTokenDetailBadges();
+}
 
 // Run immediately and after delays
 fixCriticalUIIssues();
@@ -3839,11 +3842,6 @@ const observer = new MutationObserver(() => {
   fixCriticalUIIssues();
 });
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
-        
 observer.observe(document.body, {
   childList: true,
   subtree: true
