@@ -3033,7 +3033,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
    fixTransactionModal();
 
-    // Network badge handler - add to bottom of combined.js
+// Network badge handler - add to bottom of combined.js
 document.addEventListener('DOMContentLoaded', function() {
   // Set data attributes for token identification
   function setTokenAttributes() {
