@@ -3989,3 +3989,4 @@ window.processSendTransaction = processSendTransaction;
 window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
+});
