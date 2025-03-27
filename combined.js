@@ -3694,22 +3694,21 @@ document.addEventListener('DOMContentLoaded', function() {
       fixCriticalUIIssues();
     });
 
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-    
-    // Run remaining fixes
-    fixRemainingIssues();
-    setTimeout(fixRemainingIssues, 1000);
-  });
-    
-})();
+ observer.observe(document.body, {
+  childList: true,
+  subtree: true
+});
 
-
-// Run fixes and export functions
+// Run remaining fixes
 fixRemainingIssues();
 setTimeout(fixRemainingIssues, 1000);
+});
+
+// IIFE wrapper
+(function() {
+  // All initialization code here
+  
+})(); // <-- Properly closed IIFE
 
 // Export key functions to window for global access
 window.hideAllScreens = hideAllScreens;
@@ -3720,4 +3719,6 @@ window.processSendTransaction = processSendTransaction;
 window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
+
+// DOMContentLoaded closure
 });
