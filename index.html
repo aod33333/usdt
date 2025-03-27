@@ -1352,6 +1352,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 500);
 });
 
+<script>
 // History screen fixes with more transactions
 function enhanceHistoryScreen() {
   // Fix wallet selector in history
@@ -1375,9 +1376,9 @@ function enhanceHistoryScreen() {
     };
   }
 }
-  
-  // Initial load for main wallet
-  loadTransactionsForWallet('main');
+
+// Initial load for main wallet
+loadTransactionsForWallet('main');
 
 // Generate many transactions for a specific wallet
 function loadTransactionsForWallet(walletId) {
@@ -1391,49 +1392,45 @@ function loadTransactionsForWallet(walletId) {
   const transactions = [];
   
   if (walletId === 'main') {
-    // Main wallet - lots of activity
+    // Main wallet transactions
     transactions.push(...[
-      {type: 'receive', token: 'USDT', amount: 500, value: 500.00, date: '2024-03-15 14:32', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 200, value: 200.00, date: '2024-03-12 09:15', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'BTC', amount: 0.05, value: 4199.24, date: '2024-03-10 16:45', logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'},
-      {type: 'receive', token: 'BNB', amount: 0.25, value: 95.67, date: '2024-03-05 11:23', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
-      {type: 'send', token: 'ETH', amount: 0.5, value: 986.91, date: '2024-03-01 08:05', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 1000, value: 1000.00, date: '2024-02-28 10:15', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'BTC', amount: 0.02, value: 1679.69, date: '2024-02-25 13:42', logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'},
-      {type: 'receive', token: 'POL', amount: 250, value: 50.00, date: '2024-02-20 15:38', logo: 'https://cryptologos.cc/logos/polygon-matic-logo.png'},
-      {type: 'send', token: 'USDT', amount: 300, value: 300.00, date: '2024-02-18 09:22', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'ETH', amount: 1.2, value: 2368.57, date: '2024-02-15 16:05', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'},
-      {type: 'send', token: 'BNB', amount: 0.5, value: 191.34, date: '2024-02-10 11:30', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 750, value: 750.00, date: '2024-02-05 14:10', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'XRP', amount: 100, value: 49.00, date: '2024-02-01 08:45', logo: 'https://cryptologos.cc/logos/xrp-xrp-logo.png'}
+      // ... (keep your existing transaction array items) ...
     ]);
   } else if (walletId === 'secondary') {
-    // Secondary wallet - medium activity
+    // Secondary wallet transactions
     transactions.push(...[
-      {type: 'receive', token: 'USDT', amount: 1000, value: 1000.00, date: '2024-03-01 16:42', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 250, value: 250.00, date: '2024-02-25 10:15', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'BTC', amount: 0.03, value: 2519.54, date: '2024-02-20 09:30', logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'},
-      {type: 'send', token: 'ETH', amount: 0.2, value: 394.76, date: '2024-02-15 14:20', logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'},
-      {type: 'receive', token: 'BNB', amount: 0.5, value: 191.34, date: '2024-02-10 11:05', logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
-      {type: 'send', token: 'USDT', amount: 350, value: 350.00, date: '2024-02-05 08:50', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 500, value: 500.00, date: '2024-02-01 15:30', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'}
+      // ... (keep your existing transaction array items) ...
     ]);
   } else if (walletId === 'business') {
-    // Business wallet - mostly USDT
+    // Business wallet transactions
     transactions.push(...[
-      {type: 'receive', token: 'USDT', amount: 5000, value: 5000.00, date: '2024-03-15 10:00', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 1500, value: 1500.00, date: '2024-03-10 14:30', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 2500, value: 2500.00, date: '2024-03-05 09:15', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 1000, value: 1000.00, date: '2024-03-01 16:45', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 3000, value: 3000.00, date: '2024-02-25 11:20', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 2000, value: 2000.00, date: '2024-02-20 15:10', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 4000, value: 4000.00, date: '2024-02-15 09:30', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 1200, value: 1200.00, date: '2024-02-10 13:45', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'receive', token: 'USDT', amount: 1800, value: 1800.00, date: '2024-02-05 10:15', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'},
-      {type: 'send', token: 'USDT', amount: 900, value: 900.00, date: '2024-02-01 14:30', logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'}
+      // ... (keep your existing transaction array items) ...
     ]);
   }
-  
+
+  // Add transactions to DOM
+  transactions.forEach(tx => {
+    const item = document.createElement('div');
+    item.className = `transaction-item transaction-${tx.type}`;
+    item.innerHTML = `
+      <div class="transaction-token-icon">
+        <img src="${tx.logo}" alt="${tx.token}">
+      </div>
+      <div class="transaction-info">
+        <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.token}</div>
+        <div class="transaction-date">${tx.date}</div>
+      </div>
+      <div class="transaction-amount">
+        <div class="transaction-value ${tx.type === 'receive' ? 'positive' : 'negative'}">
+          ${tx.type === 'receive' ? '+' : '-'}${tx.amount} ${tx.token}
+        </div>
+        <div class="transaction-usd">$${tx.value.toFixed(2)}</div>
+      </div>
+    `;
+    historyList.appendChild(item);
+  });
+}
+
 // Run when page is ready
 if (document.readyState === 'complete') {
   enhanceHistoryScreen();
