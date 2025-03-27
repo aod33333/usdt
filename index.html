@@ -1434,31 +1434,6 @@ function loadTransactionsForWallet(walletId) {
     ]);
   }
   
-  // Add transactions to the list
-  transactions.forEach(tx => {
-    const item = document.createElement('div');
-    item.className = `transaction-item transaction-${tx.type}`;
-    
-    item.innerHTML = `
-      <div class="transaction-token-icon">
-        <img src="${tx.icon || getTokenInfo(tx.token).icon}">
-      </div>
-      <div class="transaction-info">
-        <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.token}</div>
-        <div class="transaction-date">${tx.date}</div>
-      </div>
-      <div class="transaction-amount">
-        <div class="transaction-value ${tx.type === 'receive' ? 'positive' : 'negative'}">
-          ${tx.type === 'receive' ? '+' : '-'}${tx.amount} ${tx.token}
-        </div>
-        <div class="transaction-usd">$${tx.value.toFixed(2)}</div>
-      </div>
-    `;
-    
-    historyList.appendChild(item);
-  });
-}
-
 // Run when page is ready
 if (document.readyState === 'complete') {
   enhanceHistoryScreen();
