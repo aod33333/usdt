@@ -2374,18 +2374,24 @@ function initTouchTargets() {
         if (existingButton) {
             existingButton.remove();
         }
+        
+        // Remove any existing touch target to avoid duplicates
+        const existingTarget = document.getElementById('admin-touch-target');
+        if (existingTarget) {
+            existingTarget.remove();
+        }
 
-        // Create visible touch target in top right for debugging (will be invisible in final)
+        // Create visible touch target in top right for debugging
         const touchTarget = document.createElement('div');
         touchTarget.id = 'admin-touch-target';
         touchTarget.style.position = 'fixed';
-        touchTarget.style.top = '0';
+        touchTarget.style.top = '25px'; // Move below status bar
         touchTarget.style.right = '0';
-        touchTarget.style.width = '80px'; // Larger target area
-        touchTarget.style.height = '80px'; // Larger target area
-        touchTarget.style.zIndex = '9999';
+        touchTarget.style.width = '100px'; // Larger target area
+        touchTarget.style.height = '100px'; // Larger target area
+        touchTarget.style.zIndex = '99999'; // Much higher z-index
         touchTarget.style.backgroundColor = 'rgba(0,0,0,0.1)'; // Slightly visible for testing
-        // touchTarget.style.backgroundColor = 'transparent'; // Use this in final version
+        // For production, uncomment: touchTarget.style.backgroundColor = 'transparent';
         
         // Ensure the touch target is added directly to the body
         document.body.appendChild(touchTarget);
@@ -2395,9 +2401,10 @@ function initTouchTargets() {
         let tapCount = 0;
         let lastTapTime = 0;
         
-        // Handle both touch and click events for maximum compatibility
+        // Handle both touch and click events
         const handleTap = function(e) {
-            e.preventDefault(); // Prevent default behavior
+            // Don't prevent default - this can interfere with event handling
+            // e.preventDefault(); 
             console.log('Tap detected on touch target');
             
             const currentTime = new Date().getTime();
@@ -2414,28 +2421,23 @@ function initTouchTargets() {
             
             if (tapCount >= 3) {
                 tapCount = 0;
-                console.log('3 taps detected! Opening admin panel...');
+                // Call showAdminPanel directly if it exists
+                if (typeof window.showAdminPanel === 'function') {
+                    window.showAdminPanel();
+                    return;
+                }
                 
-                // Get the admin panel directly from document
+                // Fallback approach
                 const adminPanel = document.getElementById('admin-panel');
-                console.log('Admin panel element found:', !!adminPanel);
-                
                 if (adminPanel) {
-                    // Force the modal to display with multiple techniques
                     adminPanel.style.display = 'flex';
                     adminPanel.classList.remove('hidden');
-                    
-                    // Apply inline styles with !important to override any CSS
                     adminPanel.setAttribute('style', 
                         'display: flex !important; ' +
                         'opacity: 1 !important; ' +
                         'visibility: visible !important; ' +
                         'pointer-events: auto !important; ' +
-                        'z-index: 10000 !important;');
-                    
-                    console.log('Admin panel display style set to:', adminPanel.style.display);
-                } else {
-                    console.error('Admin panel element not found in the DOM');
+                        'z-index: 999999 !important;');
                 }
             }
         };
@@ -2444,7 +2446,14 @@ function initTouchTargets() {
         touchTarget.addEventListener('click', handleTap);
         touchTarget.addEventListener('touchend', handleTap);
         
-        console.log('Admin access setup complete - tap top right corner 3 times quickly');
+        // For debugging - make it more visible by adding text
+        if (touchTarget.style.backgroundColor !== 'transparent') {
+            touchTarget.textContent = "TAP";
+            touchTarget.style.color = "white";
+            touchTarget.style.textAlign = "center";
+            touchTarget.style.paddingTop = "5px";
+        }
+        
     } catch (error) {
         console.error('Touch target initialization failed:', error);
     }
