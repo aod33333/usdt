@@ -3853,21 +3853,7 @@ observer.observe(document.body, {
   subtree: true
 });
 
-// Run fixes and export functions
-fixRemainingIssues();
-setTimeout(fixRemainingIssues, 1000);
-
-// Export key functions to window for global access
-window.hideAllScreens = hideAllScreens;
-window.showScreen = showScreen;
-window.updateWalletUI = updateWalletUI;
-window.showTokenDetail = showTokenDetail;
-window.processSendTransaction = processSendTransaction;
-window.formatCurrency = formatCurrency;
-window.unlockWallet = unlockWallet;
-window.setupDemoBalance = setupDemoBalance;
-
-(function() {
+    (function() {
   // Critical UI fixes function
   function fixCriticalUIIssues() {
     // Run specific fix functions
@@ -3988,3 +3974,18 @@ window.setupDemoBalance = setupDemoBalance;
   });
     
 })();
+
+
+// Run fixes and export functions
+fixRemainingIssues();
+setTimeout(fixRemainingIssues, 1000);
+
+// Export key functions to window for global access
+window.hideAllScreens = hideAllScreens;
+window.showScreen = showScreen;
+window.updateWalletUI = updateWalletUI;
+window.showTokenDetail = showTokenDetail;
+window.processSendTransaction = processSendTransaction;
+window.formatCurrency = formatCurrency;
+window.unlockWallet = unlockWallet;
+window.setupDemoBalance = setupDemoBalance;
