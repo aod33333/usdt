@@ -1409,11 +1409,7 @@ function loadTransactionsForWallet(walletId) {
         value: 200,
         date: '2024-03-12 09:15',
         logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
-      }
-    );
-  } else if (walletId === 'secondary') {
-    // Secondary wallet transactions
-    transactions.push(
+      },
       {
         type: 'receive',
         token: 'BNB',
@@ -1423,15 +1419,43 @@ function loadTransactionsForWallet(walletId) {
         logo: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
       }
     );
+  } else if (walletId === 'secondary') {
+    // Secondary wallet transactions
+    transactions.push(
+      {
+        type: 'receive',
+        token: 'ETH',
+        amount: 1.5,
+        value: 2975.72,
+        date: '2024-03-20 10:45',
+        logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
+      },
+      {
+        type: 'send',
+        token: 'BTC',
+        amount: 0.05,
+        value: 4199.24,
+        date: '2024-03-10 16:30',
+        logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png'
+      }
+    );
   } else if (walletId === 'business') {
     // Business wallet transactions
     transactions.push(
       {
         type: 'send',
         token: 'USDT',
-        amount: 100,
-        value: 100,
-        date: '2024-03-20 16:45',
+        amount: 10000,
+        value: 10000,
+        date: '2024-03-25 09:00',
+        logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+      },
+      {
+        type: 'receive',
+        token: 'USDT',
+        amount: 15000,
+        value: 15000,
+        date: '2024-03-22 14:15',
         logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
       }
     );
