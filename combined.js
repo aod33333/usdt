@@ -3986,4 +3986,5 @@ window.setupDemoBalance = setupDemoBalance;
     fixRemainingIssues();
     setTimeout(fixRemainingIssues, 1000);
   });
+    
 })();
