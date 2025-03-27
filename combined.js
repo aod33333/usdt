@@ -3718,5 +3718,3 @@ window.processSendTransaction = processSendTransaction;
 window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
-
-})(); // Properly closed IIFE, remove any additional closing braces after this
