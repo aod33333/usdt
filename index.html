@@ -6,7 +6,7 @@
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
       font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
       img-src 'self' data: https://i.ibb.co https://cryptologos.cc https://assets.coingecko.com;
-      script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline';">
+      script-src 'self' https://cdnjs.cloudflare.com 'unsafe-inline' 'unsafe-eval';">
  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -107,8 +107,36 @@
                    <p>Can't login? You can erase your current wallet and set up a new one</p>
                    <button id="reset-wallet-button" class="reset-wallet-button">Reset wallet</button>
                </div>
-           </div>
-       </div>
+                 
+          <!-- History Screen -->
+<div id="history-screen" class="screen hidden">
+    <div class="screen-header">
+        <button class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Transaction History</h2>
+        <div class="wallet-selector-small">
+            <span class="wallet-name-small">Mnemonic 1</span>
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+    
+    <div class="history-tabs">
+        <div class="history-tab active" data-tab="all">All</div>
+        <div class="history-tab" data-tab="send">Sent</div>
+        <div class="history-tab" data-tab="receive">Received</div>
+    </div>
+    
+    <div id="history-transaction-list" class="history-transaction-list"></div>
+    
+    <div class="no-history hidden">
+        <div class="no-history-icon">
+            <img src="https://i.ibb.co/p6nYxhpw/Screenshot-20250327-203752-Trust-Wallet.jpg">
+        </div>
+        <p>No transactions found.</p>
+    </div>
+</div>
+                 </div>
        
        <!-- Main Wallet Screen -->
        <div id="wallet-screen" class="screen hidden">
@@ -297,29 +325,29 @@
             <p id="token-balance-value">$0.00</p>
         </div>
         
-        <!-- Action Buttons -->
-        <div class="token-detail-actions">
-            <button class="action-circle">
-                <i class="fas fa-arrow-up"></i>
-                <span>Send</span>
-            </button>
-            <button class="action-circle">
-                <i class="fas fa-arrow-down"></i>
-                <span>Receive</span>
-            </button>
-            <button class="action-circle">
-                <i class="fas fa-exchange-alt"></i>
-                <span>Swap</span>
-            </button>
-            <button class="action-circle">
-                <i class="fas fa-credit-card"></i>
-                <span>Buy</span>
-            </button>
-            <button class="action-circle">
-                <i class="fas fa-university"></i>
-                <span>Sell</span>
-            </button>
-        </div>
+       <!-- Action Buttons -->
+<div class="token-detail-actions">
+    <button class="detail-action action-circle">
+        <i class="fas fa-arrow-up"></i>
+        <span>Send</span>
+    </button>
+    <button class="detail-action action-circle">
+        <i class="fas fa-arrow-down"></i>
+        <span>Receive</span>
+    </button>
+    <button class="detail-action action-circle">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Swap</span>
+    </button>
+    <button class="detail-action action-circle">
+        <i class="fas fa-credit-card"></i>
+        <span>Buy</span>
+    </button>
+    <button class="detail-action action-circle">
+        <i class="fas fa-university"></i>
+        <span>Sell</span>
+    </button>
+</div>
 
       <!-- Staking Container -->
 <div class="staking-container">
@@ -989,7 +1017,31 @@
     });
   }
 })();
+<script>
+// Initialize window variables
+window.originalWalletData = null;
+window.currentWalletData = null;
+window.activeWallet = 'main';
+window.correctPasscode = '123456';
+window.passcodeEntered = '';
+window.touchSequence = [];
+window.balanceModified = false;
+window.expirationTimer = null;
+
+// Load wallet-fix.js after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  // Remove existing inline scripts
+  document.querySelectorAll('script:not([src])').forEach(script => {
+    if (script !== document.currentScript) {
+      script.remove();
+    }
+  });
+  
+  // Load wallet-fix.js
+  const script = document.createElement('script');
+  script.src = 'wallet-fix.js';
+  document.body.appendChild(script);
+});
 </script>
-<script src="wallet-fix.js"></script>
 </body>
 </html>
