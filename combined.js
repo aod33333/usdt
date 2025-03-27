@@ -3853,7 +3853,7 @@ observer.observe(document.body, {
   subtree: true
 });
 
-// Run immediately and after a short delay
+// Run fixes and export functions
 fixRemainingIssues();
 setTimeout(fixRemainingIssues, 1000);
 
@@ -3866,4 +3866,124 @@ window.processSendTransaction = processSendTransaction;
 window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
+
+(function() {
+  // Critical UI fixes function
+  function fixCriticalUIIssues() {
+    // Run specific fix functions
+    fixTransactionClicks();
+    fixTokenDetailBadges();
+  }
+
+  // Remaining issues fix function
+  function fixRemainingIssues() {
+    // Additional fix logic if needed
+  }
+
+  // Fix transaction clicks
+  function fixTransactionClicks() {
+    const transactions = document.querySelectorAll('.transaction-item');
+    transactions.forEach(tx => {
+      const clone = tx.cloneNode(true);
+      if (tx.parentNode) tx.parentNode.replaceChild(clone, tx);
+      
+      clone.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const explorer = document.getElementById('explorer-overlay');
+        if (explorer) {
+          explorer.style.display = 'flex';
+          explorer.style.zIndex = '9999';
+          
+          const backBtn = explorer.querySelector('.explorer-back-button');
+          if (backBtn) {
+            backBtn.onclick = function() {
+              explorer.style.display = 'none';
+            };
+          }
+        }
+        return false;
+      };
+    });
+  }
+
+  // Fix network badges on token detail
+  function fixTokenDetailBadges() {
+    const detailSymbol = document.getElementById('detail-symbol');
+    if (!detailSymbol) return;
+    
+    const symbol = detailSymbol.textContent.toLowerCase();
+    const bnbTokens = ['usdt', 'bnb', 'twt'];
+    
+    if (bnbTokens.includes(symbol)) {
+      const iconContainer = document.querySelector('.token-detail-icon-container');
+      if (!iconContainer) return;
+      
+      const existingBadges = iconContainer.querySelectorAll('.chain-badge');
+      existingBadges.forEach(b => b.parentNode && b.parentNode.removeChild(b));
+      
+      const badge = document.createElement('div');
+      badge.className = 'chain-badge-fixed';
+      badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
+      
+      badge.setAttribute('style', `
+        position: absolute !important;
+        bottom: -6px !important;
+        right: -6px !important;
+        width: 24px !important;
+        height: 24px !important;
+        border-radius: 50% !important;
+        border: 2px solid #FFFFFF !important;
+        background: #FFFFFF !important;
+        z-index: 999 !important;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        overflow: visible !important;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+      `);
+      
+      const img = badge.querySelector('img');
+      if (img) {
+        img.setAttribute('style', `
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: contain !important;
+          padding: 2px !important;
+          display: block !important;
+        `);
+      }
+      
+      iconContainer.style.position = 'relative';
+      iconContainer.style.overflow = 'visible';
+      iconContainer.style.zIndex = '1';
+      
+      iconContainer.appendChild(badge);
+    }
+  }
+
+  // Use window.addEventListener to ensure it works in IIFE
+  window.addEventListener('DOMContentLoaded', function() {
+    // Run fixes immediately
+    fixCriticalUIIssues();
+    
+    // Run after delays to catch dynamic content
+    setTimeout(fixCriticalUIIssues, 500);
+    setTimeout(fixCriticalUIIssues, 2000);
+    
+    // Set up observer to catch dynamic changes
+    const observer = new MutationObserver(() => {
+      fixCriticalUIIssues();
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+    
+    // Run remaining fixes
+    fixRemainingIssues();
+    setTimeout(fixRemainingIssues, 1000);
+  });
 })();
