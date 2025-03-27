@@ -3828,7 +3828,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // Run all fixes
-  removeSendReceiveBadges();
   fixTransactionClicks();
   fixTokenDetailBadges();
 }
@@ -3861,4 +3860,3 @@ window.processSendTransaction = processSendTransaction;
 window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
-});
