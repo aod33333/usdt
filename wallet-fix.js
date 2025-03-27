@@ -1552,18 +1552,15 @@
     }
   }
 
-// In the CryptoUtils object, replace the hashSource function with:
-function hashSource(source) {
-  // Create a simple hash without async/await issues
-  let hash = 0;
-  const str = String(source);
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash |= 0; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(16);
+hashSource: function(source) {
+    // Simple hash implementation
+    let hash = 0;
+    for (let i = 0; i < String(source).length; i++) {
+      hash = ((hash << 5) - hash) + String(source).charCodeAt(i);
+      hash |= 0; // Convert to 32bit integer
+    }
+    return Math.abs(hash).toString(16);
 }
-
 // Also fix the generateSecureTransactionHash function to not use await
 function generateSecureTransactionHash(txData) {
   // Generate a secure-looking hash without async/await
