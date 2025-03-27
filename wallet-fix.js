@@ -98,61 +98,6 @@
     }
   }
   
-  // Process transaction - fixed implementation
-  function processSendTransaction() {
-    try {
-      // Get required elements
-      const sendScreen = document.getElementById('send-screen');
-      const txStatusModal = document.getElementById('tx-status-modal');
-      const pendingView = document.getElementById('tx-pending');
-      const successView = document.getElementById('tx-success');
-      
-      if (!sendScreen || !txStatusModal) {
-        console.error('Required elements not found');
-        return;
-      }
-      
-      // Get form values
-      const amountInput = document.getElementById('send-amount');
-      const recipientInput = document.getElementById('recipient-address');
-      const amount = parseFloat(amountInput?.value || '0');
-      const recipient = recipientInput?.value?.trim() || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
-      
-      // Basic validation
-      if (isNaN(amount) || amount <= 0) {
-        alert('Please enter a valid amount');
-        return;
-      }
-      
-      // Hide send screen
-      sendScreen.style.display = 'none';
-      
-      // Show transaction pending
-      txStatusModal.style.display = 'flex';
-      txStatusModal.classList.remove('hidden');
-      
-      if (pendingView) pendingView.classList.remove('hidden');
-      if (successView) successView.classList.add('hidden');
-      
-      // Generate random transaction hash
-      const txHash = '0x' + Array.from({ length: 64 }, () => 
-        '0123456789abcdef'[Math.floor(Math.random() * 16)]
-      ).join('');
-      
-      // Update transaction details
-      updateTxDetails(txHash, amount, recipient);
-      
-      // Simulate transaction processing (3 seconds)
-      setTimeout(() => {
-        if (pendingView) pendingView.classList.add('hidden');
-        if (successView) successView.classList.remove('hidden');
-      }, 3000);
-    } catch (error) {
-      console.error('Transaction processing error:', error);
-      alert('An error occurred processing your transaction');
-    }
-  }
-  
   // Update transaction details in the UI
   function updateTxDetails(hash, amount, recipient) {
     // Update transaction hash
@@ -1379,14 +1324,15 @@
     }
   }
   
-  // Process send transaction
-  function processSendTransaction() {
+ // Process send transaction
+function processSendTransaction() {
+  try {
     // Get the active token
     const tokenId = window.activeSendTokenId || 'usdt';
-    const wallet = window.currentWalletData[window.activeWallet];
+    const wallet = window.currentWalletData?.[window.activeWallet];
     if (!wallet) return;
     
-    const token = wallet.tokens.find(t => t.id === tokenId);
+    const token = wallet.tokens?.find(t => t.id === tokenId);
     if (!token) return;
     
     // Get input values
@@ -1395,8 +1341,8 @@
     
     if (!recipientAddressEl || !sendAmountEl) return;
     
-    const recipient = recipientAddressEl.value.trim() || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
-    const amountStr = sendAmountEl.value.trim();
+    const recipient = recipientAddressEl.value?.trim() || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+    const amountStr = sendAmountEl.value?.trim() || '';
     const amount = parseFloat(amountStr);
     
     // Validate input
@@ -1416,12 +1362,21 @@
     }
     
     // Hide send screen
-    hideAllScreens();
+    if (typeof hideAllScreens === 'function') {
+      hideAllScreens();
+    } else {
+      const screens = document.querySelectorAll('.screen');
+      screens.forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+    }
     
     // Show transaction modal
     const txStatusModal = document.getElementById('tx-status-modal');
     if (txStatusModal) {
       txStatusModal.style.display = 'flex';
+      txStatusModal.classList.remove('hidden');
       
       const pendingView = document.getElementById('tx-pending');
       const successView = document.getElementById('tx-success');
@@ -1430,7 +1385,9 @@
       if (successView) successView.classList.add('hidden');
       
       // Generate TX hash and update details
-      const txHash = generateRandomHash();
+      const txHash = typeof generateRandomHash === 'function' ? 
+        generateRandomHash() : 
+        '0x' + Array.from({ length: 64 }, () => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('');
       
       const txHashEl = document.getElementById('tx-hash');
       if (txHashEl) {
@@ -1446,9 +1403,14 @@
           
           copyIcon.onclick = function(e) {
             e.stopPropagation();
-            navigator.clipboard.writeText(txHash)
-              .then(() => alert('Transaction hash copied'))
-              .catch(() => alert('Failed to copy hash'));
+            try {
+              navigator.clipboard.writeText(txHash)
+                .then(() => alert('Transaction hash copied'))
+                .catch(() => alert('Failed to copy hash'));
+            } catch (err) {
+              console.error('Copy error:', err);
+              alert('Failed to copy hash');
+            }
           };
           
           txHashEl.appendChild(copyIcon);
@@ -1482,11 +1444,13 @@
         if (successView) successView.classList.remove('hidden');
         
         // Update token balances
-        token.amount -= amount;
-        token.value -= amount * token.price;
-        wallet.totalBalance -= amount * token.price;
+        token.amount = Math.max(0, token.amount - amount);
+        token.value = Math.max(0, token.value - (amount * token.price));
+        wallet.totalBalance = Math.max(0, wallet.totalBalance - (amount * token.price));
         
         // Create transaction record
+        if (!window.currentTransactions) window.currentTransactions = {};
+        if (!window.currentTransactions[window.activeWallet]) window.currentTransactions[window.activeWallet] = {};
         if (!window.currentTransactions[window.activeWallet][tokenId]) {
           window.currentTransactions[window.activeWallet][tokenId] = [];
         }
@@ -1507,6 +1471,9 @@
         window.currentTransactions[window.activeWallet][tokenId].unshift(newTx);
         
         // Add to global transactions
+        if (!window.globalTransactions) window.globalTransactions = {};
+        if (!window.globalTransactions[window.activeWallet]) window.globalTransactions[window.activeWallet] = [];
+        
         const globalTx = {
           ...newTx,
           token: tokenId,
@@ -1522,15 +1489,31 @@
         if (closeBtn) {
           closeBtn.onclick = function() {
             txStatusModal.style.display = 'none';
-            hideAllScreens();
-            document.getElementById('wallet-screen').style.display = 'flex';
-            document.getElementById('wallet-screen').classList.remove('hidden');
-            updateWalletUI();
+            
+            if (typeof hideAllScreens === 'function') {
+              hideAllScreens();
+            }
+            
+            const walletScreen = document.getElementById('wallet-screen');
+            if (walletScreen) {
+              walletScreen.style.display = 'flex';
+              walletScreen.classList.remove('hidden');
+            }
+            
+            if (typeof updateWalletUI === 'function') {
+              updateWalletUI();
+            }
           };
         }
       }, 3000 + Math.random() * 2000); // 3-5 seconds
     }
+  } catch (error) {
+    console.error('Transaction processing error:', error);
   }
+}
+
+// Make sure the function is globally available
+window.processSendTransaction = processSendTransaction;
   
   // Generate random hash
   function generateRandomHash() {
