@@ -973,23 +973,24 @@ function getTokenLogoUrl(tokenId) {
    };
    return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
 }
-// Now modify your createTokenElement function
 function createTokenElement(token) {
    try {
        const tokenItem = document.createElement('div');
        tokenItem.className = 'token-item';
        tokenItem.setAttribute('data-token-id', token.id);
        
-      let chainBadgeHTML = '';
-if (token.chainBadge) {
-    // Use the chainBadge directly if it's a URL, otherwise get the logo URL
-    const badgeUrl = token.chainBadge.startsWith('http') ? token.chainBadge : getTokenLogoUrl(token.chainBadge);
-    chainBadgeHTML = `
-        <div class="chain-badge">
-            <img src="${badgeUrl}" alt="${token.network}">
-        </div>
-    `;
-}
+       // Modified chain badge logic ================
+       let chainBadgeHTML = '';
+       const showNetworkBadge = ['USDT', 'TWT', 'BNB'].includes(token.symbol);
+       if (showNetworkBadge) {
+           const badgeUrl = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+           chainBadgeHTML = `
+               <div class="chain-badge">
+                   <img src="${badgeUrl}" alt="BNB Chain">
+               </div>
+           `;
+       }
+       // End of modified section ====================
        
        const formattedPrice = token.price >= 1 
            ? token.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
