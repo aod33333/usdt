@@ -3367,3 +3367,24 @@ Here's the CSS to fix the USDT background issue in the history page:
   display: none !important; /* Keep !important here */
   transform: scale(0) !important; /* Extra insurance */
 }
+
+/* Universal network badge styling */
+.token-icon[data-network]::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  width: 20px;
+  height: 20px;
+  background: var(--tw-white) url('https://cryptologos.cc/logos/bnb-bnb-logo.png') center/contain no-repeat;
+  border: 2px solid var(--tw-white);
+  border-radius: 50%;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16);
+  z-index: 2;
+}
+
+/* Hide badges in Send/Receive screens */
+#send-screen .token-icon[data-network]::after,
+#receive-screen .token-icon[data-network]::after {
+  display: none;
+}
