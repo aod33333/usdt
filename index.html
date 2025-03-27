@@ -813,5 +813,110 @@
     window.balanceModified = false;
     window.expirationTimer = null;
        </script>
+
+      <script>
+// Quick login fix script
+(function() {
+  // Wait for page to load
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Login fix script running');
+    
+    // Setup passcode functionality
+    const numpadKeys = document.querySelectorAll('.numpad-key');
+    const dots = document.querySelectorAll('.dot');
+    let passcodeEntered = '';
+    const correctPasscode = '123456';
+    
+    // Add click handlers to numpad
+    numpadKeys.forEach(key => {
+      key.addEventListener('click', function() {
+        const keyValue = this.getAttribute('data-key');
+        console.log('Key pressed:', keyValue);
+        
+        if (keyValue === 'bio') {
+          // Skip biometric for now - just unlock
+          unlockWallet();
+          return;
+        }
+        
+        if (keyValue === 'back') {
+          if (passcodeEntered.length > 0) {
+            passcodeEntered = passcodeEntered.slice(0, -1);
+            updateDots();
+          }
+          return;
+        }
+        
+        // Add digit to passcode
+        if (passcodeEntered.length < 6) {
+          passcodeEntered += keyValue;
+          updateDots();
+          
+          // Automatically check when 6 digits entered
+          if (passcodeEntered.length === 6) {
+            setTimeout(() => {
+              if (passcodeEntered === correctPasscode) {
+                unlockWallet();
+              } else {
+                // Wrong passcode - shake effect
+                const dotsContainer = document.querySelector('.passcode-dots');
+                dotsContainer.classList.add('shake');
+                setTimeout(() => {
+                  dotsContainer.classList.remove('shake');
+                  passcodeEntered = '';
+                  updateDots();
+                }, 500);
+              }
+            }, 300);
+          }
+        }
+      });
+    });
+    
+    // Add handler to unlock button
+    document.getElementById('unlock-button').addEventListener('click', function() {
+      if (passcodeEntered === correctPasscode || passcodeEntered.length === 6) {
+        unlockWallet();
+      } else {
+        alert('Please enter the 6-digit passcode: 123456');
+      }
+    });
+    
+    // Update passcode dots display
+    function updateDots() {
+      dots.forEach((dot, index) => {
+        if (index < passcodeEntered.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+    }
+    
+    // Unlock and show wallet
+    function unlockWallet() {
+      document.getElementById('lock-screen').style.display = 'none';
+      document.getElementById('wallet-screen').style.display = 'flex';
+      document.getElementById('wallet-screen').classList.remove('hidden');
+      setupDemoBalance();
+    }
+    
+    // Setup demo balance
+    function setupDemoBalance() {
+      try {
+        // Update wallet UI with some values
+        const totalBalance = document.getElementById('total-balance');
+        if (totalBalance) totalBalance.textContent = '$10,000,000.00';
+        
+        console.log('Demo balance set up successfully');
+      } catch (error) {
+        console.error('Demo balance setup failed:', error);
+      }
+    }
+    
+    console.log('Login fix script loaded successfully');
+  });
+})();
+</script>
 </body>
 </html>
