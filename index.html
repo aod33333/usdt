@@ -813,5 +813,86 @@
     window.balanceModified = false;
     window.expirationTimer = null;
        </script>
+
+      <script>
+// Direct fix for the login screen - add to end of index.html
+(function() {
+  // Run on page load
+  window.addEventListener('load', function() {
+    // Get all key elements
+    const keys = document.querySelectorAll('.numpad-key');
+    const dots = document.querySelectorAll('.dot');
+    const unlockBtn = document.getElementById('unlock-button');
+    const lockScreen = document.getElementById('lock-screen');
+    const walletScreen = document.getElementById('wallet-screen');
+    
+    // Track passcode
+    let code = '';
+    
+    // Add click handlers to all numpad keys
+    keys.forEach(key => {
+      key.onclick = function() {
+        const val = this.getAttribute('data-key');
+        
+        // Handle different keys
+        if (val === 'bio') {
+          showWallet();
+        } else if (val === 'back') {
+          if (code.length > 0) {
+            code = code.slice(0, -1);
+            updateDots();
+          }
+        } else if (code.length < 6) {
+          code += val;
+          updateDots();
+          
+          // Auto-unlock if code is complete
+          if (code.length === 6) {
+            setTimeout(() => {
+              if (code === '123456') {
+                showWallet();
+              } else {
+                // Wrong code, shake
+                const dotsElem = document.querySelector('.passcode-dots');
+                dotsElem.classList.add('shake');
+                setTimeout(() => {
+                  dotsElem.classList.remove('shake');
+                  code = '';
+                  updateDots();
+                }, 500);
+              }
+            }, 300);
+          }
+        }
+      };
+    });
+    
+    // Update visual dots
+    function updateDots() {
+      dots.forEach((dot, i) => {
+        dot.className = i < code.length ? 'dot filled' : 'dot';
+      });
+    }
+    
+    // Show wallet screen
+    function showWallet() {
+      lockScreen.style.display = 'none';
+      walletScreen.style.display = 'flex';
+      walletScreen.classList.remove('hidden');
+    }
+    
+    // Connect unlock button
+    if (unlockBtn) {
+      unlockBtn.onclick = function() {
+        if (code.length === 6) {
+          showWallet();
+        } else {
+          alert('Please enter 6 digits (123456)');
+        }
+      };
+    }
+  });
+})();
+</script>
 </body>
 </html>
