@@ -3826,11 +3826,6 @@ document.addEventListener('DOMContentLoaded', function() {
       iconContainer.appendChild(badge);
     }
   }
-  
-  // Run all fixes
-  fixTransactionClicks();
-  fixTokenDetailBadges();
-}
 
 // Run immediately and after delays
 fixCriticalUIIssues();
