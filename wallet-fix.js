@@ -1802,6 +1802,45 @@ document.addEventListener('DOMContentLoaded', function() {
       updateHistoryTransactionList();
     }
   }
+
+// Robust token logo URL resolver
+function getTokenLogoUrl(tokenId, tokenSymbol) {
+    // Predefined URL mapping for known tokens
+    const logoUrls = {
+        'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+        'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+        'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+        'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+        'twt': 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png',
+        'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+        'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+        'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png'
+    };
+
+    // Direct lookup first
+    if (logoUrls[tokenId]) {
+        return logoUrls[tokenId];
+    }
+
+    // Try constructing URL with lowercase symbol
+    try {
+        const constructedUrl = `https://cryptologos.cc/logos/${tokenId}-${tokenSymbol.toLowerCase()}-logo.png`;
+        return constructedUrl;
+    } catch (error) {
+        console.warn(`Failed to construct logo URL for token: ${tokenId}`, error);
+    }
+
+    // Fallback to generic logo
+    return 'https://cryptologos.cc/logos/default-crypto-logo.png';
+}
+
+// Example usage
+function updateTokenIcon(token) {
+    const tokenIcon = document.getElementById('token-detail-icon');
+    if (tokenIcon) {
+        tokenIcon.src = getTokenLogoUrl(token.id, token.symbol);
+    }
+}
   
   // Split amount randomly
   function splitAmountRandomly(total, parts) {
