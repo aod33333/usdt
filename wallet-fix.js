@@ -459,7 +459,7 @@
           {id: 'pol', name: 'Polygon', symbol: 'POL', network: 'Polygon', icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png', amount: 7500, value: 1500.00, price: 0.20, change: 2.05},
           {id: 'bnb', name: 'BNB', symbol: 'BNB', network: 'BNB Smart Chain', icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png', amount: 157.7, value: 100000.00, price: 634.12, change: 0.95, chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
           {id: 'trx', name: 'TRON', symbol: 'TRX', network: 'Tron', icon: 'https://cryptologos.cc/logos/tron-trx-logo.png', amount: 769230, value: 100000.00, price: 0.13, change: 0.95},
-          {id: 'twt', name: 'Trust Wallet Token', symbol: 'TWT', network: 'BNB Smart Chain', icon: 'src="https://i.ibb.co/ks3wxCRz/Screenshot-2025-03-25-031051.png', amount: 112359, value: 100000.00, price: 0.89, change: 0.09, chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
+          {id: 'twt', name: 'Trust Wallet Token', symbol: 'TWT', network: 'BNB Smart Chain', icon: 'https://i.ibb.co/ks3wxCRz/Screenshot-2025-03-25-031051.png', amount: 112359, value: 100000.00, price: 0.89, change: 0.09, chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
           {id: 'usdt', name: 'Tether', symbol: 'USDT', network: 'BNB Smart Chain', icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png', amount: 10000000, value: 10000000.00, price: 1.00, change: 0.00, chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'},
           {id: 'xrp', name: 'XRP', symbol: 'XRP', network: 'XRP Ledger', icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png', amount: 50000, value: 24500.00, price: 0.49, change: 1.25}
         ]
@@ -2228,7 +2228,7 @@ const CryptoUtils = {
         return combinedHash;
     },
 
-   async hashSource(source) {
+   hashSource: function(source) {
     // Multiple hashing for increased security  
     const encoder = new TextEncoder();
     const data = encoder.encode(String(source));
@@ -2237,7 +2237,7 @@ const CryptoUtils = {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-   async generateSecureTransactionHash(txData) {
+   generateSecureTransactionHash: function(txData) {
     const timestamp = Date.now();
     const randomSalt = crypto.getRandomValues(new Uint8Array(16));
     
