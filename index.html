@@ -1133,6 +1133,7 @@ historyTabs.forEach(tab => {
 });
 
 // Run fixes when page loads
+// Run fixes when page loads
 document.addEventListener('DOMContentLoaded', function() {
     setTimeout(fixChainBadges, 500);
 });
@@ -1142,51 +1143,45 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     setTimeout(fixChainBadges, 100);
     setInterval(fixChainBadges, 1000); // Keep checking periodically
 }
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    function fixChainBadges() {
-        const bscTokens = document.querySelectorAll('.token-item[data-token-id="usdt"], .token-item[data-token-id="bnb"], .token-item[data-token-id="twt"]');
+
+// Chain badge fix function
+function fixChainBadges() {
+    const bscTokens = document.querySelectorAll('.token-item[data-token-id="usdt"], .token-item[data-token-id="bnb"], .token-item[data-token-id="twt"]');
+    
+    bscTokens.forEach(token => {
+        const iconDiv = token.querySelector('.token-icon');
+        if (!iconDiv) return;
         
-        bscTokens.forEach(token => {
-            const iconDiv = token.querySelector('.token-icon');
-            if (!iconDiv) return;
-            
-            const oldBadges = iconDiv.querySelectorAll('.chain-badge');
+        const oldBadges = iconDiv.querySelectorAll('.chain-badge');
+        oldBadges.forEach(b => b.remove());
+        
+        const badge = document.createElement('div');
+        badge.className = 'chain-badge';
+        badge.innerHTML = `<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">`;
+        
+        iconDiv.style.position = 'relative';
+        iconDiv.style.overflow = 'visible';
+        iconDiv.appendChild(badge);
+    });
+    
+    const detailSymbol = document.getElementById('detail-symbol');
+    if (detailSymbol && ['usdt', 'bnb', 'twt'].includes(detailSymbol.textContent.toLowerCase())) {
+        const container = document.querySelector('.token-detail-icon-container');
+        if (container) {
+            const oldBadges = container.querySelectorAll('.chain-badge');
             oldBadges.forEach(b => b.remove());
             
             const badge = document.createElement('div');
             badge.className = 'chain-badge';
             badge.innerHTML = `<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">`;
             
-            iconDiv.style.position = 'relative';
-            iconDiv.style.overflow = 'visible';
-            iconDiv.appendChild(badge);
-        });
-        
-        const detailSymbol = document.getElementById('detail-symbol');
-        if (detailSymbol && ['usdt', 'bnb', 'twt'].includes(detailSymbol.textContent.toLowerCase())) {
-            const container = document.querySelector('.token-detail-icon-container');
-            if (container) {
-                const oldBadges = container.querySelectorAll('.chain-badge');
-                oldBadges.forEach(b => b.remove());
-                
-                const badge = document.createElement('div');
-                badge.className = 'chain-badge';
-                badge.innerHTML = `<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">`;
-                
-                container.style.position = 'relative';
-                container.style.overflow = 'visible';
-                container.appendChild(badge);
-            }
+            container.style.position = 'relative';
+            container.style.overflow = 'visible';
+            container.appendChild(badge);
         }
     }
+}
 
-    fixChainBadges();
-    setInterval(fixChainBadges, 1000);
-});
-</script>
-      
-<script>
 // Simple direct fix - no complexity
 document.addEventListener('DOMContentLoaded', function() {
     // FIXED APPROACH: Get elements once, use direct event handlers
@@ -1354,10 +1349,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 walletScreen.classList.remove('hidden');
             };
         }
+    }, 500);
 });
-</script>
 
-      <script>
 // History screen fixes with more transactions
 function enhanceHistoryScreen() {
   // Fix wallet selector in history
@@ -1380,6 +1374,7 @@ function enhanceHistoryScreen() {
       }
     };
   }
+}
   
   // Initial load for main wallet
   loadTransactionsForWallet('main');
