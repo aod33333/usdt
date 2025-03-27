@@ -3725,11 +3725,24 @@ setTimeout(fixRemainingIssues, 1000);
   
 })(); // <-- Properly closed IIFE
 
-window.hideAllScreens = hideAllScreens;
-window.showScreen = showScreen;
-window.updateWalletUI = updateWalletUI;
-window.showTokenDetail = showTokenDetail;
-window.processSendTransaction = processSendTransaction;
-window.formatCurrency = formatCurrency;
-window.unlockWallet = unlockWallet;
-window.setupDemoBalance = setupDemoBalance;
+// Add event handlers for remaining fixes
+document.addEventListener('DOMContentLoaded', function() {
+  // Run fixes immediately and after a delay
+  if (typeof fixRemainingIssues === 'function') {
+    fixRemainingIssues();
+    setTimeout(fixRemainingIssues, 1000);
+  }
+  
+  // Register important functions in global scope
+  window.hideAllScreens = hideAllScreens;
+  window.showScreen = showScreen;
+  window.updateWalletUI = updateWalletUI;
+  window.showTokenDetail = showTokenDetail;
+  window.processSendTransaction = processSendTransaction;
+  window.formatCurrency = formatCurrency;
+  window.unlockWallet = unlockWallet;
+  window.setupDemoBalance = setupDemoBalance;
+  
+  // Initialize any remaining components
+  console.log('All core wallet functionality initialized');
+});
