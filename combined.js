@@ -3061,6 +3061,247 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(setTokenAttributes, 1000);
 });
 
+    // Enhanced event listener conflict resolution that also fixes other issues
+function resolveWalletAppIssues() {
+  // 1. Fix event listener conflicts
+  function safeReplaceWithClone(selector, clickHandler) {
+    const element = document.querySelector(selector);
+    if (!element || !element.parentNode) return null;
+    
+    const clone = element.cloneNode(true);
+    element.parentNode.replaceChild(clone, element);
+    
+    if (clickHandler) {
+      clone.addEventListener('click', clickHandler);
+    }
+    
+    return clone;
+  }
+  
+  // 2. Fix send/receive buttons
+  safeReplaceWithClone('#send-button', function() {
+    showSendScreen('usdt');
+  });
+  
+  safeReplaceWithClone('#receive-button', function() {
+    showReceiveScreen('btc');
+  });
+  
+  // 3. Fix token detail send/receive buttons
+  safeReplaceWithClone('#token-detail .token-detail-actions .action-circle:nth-child(1)', function() {
+    const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'usdt';
+    showSendScreen(tokenId);
+  });
+  
+  safeReplaceWithClone('#token-detail .token-detail-actions .action-circle:nth-child(2)', function() {
+    const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'btc';
+    showReceiveScreen(tokenId);
+  });
+  
+  // 4. Fix continue send button (ALSO ADDRESSES TRANSACTION FLOW ISSUE)
+  const sendButton = safeReplaceWithClone('#continue-send', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Fix send button position
+    if (this) {
+      this.style.marginTop = 'auto';
+      this.style.marginBottom = '80px';
+    }
+    
+    // Show loading state
+    this.classList.add('loading');
+    
+    // Get form values
+    const recipientInput = document.getElementById('recipient-address');
+    const amountInput = document.getElementById('send-amount');
+    
+    if (!recipientInput || !amountInput) {
+      alert('Error: Form fields not found');
+      this.classList.remove('loading');
+      return;
+    }
+    
+    // Basic validation
+    const recipient = recipientInput.value.trim();
+    const amount = parseFloat(amountInput.value);
+    
+    if (!recipient || recipient.length < 5) {
+      alert('Please enter a valid recipient address');
+      this.classList.remove('loading');
+      return;
+    }
+    
+    if (isNaN(amount) || amount <= 0) {
+      alert('Please enter a valid amount');
+      this.classList.remove('loading');
+      return;
+    }
+    
+    // Hide send screen
+    const sendScreen = document.getElementById('send-screen');
+    if (sendScreen) sendScreen.style.display = 'none';
+    
+    // Show transaction modal
+    const txModal = document.getElementById('tx-status-modal');
+    if (txModal) {
+      // Fix transaction modal z-index
+      txModal.style.zIndex = '9999';
+      txModal.style.display = 'flex';
+      
+      // Set modal elements
+      const pendingView = document.getElementById('tx-pending');
+      const successView = document.getElementById('tx-success');
+      
+      if (pendingView) pendingView.classList.remove('hidden');
+      if (successView) successView.classList.add('hidden');
+      
+      // Set transaction details
+      const txHash = document.getElementById('tx-hash');
+      const txAmount = document.getElementById('tx-amount');
+      const txTo = document.getElementById('tx-to');
+      
+      if (txHash) txHash.textContent = '0x' + Math.random().toString(16).substring(2, 18) + '...';
+      if (txAmount) txAmount.textContent = `${amount} USDT`;
+      if (txTo) txTo.textContent = recipient.substring(0, 6) + '...';
+      
+      // Simulate blockchain confirmation (3 seconds)
+      setTimeout(() => {
+        this.classList.remove('loading');
+        
+        if (pendingView) pendingView.classList.add('hidden');
+        if (successView) successView.classList.remove('hidden');
+        
+        // Fix "Done" button
+        fixTransactionModal();
+      }, 3000);
+    }
+  });
+  
+  // 5. Fix transaction close button
+  safeReplaceWithClone('#close-tx-success', function() {
+    const modal = document.getElementById('tx-status-modal');
+    if (modal) modal.style.display = 'none';
+    
+    const walletScreen = document.getElementById('wallet-screen');
+    if (walletScreen) {
+      walletScreen.style.display = 'flex';
+      walletScreen.classList.remove('hidden');
+    }
+  });
+  
+  // 6. Fix back buttons
+  document.querySelectorAll('.back-button').forEach(button => {
+    const newButton = button.cloneNode(true);
+    if (button.parentNode) {
+      button.parentNode.replaceChild(newButton, button);
+      
+      newButton.addEventListener('click', function() {
+        const currentScreen = newButton.closest('.screen');
+        if (!currentScreen) return;
+        
+        // Hide current screen
+        currentScreen.style.display = 'none';
+        
+        // Show wallet screen
+        const walletScreen = document.getElementById('wallet-screen');
+        if (walletScreen) {
+          walletScreen.style.display = 'flex';
+          walletScreen.classList.remove('hidden');
+        }
+      });
+    }
+  });
+  
+  // 7. Fix explorer display for transaction history
+  const transactionItems = document.querySelectorAll('.transaction-item');
+  transactionItems.forEach(item => {
+    const newItem = item.cloneNode(true);
+    if (item.parentNode) {
+      item.parentNode.replaceChild(newItem, item);
+      
+      newItem.addEventListener('click', function() {
+        const explorerOverlay = document.getElementById('explorer-overlay');
+        if (!explorerOverlay) return;
+        
+        // Fix explorer styling
+        explorerOverlay.style.zIndex = '2000';
+        explorerOverlay.style.display = 'flex';
+        
+        // Add back button functionality
+        const backButton = explorerOverlay.querySelector('.explorer-back-button');
+        if (backButton) {
+          backButton.onclick = function() {
+            explorerOverlay.style.display = 'none';
+          };
+        }
+      });
+    }
+  });
+  
+  // 8. Ensure bottom tabs stay visible
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (bottomTabs) {
+    bottomTabs.style.display = 'flex';
+    bottomTabs.style.position = 'fixed';
+    bottomTabs.style.bottom = '0';
+    bottomTabs.style.left = '0';
+    bottomTabs.style.width = '100%';
+    bottomTabs.style.zIndex = '9999';
+    bottomTabs.style.visibility = 'visible';
+    bottomTabs.style.opacity = '1';
+    
+    // Keep tabs on top of everything else
+    document.body.appendChild(bottomTabs);
+  }
+  
+  // 9. Fix all token detail pages with proper attribute
+  const tokenList = document.getElementById('token-list');
+  if (tokenList) {
+    const tokenItems = tokenList.querySelectorAll('.token-item');
+    tokenItems.forEach(item => {
+      const newItem = item.cloneNode(true);
+      if (item.parentNode) {
+        item.parentNode.replaceChild(newItem, item);
+        
+        // Ensure all tokens show token detail
+        newItem.addEventListener('click', function() {
+          const tokenId = newItem.getAttribute('data-token-id');
+          if (tokenId && typeof showTokenDetail === 'function') {
+            showTokenDetail(tokenId);
+          }
+        });
+      }
+    });
+  }
+}
+
+// Run the enhanced conflict resolution when the DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Run immediately after DOM loads
+  setTimeout(resolveWalletAppIssues, 500);
+  
+  // Run again after a delay to catch any dynamically loaded content
+  setTimeout(resolveWalletAppIssues, 2000);
+  
+  // Also run whenever a screen becomes visible
+  const observer = new MutationObserver(mutations => {
+    mutations.forEach(mutation => {
+      if (mutation.type === 'attributes' && 
+          mutation.attributeName === 'style' && 
+          mutation.target.style.display !== 'none') {
+        // Screen became visible, apply fixes
+        setTimeout(resolveWalletAppIssues, 50);
+      }
+    });
+  });
+  
+  // Observe all screens for visibility changes
+  document.querySelectorAll('.screen').forEach(screen => {
+    observer.observe(screen, { attributes: true });
+  });
+});
+
 // Export key functions to window for global access
 window.hideAllScreens = hideAllScreens;
 window.showScreen = showScreen;
