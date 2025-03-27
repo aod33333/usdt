@@ -1552,7 +1552,7 @@
     }
   }
 
-hashSource: function(source) {
+hashSource(source) {
     // Simple hash implementation
     let hash = 0;
     for (let i = 0; i < String(source).length; i++) {
