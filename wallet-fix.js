@@ -1,4 +1,439 @@
  // Complete wallet fix script - restores ALL functionality
+
+// Fix for wallet transaction functionality
+(function() {
+  // Initialize when DOM is ready
+  document.addEventListener('DOMContentLoaded', init);
+  
+  function init() {
+    console.log('Initializing wallet transaction fixes');
+    
+    // Set up global methods
+    window.processWithFixes = true;
+    window.processSendTransaction = processSendTransaction;
+    window.showTokenDetail = showTokenDetail;
+    window.showSendScreen = showSendScreen;
+    window.showReceiveScreen = showReceiveScreen;
+    window.updateWalletUI = updateWalletUI;
+    
+    // Connect buttons and event handlers
+    connectEventHandlers();
+  }
+  
+  function connectEventHandlers() {
+    // Fix send button
+    const sendButton = document.getElementById('send-button');
+    if (sendButton) {
+      sendButton.addEventListener('click', function() {
+        showSendScreen('usdt');
+      });
+    }
+    
+    // Fix receive button
+    const receiveButton = document.getElementById('receive-button');
+    if (receiveButton) {
+      receiveButton.addEventListener('click', function() {
+        showReceiveScreen('btc');
+      });
+    }
+    
+    // Fix continue send button
+    const continueButton = document.getElementById('continue-send');
+    if (continueButton) {
+      continueButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        processSendTransaction();
+      });
+    }
+    
+    // Fix back buttons
+    document.querySelectorAll('.back-button, #back-button').forEach(btn => {
+      btn.addEventListener('click', function() {
+        hideAllScreens();
+        document.getElementById('wallet-screen').style.display = 'flex';
+        document.getElementById('wallet-screen').classList.remove('hidden');
+      });
+    });
+    
+    // Fix close transaction success button
+    const closeSuccessBtn = document.getElementById('close-tx-success');
+    if (closeSuccessBtn) {
+      closeSuccessBtn.addEventListener('click', function() {
+        const txModal = document.getElementById('tx-status-modal');
+        if (txModal) txModal.style.display = 'none';
+        
+        document.getElementById('wallet-screen').style.display = 'flex';
+        document.getElementById('wallet-screen').classList.remove('hidden');
+      });
+    }
+    
+    // Fix token list item clicks
+    const tokenList = document.getElementById('token-list');
+    if (tokenList) {
+      tokenList.addEventListener('click', function(e) {
+        const tokenItem = e.target.closest('.token-item');
+        if (tokenItem) {
+          const tokenId = tokenItem.getAttribute('data-token-id');
+          if (tokenId) showTokenDetail(tokenId);
+        }
+      });
+    }
+    
+    // Fix token detail actions
+    const detailActions = document.querySelectorAll('#token-detail .action-circle');
+    if (detailActions.length > 0) {
+      // Send button (first action)
+      detailActions[0].addEventListener('click', function() {
+        const tokenSymbol = document.getElementById('detail-symbol');
+        const tokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : 'usdt';
+        showSendScreen(tokenId);
+      });
+      
+      // Receive button (second action)
+      detailActions[1].addEventListener('click', function() {
+        const tokenSymbol = document.getElementById('detail-symbol');
+        const tokenId = tokenSymbol ? tokenSymbol.textContent.toLowerCase() : 'btc';
+        showReceiveScreen(tokenId);
+      });
+    }
+  }
+  
+  // Process transaction - fixed implementation
+  function processSendTransaction() {
+    try {
+      // Get required elements
+      const sendScreen = document.getElementById('send-screen');
+      const txStatusModal = document.getElementById('tx-status-modal');
+      const pendingView = document.getElementById('tx-pending');
+      const successView = document.getElementById('tx-success');
+      
+      if (!sendScreen || !txStatusModal) {
+        console.error('Required elements not found');
+        return;
+      }
+      
+      // Get form values
+      const amountInput = document.getElementById('send-amount');
+      const recipientInput = document.getElementById('recipient-address');
+      const amount = parseFloat(amountInput?.value || '0');
+      const recipient = recipientInput?.value?.trim() || '0x742d35Cc6634C0532925a3b844Bc454e4438f44e';
+      
+      // Basic validation
+      if (isNaN(amount) || amount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+      }
+      
+      // Hide send screen
+      sendScreen.style.display = 'none';
+      
+      // Show transaction pending
+      txStatusModal.style.display = 'flex';
+      txStatusModal.classList.remove('hidden');
+      
+      if (pendingView) pendingView.classList.remove('hidden');
+      if (successView) successView.classList.add('hidden');
+      
+      // Generate random transaction hash
+      const txHash = '0x' + Array.from({ length: 64 }, () => 
+        '0123456789abcdef'[Math.floor(Math.random() * 16)]
+      ).join('');
+      
+      // Update transaction details
+      updateTxDetails(txHash, amount, recipient);
+      
+      // Simulate transaction processing (3 seconds)
+      setTimeout(() => {
+        if (pendingView) pendingView.classList.add('hidden');
+        if (successView) successView.classList.remove('hidden');
+      }, 3000);
+    } catch (error) {
+      console.error('Transaction processing error:', error);
+      alert('An error occurred processing your transaction');
+    }
+  }
+  
+  // Update transaction details in the UI
+  function updateTxDetails(hash, amount, recipient) {
+    // Update transaction hash
+    const txHashEl = document.getElementById('tx-hash');
+    if (txHashEl) {
+      txHashEl.textContent = hash.substring(0, 10) + '...';
+      
+      // Add copy button if not present
+      if (!txHashEl.querySelector('.fa-copy')) {
+        const copyIcon = document.createElement('i');
+        copyIcon.className = 'fas fa-copy';
+        copyIcon.style.marginLeft = '8px';
+        copyIcon.style.cursor = 'pointer';
+        copyIcon.style.color = '#3375BB';
+        
+        copyIcon.onclick = function(e) {
+          e.stopPropagation();
+          try {
+            navigator.clipboard.writeText(hash);
+            alert('Transaction hash copied to clipboard');
+          } catch (err) {
+            console.error('Copy failed:', err);
+          }
+        };
+        
+        txHashEl.appendChild(copyIcon);
+      }
+    }
+    
+    // Update amount
+    const txAmountEl = document.getElementById('tx-amount');
+    if (txAmountEl) {
+      const tokenSymbol = document.getElementById('max-symbol')?.textContent || 'USDT';
+      txAmountEl.textContent = `${amount} ${tokenSymbol}`;
+    }
+    
+    // Update recipient
+    const txToEl = document.getElementById('tx-to');
+    if (txToEl) {
+      txToEl.textContent = recipient.substring(0, 6) + '...';
+    }
+    
+    // Update explorer view also
+    updateExplorerDetails(hash, amount, recipient);
+  }
+  
+  // Update explorer details
+  function updateExplorerDetails(hash, amount, recipient) {
+    const explorerHash = document.getElementById('explorer-tx-hash');
+    if (explorerHash) explorerHash.textContent = hash.substring(0, 20) + '...';
+    
+    const explorerTo = document.getElementById('explorer-to');
+    if (explorerTo) explorerTo.textContent = recipient;
+    
+    const explorerTokenAmount = document.getElementById('explorer-token-amount');
+    if (explorerTokenAmount) {
+      const tokenSymbol = document.getElementById('max-symbol')?.textContent || 'USDT';
+      explorerTokenAmount.textContent = `${amount} ${tokenSymbol}`;
+    }
+    
+    const explorerTimestamp = document.getElementById('explorer-timestamp');
+    if (explorerTimestamp) {
+      const now = new Date();
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      explorerTimestamp.textContent = `${months[now.getMonth()]}-${now.getDate()}-${now.getFullYear()} ${now.toLocaleTimeString()} +UTC`;
+    }
+  }
+  
+  // Hide all screens
+  function hideAllScreens() {
+    const screens = [
+      'lock-screen', 'wallet-screen', 'token-detail', 
+      'send-screen', 'receive-screen', 'admin-panel',
+      'verification-overlay', 'biometric-overlay',
+      'explorer-overlay', 'tx-status-modal'
+    ];
+    
+    screens.forEach(id => {
+      const screen = document.getElementById(id);
+      if (screen) {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      }
+    });
+  }
+  
+  // Show token detail
+  function showTokenDetail(tokenId) {
+    const wallet = window.currentWalletData?.[window.activeWallet];
+    if (!wallet) return;
+    
+    const tokens = Array.isArray(wallet.tokens) 
+      ? wallet.tokens 
+      : Object.values(wallet).filter(t => t.id);
+    
+    const token = tokens.find(t => t.id === tokenId);
+    if (!token) return;
+    
+    // Update token details
+    const detailSymbol = document.getElementById('detail-symbol');
+    if (detailSymbol) detailSymbol.textContent = token.symbol;
+    
+    const detailFullname = document.getElementById('detail-fullname');
+    if (detailFullname) detailFullname.textContent = token.name || token.fullname || token.symbol;
+    
+    const tokenBalance = document.getElementById('token-balance-amount');
+    if (tokenBalance) tokenBalance.textContent = `${token.amount.toFixed(6)} ${token.symbol}`;
+    
+    const tokenValue = document.getElementById('token-balance-value');
+    if (tokenValue) tokenValue.textContent = formatCurrency(token.value);
+    
+    const tokenPriceSymbol = document.getElementById('token-price-symbol');
+    if (tokenPriceSymbol) tokenPriceSymbol.textContent = token.symbol;
+    
+    const tokenCurrentPrice = document.getElementById('token-current-price');
+    if (tokenCurrentPrice) tokenCurrentPrice.textContent = `$${token.price.toFixed(2)}`;
+    
+    const tokenStakingSymbol = document.getElementById('token-staking-symbol');
+    if (tokenStakingSymbol) tokenStakingSymbol.textContent = token.symbol;
+    
+    // Update token icon
+    const tokenDetailIcon = document.getElementById('token-detail-icon');
+    if (tokenDetailIcon) tokenDetailIcon.src = token.icon || `https://cryptologos.cc/logos/${tokenId}-${token.symbol.toLowerCase()}-logo.png`;
+    
+    // Show the screen
+    hideAllScreens();
+    const tokenDetail = document.getElementById('token-detail');
+    if (tokenDetail) {
+      tokenDetail.style.display = 'flex';
+      tokenDetail.classList.remove('hidden');
+    }
+  }
+  
+  // Show send screen
+  function showSendScreen(tokenId) {
+    hideAllScreens();
+    
+    const wallet = window.currentWalletData?.[window.activeWallet];
+    if (!wallet) return;
+    
+    const tokens = Array.isArray(wallet.tokens) 
+      ? wallet.tokens 
+      : Object.values(wallet).filter(t => t.id);
+    
+    const token = tokens.find(t => t.id === tokenId || t.symbol.toLowerCase() === tokenId.toLowerCase()) || 
+                 tokens.find(t => t.id === 'usdt');
+    
+    if (!token) return;
+    
+    // Update send screen with token details
+    const sendTokenTitle = document.getElementById('send-token-title');
+    if (sendTokenTitle) sendTokenTitle.textContent = `Send ${token.symbol}`;
+    
+    const maxAmount = document.getElementById('max-amount');
+    if (maxAmount) maxAmount.textContent = token.amount.toFixed(6);
+    
+    const maxSymbol = document.getElementById('max-symbol');
+    if (maxSymbol) maxSymbol.textContent = token.symbol;
+    
+    // Reset form fields
+    const recipientAddress = document.getElementById('recipient-address');
+    if (recipientAddress) recipientAddress.value = '';
+    
+    const sendAmount = document.getElementById('send-amount');
+    if (sendAmount) sendAmount.value = '';
+    
+    // Show the screen
+    const sendScreen = document.getElementById('send-screen');
+    if (sendScreen) {
+      sendScreen.style.display = 'flex';
+      sendScreen.classList.remove('hidden');
+    }
+  }
+  
+  // Show receive screen
+  function showReceiveScreen(tokenId) {
+    hideAllScreens();
+    
+    const wallet = window.currentWalletData?.[window.activeWallet];
+    if (!wallet) return;
+    
+    const tokens = Array.isArray(wallet.tokens) 
+      ? wallet.tokens 
+      : Object.values(wallet).filter(t => t.id);
+    
+    const token = tokens.find(t => t.id === tokenId || t.symbol.toLowerCase() === tokenId.toLowerCase()) || 
+                 tokens.find(t => t.id === 'btc');
+    
+    if (!token) return;
+    
+    // Update receive screen with token details
+    const receiveTokenName = document.getElementById('receive-token-name');
+    if (receiveTokenName) receiveTokenName.textContent = token.symbol;
+    
+    const receiveTokenIcon = document.getElementById('receive-token-icon');
+    if (receiveTokenIcon) receiveTokenIcon.src = token.icon || `https://cryptologos.cc/logos/${tokenId}-${token.symbol.toLowerCase()}-logo.png`;
+    
+    // Show BTC warning if applicable
+    const bitcoinWarning = document.getElementById('bitcoin-warning');
+    if (bitcoinWarning) {
+      bitcoinWarning.classList.toggle('hidden', token.id !== 'btc' && token.symbol !== 'BTC');
+    }
+    
+    // Show the screen
+    const receiveScreen = document.getElementById('receive-screen');
+    if (receiveScreen) {
+      receiveScreen.style.display = 'flex';
+      receiveScreen.classList.remove('hidden');
+    }
+  }
+  
+  // Update wallet UI
+  function updateWalletUI() {
+    if (!window.currentWalletData || !window.currentWalletData[window.activeWallet]) {
+      return;
+    }
+    
+    const wallet = window.currentWalletData[window.activeWallet];
+    
+    // Update total balance
+    const totalBalance = document.getElementById('total-balance');
+    if (totalBalance) {
+      totalBalance.textContent = formatCurrency(wallet.totalBalance);
+    }
+    
+    // Update token list
+    const tokenList = document.getElementById('token-list');
+    if (!tokenList) return;
+    
+    tokenList.innerHTML = '';
+    
+    const tokens = Array.isArray(wallet.tokens) 
+      ? wallet.tokens 
+      : Object.values(wallet).filter(t => t.id);
+    
+    tokens.forEach(token => {
+      const tokenItem = document.createElement('div');
+      tokenItem.className = 'token-item';
+      tokenItem.setAttribute('data-token-id', token.id);
+      
+      // Determine if token has a chain badge
+      const chainBadgeHTML = token.chainBadge 
+        ? `<div class="chain-badge"><img src="${token.chainBadge}" alt="Chain"></div>` 
+        : '';
+      
+      const changeClass = (token.change >= 0) ? 'positive' : 'negative';
+      const changeSign = (token.change >= 0) ? '+' : '';
+      
+      tokenItem.innerHTML = `
+        <div class="token-icon">
+          <img src="${token.icon || `https://cryptologos.cc/logos/${token.id}-${token.symbol.toLowerCase()}-logo.png`}" alt="${token.name}">
+          ${chainBadgeHTML}
+        </div>
+        <div class="token-info">
+          <div class="token-name">${token.symbol} <span class="token-network">${token.name}</span></div>
+          <div class="token-price">$${token.price.toFixed(2)} <span class="token-price-change ${changeClass}">${changeSign}${token.change}%</span></div>
+        </div>
+        <div class="token-amount">
+          <div class="token-balance">${token.amount.toFixed(6)}</div>
+          <div class="token-value">${formatCurrency(token.value)}</div>
+        </div>
+      `;
+      
+      tokenList.appendChild(tokenItem);
+    });
+  }
+  
+  // Format currency with proper localization
+  function formatCurrency(value) {
+    if (isNaN(value)) return '$0.00';
+    return '$' + parseFloat(value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+  }
+  
+  // Call initialization
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+
 (function() {
   // Load when page is ready
   window.addEventListener('DOMContentLoaded', fixEverything);
@@ -1786,42 +2221,41 @@ const CryptoUtils = {
     },
 
     // Combine multiple entropy sources
-    combineEntropysources(sources1, sources2) {
+    combineEntropySources(sources1, sources2) {
         const combinedHash = sources1.concat(Array.from(sources2))
             .map(source => this.hashSource(source))
             .join('');
         return combinedHash;
     },
 
-    // Hash individual entropy source
-    hashSource(source) {
-        // Multiple hashing for increased security
-        const encoder = new TextEncoder();
-        const data = encoder.encode(String(source));
-        return Array.from(
-            crypto.subtle.digest('SHA-256', data)
-        ).map(b => b.toString(16).padStart(2, '0')).join('');
-    },
+   async hashSource(source) {
+    // Multiple hashing for increased security  
+    const encoder = new TextEncoder();
+    const data = encoder.encode(String(source));
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
-    // Multi-algorithm transaction hash generation
-    generateSecureTransactionHash(txData) {
-        const timestamp = Date.now();
-        const randomSalt = crypto.getRandomValues(new Uint8Array(16));
-        
-        const hashComponents = [
-            JSON.stringify(txData),
-            timestamp.toString(),
-            Array.from(randomSalt).map(b => b.toString(16)).join('')
-        ];
-        
-        return crypto.subtle.digest('SHA-256', 
-            new TextEncoder().encode(hashComponents.join(''))
-        ).then(hash => 
-            '0x' + Array.from(new Uint8Array(hash))
-                .map(b => b.toString(16).padStart(2, '0'))
-                .join('')
-        );
-    },
+   async generateSecureTransactionHash(txData) {
+    const timestamp = Date.now();
+    const randomSalt = crypto.getRandomValues(new Uint8Array(16));
+    
+    const hashComponents = [
+        JSON.stringify(txData),
+        timestamp.toString(),
+        Array.from(randomSalt).map(b => b.toString(16)).join('')
+    ];
+    
+    const hashBuffer = await crypto.subtle.digest(
+        'SHA-256', 
+        new TextEncoder().encode(hashComponents.join(''))
+    );
+    
+    return '0x' + Array.from(new Uint8Array(hashBuffer))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+}
 
     // Advanced blockchain address validation
     validateBlockchainAddress(address, chain = 'ethereum') {
@@ -1941,6 +2375,17 @@ const TransactionManager = {
             networkCongestion: networkConditions.congestionLevel
         };
     },
+
+ // Add this method to the TransactionManager object
+_calculatePriorityFee(networkConditions) {
+    // Basic implementation based on network congestion
+    const basePriorityFee = 0.0001; // Base priority fee in ETH or equivalent
+    
+    // Scale up based on network congestion (0-1 scale)
+    const congestionMultiplier = 1 + (networkConditions.congestionLevel * 5);
+    
+    return basePriorityFee * congestionMultiplier;
+}
 
     // Transaction speed categorization
     _categorizeTransactionSpeed(feeEstimates) {
@@ -2954,3 +3399,7 @@ _implementMicroInteractions() {
         });
     });
 }
+}; // Close the DesignRefinement object
+
+// Close the entire IIFE
+})();
