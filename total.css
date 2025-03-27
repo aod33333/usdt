@@ -3360,46 +3360,68 @@ Here's the CSS to fix the USDT background issue in the history page:
   border-radius: 4px;
 }
 
-/* Add this CLEANED VERSION at the BOTTOM of total.css */
-
-/* Base badge styling - Applies EVERYWHERE except Send/Receive */
-.token-icon[data-network] {
-  position: relative;
+/* Network Badge System - Updated Approach */
+/* Base badge styling - Applies to tokens that need network badges */
+.token-item[data-token-id="usdt"] .token-icon,
+.token-item[data-token-id="bnb"] .token-icon,
+.token-item[data-token-id="twt"] .token-icon {
+  position: relative !important;
+  overflow: visible !important;
 }
 
-.token-icon[data-network]::after {
-  content: "";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: var(--tw-white) url('https://cryptologos.cc/logos/bnb-bnb-logo.png') center/contain no-repeat;
-  border: 2px solid var(--tw-white);
-  border-radius: 50%;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16);
-  z-index: 2;
+.token-item[data-token-id="usdt"] .token-icon::after,
+.token-item[data-token-id="bnb"] .token-icon::after,
+.token-item[data-token-id="twt"] .token-icon::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 20px !important;
+  height: 20px !important;
+  background: #FFFFFF url('https://cryptologos.cc/logos/bnb-bnb-logo.png') center/80% no-repeat !important;
+  border: 2px solid #FFFFFF !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  z-index: 5 !important;
+  bottom: -6px !important;
+  right: -6px !important;
   display: block !important;
 }
 
-/* Default position for most screens */
-.token-icon[data-network]::after {
-  bottom: -6px;
-  right: -6px;
+/* Token detail page badges */
+#token-detail .token-detail-icon-container {
+  position: relative !important;
+  overflow: visible !important;
 }
 
-/* Alternate position in Token Detail */
-#token-detail .token-icon[data-network]::after {
-  bottom: auto;
-  top: -6px;
-  right: -6px;
+#detail-symbol:not(:empty) ~ .token-detail-icon-container::after {
+  content: "" !important;
+  position: absolute !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: none !important; /* Hidden by default */
+  background: #FFFFFF url('https://cryptologos.cc/logos/bnb-bnb-logo.png') center/80% no-repeat !important;
+  border: 2px solid #FFFFFF !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  z-index: 5 !important;
+  bottom: -6px !important;
+  right: -6px !important;
+}
+
+/* Show badges only for specific tokens in detail view */
+#detail-symbol[data-original="usdt"] ~ .token-detail-icon-container::after,
+#detail-symbol:matches("USDT") ~ .token-detail-icon-container::after,
+#detail-symbol:matches("BNB") ~ .token-detail-icon-container::after,
+#detail-symbol:matches("TWT") ~ .token-detail-icon-container::after {
+  display: block !important;
 }
 
 /* Hide in Send/Receive screens */
-#send-screen .token-icon[data-network]::after,
-#receive-screen .token-icon[data-network]::after {
+#send-screen .token-icon::after,
+#receive-screen .token-icon::after {
   display: none !important;
 }
 
-/* Disable legacy system */
+/* Disable legacy chain badge system */
 .chain-badge {
   display: none !important;
 }
