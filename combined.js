@@ -2965,7 +2965,13 @@ document.addEventListener('DOMContentLoaded', function() {
        
        // Initialize all main components safely
        safeInit('Screen Initialization', initializeAllScreens);
-       safeInit('Touch Targets', initTouchTargets);
+       stry {
+  console.log('Initializing touch targets...');
+  initTouchTargets();
+  console.log('Touch targets successfully initialized');
+} catch (error) {
+  console.error('Touch target initialization failed with error:', error);
+}
        safeInit('Passcode', initPasscode);
        safeInit('Admin Panel', initAdminPanel);
        safeInit('Wallet Selector', initWalletSelector);
