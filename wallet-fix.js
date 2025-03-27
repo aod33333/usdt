@@ -1567,6 +1567,7 @@ function generateSecureTransactionHash(txData) {
   const timestamp = Date.now();
   const randomPart = Math.random().toString(36).substring(2);
   const dataStr = JSON.stringify(txData) + timestamp + randomPart;
+}
   
   // Simple hash function that doesn't use crypto.subtle
   let hash = 0;
@@ -1584,6 +1585,7 @@ function generateSecureTransactionHash(txData) {
 // Make sure to connect the buttons on page load
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Connecting send transaction buttons...');
+  }
   
   // Connect the continue button in send screen
   const continueButton = document.getElementById('continue-send');
@@ -2295,58 +2297,6 @@ function updateTokenIcon(token) {
     }
 
    // Advanced Wallet Security and Performance Module
-
-// Cryptographic Utilities
-const CryptoUtils = {
-    // Quantum-resistant address generation
-    generateQuantumResistantAddress() {
-        // Implement lattice-based cryptography approach
-        const entropy = this.generateAdvancedEntropy();
-        const addressHash = this.hashWithMultipleAlgorithms(entropy);
-        return `0x${addressHash.slice(0, 40)}`;
-    },
-
-    // Advanced entropy source
-    generateAdvancedEntropy() {
-        const browserEntropy = [
-            navigator.userAgent,
-            screen.width,
-            screen.height,
-            new Date().getTime(),
-            Math.random()
-        ];
-        
-        // Use Web Crypto API for robust entropy
-        const cryptoEntropy = crypto.getRandomValues(new Uint32Array(5));
-        
-        return this.combineEntropySources(browserEntropy, cryptoEntropy);
-    },
-
-    // Combine multiple entropy sources
-    combineEntropySources(sources1, sources2) {
-        const combinedHash = sources1.concat(Array.from(sources2))
-            .map(source => this.hashSource(source))
-            .join('');
-        return combinedHash;
-    },
-
- hashSource: function(source) {
-    // Multiple hashing for increased security  
-    if (source === null || source === undefined) {
-        return '';
-    }
-
-    const sourceStr = String(source);
-    let hash = 0;
-    
-    for (let i = 0; i < sourceStr.length; i++) {
-        hash = ((hash << 5) - hash) + sourceStr.charCodeAt(i);
-        hash |= 0; // Convert to 32bit integer
-    }
-    
-    return Math.abs(hash).toString(16);
-}
-
  const CryptoUtils = {
     generateQuantumResistantAddress() {
         const entropy = this.generateAdvancedEntropy();
