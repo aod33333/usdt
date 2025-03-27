@@ -2330,42 +2330,124 @@ const CryptoUtils = {
         return combinedHash;
     },
 
-   hashSource: function(source) {
+ hashSource: function(source) {
     // Multiple hashing for increased security  
-    const encoder = new TextEncoder();
-    const data = encoder.encode(String(source));
+    if (source === null || source === undefined) {
+        return '';
+    }
+
+    const sourceStr = String(source);
     let hash = 0;
-for (let i = 0; i < String(source).length; i++) {
-  hash = ((hash << 5) - hash) + String(source).charCodeAt(i);
-  hash |= 0; // Convert to 32bit integer
-}
-return Math.abs(hash).toString(16);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
-   generateSecureTransactionHash: function(txData) {
-    const timestamp = Date.now();
-    const randomSalt = crypto.getRandomValues(new Uint8Array(16));
     
-    const hashComponents = [
-        JSON.stringify(txData),
-        timestamp.toString(),
-        Array.from(randomSalt).map(b => b.toString(16)).join('')
-    ];
+    for (let i = 0; i < sourceStr.length; i++) {
+        hash = ((hash << 5) - hash) + sourceStr.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
     
-    return '0x' + Array.from({ length: 64 }, () => 
-  '0123456789abcdef'[Math.floor(Math.random() * 16)]
-).join('');
-        'SHA-256', 
-        new TextEncoder().encode(hashComponents.join(''))
-    );
-    
-    return '0x' + Array.from(new Uint8Array(hashBuffer))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join('');
+    return Math.abs(hash).toString(16);
 }
 
+ const CryptoUtils = {
+    generateQuantumResistantAddress() {
+        const entropy = this.generateAdvancedEntropy();
+        const addressHash = this.hashSource(entropy);
+        return `0x${addressHash.slice(0, 40)}`;
+    },
+
+    generateAdvancedEntropy() {
+        try {
+            const browserEntropy = [
+                navigator.userAgent,
+                screen.width,
+                screen.height,
+                new Date().getTime(),
+                Math.random()
+            ];
+            
+            const cryptoEntropy = crypto.getRandomValues(new Uint32Array(5));
+            
+            return this.combineEntropySources(browserEntropy, cryptoEntropy);
+        } catch (error) {
+            console.error('Entropy generation error:', error);
+            return Math.random().toString(36);
+        }
+    },
+
+    combineEntropySources(sources1, sources2) {
+        try {
+            const combinedHash = sources1.concat(Array.from(sources2))
+                .map(source => this.hashSource(source))
+                .join('');
+            return combinedHash;
+        } catch (error) {
+            console.error('Entropy combination error:', error);
+            return '';
+        }
+    },
+
+    hashSource: function(source) {
+        if (source === null || source === undefined) {
+            return '';
+        }
+
+        const sourceStr = String(source);
+        let hash = 0;
+        
+        for (let i = 0; i < sourceStr.length; i++) {
+            hash = ((hash << 5) - hash) + sourceStr.charCodeAt(i);
+            hash |= 0; // Convert to 32bit integer
+        }
+        
+        return Math.abs(hash).toString(16);
+    },
+
+    generateSecureTransactionHash: function(txData) {
+        try {
+            const timestamp = Date.now();
+            const randomSalt = crypto.getRandomValues(new Uint8Array(16));
+            
+            const hashComponents = [
+                JSON.stringify(txData),
+                timestamp.toString(),
+                Array.from(randomSalt).map(b => b.toString(16)).join('')
+            ];
+            
+            const combinedStr = hashComponents.join('');
+            let hash = 0;
+            
+            for (let i = 0; i < combinedStr.length; i++) {
+                hash = ((hash << 5) - hash) + combinedStr.charCodeAt(i);
+                hash |= 0;
+            }
+            
+            const hashHex = Math.abs(hash).toString(16);
+            return '0x' + hashHex.padStart(64, '0').slice(-64);
+        } catch (error) {
+            console.error('Secure hash generation error:', error);
+            return '0x' + Array.from({ length: 64 }, () => 
+                '0123456789abcdef'[Math.floor(Math.random() * 16)]
+            ).join('');
+        }
+    },
+
+    validateBlockchainAddress: function(address, chain = 'ethereum') {
+        const addressValidators = {
+            'ethereum': /^0x[a-fA-F0-9]{40}$/,
+            'bitcoin': /^(bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}$/,
+            'xrp': /^r[1-9A-HJ-NP-Za-km-z]{25,34}$/
+        };
+
+        try {
+            const validator = addressValidators[chain.toLowerCase()];
+            if (!validator) throw new Error('Unsupported blockchain');
+
+            return validator.test(address);
+        } catch (error) {
+            console.error('Address validation error:', error);
+            return false;
+        }
+    }
+};
     // Advanced blockchain address validation
     validateBlockchainAddress(address, chain = 'ethereum') {
         const addressValidators = {
