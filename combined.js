@@ -3061,38 +3061,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setInterval(setTokenAttributes, 1000);
 });
 
-// Add this code to the bottom of combined.js or as a new <script> tag at the end of index.html
-
-(function() {
-  // Main fix function that will be called at strategic times
-  function fixWalletApp() {
-    console.log("Applying wallet fixes...");
-    
-    // 1. Fix bottom tabs - most critical UI element
-    fixBottomTabs();
-    
-    // 2. Fix token detail header
-    fixTokenDetailHeader();
-    
-    // 3. Fix send/receive screens
-    fixSendReceiveScreens();
-    
-    // 4. Fix transaction flow
-    fixTransactionFlow();
-    
-    // 5. Make all tokens clickable
-    makeTokensClickable();
-    
-    // 6. Fix explorer overlay
-    fixExplorerOverlay();
-    
-    // 7. Fix chain badges
-    fixChainBadges();
-    
-    // 8. Fix history screen
-    fixHistoryScreen();
-  }
-  
   // Fix bottom tabs to always be visible
   function fixBottomTabs() {
     const bottomTabs = document.querySelector('.bottom-tabs');
