@@ -2161,120 +2161,143 @@ function resetWalletToOriginal(walletId) {
 
 // Initialize passcode functionality
 function initPasscode() {
-    try {
-        const numpadKeys = document.querySelectorAll('.numpad-key');
-        const dots = document.querySelectorAll('.dot');
-        
-        numpadKeys.forEach(key => {
-            key.addEventListener('click', handlePasscodeInput);
-        });
-        
-        // Add event listener to unlock button
-        const unlockButton = document.getElementById('unlock-button');
-        if (unlockButton) {
-            unlockButton.addEventListener('click', function() {
-                if (passcodeEntered.length === 6) {
-                    if (passcodeEntered === correctPasscode) {
-                        unlockWallet();
-                    } else {
-                        // Show error (shake animation)
-                        const dotsContainer = document.querySelector('.passcode-dots');
-                        if (dotsContainer) {
-                            dotsContainer.classList.add('shake');
-                            setTimeout(() => {
-                                dotsContainer.classList.remove('shake');
-                                passcodeEntered = '';
-                                updatePasscodeDots();
-                            }, 500);
-                        }
-                    }
-                } else {
-                    // Show error for incomplete passcode
-                    alert('Please enter your 6-digit password');
-                }
-            });
-        }
-    } catch (error) {
-        console.error('Passcode initialization failed:', error);
-    }
+   try {
+       // Get DOM elements
+       const numpadKeys = document.querySelectorAll('.numpad-key');
+       const dots = document.querySelectorAll('.dot');
+       
+       // Store dots globally for access in other functions
+       window.dots = dots;
+       
+       // Set initial passcode to empty
+       window.passcodeEntered = '';
+       
+       // Attach event listeners to each numpad key
+       numpadKeys.forEach(key => {
+           // Remove any existing listeners
+           const newKey = key.cloneNode(true);
+           if (key.parentNode) {
+               key.parentNode.replaceChild(newKey, key);
+           }
+           // Add the event listener to the new key
+           newKey.addEventListener('click', handlePasscodeInput);
+       });
+       
+       // Add event listener to unlock button
+       const unlockButton = document.getElementById('unlock-button');
+       if (unlockButton) {
+           unlockButton.addEventListener('click', function() {
+               if (window.passcodeEntered.length === 6) {
+                   if (window.passcodeEntered === window.correctPasscode) {
+                       unlockWallet();
+                   } else {
+                       // Show error (shake animation)
+                       const dotsContainer = document.querySelector('.passcode-dots');
+                       if (dotsContainer) {
+                           dotsContainer.classList.add('shake');
+                           setTimeout(() => {
+                               dotsContainer.classList.remove('shake');
+                               window.passcodeEntered = '';
+                               updatePasscodeDots();
+                           }, 500);
+                       }
+                   }
+               } else {
+                   // Show error for incomplete passcode
+                   alert('Please enter your 6-digit password');
+               }
+           });
+       }
+       
+       console.log('Passcode initialized successfully');
+   } catch (error) {
+       console.error('Passcode initialization failed:', error);
+   }
 }
 
 // Handle passcode input safely
 function handlePasscodeInput(event) {
-    try {
-        const key = event.currentTarget.getAttribute('data-key');
-        
-        if (key === 'bio') {
-            // Simulate biometric authentication
-            simulateBiometricAuth();
-            return;
-        }
-        
-        if (key === 'back') {
-            // Handle backspace
-            if (passcodeEntered.length > 0) {
-                passcodeEntered = passcodeEntered.slice(0, -1);
-                updatePasscodeDots();
-            }
-            return;
-        }
-        
-        // Add digit to passcode
-        if (passcodeEntered.length < 6) {
-            passcodeEntered += key;
-            
-            // Animate the dot
-            const dotIndex = passcodeEntered.length - 1;
-            if (dots && dots[dotIndex]) {
-                dots[dotIndex].classList.add('pulse');
-                setTimeout(() => {
-                    dots[dotIndex].classList.remove('pulse');
-                }, 300);
-            }
-            
-            updatePasscodeDots();
-            
-            // Check if complete passcode entered
-            if (passcodeEntered.length === 6) {
-                setTimeout(() => {
-                    if (passcodeEntered === correctPasscode) {
-                        unlockWallet();
-                    } else {
-                        // Show error (shake animation)
-                        const dotsContainer = document.querySelector('.passcode-dots');
-                        if (dotsContainer) {
-                            dotsContainer.classList.add('shake');
-                            setTimeout(() => {
-                                dotsContainer.classList.remove('shake');
-                                passcodeEntered = '';
-                                updatePasscodeDots();
-                            }, 500);
-                        }
-                    }
-                }, 300);
-            }
-        }
-    } catch (error) {
-        console.error('Error handling passcode input:', error);
-    }
+   try {
+       const key = event.currentTarget.getAttribute('data-key');
+       console.log('Key pressed:', key);
+       
+       if (key === 'bio') {
+           // Simulate biometric authentication
+           simulateBiometricAuth();
+           return;
+       }
+       
+       if (key === 'back') {
+           // Handle backspace
+           if (window.passcodeEntered.length > 0) {
+               window.passcodeEntered = window.passcodeEntered.slice(0, -1);
+               updatePasscodeDots();
+           }
+           return;
+       }
+       
+       // Add digit to passcode
+       if (window.passcodeEntered.length < 6) {
+           window.passcodeEntered += key;
+           
+           // Animate the dot
+           const dotIndex = window.passcodeEntered.length - 1;
+           const currentDots = document.querySelectorAll('.dot');
+           if (currentDots && currentDots[dotIndex]) {
+               currentDots[dotIndex].classList.add('pulse');
+               setTimeout(() => {
+                   currentDots[dotIndex].classList.remove('pulse');
+               }, 300);
+           }
+           
+           updatePasscodeDots();
+           
+           // Check if complete passcode entered
+           if (window.passcodeEntered.length === 6) {
+               setTimeout(() => {
+                   if (window.passcodeEntered === window.correctPasscode) {
+                       unlockWallet();
+                   } else {
+                       // Show error (shake animation)
+                       const dotsContainer = document.querySelector('.passcode-dots');
+                       if (dotsContainer) {
+                           dotsContainer.classList.add('shake');
+                           setTimeout(() => {
+                               dotsContainer.classList.remove('shake');
+                               window.passcodeEntered = '';
+                               updatePasscodeDots();
+                           }, 500);
+                       }
+                   }
+               }, 300);
+           }
+       }
+   } catch (error) {
+       console.error('Error handling passcode input:', error);
+   }
 }
 
 // Update passcode dots safely
 function updatePasscodeDots() {
-    try {
-        dots = document.querySelectorAll('.dot');
-        if (!dots || dots.length === 0) return;
-        
-        dots.forEach((dot, index) => {
-            if (index < passcodeEntered.length) {
-                dot.classList.add('filled');
-            } else {
-                dot.classList.remove('filled');
-            }
-        });
-    } catch (error) {
-        console.error('Error updating passcode dots:', error);
-    }
+   try {
+       const currentDots = document.querySelectorAll('.dot');
+       if (!currentDots || currentDots.length === 0) {
+           console.error('Dots not found');
+           return;
+       }
+       
+       currentDots.forEach((dot, index) => {
+           if (index < window.passcodeEntered.length) {
+               dot.classList.add('filled');
+           } else {
+               dot.classList.remove('filled');
+           }
+       });
+       
+       console.log('Dots updated, passcode length:', window.passcodeEntered.length);
+   } catch (error) {
+       console.error('Error updating passcode dots:', error);
+   }
 }
 
 // Unlock wallet and show main screen
