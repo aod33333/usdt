@@ -3032,6 +3032,33 @@ document.addEventListener('DOMContentLoaded', function() {
    setTimeout(runDiagnostics, 2000);
 
    fixTransactionModal();
+
+    // Network badge handler - add to bottom of combined.js
+document.addEventListener('DOMContentLoaded', function() {
+  // Set data attributes for token identification
+  function setTokenAttributes() {
+    // Handle main list
+    document.querySelectorAll('.token-item').forEach(item => {
+      const tokenId = item.getAttribute('data-token-id');
+      if (!tokenId) return;
+      
+      const tokenIcon = item.querySelector('.token-icon');
+      if (tokenIcon) {
+        tokenIcon.setAttribute('data-token', tokenId);
+      }
+    });
+    
+    // Handle token detail view
+    const detailSymbol = document.getElementById('detail-symbol');
+    if (detailSymbol) {
+      const symbol = detailSymbol.textContent.trim();
+      detailSymbol.setAttribute('data-original', symbol.toLowerCase());
+    }
+  }
+  
+  // Run initially and when UI changes
+  setTokenAttributes();
+  setInterval(setTokenAttributes, 1000);
 });
 
 // Export key functions to window for global access
