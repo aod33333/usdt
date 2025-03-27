@@ -2933,27 +2933,24 @@ const DesignRefinement = {
         document.documentElement.style.setProperty('--accent-red', '#EB5757');
     },
 
-    _applyTypography() {
-        document.body.style.fontFamily = "'Inter', sans-serif";
-        // Apply Trust Wallet-like text styles
-        const headings = document.querySelectorAll('h1, h2, h3');
-        headings.forEach(heading => {
-            heading.style.fontWeight = '600';
-            heading.style.letterSpacing = '-0.02em';
+ _applyTypography() {
+    document.body.style.fontFamily = "'Inter', sans-serif";
+    // Apply Trust Wallet-like text styles
+    const headings = document.querySelectorAll('h1, h2, h3');
+    headings.forEach(heading => {
+        heading.style.fontWeight = '600';
+        heading.style.letterSpacing = '-0.02em';
+    });
+},
+_implementMicroInteractions() {
+    // Add subtle animations and interactions
+    const interactiveElements = document.querySelectorAll('.token-item, .action-button');
+    interactiveElements.forEach(el => {
+        el.addEventListener('mousedown', () => {
+            el.style.transform = 'scale(0.98)';
         });
-    },
-
-    _implementMicroInteractions() {
-        // Add subtle animations and interactions
-        const interactiveElements = document.querySelectorAll('.token-item, .action-button');
-        interactiveElements.forEach(el => {
-            el.addEventListener('mousedown', () => {
-                el.style.transform = 'scale(0.98)';
-            });
-            el.addEventListener('mouseup', () => {
-                el.style.transform = 'scale(1)';
-            });
+        el.addEventListener('mouseup', () => {
+            el.style.transform = 'scale(1)';
         });
-    }
-};
-})();
+    });
+}
