@@ -3710,7 +3710,6 @@ setTimeout(fixRemainingIssues, 1000);
   
 })(); // <-- Properly closed IIFE
 
-// Export key functions to window for global access
 window.hideAllScreens = hideAllScreens;
 window.showScreen = showScreen;
 window.updateWalletUI = updateWalletUI;
@@ -3720,5 +3719,4 @@ window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
 
-// DOMContentLoaded closure
-});
+})(); // Properly closed IIFE, remove any additional closing braces after this
