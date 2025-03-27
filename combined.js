@@ -3732,100 +3732,111 @@ document.addEventListener('DOMContentLoaded', function() {
    
 
    
-  
-  // 2. Fix transaction clicks - COMPLETELY override their behavior
-  function fixTransactionClicks() {
-    const transactions = document.querySelectorAll('.transaction-item');
-    transactions.forEach(tx => {
-      // Replace with a clone to remove ALL event listeners
-      const clone = tx.cloneNode(true);
-      if (tx.parentNode) tx.parentNode.replaceChild(clone, tx);
+  // Fix transaction clicks - COMPLETELY override their behavior
+function fixTransactionClicks() {
+  const transactions = document.querySelectorAll('.transaction-item');
+  transactions.forEach(tx => {
+    // Replace with a clone to remove ALL event listeners
+    const clone = tx.cloneNode(true);
+    if (tx.parentNode) tx.parentNode.replaceChild(clone, tx);
+    
+    // Add direct onclick property (highest priority)
+    clone.onclick = function(e) {
+      e.preventDefault();
+      e.stopPropagation();
       
-      // Add direct onclick property (highest priority)
-      clone.onclick = function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+      const explorer = document.getElementById('explorer-overlay');
+      if (explorer) {
+        explorer.style.display = 'flex';
+        explorer.style.zIndex = '9999';
         
-        const explorer = document.getElementById('explorer-overlay');
-        if (explorer) {
-          explorer.style.display = 'flex';
-          explorer.style.zIndex = '9999';
-          
-          // Also fix explorer back button
-          const backBtn = explorer.querySelector('.explorer-back-button');
-          if (backBtn) {
-            backBtn.onclick = function() {
-              explorer.style.display = 'none';
-            };
-          }
+        // Also fix explorer back button
+        const backBtn = explorer.querySelector('.explorer-back-button');
+        if (backBtn) {
+          backBtn.onclick = function() {
+            explorer.style.display = 'none';
+          };
         }
-        return false;
-      };
-    });
-  }
-  
-  // 3. Fix network badges on token detail
-  function fixTokenDetailBadges() {
-    // Get current token ID
-    const detailSymbol = document.getElementById('detail-symbol');
-    if (!detailSymbol) return;
-    
-    const symbol = detailSymbol.textContent.toLowerCase();
-    const bnbTokens = ['usdt', 'bnb', 'twt'];
-    
-    if (bnbTokens.includes(symbol)) {
-      // Find the token icon container
-      const iconContainer = document.querySelector('.token-detail-icon-container');
-      if (!iconContainer) return;
-      
-      // Remove any existing badges
-      const existingBadges = iconContainer.querySelectorAll('.chain-badge');
-      existingBadges.forEach(b => b.parentNode && b.parentNode.removeChild(b));
-      
-      // Create new badge with FORCED styling
-      const badge = document.createElement('div');
-      badge.className = 'chain-badge-fixed';
-      badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
-      
-      // Apply inline styles for maximum compatibility
-      badge.setAttribute('style', `
-        position: absolute !important;
-        bottom: -6px !important;
-        right: -6px !important;
-        width: 24px !important;
-        height: 24px !important;
-        border-radius: 50% !important;
-        border: 2px solid #FFFFFF !important;
-        background: #FFFFFF !important;
-        z-index: 999 !important;
-        display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        overflow: visible !important;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-      `);
-      
-      // Style the image too
-      const img = badge.querySelector('img');
-      if (img) {
-        img.setAttribute('style', `
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: contain !important;
-          padding: 2px !important;
-          display: block !important;
-        `);
       }
-      
-      // Set icon container to relative positioning
-      iconContainer.style.position = 'relative';
-      iconContainer.style.overflow = 'visible';
-      iconContainer.style.zIndex = '1';
-      
-// Add badge to container
-      iconContainer.appendChild(badge);
+      return false;
+    };
+  });
+}
+
+// Fix network badges on token detail
+function fixTokenDetailBadges() {
+  // Get current token ID
+  const detailSymbol = document.getElementById('detail-symbol');
+  if (!detailSymbol) return;
+  
+  const symbol = detailSymbol.textContent.toLowerCase();
+  const bnbTokens = ['usdt', 'bnb', 'twt'];
+  
+  if (bnbTokens.includes(symbol)) {
+    // Find the token icon container
+    const iconContainer = document.querySelector('.token-detail-icon-container');
+    if (!iconContainer) return;
+    
+    // Remove any existing badges
+    const existingBadges = iconContainer.querySelectorAll('.chain-badge');
+    existingBadges.forEach(b => b.parentNode && b.parentNode.removeChild(b));
+    
+    // Create new badge with FORCED styling
+    const badge = document.createElement('div');
+    badge.className = 'chain-badge-fixed';
+    badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
+    
+    // Apply inline styles for maximum compatibility
+    badge.setAttribute('style', `
+      position: absolute !important;
+      bottom: -6px !important;
+      right: -6px !important;
+      width: 24px !important;
+      height: 24px !important;
+      border-radius: 50% !important;
+      border: 2px solid #FFFFFF !important;
+      background: #FFFFFF !important;
+      z-index: 999 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      overflow: visible !important;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    `);
+    
+    // Style the image too
+    const img = badge.querySelector('img');
+    if (img) {
+      img.setAttribute('style', `
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+        padding: 2px !important;
+        display: block !important;
+      `);
     }
+    
+    // Set icon container to relative positioning
+    iconContainer.style.position = 'relative';
+    iconContainer.style.overflow = 'visible';
+    iconContainer.style.zIndex = '1';
+    
+    // Add badge to container
+    iconContainer.appendChild(badge);
   }
+}
+
+// Critical UI fixes function
+function fixCriticalUIIssues() {
+  // Run specific fix functions
+  fixTransactionClicks();
+  fixTokenDetailBadges();
+}
+
+// Remaining issues fix function
+function fixRemainingIssues() {
+  // Add any additional fix logic if needed
+}
 
 // Run immediately and after delays
 fixCriticalUIIssues();
@@ -3855,3 +3866,4 @@ window.processSendTransaction = processSendTransaction;
 window.formatCurrency = formatCurrency;
 window.unlockWallet = unlockWallet;
 window.setupDemoBalance = setupDemoBalance;
+})();
