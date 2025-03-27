@@ -1441,7 +1441,7 @@ function loadTransactionsForWallet(walletId) {
     
     item.innerHTML = `
       <div class="transaction-token-icon">
-        <img src="${tx.logo}" alt="${tx.token}">
+        <img src="${tx.icon || getTokenInfo(tx.token).icon}">
       </div>
       <div class="transaction-info">
         <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.token}</div>
