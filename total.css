@@ -584,9 +584,9 @@ button {
 }
 
 .token-wrapper {
-    position: relative;
-    padding-bottom: 8px;
-    padding-right: 8px;
+  position: relative;
+  margin-right: 16px;
+    
 }
 
 .token-icon {
@@ -596,8 +596,8 @@ button {
 
 .chain-badge {
     position: absolute;
-    bottom: 0;
-    right: 0;
+    bottom: -6px;
+  right: -6px;
 
     }
 
