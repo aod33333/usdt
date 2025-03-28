@@ -597,12 +597,12 @@ button {
   border: 2px solid #FFFFFF !important;
   background: #FFFFFF !important;
   z-index: 1000 !important;
-  overflow: hidden !important;
+  overflow: visible !important; /* Changed from hidden to visible */
   box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
   display: block !important; /* Make sure it's always visible */
 }
 
-./* Badge image styling */
+/* Badge image styling */
 .chain-badge img,
 .chain-badge-fixed img {
     width: 100% !important;
@@ -615,6 +615,7 @@ button {
 .token-icon {
     position: relative !important;
     z-index: 1 !important;
+    overflow: visible !important; /* Added overflow: visible */
 }
 
 .chain-badge[data-network="bsc"] img, img[src*="bnb-bnb-logo"] {
@@ -651,8 +652,24 @@ button {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    overflow: visible !important;
+    overflow: visible !important; /* Ensure this is visible too */
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Hide badges on send and receive screens */
+#send-screen .chain-badge,
+#send-screen .chain-badge-fixed,
+#receive-screen .chain-badge,
+#receive-screen .chain-badge-fixed {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Fix token detail icon container */
+.token-detail-icon-container {
+    position: relative !important;
+    overflow: visible !important;
 }
 
 /* Bottom Tabs */
@@ -816,7 +833,7 @@ button {
     margin: 20px 0;
     position: relative;
     overflow: visible;
-    z-index: 1;
+    z-index: 1000;
 }
 
 .token-detail-large-icon {
@@ -1112,6 +1129,19 @@ button {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
+/* Ensure container has proper positioning for the badge */
+.token-detail-icon-container {
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 1 !important;
+}
+
+/* Only show badges for specific tokens in token detail */
+#token-detail[data-token-id="usdt"] .chain-badge-fixed,
+#token-detail[data-token-id="twt"] .chain-badge-fixed,
+#token-detail[data-token-id="bnb"] .chain-badge-fixed {
+    display: block !important;
+}
 /* =================================================================
    PART 4: TRANSACTION VIEWS & HISTORY
    ================================================================= */
