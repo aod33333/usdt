@@ -1,3 +1,14 @@
+document.addEventListener('DOMContentLoaded', function() {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Hide the image in the no-transactions section */
+    .no-tx-icon {
+      display: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+});
+
 // =================================================================
 // SECTION 1: CORE UTILITIES AND SECURITY
 // =================================================================
