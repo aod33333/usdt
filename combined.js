@@ -3072,38 +3072,41 @@ function applyTokenDetailStyles() {
   const tokenDetail = document.getElementById('token-detail');
   if (!tokenDetail) return;
   
-  // Fix header styling
+  // Move everything UP by fixing header
   const header = tokenDetail.querySelector('.detail-header');
   if (header) {
     header.style.backgroundColor = 'white';
-    header.style.paddingTop = '30px';
+    header.style.paddingTop = '20px'; // REDUCED padding (was 30px)
+    header.style.paddingBottom = '5px'; // REDUCED padding
     header.style.borderBottom = 'none';
   }
   
-  // Fix token detail title
+  // Fix title alignment
   const titleElement = tokenDetail.querySelector('.token-detail-title');
   if (titleElement) {
     titleElement.style.display = 'flex';
     titleElement.style.flexDirection = 'column';
     titleElement.style.alignItems = 'center';
-    titleElement.style.justifyContent = 'center';
-    titleElement.style.width = '100%';
+    titleElement.style.margin = '0'; // REMOVED margin
+    titleElement.style.paddingTop = '0'; // NO extra padding
     
-    // Symbol styling
+    // Symbol styling - make BIGGER and more prominent
     const symbolElement = document.getElementById('detail-symbol');
     if (symbolElement) {
-      symbolElement.style.fontSize = '20px';
+      symbolElement.style.fontSize = '24px'; // BIGGER font
       symbolElement.style.fontWeight = '600';
       symbolElement.style.textAlign = 'center';
-      symbolElement.style.marginBottom = '4px';
+      symbolElement.style.margin = '0 0 2px 0'; // TIGHTER spacing
+      symbolElement.style.paddingTop = '0'; // REMOVE padding
     }
     
-    // Fullname styling (COIN | TokenName)
+    // Fullname styling
     const fullnameElement = document.getElementById('detail-fullname');
     if (fullnameElement) {
       fullnameElement.style.fontSize = '12px';
       fullnameElement.style.color = '#8A939D';
       fullnameElement.style.textAlign = 'center';
+      fullnameElement.style.margin = '0'; // NO margin
       
       // Make sure it has the right format
       if (!fullnameElement.textContent.includes('|')) {
@@ -3113,58 +3116,24 @@ function applyTokenDetailStyles() {
     }
   }
   
+  // Make content scrollable to see transactions
+  const detailContent = tokenDetail.querySelector('.token-detail-content');
+  if (detailContent) {
+    detailContent.style.overflowY = 'auto';
+    detailContent.style.height = 'calc(100% - 50px)'; // MORE space for content
+  }
+  
+  // Larger "no transactions" image
+  const noTxIcon = tokenDetail.querySelector('.no-tx-icon');
+  if (noTxIcon) {
+    noTxIcon.style.width = '120px'; 
+    noTxIcon.style.height = '120px';
+  }
+  
   // Remove network badges
   const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
   badges.forEach(badge => {
     badge.style.display = 'none';
-  });
-  
-  // Fix transaction items (blue for receive)
-  const transactions = tokenDetail.querySelectorAll('.transaction-item');
-  transactions.forEach(item => {
-    const icon = item.querySelector('.transaction-icon');
-    if (icon && item.classList.contains('transaction-receive')) {
-      icon.style.backgroundColor = 'rgba(51, 117, 187, 0.1)';
-      icon.style.color = '#3375BB';
-    }
-    
-    // Trust Wallet uses blue for positive values
-    const value = item.querySelector('.transaction-value');
-    if (value && value.classList.contains('positive')) {
-      value.style.color = '#3375BB';
-    }
-  });
-  
-  // Fix price change color
-  const priceChange = document.getElementById('token-price-change');
-  if (priceChange && priceChange.classList.contains('positive')) {
-    priceChange.style.color = '#3375BB';
-  }
-}
-
-// Initialize when document is ready
-if (typeof document !== 'undefined') {
-  document.addEventListener('DOMContentLoaded', applyTokenDetailStyles);
-}
-
-// Also initialize after DOM changes (for dynamic content)
-if (typeof MutationObserver !== 'undefined') {
-  const observer = new MutationObserver(function(mutations) {
-    for (const mutation of mutations) {
-      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-        // DOM changed, check if token detail is now visible
-        const tokenDetail = document.getElementById('token-detail');
-        if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
-          applyTokenDetailStyles();
-          break;
-        }
-      }
-    }
-  });
-  
-  // Start observing when document is ready
-  document.addEventListener('DOMContentLoaded', function() {
-    observer.observe(document.body, { childList: true, subtree: true });
   });
 }
 
