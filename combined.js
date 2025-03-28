@@ -1735,22 +1735,6 @@ function enhanceHistoryScreen() {
         });
     }
     
-    // Add transaction date header if missing
-    const historyList = document.getElementById('history-transaction-list');
-    if (historyList && !document.querySelector('.transaction-date-header')) {
-        const transactions = historyList.querySelectorAll('.transaction-item');
-        if (transactions.length > 0) {
-            // Create a date header for March 20, 2025
-            const dateHeader = document.createElement('div');
-            dateHeader.className = 'transaction-date-header';
-            dateHeader.textContent = '20 Mar 2025';
-            
-            // Insert at the top of the transaction list
-            historyList.insertBefore(dateHeader, transactions[0]);
-        }
-    }
-}
-
 // Call this at the end of your initHistoryScreen function
 // or add it to your existing updateHistoryTransactionList function
 
