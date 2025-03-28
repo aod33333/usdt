@@ -1179,6 +1179,262 @@ function processSendTransaction(e) {
     }
 }
 
+// Initialize the send token selection screen
+function initSendTokenSelect() {
+    try {
+        // Get elements
+        const tokenSelectScreen = document.getElementById('send-token-select');
+        const tokenList = document.getElementById('select-token-list');
+        const backButton = tokenSelectScreen.querySelector('.back-button');
+        const searchInput = document.getElementById('token-search-input');
+        
+        // Clear token list first
+        if (tokenList) {
+            tokenList.innerHTML = '';
+        }
+        
+        // Populate token list with tokens from current wallet
+        populateTokenSelectionList();
+        
+        // Add back button functionality
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                tokenSelectScreen.style.display = 'none';
+                tokenSelectScreen.classList.add('hidden');
+                
+                // Go back to wallet screen
+                const walletScreen = document.getElementById('wallet-screen');
+                if (walletScreen) {
+                    walletScreen.style.display = 'flex';
+                    walletScreen.classList.remove('hidden');
+                }
+            });
+        }
+        
+        // Add search functionality
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                filterTokenList(searchTerm);
+            });
+        }
+        
+        // Make the network dropdown clickable
+        const networkDropdown = tokenSelectScreen.querySelector('.all-networks');
+        if (networkDropdown) {
+            networkDropdown.addEventListener('click', function() {
+                // Toggle active class for visual feedback
+                this.classList.toggle('active');
+                
+                // In a real app, this would show a dropdown
+                alert('Network selection would show here');
+            });
+        }
+        
+        console.log('Send token select screen initialized');
+    } catch (error) {
+        console.error('Error initializing send token select screen:', error);
+    }
+}
+
+// Populate the token selection list
+function populateTokenSelectionList() {
+    try {
+        const tokenList = document.getElementById('select-token-list');
+        if (!tokenList) {
+            console.error('Token list element not found');
+            return;
+        }
+        
+        // Clear existing items
+        tokenList.innerHTML = '';
+        
+        // Get tokens from active wallet
+        const wallet = currentWalletData[activeWallet];
+        if (!wallet || !wallet.tokens) {
+            console.error('No tokens found in active wallet');
+            return;
+        }
+        
+        // Sort tokens by value (highest first)
+        const sortedTokens = [...wallet.tokens].sort((a, b) => b.value - a.value);
+        
+        // Create token items
+        sortedTokens.forEach(token => {
+            const tokenItem = createTokenSelectionItem(token);
+            tokenList.appendChild(tokenItem);
+        });
+    } catch (error) {
+        console.error('Error populating token selection list:', error);
+    }
+}
+
+// Create a token selection item
+function createTokenSelectionItem(token) {
+    try {
+        const tokenItem = document.createElement('div');
+        tokenItem.className = 'token-item';
+        tokenItem.setAttribute('data-token-id', token.id);
+        
+        // Format numbers for display
+        const formattedAmount = token.amount.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 6
+        });
+        
+        const formattedValue = formatCurrency(token.value);
+        
+        // Show network badge for specific tokens
+        const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+        const networkBadge = showBadge ? 
+            `<span class="token-network-badge">BEP20</span>` : '';
+        
+        // Check if balance is zero (to show warning)
+        const isZeroBalance = token.amount <= 0;
+        const warningText = isZeroBalance ? 
+            `<div class="token-warning-text">Insufficient balance</div>` : '';
+        
+        tokenItem.innerHTML = `
+            <div class="token-icon">
+                <img src="${getTokenLogoUrl(token.id)}" alt="${token.name}">
+            </div>
+            <div class="token-info">
+                <div class="token-name">
+                    ${token.symbol} ${networkBadge}
+                </div>
+                <div class="token-price">
+                    ${token.name}
+                </div>
+            </div>
+            <div class="token-amount-container">
+                <div class="token-balance">${formattedAmount} ${token.symbol}</div>
+                <div class="token-value">${formattedValue}</div>
+                ${warningText}
+            </div>
+        `;
+        
+        // Add click handler to select this token and go to send screen
+        tokenItem.addEventListener('click', function() {
+            selectTokenForSend(token.id);
+        });
+        
+        return tokenItem;
+    } catch (error) {
+        console.error('Error creating token selection item:', error);
+        
+        // Return fallback element
+        const fallbackItem = document.createElement('div');
+        fallbackItem.className = 'token-item error';
+        fallbackItem.textContent = 'Error loading token';
+        return fallbackItem;
+    }
+}
+
+// Filter the token list based on search term
+function filterTokenList(searchTerm) {
+    try {
+        const tokenItems = document.querySelectorAll('#select-token-list .token-item');
+        
+        if (!tokenItems.length) {
+            console.error('No token items found to filter');
+            return;
+        }
+        
+        tokenItems.forEach(item => {
+            const tokenId = item.getAttribute('data-token-id');
+            const tokenInfo = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+            
+            if (!tokenInfo) return;
+            
+            const tokenName = tokenInfo.name.toLowerCase();
+            const tokenSymbol = tokenInfo.symbol.toLowerCase();
+            
+            // Check if token matches search term
+            const matches = tokenName.includes(searchTerm) || 
+                            tokenSymbol.includes(searchTerm) ||
+                            tokenId.includes(searchTerm);
+            
+            // Show/hide based on match
+            item.style.display = matches ? 'flex' : 'none';
+        });
+    } catch (error) {
+        console.error('Error filtering token list:', error);
+    }
+}
+
+// Select a token and proceed to send screen
+function selectTokenForSend(tokenId) {
+    try {
+        // Hide token select screen
+        const tokenSelectScreen = document.getElementById('send-token-select');
+        tokenSelectScreen.style.display = 'none';
+        tokenSelectScreen.classList.add('hidden');
+        
+        // Store the selected token ID globally
+        window.activeSendTokenId = tokenId;
+        
+        // Show the send screen with the selected token
+        showSendScreen(tokenId);
+    } catch (error) {
+        console.error('Error selecting token for send:', error);
+    }
+}
+
+// Update send button click to show token selection first
+function updateSendButtonFlow() {
+    try {
+        const sendButton = document.getElementById('send-button');
+        if (!sendButton) {
+            console.error('Send button not found');
+            return;
+        }
+        
+        // Remove existing listener by cloning and replacing
+        const newSendButton = sendButton.cloneNode(true);
+        sendButton.parentNode.replaceChild(newSendButton, sendButton);
+        
+        // Add new listener to show token selection screen
+        newSendButton.addEventListener('click', function() {
+            // Hide wallet screen
+            const walletScreen = document.getElementById('wallet-screen');
+            walletScreen.style.display = 'none';
+            walletScreen.classList.add('hidden');
+            
+            // Show token selection screen
+            const tokenSelectScreen = document.getElementById('send-token-select');
+            tokenSelectScreen.style.display = 'flex';
+            tokenSelectScreen.classList.remove('hidden');
+            
+            // Initialize token selection screen
+            initSendTokenSelect();
+        });
+    } catch (error) {
+        console.error('Error updating send button flow:', error);
+    }
+}
+
+// Add token selection styles and initialize
+document.addEventListener('DOMContentLoaded', function() {
+    // Add the CSS
+    const style = document.createElement('style');
+    style.textContent = document.getElementById('send-flow-css').textContent;
+    document.head.appendChild(style);
+    
+    // Update send button flow
+    updateSendButtonFlow();
+    
+    // Update token detail send button
+    const detailSendButton = document.querySelector('#token-detail .detail-action:nth-child(1)');
+    if (detailSendButton) {
+        detailSendButton.addEventListener('click', function() {
+            const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'usdt';
+            
+            // In token detail view, go directly to send screen without selection
+            selectTokenForSend(tokenId);
+        });
+    }
+});
+
 // Update transactions for a specific token with safety
 function updateTransactionsForToken(tokenId) {
     try {
