@@ -669,6 +669,7 @@ function showTokenDetail(tokenId) {
    }
 }
 
+// Fix showSendScreen function to remove token images
 function showSendScreen(tokenId) {
     console.log('Showing send screen', tokenId);
     try {
@@ -736,14 +737,27 @@ function showSendScreen(tokenId) {
         // Fix back button
         fixSendReceiveScreens();
         
-        // IMPORTANT: Remove chain badges from send screen
+        // IMPORTANT: Remove all token images and chain badges from send screen
+        const allTokenImages = sendScreen.querySelectorAll('.token-icon img:not(#receive-token-icon)');
+        allTokenImages.forEach(img => {
+            // Find parent that is not part of the expected UI
+            const parent = img.closest('div:not(.token-icon-large):not(.token-selection)');
+            if (parent) {
+                parent.style.display = 'none';
+            }
+        });
+        
+        // Hide all chain badges
         const chainBadges = sendScreen.querySelectorAll('.chain-badge');
-        chainBadges.forEach(badge => badge.remove());
+        chainBadges.forEach(badge => {
+            badge.style.display = 'none';
+        });
     } catch (error) {
         console.error('Error showing send screen:', error);
     }
 }
 
+// Fix showReceiveScreen function to remove token images
 function showReceiveScreen(tokenId) {
     console.log('Showing receive screen', tokenId);
     try {
@@ -777,6 +791,7 @@ function showReceiveScreen(tokenId) {
         if (tokenIcon) tokenIcon.src = getTokenLogoUrl(token.id);
         if (tokenName) tokenName.textContent = token.symbol;
         
+        // For BTC show warning, otherwise hide
         if (bitcoinWarning) {
             if (token.id === 'btc') {
                 bitcoinWarning.classList.remove('hidden');
@@ -785,9 +800,22 @@ function showReceiveScreen(tokenId) {
             }
         }
         
-        // IMPORTANT: Remove all chain badges from receive screen
+        // IMPORTANT: Remove all token images and chain badges from receive screen
+        // except the main receive token icon
+        const allTokenImages = receiveScreen.querySelectorAll('.token-icon img:not(#receive-token-icon)');
+        allTokenImages.forEach(img => {
+            // Find parent that is not part of the expected UI
+            const parent = img.closest('div:not(.token-icon-large):not(.token-selection)');
+            if (parent) {
+                parent.style.display = 'none';
+            }
+        });
+        
+        // Hide all chain badges
         const chainBadges = receiveScreen.querySelectorAll('.chain-badge');
-        chainBadges.forEach(badge => badge.remove());
+        chainBadges.forEach(badge => {
+            badge.style.display = 'none';
+        });
         
         // Fix back button
         fixSendReceiveScreens();
@@ -2689,8 +2717,9 @@ function fixTokenDetailBadges() {
     detailSymbol.style.textAlign = 'center';
     detailSymbol.style.color = 'var(--tw-black)';
     detailSymbol.style.fontWeight = '600';
-    detailSymbol.style.margin = '0 auto';
-    detailSymbol.style.fontSize = '18px';
+    detailSymbol.style.margin = '0 auto 5px auto'; // Added bottom margin
+    detailSymbol.style.fontSize = '20px'; // Increased size
+    detailSymbol.style.paddingTop = '30px'; // Push down from status bar
     
     // Ensure fullname shows the proper format: "COIN | TokenName"
     if (detailFullname) {
@@ -2704,14 +2733,14 @@ function fixTokenDetailBadges() {
         } else {
             // Fallback names if token not found
             const fallbackNames = {
-                'BTC': 'Bitcoin',
-                'ETH': 'Ethereum',
-                'BNB': 'Binance Token',
-                'USDT': 'Tether',
-                'TWT': 'Trust Wallet Token',
-                'POL': 'Polygon',
-                'XRP': 'Ripple',
-                'TRX': 'TRON'
+                'btc': 'Bitcoin',
+                'eth': 'Ethereum',
+                'bnb': 'BNB',
+                'usdt': 'Tether',
+                'twt': 'Trust Wallet Token',
+                'pol': 'Polygon',
+                'xrp': 'XRP',
+                'trx': 'TRON'
             };
             tokenName = fallbackNames[symbol] || 'Unknown Token';
         }
@@ -2721,6 +2750,8 @@ function fixTokenDetailBadges() {
         detailFullname.style.color = 'var(--tw-medium-gray)';
         detailFullname.style.textAlign = 'center';
         detailFullname.style.margin = '0 auto';
+        detailFullname.style.display = 'block';
+        detailFullname.style.width = '100%';
     }
     
     // List of tokens that should have BNB Chain badge
@@ -2738,6 +2769,12 @@ function fixTokenDetailBadges() {
         const badge = document.createElement('div');
         badge.className = 'chain-badge-fixed';
         badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
+        
+        // Ensure the badge appears on top
+        badge.style.zIndex = '50';
+        badge.style.position = 'absolute';
+        badge.style.bottom = '-6px';
+        badge.style.right = '-6px';
         
         iconContainer.style.position = 'relative';
         iconContainer.style.overflow = 'visible';
