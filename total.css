@@ -761,32 +761,7 @@ button {
    PART 3: TOKEN DETAIL VIEW
    ================================================================= */
 
-/* Shared Screen Header */
-.screen-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
-    border-bottom: 1px solid rgba(128,128,128,0.1);
-}
-
-.screen-header h2 {
-    font-size: var(--font-lg);
-    font-weight: 600;
-}
-
-.back-button {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--tw-black);
-}
-
-.placeholder-icon {
-    width: 36px;
-}
+/* [Rest of the existing code remains the same until Token Detail Header] */
 
 /* Token Detail Header */
 #token-detail .detail-header {
@@ -818,16 +793,16 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
   width: 100%;
+  margin-top: 16px;
 }
 
 #detail-symbol {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  color: var(--tw-black);
-  text-align: center;
   margin-bottom: 4px;
+  text-align: center;
+  color: var(--tw-black);
 }
 
 #detail-fullname {
@@ -836,57 +811,101 @@ button {
   text-align: center;
 }
 
-/* Warning Banner */
-.token-warning {
-  width: calc(100% - 32px);
-  margin: 16px;
-  border-radius: 8px;
-  border-left: 4px solid var(--tw-warning-text);
-  background-color: var(--tw-warning-bg);
-  padding: 12px;
-}
-
-.token-warning .warning-icon {
-  color: var(--tw-warning-text);
-  font-size: 20px;
-  margin-right: 12px;
-}
-
-.token-warning .investment-warning-text {
-  font-size: 12px;
-  line-height: 1.4;
-}
-
-/* Gas Fee Indicator */
-.gas-fee-indicator {
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  font-size: 13px;
-  color: var(--tw-dark-gray);
-}
-
-.gas-fee-indicator i {
-  color: var(--tw-blue);
-  margin-right: 8px;
-}
-
 /* Token Balance Display */
 .token-detail-balance {
   text-align: center;
-  margin: 24px 0;
+  margin: 16px 0;
 }
 
 .token-detail-balance h2 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 600;
-  color: var(--tw-black);
   margin-bottom: 4px;
+  color: var(--tw-black);
 }
 
 .token-detail-balance p {
-  font-size: 18px;
+  font-size: 16px;
   color: var(--tw-medium-gray);
+}
+
+/* Token Detail Icon Container */
+.token-detail-icon-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 16px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.token-detail-large-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: contain;
+  max-width: 100%;
+}
+
+/* Action Buttons */
+.token-detail-actions {
+  display: flex;
+  justify-content: space-between;
+  margin: 16px 0;
+  padding: 0 16px;
+}
+
+.detail-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detail-action i {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(51, 117, 187, 0.08);
+  color: var(--tw-blue);
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.detail-action span {
+  font-size: 12px;
+  color: var(--tw-dark-gray);
+}
+
+/* Remove any potential large background graphics */
+.token-detail-content::after {
+  content: none;
+}
+
+/* Hide network badges */
+#token-detail .chain-badge,
+#token-detail .chain-badge-fixed,
+.token-detail-icon-container .chain-badge,
+.token-detail-icon-container .chain-badge-fixed {
+  display: none !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 375px) {
+  .token-detail-large-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .token-detail-balance h2 {
+    font-size: 18px;
+  }
+  
+  .token-detail-balance p {
+    font-size: 14px;
+  }
 }
 
 /* Action Buttons */
