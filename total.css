@@ -1297,22 +1297,22 @@ body .with-status-bar {
 
 /* Updated History Screen Styles */
 .history-screen {
-  background-color: var(--tw-white);
+  background-color: #FFFFFF;
 }
 
 /* Header with appropriate spacing and alignment */
 #history-screen .screen-header {
   display: flex;
   align-items: center;
-  padding: 16px;
-  background-color: var(--tw-white);
+  padding: 8px 12px;
+  background-color: #FFFFFF;
   position: relative;
-  border-bottom: 1px solid var(--tw-bg-gray);
+  border-bottom: none;
 }
 
 #history-screen .back-button {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1324,93 +1324,79 @@ body .with-status-bar {
 #history-screen h2 {
   flex: 1;
   text-align: center;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 600;
   margin: 0;
 }
 
 /* Networks filter styled to match screenshot */
 .networks-filter {
-  padding: 12px 16px;
-  background-color: var(--tw-bg-gray);
+  padding: 8px 16px;
+  background-color: #F5F5F5;
   display: flex;
-}
-
-.wallet-selector-small {
-  margin-left: auto;
+  align-items: center;
 }
 
 /* All Networks dropdown styled like in screenshot */
 .all-networks {
   display: flex;
   align-items: center;
-  background-color: var(--tw-white);
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 14px;
+  background-color: #FFFFFF;
+  border-radius: 16px;
+  padding: 6px 12px;
+  font-size: 12px;
   color: var(--tw-black);
   cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  margin-right: auto;
 }
 
 .all-networks i {
-  margin-left: 8px;
-  font-size: 12px;
+  margin-left: 4px;
+  font-size: 10px;
   color: var(--tw-medium-gray);
-}
-
-/* Alternative for existing history tabs - hide by default */
-.history-tabs {
-  display: none;
 }
 
 /* Date headers styled like in screenshot */
 .transaction-date-header {
-  padding: 12px 16px;
-  font-size: 16px;
+  padding: 8px 16px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--tw-black);
-  background-color: var(--tw-bg-gray);
+  background-color: #F5F5F5;
 }
 
 .history-transaction-list {
-  background-color: var(--tw-white);
+  background-color: #FFFFFF;
 }
 
 /* Transaction item styling to match screenshot exactly */
 .history-transaction-list .transaction-item {
   display: flex;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--tw-bg-gray);
-  background-color: var(--tw-white);
+  padding: 12px 16px;
+  border-bottom: 1px solid #F5F5F5;
+  background-color: #FFFFFF;
 }
 
 /* Icon styling with proper size and positioning */
 .transaction-token-icon,
 .transaction-icon {
-  min-width: 42px;
-  width: 42px;
-  height: 42px;
+  min-width: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 16px;
+  margin-right: 12px;
   position: relative;
   background-color: rgba(51, 117, 187, 0.1);
 }
 
-.transaction-receive .transaction-icon i {
-  color: var(--tw-blue);
-}
-
-.transaction-send .transaction-icon i {
-  color: var(--tw-red);
-}
-
 .transaction-token-icon img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
 }
 
 /* Transaction info styling */
@@ -1419,15 +1405,15 @@ body .with-status-bar {
 }
 
 .transaction-type {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--tw-black);
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .transaction-date,
 .transaction-address {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--tw-medium-gray);
 }
 
@@ -1437,9 +1423,9 @@ body .with-status-bar {
 }
 
 .transaction-value {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .transaction-value.positive {
@@ -1451,56 +1437,8 @@ body .with-status-bar {
 }
 
 .transaction-usd {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--tw-medium-gray);
-}
-
-/* Add Check Explorer section at bottom */
-.check-explorer {
-  display: flex;
-  justify-content: center;
-  padding: 16px;
-  border-top: 1px solid var(--tw-bg-gray);
-  color: var(--tw-medium-gray);
-  font-size: 14px;
-}
-
-.check-explorer a {
-  color: var(--tw-blue);
-  margin-left: 5px;
-  text-decoration: none;
-}
-
-/* Empty state styling */
-.no-history {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-  height: 100%;
-  opacity: 0.9;
-}
-
-.no-history-icon {
-  width: 80px;
-  height: 80px;
-  margin-bottom: var(--space-md);
-  opacity: 0.8;
-}
-
-.no-history-icon img {
-  width: 100%;
-  opacity: 0.6;
-}
-
-.no-history p {
-  color: var(--tw-dark-gray);
-  font-size: var(--font-md);
-  max-width: 200px;
-  margin: 0 auto;
-  line-height: 1.4;
 }
 
 /* Explorer Overlay */
