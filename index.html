@@ -481,6 +481,40 @@
                 </div>
             </div>
         </div>
+
+        <!-- Token Selection Screen (New Screen) -->
+<div id="send-token-select" class="screen hidden">
+    <div class="screen-header">
+        <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Send</h2>
+        <div class="placeholder-icon"></div>
+    </div>
+    
+    <!-- Search bar for tokens -->
+    <div class="search-container">
+        <div class="search-bar token-search">
+            <i class="fas fa-search"></i>
+            <input type="text" 
+                id="token-search-input" 
+                placeholder="Search" 
+                aria-label="Search tokens">
+        </div>
+    </div>
+    
+    <!-- Networks filter dropdown -->
+    <div class="networks-filter">
+        <div class="all-networks">
+            All Networks <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+    
+    <!-- Tokens list for selection -->
+    <div id="select-token-list" class="token-list">
+        <!-- Tokens will be dynamically populated here -->
+    </div>
+</div>
         
         <!-- Send Screen -->
         <div id="send-screen" class="screen hidden send-screen">
