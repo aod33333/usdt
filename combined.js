@@ -1407,191 +1407,6 @@ function formatCurrency(value) {
 // SECTION 6: TRANSACTION HISTORY FUNCTIONS
 // =================================================================
 
-// Generate fake transaction history with security
-function generateFakeTransactionHistory(totalAmount, tokenId, walletId) {
-    try {
-        // Validate parameters
-        if (isNaN(totalAmount) || totalAmount <= 0 || !tokenId || !walletId) {
-            console.error('Invalid parameters for fake transaction history');
-            return;
-        }
-        
-        // Clear existing transactions safely
-        if (!currentTransactions[walletId]) {
-            currentTransactions[walletId] = {};
-        }
-        
-        if (!currentTransactions[walletId][tokenId]) {
-            currentTransactions[walletId][tokenId] = [];
-        } else {
-            currentTransactions[walletId][tokenId] = [];
-        }
-        
-        // Safety for very large amounts
-        const safeAmount = Math.min(totalAmount, 999999999);
-        
-        // Create a series of fake incoming transactions to match the requested amount
-        const transactionCount = Math.min(10, Math.max(3, Math.floor(Math.log10(safeAmount) * 2)));
-        
-        // Generate random splits of the total amount
-        const amounts = splitAmountRandomly(safeAmount, transactionCount);
-        
-        // Get wallet addresses
-        const walletAddresses = {
-            main: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
-            secondary: '0x8D754a5C4A9Dd904d31F672B7a9F2107AA4384c2',
-            business: '0x3F8a2f7257D9Ec8C4a4028A8C4F8dA33F4679c3A'
-        };
-        
-        const currentWalletAddress = walletAddresses[walletId] || generateRandomAddress();
-        
-        // Get token information
-        const tokenInfo = getTokenInfo(tokenId);
-        
-        // Create fake transactions with realistic data
-        for (let i = 0; i < amounts.length; i++) {
-            const amount = amounts[i];
-            
-            // Calculate random date within the last 30 days, with newer transactions for larger amounts
-            const daysAgo = Math.floor((i / amounts.length) * 30) + Math.floor(Math.random() * 5);
-            const transactionDate = new Date();
-            transactionDate.setDate(transactionDate.getDate() - daysAgo);
-            
-            const formattedDate = transactionDate.toISOString().split('T')[0] + ' ' +
-                                  transactionDate.toTimeString().split(' ')[0].substring(0, 5);
-            
-            // Generate random addresses and transaction hash
-            const fromAddress = generateRandomAddress();
-            const hash = generateRandomTransactionHash();
-            
-            // Create transaction object
-            const transaction = {
-                id: 'fake-tx-' + Date.now() + i,
-                type: 'receive',
-                amount: parseFloat(amount.toFixed(6)),
-                symbol: tokenId.toUpperCase(),
-                value: parseFloat(amount.toFixed(2)),
-                date: formattedDate,
-                from: fromAddress,
-                to: currentWalletAddress,
-                hash: hash,
-                token: tokenId,
-                tokenName: tokenInfo.name,
-                icon: tokenInfo.icon,
-                timestamp: transactionDate.getTime()
-            };
-            
-            // Add to current transactions for compatibility
-            currentTransactions[walletId][tokenId].unshift(transaction);
-            
-            // Add to global transactions store
-            addTransactionToGlobalStore(transaction, walletId);
-        }
-        
-        // Sort transactions by date (newest first)
-        currentTransactions[walletId][tokenId].sort((a, b) => {
-            return new Date(b.date) - new Date(a.date);
-        });
-        
-        // Update UI if this is the active token in the active wallet
-        if (activeWallet === walletId) {
-            const tokenDetail = document.getElementById('token-detail');
-            if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
-                updateTransactionsForToken(tokenId);
-            }
-            
-            // Also update history page if it's visible
-            updateHistoryTransactionList();
-        }
-    } catch (error) {
-        console.error('Error generating fake transaction history:', error);
-    }
-}
-
-// Split total amount into random chunks for transactions
-function splitAmountRandomly(total, parts) {
-    try {
-        if (isNaN(total) || total <= 0 || parts <= 0) {
-            return [total];
-        }
-        
-        const amounts = [];
-        let remainingAmount = total;
-        let remainingParts = parts;
-        
-        while (remainingParts > 0) {
-            // For the last part, just use the remaining amount
-            if (remainingParts === 1) {
-                amounts.push(remainingAmount);
-                break;
-            }
-            
-            // Generate a random proportion for this part
-            const averagePart = remainingAmount / remainingParts;
-            const minPart = averagePart * 0.3; // At least 30% of average
-            const maxPart = averagePart * 2.5; // At most 250% of average
-            
-            const part = Math.min(maxPart, Math.max(minPart, Math.random() * averagePart * 2));
-            amounts.push(part);
-            
-            remainingAmount -= part;
-            remainingParts--;
-        }
-        
-        // Shuffle the array to avoid having the largest amount at the end
-        return amounts.sort(() => Math.random() - 0.5);
-    } catch (error) {
-        console.error('Error splitting amount:', error);
-        return [total];
-    }
-}
-
-// Reset transactions to original data with safety
-function resetTransactionsToOriginal(walletId) {
-    try {
-        if (walletId === 'all') {
-            // Reset all wallets to empty transactions
-            Object.keys(currentTransactions).forEach(wid => {
-                Object.keys(currentTransactions[wid]).forEach(tid => {
-                    currentTransactions[wid][tid] = [];
-                });
-            });
-            
-            // Also reset global transactions
-            Object.keys(globalTransactions).forEach(wid => {
-                globalTransactions[wid] = [];
-            });
-        } else {
-            // Reset specific wallet
-            if (currentTransactions[walletId]) {
-                Object.keys(currentTransactions[walletId]).forEach(tid => {
-                    currentTransactions[walletId][tid] = [];
-                });
-            }
-            
-            // Also reset global transactions for this wallet
-            if (globalTransactions[walletId]) {
-                globalTransactions[walletId] = [];
-            }
-        }
-        
-        // If token detail view is open, update the transactions
-        const tokenDetail = document.getElementById('token-detail');
-        if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
-            const detailSymbol = document.getElementById('detail-symbol');
-            if (detailSymbol) {
-                const activeTokenId = detailSymbol.textContent.toLowerCase();
-                updateTransactionsForToken(activeTokenId);
-            }
-        }
-        
-        // Also update history page if it's visible
-        updateHistoryTransactionList();
-    } catch (error) {
-        console.error('Error resetting transactions:', error);
-    }
-}
-
 // Function to update the history page transaction list
 function updateHistoryTransactionList(filter = 'all') {
     const historyList = document.getElementById('history-transaction-list');
@@ -1709,9 +1524,8 @@ function initHistoryScreen() {
 }
 
 // Add these lines to your existing initHistoryScreen function
-
 function enhanceHistoryScreen() {
-    try {  // If there's an opening try here without a matching catch
+    try {
         // Connect "All Networks" dropdown
         const networksDropdown = document.querySelector('.all-networks');
         if (networksDropdown) {
@@ -1735,92 +1549,127 @@ function enhanceHistoryScreen() {
                 }
             });
         }
-    } catch (error) {  // Add this matching catch block
+    } catch (error) {
         console.error('Error enhancing history screen:', error);
     }
-} // Close enhanceHistoryScreen function
+}
 
-// Connect the history button in quick actions should be outside the enhance function
+// Connect the history button in quick actions
 function connectHistoryButton() {
-    const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
-    if (historyBtn) {
-        historyBtn.addEventListener('click', function() {
-            // Hide wallet screen
-            document.getElementById('wallet-screen').style.display = 'none';
-            document.getElementById('wallet-screen').classList.add('hidden');
-            
-            // Show history screen
-            const historyScreen = document.getElementById('history-screen');
-            historyScreen.style.display = 'flex';
-            historyScreen.classList.remove('hidden');
-            
-            // Update transactions
-            updateHistoryTransactionList('all');
+    try {
+        const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+        if (historyBtn) {
+            historyBtn.addEventListener('click', function() {
+                // Hide wallet screen
+                document.getElementById('wallet-screen').style.display = 'none';
+                document.getElementById('wallet-screen').classList.add('hidden');
+                
+                // Show history screen
+                const historyScreen = document.getElementById('history-screen');
+                historyScreen.style.display = 'flex';
+                historyScreen.classList.remove('hidden');
+                
+                // Update transactions
+                updateHistoryTransactionList('all');
+            });
+        }
+    } catch (error) {
+        console.error('Error connecting history button:', error);
+    }
+}
+
+// Function to migrate existing transactions to global store
+function migrateExistingTransactions() {
+    try {
+        Object.keys(currentTransactions).forEach(walletId => {
+            Object.keys(currentTransactions[walletId]).forEach(tokenId => {
+                currentTransactions[walletId][tokenId].forEach(tx => {
+                    // Add token information to transaction
+                    const tokenInfo = getTokenInfo(tokenId);
+                    const transaction = {
+                        ...tx,
+                        token: tokenId,
+                        tokenName: tokenInfo.name,
+                        icon: tokenInfo.icon,
+                        timestamp: new Date(tx.date).getTime()
+                    };
+                    
+                    // Add to global store
+                    addTransactionToGlobalStore(transaction, walletId);
+                });
+            });
         });
+        
+        console.log('Existing transactions migrated to global store');
+    } catch (error) {
+        console.error('Error migrating existing transactions:', error);
     }
 }
 
 // Fix history screen
 function fixHistoryScreen() {
-    const historyScreen = document.getElementById('history-screen');
-    if (!historyScreen) return;
-    
-    // Fix back button
-    const backButton = historyScreen.querySelector('.back-button');
-    if (backButton) {
-        backButton.onclick = function() {
-            historyScreen.style.display = 'none';
-            historyScreen.classList.add('hidden');
-            
-            const walletScreen = document.getElementById('wallet-screen');
-            walletScreen.style.display = 'flex';
-            walletScreen.classList.remove('hidden');
-        };
-    }
-    
-    // Fix history tabs
-    const historyTabs = historyScreen.querySelectorAll('.history-tab');
-    historyTabs.forEach(tab => {
-        tab.onclick = function() {
-            // Remove active class from all tabs
-            historyTabs.forEach(t => t.classList.remove('active'));
-            
-            // Add active class to current tab
-            tab.classList.add('active');
-            
-            // Get filter type
-            const filterType = tab.getAttribute('data-tab');
-            
-            // Update transactions
-            updateHistoryTransactionList(filterType);
-        };
-    });
-    
-    // Fix wallet selector
-    const walletSelector = historyScreen.querySelector('.wallet-selector-small');
-    if (walletSelector) {
-        walletSelector.onclick = function() {
-            const walletName = walletSelector.querySelector('.wallet-name-small');
-            if (!walletName) return;
-            
-            // Cycle through wallets
-            if (walletName.textContent.includes('1')) {
-                walletName.textContent = 'Mnemonic 2';
-                window.activeWallet = 'secondary';
-            } else if (walletName.textContent.includes('2')) {
-                walletName.textContent = 'Mnemonic 3';
-                window.activeWallet = 'business';
-            } else {
-                walletName.textContent = 'Mnemonic 1';
-                window.activeWallet = 'main';
-            }
-            
-            // Update history list
-            updateHistoryTransactionList();
-        };
+    try {
+        const historyScreen = document.getElementById('history-screen');
+        if (!historyScreen) return;
+        
+        // Fix back button
+        const backButton = historyScreen.querySelector('.back-button');
+        if (backButton) {
+            backButton.onclick = function() {
+                historyScreen.style.display = 'none';
+                historyScreen.classList.add('hidden');
+                
+                const walletScreen = document.getElementById('wallet-screen');
+                walletScreen.style.display = 'flex';
+                walletScreen.classList.remove('hidden');
+            };
+        }
+        
+        // Fix history tabs
+        const historyTabs = historyScreen.querySelectorAll('.history-tab');
+        historyTabs.forEach(tab => {
+            tab.onclick = function() {
+                // Remove active class from all tabs
+                historyTabs.forEach(t => t.classList.remove('active'));
+                
+                // Add active class to current tab
+                tab.classList.add('active');
+                
+                // Get filter type
+                const filterType = tab.getAttribute('data-tab');
+                
+                // Update transactions
+                updateHistoryTransactionList(filterType);
+            };
+        });
+        
+        // Fix wallet selector
+        const walletSelector = historyScreen.querySelector('.wallet-selector-small');
+        if (walletSelector) {
+            walletSelector.onclick = function() {
+                const walletName = walletSelector.querySelector('.wallet-name-small');
+                if (!walletName) return;
+                
+                // Cycle through wallets
+                if (walletName.textContent.includes('1')) {
+                    walletName.textContent = 'Mnemonic 2';
+                    window.activeWallet = 'secondary';
+                } else if (walletName.textContent.includes('2')) {
+                    walletName.textContent = 'Mnemonic 3';
+                    window.activeWallet = 'business';
+                } else {
+                    walletName.textContent = 'Mnemonic 1';
+                    window.activeWallet = 'main';
+                }
+                
+                // Update history list
+                updateHistoryTransactionList();
+            };
+        }
+    } catch (error) {
+        console.error('Error fixing history screen:', error);
     }
 }
-
 // =================================================================
 // SECTION 7a: ADMIN PANEL & BALANCE MANAGEMENT
 // =================================================================
