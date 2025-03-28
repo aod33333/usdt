@@ -3281,28 +3281,26 @@ const WalletAdvancedFeatures = {
             return true;
         },
 
-        _executeFinalizedTransaction(wallet, transaction) {
-            wallet.transactions.push(transaction);
-            wallet.pendingTransactions = wallet.pendingTransactions.filter(t => t.id !== transaction.id);
-        } // <-- THIS BRACKET WAS MISSING
-    }, // <-- Comma for MultiSignatureWallet
+         _executeFinalizedTransaction(wallet, transaction) {
+        wallet.transactions.push(transaction);
+        wallet.pendingTransactions = wallet.pendingTransactions.filter(t => t.id !== transaction.id);
+    } // <-- Closing bracket for the method
+} // <-- Closing bracket for the MultiSignatureWallet object
+}, // <-- Valid comma separator for the next object (ComplianceManager)
 
-    ComplianceManager: {
-        validateTransaction(transaction) {
-            return [
-                this._checkTransactionLimit(transaction),
-                this._checkGeographicalRestrictions(transaction),
-                this._performAMLCheck(transaction)
-            ].every(Boolean);
-        },
-
-        _checkTransactionLimit(tx) { return tx.value <= 10000; },
-        _checkGeographicalRestrictions(tx) { return !['North Korea', 'Iran'].includes(tx.country); },
-        _performAMLCheck(tx) { return !(tx.isHighRisk || tx.hasUnusualPattern); }
-    }
+const ComplianceManager = {
+    validateTransaction(transaction) {
+        return [
+            this._checkTransactionLimit(transaction),
+            this._checkGeographicalRestrictions(transaction),
+            this._performAMLCheck(transaction)
+        ].every(Boolean);
+    },
+    _checkTransactionLimit(tx) { return tx.value <= 10000; },
+    _checkGeographicalRestrictions(tx) { return !['North Korea', 'Iran'].includes(tx.country); },
+    _performAMLCheck(tx) { return !(tx.isHighRisk || tx.hasUnusualPattern); }
 };
 
-// Design Refinement Utilities
 const DesignRefinement = {
     applyTrustWalletTheme() {
         document.body.classList.add('trust-wallet-theme');
@@ -3310,7 +3308,6 @@ const DesignRefinement = {
         this._applyTypography();
         this._implementMicroInteractions();
     },
-
     _updateColorPalette() {
         const styles = document.documentElement.style;
         styles.setProperty('--primary-blue', '#3375BB');
@@ -3319,7 +3316,6 @@ const DesignRefinement = {
         styles.setProperty('--accent-green', '#05C46B');
         styles.setProperty('--accent-red', '#EB5757');
     },
-
     _applyTypography() {
         document.body.style.fontFamily = "'Inter', sans-serif";
         document.querySelectorAll('h1, h2, h3').forEach(heading => {
@@ -3327,7 +3323,6 @@ const DesignRefinement = {
             heading.style.letterSpacing = '-0.02em';
         });
     },
-
     _implementMicroInteractions() {
         document.querySelectorAll('.token-item, .action-button').forEach(el => {
             el.addEventListener('mousedown', () => el.style.transform = 'scale(0.98)');
@@ -3335,5 +3330,3 @@ const DesignRefinement = {
         });
     }
 };
-
-})();
