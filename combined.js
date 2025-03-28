@@ -2748,7 +2748,6 @@ function initPullToRefresh() {
     }
 }
 
-// Enhanced fixTokenDetailBadges function to properly handle badges
 function fixTokenDetailBadges() {
     const detailSymbol = document.getElementById('detail-symbol');
     const detailFullname = document.getElementById('detail-fullname');
@@ -2799,49 +2798,21 @@ function fixTokenDetailBadges() {
         detailFullname.style.width = '100%';
     }
     
-    // List of tokens that should have BNB Chain badge
-    const bnbTokens = ['usdt', 'bnb', 'twt'];
-    
     // Remove any existing badges first
     const iconContainer = document.querySelector('.token-detail-icon-container');
     if (!iconContainer) return;
     
     const existingBadges = iconContainer.querySelectorAll('.chain-badge, .chain-badge-fixed');
-    existingBadges.forEach(badge => badge.parentNode && badge.parentNode.removeChild(badge));
+    existingBadges.forEach(badge => {
+        if (badge.parentNode) {
+            badge.parentNode.removeChild(badge);
+        }
+    });
     
-    // Only add badge for specified tokens
-    if (bnbTokens.includes(symbol)) {
-        const badge = document.createElement('div');
-        badge.className = 'chain-badge-fixed';
-        badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
-        
-        // Use a combination of CSS properties with !important to ensure display
-        Object.assign(badge.style, {
-            position: 'absolute !important',
-            bottom: '-6px !important',
-            right: '-6px !important',
-            width: '20px !important',
-            height: '20px !important',
-            borderRadius: '50% !important',
-            border: '2px solid #FFFFFF !important',
-            backgroundColor: '#FFFFFF !important',
-            zIndex: '9999 !important',
-            display: 'block !important',
-            visibility: 'visible !important',
-            opacity: '1 !important',
-            overflow: 'visible !important',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1) !important'
-        });
-        
-        // Set important container styles
-        iconContainer.style.position = 'relative';
-        iconContainer.style.overflow = 'visible';
-        
-        // Append badge
-        iconContainer.appendChild(badge);
-    }
+    // Set important container styles but don't add any badges
+    iconContainer.style.position = 'relative';
+    iconContainer.style.overflow = 'visible';
 }
-
 
 // Fix bottom tabs to always be visible
 function fixBottomTabs() {
