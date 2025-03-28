@@ -1441,6 +1441,87 @@ body .with-status-bar {
   color: var(--tw-medium-gray);
 }
 
+/* Token Selection Screen Styles */
+#send-token-select {
+    background-color: var(--tw-white);
+    display: flex;
+    flex-direction: column;
+}
+
+#send-token-select .screen-header {
+    display: flex;
+    align-items: center;
+    padding: 16px 12px;
+    background-color: var(--tw-white);
+}
+
+#send-token-select .back-button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--tw-black);
+    background: transparent;
+    border: none;
+}
+
+#send-token-select h2 {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+#send-token-select .search-container {
+    padding: 0 16px 16px;
+}
+
+#send-token-select .token-search {
+    background-color: var(--tw-bg-gray);
+    border-radius: 30px;
+    padding: 8px 16px;
+}
+
+/* Token list item for selection */
+#select-token-list .token-item {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--tw-bg-gray);
+    cursor: pointer;
+}
+
+#select-token-list .token-item:active {
+    background-color: var(--tw-bg-gray);
+}
+
+/* Token amount display with warning */
+.token-amount-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.token-warning-text {
+    color: var(--tw-red);
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+/* BEP20 badge */
+.token-network-badge {
+    display: inline-block;
+    background-color: rgba(240, 185, 11, 0.1);
+    color: #F0B90B;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 500;
+}
+
 /* Explorer Overlay */
 .explorer-overlay {
   position: fixed;
