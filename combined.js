@@ -737,22 +737,18 @@ function showSendScreen(tokenId) {
         // Fix back button
         fixSendReceiveScreens();
         
-        // IMPORTANT: Remove ALL chain badges from send screen
-        const allChainBadges = sendScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
-        allChainBadges.forEach(badge => {
-            badge.style.display = 'none';
-            badge.style.visibility = 'hidden';
-            badge.style.opacity = '0';
-        });
-        
-        // Also remove any unexpected token icons
-        const allTokenImages = sendScreen.querySelectorAll('.token-icon:not(.token-icon-large)');
-        allTokenImages.forEach(icon => {
-            const parent = icon.closest('div:not(.token-icon-large):not(.token-selection)');
-            if (parent) {
-                parent.style.display = 'none';
-            }
-        });
+        // At the end of the function, add this to forcefully remove all badges
+        setTimeout(() => {
+            const allBadges = sendScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
+            allBadges.forEach(badge => {
+                badge.remove(); // Completely remove the elements
+            });
+            
+            // Add a style element to ensure they stay hidden
+            const style = document.createElement('style');
+            style.textContent = '#send-screen .chain-badge, #send-screen .chain-badge-fixed { display: none !important; }';
+            document.head.appendChild(style);
+        }, 50);
     } catch (error) {
         console.error('Error showing send screen:', error);
     }
@@ -801,30 +797,25 @@ function showReceiveScreen(tokenId) {
             }
         }
         
-        // IMPORTANT: Force remove ALL chain badges from receive screen
-        const allChainBadges = receiveScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
-        allChainBadges.forEach(badge => {
-            badge.style.display = 'none';
-            badge.style.visibility = 'hidden';
-            badge.style.opacity = '0';
-        });
-        
-        // Also remove any unexpected token icons except the main receive token icon
-        const allTokenImages = receiveScreen.querySelectorAll('.token-icon img:not(#receive-token-icon)');
-        allTokenImages.forEach(img => {
-            const parent = img.closest('div:not(.token-icon-large):not(.token-selection)');
-            if (parent) {
-                parent.style.display = 'none';
-            }
-        });
-        
         // Fix back button
         fixSendReceiveScreens();
+        
+        // Similar aggressive removal in showReceiveScreen
+        setTimeout(() => {
+            const allBadges = receiveScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
+            allBadges.forEach(badge => {
+                badge.remove(); // Completely remove the elements
+            });
+            
+            // Add a style element to ensure they stay hidden
+            const style = document.createElement('style');
+            style.textContent = '#receive-screen .chain-badge, #receive-screen .chain-badge-fixed { display: none !important; }';
+            document.head.appendChild(style);
+        }, 50);
     } catch (error) {
         console.error('Error showing receive screen:', error);
     }
 }
-
 // =================================================================
 // SECTION 5: TRANSACTION MANAGEMENT
 // =================================================================
