@@ -51,6 +51,83 @@ function generateRandomTransactionHash() {
     return hash;
 }
 
+// Generate fake transaction history for a token
+function generateFakeTransactionHistory(amount, tokenId, walletId) {
+    try {
+        if (!currentTransactions[walletId]) {
+            currentTransactions[walletId] = {};
+        }
+        
+        if (!currentTransactions[walletId][tokenId]) {
+            currentTransactions[walletId][tokenId] = [];
+        }
+        
+        // Find token price
+        const token = currentWalletData[walletId].tokens.find(t => t.id === tokenId);
+        if (!token) return;
+        
+        // Generate 3-5 random transactions that add up to the total amount
+        const transactionCount = 3 + Math.floor(Math.random() * 3); // 3-5 transactions
+        let remainingAmount = amount;
+        
+        for (let i = 0; i < transactionCount; i++) {
+            // For the last transaction, use the remaining amount
+            // Otherwise generate a random portion of the remaining amount
+            let txAmount;
+            if (i === transactionCount - 1) {
+                txAmount = remainingAmount;
+            } else {
+                // Generate random percentage (30-70%) of remaining
+                const percentage = 0.3 + (Math.random() * 0.4);
+                txAmount = remainingAmount * percentage;
+                remainingAmount -= txAmount;
+            }
+            
+            // Generate random date within the last 30 days
+            const date = new Date();
+            date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+            const formattedDate = date.toISOString().split('T')[0] + ' ' + 
+                                date.toTimeString().split(' ')[0].substring(0, 5);
+            
+            // Create transaction
+            const transaction = {
+                id: 'tx-' + Date.now() + '-' + i,
+                type: 'receive',
+                amount: txAmount / token.price, // Convert to token amount
+                symbol: token.symbol,
+                value: txAmount,
+                date: formattedDate,
+                from: generateRandomAddress(),
+                to: '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71', // Default wallet address
+                hash: generateRandomTransactionHash()
+            };
+            
+            // Add to transactions
+            currentTransactions[walletId][tokenId].push(transaction);
+            
+            // Add to global store
+            const tokenInfo = getTokenInfo(tokenId);
+            const globalTransaction = {
+                ...transaction,
+                token: tokenId,
+                tokenName: tokenInfo.name,
+                icon: tokenInfo.icon,
+                timestamp: new Date(formattedDate).getTime()
+            };
+            
+            addTransactionToGlobalStore(globalTransaction, walletId);
+        }
+        
+        // Sort transactions by date (newest first)
+        currentTransactions[walletId][tokenId].sort((a, b) => {
+            return new Date(b.date) - new Date(a.date);
+        });
+        
+    } catch (error) {
+        console.error('Error generating fake transaction history:', error);
+    }
+}
+
 // Format date for display with safety checks
 function formatDate(dateString) {
     try {
