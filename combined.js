@@ -1756,34 +1756,6 @@ function connectHistoryButton() {
     }
 } // Close connectHistoryButton function
 
-// Function to migrate existing transactions to global store
-function migrateExistingTransactions() {
-    try {
-        Object.keys(currentTransactions).forEach(walletId => {
-            Object.keys(currentTransactions[walletId]).forEach(tokenId => {
-                currentTransactions[walletId][tokenId].forEach(tx => {
-                    // Add token information to transaction
-                    const tokenInfo = getTokenInfo(tokenId);
-                    const transaction = {
-                        ...tx,
-                        token: tokenId,
-                        tokenName: tokenInfo.name,
-                        icon: tokenInfo.icon,
-                        timestamp: new Date(tx.date).getTime()
-                    };
-                    
-                    // Add to global store
-                    addTransactionToGlobalStore(transaction, walletId);
-                });
-            });
-        });
-        
-        console.log('Existing transactions migrated to global store');
-    } catch (error) {
-        console.error('Error migrating existing transactions:', error);
-    }
-}
-
 // Fix history screen
 function fixHistoryScreen() {
     const historyScreen = document.getElementById('history-screen');
