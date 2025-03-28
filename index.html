@@ -20,53 +20,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="total.css">
 
-    <!-- Chain Badge & History Page Fixes -->
-    <style id="wallet-fix-styles">
-        /* Chain Badge Fixes */
-        .chain-badge {
-            display: block !important;
-            position: absolute !important;
-            bottom: -6px !important;
-            right: -6px !important;
-            width: 20px !important;
-            height: 20px !important;
-            border-radius: 50% !important;
-            border: 2px solid #FFFFFF !important;
-            background: #FFFFFF !important;
-            z-index: 5 !important;
-            overflow: hidden !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-        }
-        .chain-badge img {
-            width: 100% !important;
-            height: 100% !important;
-            object-fit: contain !important;
-            padding: 2px !important;
-            display: block !important;
-        }
-        .chain-badge[data-network="bsc"] img, img[src*="bnb-bnb-logo"] {
-            content: url('https://cryptologos.cc/logos/bnb-bnb-logo.png') !important;
-        }
-        .token-icon, .token-detail-icon-container {
-            position: relative !important;
-            overflow: hidden !important;
-        }
-        
-        /* Accessibility helper */
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            margin: -1px;
-            padding: 0;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
-        }
-    </style>
-</head>
-<body>
-
       <!-- Status Bar -->
     <div class="status-bar">
         <div class="status-time">02:08</div>
