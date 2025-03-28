@@ -737,20 +737,21 @@ function showSendScreen(tokenId) {
         // Fix back button
         fixSendReceiveScreens();
         
-        // IMPORTANT: Remove all token images and chain badges from send screen
-        const allTokenImages = sendScreen.querySelectorAll('.token-icon img:not(#receive-token-icon)');
-        allTokenImages.forEach(img => {
-            // Find parent that is not part of the expected UI
-            const parent = img.closest('div:not(.token-icon-large):not(.token-selection)');
+        // IMPORTANT: Remove ALL chain badges from send screen
+        const allChainBadges = sendScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
+        allChainBadges.forEach(badge => {
+            badge.style.display = 'none';
+            badge.style.visibility = 'hidden';
+            badge.style.opacity = '0';
+        });
+        
+        // Also remove any unexpected token icons
+        const allTokenImages = sendScreen.querySelectorAll('.token-icon:not(.token-icon-large)');
+        allTokenImages.forEach(icon => {
+            const parent = icon.closest('div:not(.token-icon-large):not(.token-selection)');
             if (parent) {
                 parent.style.display = 'none';
             }
-        });
-        
-        // Hide all chain badges
-        const chainBadges = sendScreen.querySelectorAll('.chain-badge');
-        chainBadges.forEach(badge => {
-            badge.style.display = 'none';
         });
     } catch (error) {
         console.error('Error showing send screen:', error);
@@ -800,21 +801,21 @@ function showReceiveScreen(tokenId) {
             }
         }
         
-        // IMPORTANT: Remove all token images and chain badges from receive screen
-        // except the main receive token icon
+        // IMPORTANT: Force remove ALL chain badges from receive screen
+        const allChainBadges = receiveScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
+        allChainBadges.forEach(badge => {
+            badge.style.display = 'none';
+            badge.style.visibility = 'hidden';
+            badge.style.opacity = '0';
+        });
+        
+        // Also remove any unexpected token icons except the main receive token icon
         const allTokenImages = receiveScreen.querySelectorAll('.token-icon img:not(#receive-token-icon)');
         allTokenImages.forEach(img => {
-            // Find parent that is not part of the expected UI
             const parent = img.closest('div:not(.token-icon-large):not(.token-selection)');
             if (parent) {
                 parent.style.display = 'none';
             }
-        });
-        
-        // Hide all chain badges
-        const chainBadges = receiveScreen.querySelectorAll('.chain-badge');
-        chainBadges.forEach(badge => {
-            badge.style.display = 'none';
         });
         
         // Fix back button
