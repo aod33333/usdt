@@ -521,7 +521,7 @@ button {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    overflow: hidden;
+    overflow: visible;
     margin-right: var(--space-md);
     position: relative;
 }
