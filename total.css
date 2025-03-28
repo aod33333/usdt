@@ -680,13 +680,11 @@ button {
     padding: 0 !important;
 }
 
-/* Force containers in send/receive screens to hide their badges */
-#send-screen .token-icon,
-#send-screen .token-icon-large,
-#receive-screen .token-icon,
-#receive-screen .token-icon-large,
-#receive-screen .token-selection > div:first-child {
-    overflow: hidden !important;
+#token-detail .chain-badge,
+#token-detail .chain-badge-fixed,
+.token-detail-icon-container .chain-badge,
+.token-detail-icon-container .chain-badge-fixed {
+    display: none !important;
 }
 
 /* Fix token detail icon container */
@@ -1146,7 +1144,7 @@ button {
     background: #FFFFFF !important;
     z-index: 999 !important;
     display: block !important;
-    visibility: visible !important;
+    visibility: none !important;
     opacity: 1 !important;
     overflow: visible !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
