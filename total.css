@@ -754,6 +754,7 @@ button {
 
 .gas-fee-indicator i {
     margin-right: 5px;
+    color: var(--tw-blue) !important; /* Force blue color for gas icon */
 }
 
 .token-detail-content {
@@ -1165,7 +1166,8 @@ button {
     display: flex;
     background-color: var(--tw-white);
     border-bottom: 1px solid var(--tw-bg-gray);
-    margin-bottom: var(--space-xs);
+    margin-bottom: 0;
+    padding: 0 var(--space-md);
 }
 
 .history-tab {
@@ -1177,10 +1179,12 @@ button {
     position: relative;
     font-size: var(--font-md);
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .history-tab.active {
     color: var(--tw-blue);
+    font-weight: 600;
 }
 
 .history-tab.active::after {
@@ -1197,6 +1201,7 @@ button {
     background-color: var(--tw-white);
     overflow-y: auto;
     flex: 1;
+    padding: 0;
 }
 
 .wallet-selector-small {
@@ -1206,10 +1211,11 @@ button {
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
+    color: var(--tw-blue);
 }
 
 .wallet-name-small {
-    color: var(--tw-dark-gray);
+    color: var(--tw-blue);
 }
 
 .no-history {
@@ -1217,7 +1223,7 @@ button {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 60px 20px;
     text-align: center;
     height: 100%;
 }
@@ -1225,7 +1231,8 @@ button {
 .no-history-icon {
     width: 80px;
     height: 80px;
-    margin-bottom: 16px;
+    margin-bottom: var(--space-md);
+    opacity: 0.8;
 }
 
 .no-history-icon img {
@@ -1235,16 +1242,26 @@ button {
 
 .no-history p {
     color: var(--tw-dark-gray);
-    font-size: 14px;
+    font-size: var(--font-md);
+    margin-bottom: var(--space-sm);
 }
 
 /* Transaction Item in History */
+.history-transaction-list .transaction-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--tw-bg-gray);
+    background-color: var(--tw-white);
+}
+
 .transaction-token-icon {
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     overflow: hidden;
     margin-right: var(--space-md);
+    position: relative;
 }
 
 .transaction-token-icon img {
@@ -1253,6 +1270,31 @@ button {
     object-fit: cover;
 }
 
+/* Chain badge positioning in transaction items */
+.transaction-token-icon .chain-badge {
+    position: absolute;
+    bottom: -4px;
+    right: -4px;
+    width: 16px;
+    height: 16px;
+    z-index: 5;
+}
+
+/* Filter buttons hover effect */
+.history-tab:hover {
+    color: var(--tw-blue-light);
+}
+
+/* Empty state refinements */
+.no-history {
+    opacity: 0.9;
+}
+
+.no-history p {
+    max-width: 200px;
+    margin: 0 auto;
+    line-height: 1.4;
+}
 /* Explorer Overlay */
 .explorer-overlay {
     position: fixed;
