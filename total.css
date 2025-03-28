@@ -298,18 +298,16 @@ button {
     padding-right: 8px;
 }
 
+/* 4. Fix transaction warning text spacing */
 .investment-warning-text p {
-    font-size: var(--font-xs);
-    margin: 0;
-    line-height: 1.4;
-    color: var(--tw-black);
+    line-height: 1.5 !important;
+    margin-bottom: 4px !important;
 }
 
 .learn-more {
-    color: var(--tw-blue);
-    text-decoration: underline;
-    display: inline-block;
-    margin-top: 4px;
+    display: inline-block !important;
+    margin-top: 2px !important;
+    line-height: 1.5 !important;
 }
 
 .close-warning {
@@ -761,14 +759,32 @@ button {
     color: var(--tw-white);
 }
 
+/* 1. Fix for token name being covered by status panel */
 .token-detail-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: 500;
+    padding-top: 30px !important; /* Add padding to push content down below status bar */
+    margin-top: 5px !important;
 }
+
+/* Fix for token text positioning */
+.token-symbol-container {
+    margin-top: 10px !important;
+}
+
+#detail-symbol {
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    display: block !important;
+    margin-bottom: 5px !important;
+    text-align: center !important;
+}
+
+#detail-fullname {
+    font-size: 12px !important;
+    color: var(--tw-medium-gray) !important;
+    text-align: center !important;
+    margin-top: 0 !important;
+}
+
 
 .token-separator {
     color: var(--tw-medium-gray);
@@ -1865,6 +1881,13 @@ button {
     font-weight: 600;
     font-size: var(--font-md);
     margin-bottom: 80px;
+}
+
+#send-screen .token-icon .chain-badge,
+#receive-screen .token-icon .chain-badge,
+#send-screen .transaction-token-icon .chain-badge,
+#receive-screen .transaction-token-icon .chain-badge {
+    display: none !important;
 }
 
 /* Biometric Authentication */
