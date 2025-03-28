@@ -3293,8 +3293,8 @@ const WalletAdvancedFeatures = {
         _executeFinalizedTransaction(wallet, transaction) {
             wallet.transactions.push(transaction);
             wallet.pendingTransactions = wallet.pendingTransactions.filter(t => t.id !== transaction.id);
-        }
-    },
+        } // <-- THIS BRACKET WAS MISSING
+    }, // <-- Comma for MultiSignatureWallet
 
     ComplianceManager: {
         validateTransaction(transaction) {
