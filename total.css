@@ -588,18 +588,18 @@ button {
 }
 
 .chain-badge {
-    display: none !important; /* Hide by default */
-    position: absolute !important;
-    bottom: -6px !important;
-    right: -6px !important;
-    width: 20px !important;
-    height: 20px !important;
-    border-radius: 50% !important;
-    border: 2px solid #FFFFFF !important;
-    background: #FFFFFF !important;
-    z-index: 10 !important;
-    overflow: hidden !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+  position: absolute !important;
+  bottom: -6px !important;
+  right: -6px !important;
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 50% !important;
+  border: 2px solid #FFFFFF !important;
+  background: #FFFFFF !important;
+  z-index: 1000 !important;
+  overflow: hidden !important;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+  display: block !important; /* Make sure it's always visible */
 }
 
 ./* Badge image styling */
@@ -762,7 +762,7 @@ button {
 
 /* 1. Fix for token name being covered by status panel */
 .token-detail-title {
-    padding-top: 30px !important; /* Add padding to push content down below status bar */
+    padding-top: 10px !important; /* Add padding to push content down below status bar */
     margin-top: 5px !important;
 }
 
@@ -772,18 +772,14 @@ button {
 }
 
 #detail-symbol {
-    font-size: 20px !important;
-    font-weight: 600 !important;
-    display: block !important;
-    margin-bottom: 5px !important;
-    text-align: center !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  margin-bottom: 2px !important;
 }
 
 #detail-fullname {
-    font-size: 12px !important;
-    color: var(--tw-medium-gray) !important;
-    text-align: center !important;
-    margin-top: 0 !important;
+  font-size: 12px !important;
+  color: var(--tw-medium-gray) !important;
 }
 
 
@@ -1214,44 +1210,39 @@ button {
     color: var(--tw-white);
 }
 
-/* History Screen */
 .history-screen {
-    background-color: var(--tw-white);
+  background-color: var(--tw-white);
 }
 
 .history-tabs {
-    display: flex;
-    background-color: var(--tw-white);
-    border-bottom: 1px solid var(--tw-bg-gray);
-    margin-bottom: 0;
-    padding: 0;
+  display: flex;
+  background-color: var(--tw-white);
+  border-bottom: 1px solid var(--tw-bg-gray);
 }
 
 .history-tab {
-    flex: 1;
-    text-align: center;
-    padding: 12px 0;
-    color: var(--tw-dark-gray);
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.2s ease;
+  flex: 1;
+  text-align: center;
+  padding: 12px 0;
+  color: var(--tw-dark-gray);
+  font-weight: 500;
+  font-size: 14px;
 }
 
 .history-tab.active {
-    color: var(--tw-blue);
-    font-weight: 600;
+  color: var(--tw-blue);
+  font-weight: 600;
+  position: relative;
 }
 
 .history-tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background-color: var(--tw-blue);
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--tw-blue);
 }
 
 .history-tab:hover {
@@ -1259,10 +1250,7 @@ button {
 }
 
 .history-transaction-list {
-    background-color: var(--tw-white);
-    overflow-y: auto;
-    flex: 1;
-    padding: 0;
+  background-color: var(--tw-white);
 }
 
 .wallet-selector-small {
