@@ -269,7 +269,7 @@ button {
     background-color: var(--tw-warning-bg);
     color: var(--tw-warning-text);
     padding: 12px;
-    font-size: 11px !important;
+    font-size: 10px !important; /* Reduced from 11px */
     margin: 16px;
     border-radius: 8px;
     border-left: 4px solid var(--tw-warning-text);
@@ -277,38 +277,34 @@ button {
     align-items: flex-start;
     box-sizing: border-box;
 }
-
 .investment-warning-content {
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
 }
-
 .warning-icon {
     font-size: 20px;
     color: var(--tw-warning-text);
     flex-shrink: 0;
     margin-right: 12px;
     align-self: flex-start;
-    margin-top: 4px;
+    margin-top: 2px; /* Adjusted from 4px for better alignment */
 }
-
 .investment-warning-text {
     flex: 1;
     padding-right: 8px;
+    line-height: 1.4 !important; /* Consistent line height for all content */
 }
-
 /* 4. Fix transaction warning text spacing */
 .investment-warning-text p {
-    line-height: 1.5 !important;
-    margin-bottom: 4px !important;
+    line-height: 1.4 !important; /* Consistent line height */
+    margin-bottom: 3px !important; /* Reduced from 4px */
 }
-
 .learn-more {
     display: inline-block !important;
-    margin-top: 2px !important;
-    line-height: 1.5 !important;
+    margin-top: 0 !important; /* Reduced from 2px to even out spacing */
+    line-height: 1.4 !important; /* Match other line heights */
 }
 
 .close-warning {
