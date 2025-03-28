@@ -1138,7 +1138,7 @@ button {
 .token-detail-icon-container .chain-badge-fixed {
     position: absolute !important;
     bottom: -8px !important; /* Adjusted from -6px */
-    right: -8px !important; /* Adjusted from -6px */
+    right: 0px !important; /* Adjusted from -6px */
     width: 24px !important;
     height: 24px !important;
     border-radius: 50% !important;
