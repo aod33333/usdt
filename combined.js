@@ -669,7 +669,71 @@ function showTokenDetail(tokenId) {
    }
 }
 
-// Fix showSendScreen function to remove token images
+// New aggressive function to completely remove all badges from a screen
+function removeBadgesAggressively(screenElement) {
+    if (!screenElement) return;
+    
+    console.log('Aggressively removing badges from screen', screenElement.id);
+    
+    // First, find and remove all existing badges
+    const allBadges = screenElement.querySelectorAll('.chain-badge, .chain-badge-fixed');
+    console.log(`Found ${allBadges.length} badges to remove`);
+    
+    allBadges.forEach(badge => {
+        badge.parentNode && badge.parentNode.removeChild(badge);
+    });
+    
+    // Create a style tag with !important rules to ensure badges stay hidden
+    const screenId = screenElement.id;
+    const styleId = `badge-blocker-${screenId}`;
+    
+    // Remove any existing style element for this screen to avoid duplicates
+    const existingStyle = document.getElementById(styleId);
+    if (existingStyle) existingStyle.remove();
+    
+    // Create new style element with aggressive hiding rules
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+        #${screenId} .chain-badge, 
+        #${screenId} .chain-badge-fixed, 
+        #${screenId} .token-icon .chain-badge,
+        #${screenId} .token-icon .chain-badge-fixed,
+        #${screenId} .token-icon-large .chain-badge,
+        #${screenId} .token-icon-large .chain-badge-fixed,
+        #${screenId} .token-wrapper .chain-badge,
+        #${screenId} .token-wrapper .chain-badge-fixed {
+            display: none !important; 
+            visibility: hidden !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+            position: absolute !important;
+            z-index: -9999 !important;
+            pointer-events: none !important;
+        }
+        
+        #${screenId} .token-icon,
+        #${screenId} .token-icon-large {
+            overflow: hidden !important;
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Also set inline styles on any elements that might contain badges
+    const potentialContainers = screenElement.querySelectorAll('.token-icon, .token-icon-large, .token-detail-icon-container');
+    potentialContainers.forEach(container => {
+        container.style.overflow = 'hidden';
+        
+        // Remove any badges inside these containers as well
+        const containerBadges = container.querySelectorAll('.chain-badge, .chain-badge-fixed');
+        containerBadges.forEach(badge => {
+            badge.parentNode && badge.parentNode.removeChild(badge);
+        });
+    });
+}
+
+// Updated showSendScreen function to use aggressive badge removal
 function showSendScreen(tokenId) {
     console.log('Showing send screen', tokenId);
     try {
@@ -737,24 +801,18 @@ function showSendScreen(tokenId) {
         // Fix back button
         fixSendReceiveScreens();
         
-        // At the end of the function, add this to forcefully remove all badges
-        setTimeout(() => {
-            const allBadges = sendScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
-            allBadges.forEach(badge => {
-                badge.remove(); // Completely remove the elements
-            });
-            
-            // Add a style element to ensure they stay hidden
-            const style = document.createElement('style');
-            style.textContent = '#send-screen .chain-badge, #send-screen .chain-badge-fixed { display: none !important; }';
-            document.head.appendChild(style);
-        }, 50);
+        // Immediately remove badges
+        removeBadgesAggressively(sendScreen);
+        
+        // Do it again after delays to catch any that might be added dynamically
+        setTimeout(() => removeBadgesAggressively(sendScreen), 50);
+        setTimeout(() => removeBadgesAggressively(sendScreen), 300);
     } catch (error) {
         console.error('Error showing send screen:', error);
     }
 }
 
-// Fix showReceiveScreen function to remove token images
+// Updated showReceiveScreen function to use aggressive badge removal
 function showReceiveScreen(tokenId) {
     console.log('Showing receive screen', tokenId);
     try {
@@ -800,22 +858,17 @@ function showReceiveScreen(tokenId) {
         // Fix back button
         fixSendReceiveScreens();
         
-        // Similar aggressive removal in showReceiveScreen
-        setTimeout(() => {
-            const allBadges = receiveScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
-            allBadges.forEach(badge => {
-                badge.remove(); // Completely remove the elements
-            });
-            
-            // Add a style element to ensure they stay hidden
-            const style = document.createElement('style');
-            style.textContent = '#receive-screen .chain-badge, #receive-screen .chain-badge-fixed { display: none !important; }';
-            document.head.appendChild(style);
-        }, 50);
+        // Immediately remove badges
+        removeBadgesAggressively(receiveScreen);
+        
+        // Do it again after delays to catch any that might be added dynamically
+        setTimeout(() => removeBadgesAggressively(receiveScreen), 50);
+        setTimeout(() => removeBadgesAggressively(receiveScreen), 300);
     } catch (error) {
         console.error('Error showing receive screen:', error);
     }
 }
+
 // =================================================================
 // SECTION 5: TRANSACTION MANAGEMENT
 // =================================================================
@@ -2695,7 +2748,7 @@ function initPullToRefresh() {
     }
 }
 
-// Function to fix token detail display - proper ticker and selective network badges
+// Enhanced fixTokenDetailBadges function to properly handle badges
 function fixTokenDetailBadges() {
     const detailSymbol = document.getElementById('detail-symbol');
     const detailFullname = document.getElementById('detail-fullname');
@@ -2709,8 +2762,8 @@ function fixTokenDetailBadges() {
     detailSymbol.style.textAlign = 'center';
     detailSymbol.style.color = 'var(--tw-black)';
     detailSymbol.style.fontWeight = '600';
-    detailSymbol.style.margin = '0 auto 5px auto'; // Added bottom margin
-    detailSymbol.style.fontSize = '20px'; // Increased size
+    detailSymbol.style.margin = '0 auto 5px auto';
+    detailSymbol.style.fontSize = '20px';
     detailSymbol.style.paddingTop = '30px'; // Push down from status bar
     
     // Ensure fullname shows the proper format: "COIN | TokenName"
@@ -2762,17 +2815,33 @@ function fixTokenDetailBadges() {
         badge.className = 'chain-badge-fixed';
         badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
         
-        // Ensure the badge appears on top
-        badge.style.zIndex = '50';
-        badge.style.position = 'absolute';
-        badge.style.bottom = '-6px';
-        badge.style.right = '-6px';
+        // Use a combination of CSS properties with !important to ensure display
+        Object.assign(badge.style, {
+            position: 'absolute !important',
+            bottom: '-6px !important',
+            right: '-6px !important',
+            width: '24px !important',
+            height: '24px !important',
+            borderRadius: '50% !important',
+            border: '2px solid #FFFFFF !important',
+            backgroundColor: '#FFFFFF !important',
+            zIndex: '9999 !important',
+            display: 'block !important',
+            visibility: 'visible !important',
+            opacity: '1 !important',
+            overflow: 'visible !important',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1) !important'
+        });
         
+        // Set important container styles
         iconContainer.style.position = 'relative';
         iconContainer.style.overflow = 'visible';
+        
+        // Append badge
         iconContainer.appendChild(badge);
     }
 }
+
 
 // Fix bottom tabs to always be visible
 function fixBottomTabs() {
