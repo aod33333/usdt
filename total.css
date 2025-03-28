@@ -163,7 +163,12 @@ button {
 }
 
 .positive {
-    color: var(--tw-green);
+    color: var(--tw-blue) !important;
+}
+
+/* Specific fix for token price change */
+.token-price-change.positive {
+    color: var(--tw-blue) !important;
 }
 
 .negative {
@@ -593,7 +598,7 @@ button {
     border-radius: 50% !important;
     border: 2px solid #FFFFFF !important;
     background: #FFFFFF !important;
-    z-index: 5 !important;
+    z-index: 10 !important;
     overflow: hidden !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
@@ -606,6 +611,11 @@ button {
     object-fit: contain !important;
     padding: 2px !important;
     display: block !important;
+}
+
+.token-icon {
+    position: relative !important;
+    z-index: 1 !important;
 }
 
 .chain-badge[data-network="bsc"] img, img[src*="bnb-bnb-logo"] {
@@ -1188,23 +1198,27 @@ button {
 }
 
 /* History Screen */
+.history-screen {
+    background-color: var(--tw-white);
+}
+
 .history-tabs {
     display: flex;
     background-color: var(--tw-white);
     border-bottom: 1px solid var(--tw-bg-gray);
     margin-bottom: 0;
-    padding: 0 var(--space-md);
+    padding: 0;
 }
 
 .history-tab {
     flex: 1;
     text-align: center;
-    padding: var(--space-sm) 0;
+    padding: 12px 0;
     color: var(--tw-dark-gray);
     font-weight: 500;
-    position: relative;
-    font-size: var(--font-md);
+    font-size: 14px;
     cursor: pointer;
+    position: relative;
     transition: color 0.2s ease;
 }
 
@@ -1223,6 +1237,10 @@ button {
     background-color: var(--tw-blue);
 }
 
+.history-tab:hover {
+    color: var(--tw-blue-light);
+}
+
 .history-transaction-list {
     background-color: var(--tw-white);
     overflow-y: auto;
@@ -1231,17 +1249,18 @@ button {
 }
 
 .wallet-selector-small {
+    color: var(--tw-blue);
+    font-weight: 600;
     display: flex;
     align-items: center;
     gap: 5px;
     font-size: 14px;
-    font-weight: 500;
     cursor: pointer;
-    color: var(--tw-blue);
 }
 
 .wallet-name-small {
     color: var(--tw-blue);
+    margin-right: 4px;
 }
 
 .no-history {
@@ -1252,6 +1271,7 @@ button {
     padding: 60px 20px;
     text-align: center;
     height: 100%;
+    opacity: 0.9;
 }
 
 .no-history-icon {
@@ -1270,13 +1290,16 @@ button {
     color: var(--tw-dark-gray);
     font-size: var(--font-md);
     margin-bottom: var(--space-sm);
+    max-width: 200px;
+    margin: 0 auto;
+    line-height: 1.4;
 }
 
 /* Transaction Item in History */
 .history-transaction-list .transaction-item {
     display: flex;
     align-items: center;
-    padding: var(--space-md);
+    padding: 16px;
     border-bottom: 1px solid var(--tw-bg-gray);
     background-color: var(--tw-white);
 }
@@ -1286,7 +1309,7 @@ button {
     height: 40px;
     border-radius: 50%;
     overflow: hidden;
-    margin-right: var(--space-md);
+    margin-right: 16px;
     position: relative;
 }
 
@@ -1303,7 +1326,24 @@ button {
     right: -4px;
     width: 16px;
     height: 16px;
+    border-radius: 50%;
+    border: 1.5px solid #FFFFFF;
+    background: #FFFFFF;
     z-index: 5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    display: none;
+}
+
+/* Only show chain badges for specific tokens */
+.transaction-item[data-token="usdt"] .chain-badge,
+.transaction-item[data-token="twt"] .chain-badge,
+.transaction-item[data-token="bnb"] .chain-badge {
+    display: block;
+}
+
+/* Transaction value styling */
+.transaction-value.positive {
+    color: var(--tw-blue) !important;
 }
 
 /* Filter buttons hover effect */
