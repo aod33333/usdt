@@ -652,29 +652,41 @@ button {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
-/* Enhanced badge hiding for send/receive screens */
+/* FIX 2: Completely nuke badges on send/receive screens */
+/* Target every possible badge and container element */
+#send-screen .chain-badge,
+#send-screen .chain-badge-fixed,
+#send-screen div[class*="badge"],
+#send-screen div[class*="chain"],
 #send-screen .token-icon > div,
 #send-screen .token-icon-large > div,
+#receive-screen .chain-badge,
+#receive-screen .chain-badge-fixed,
+#receive-screen div[class*="badge"],
+#receive-screen div[class*="chain"],
 #receive-screen .token-icon > div,
 #receive-screen .token-icon-large > div,
-#receive-screen .token-selection div > div,
-#send-screen div[class*="badge"],
-#receive-screen div[class*="badge"] {
+#receive-screen .token-selection div > div:not(img) {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
     width: 0 !important;
     height: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-/* Force icon containers to hide overflow */
+/* Force containers in send/receive screens to hide their badges */
 #send-screen .token-icon,
 #send-screen .token-icon-large,
 #receive-screen .token-icon,
 #receive-screen .token-icon-large,
 #receive-screen .token-selection > div:first-child {
     overflow: hidden !important;
-    position: relative !important;
 }
 
 /* Fix token detail icon container */
@@ -1122,11 +1134,11 @@ button {
     line-height: 1.5;
 }
 
-/* Chain Badge in Token Detail */
-.chain-badge-fixed {
+/* FIX 1: Properly position badges on token detail screen */
+.token-detail-icon-container .chain-badge-fixed {
     position: absolute !important;
-    bottom: -6px !important;
-    right: -6px !important;
+    bottom: -8px !important; /* Adjusted from -6px */
+    right: -8px !important; /* Adjusted from -6px */
     width: 24px !important;
     height: 24px !important;
     border-radius: 50% !important;
@@ -1140,11 +1152,13 @@ button {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
-/* Ensure container has proper positioning for the badge */
+/* Make sure the container has proper positioning for badges */
 .token-detail-icon-container {
     position: relative !important;
     overflow: visible !important;
     z-index: 1 !important;
+    /* Add space around container to make room for badge */
+    margin: 20px 10px !important;
 }
 
 /* Only show badges for specific tokens in token detail */
