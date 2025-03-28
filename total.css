@@ -269,6 +269,7 @@ button {
     background-color: var(--tw-warning-bg);
     color: var(--tw-warning-text);
     padding: 12px;
+    font-size: 11px !important;
     margin: 16px;
     border-radius: 8px;
     border-left: 4px solid var(--tw-warning-text);
