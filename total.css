@@ -788,383 +788,361 @@ button {
     width: 36px;
 }
 
-/* Token Detail Screen */
-.detail-header {
-    background: var(--tw-white) !important;
-    padding: var(--space-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--tw-white);
+/* Token Detail Header */
+#token-detail .detail-header {
+  background-color: white;
+  padding-top: 30px;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 10px;
+  border-bottom: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* 1. Fix for token name being covered by status panel */
+#token-detail .back-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--tw-black);
+  background: transparent;
+  border: none;
+}
+
+/* Token Detail Title */
 .token-detail-title {
-    padding-top: 10px !important; /* Add padding to push content down below status bar */
-    margin-top: 5px !important;
-}
-
-/* Fix for token text positioning */
-.token-symbol-container {
-    margin-top: 10px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 }
 
 #detail-symbol {
-  font-size: 18px !important;
-  font-weight: 600 !important;
-  margin-bottom: 2px !important;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--tw-black);
+  text-align: center;
+  margin-bottom: 4px;
 }
 
 #detail-fullname {
-  font-size: 12px !important;
-  color: var(--tw-medium-gray) !important;
+  font-size: 12px;
+  color: var(--tw-medium-gray);
+  text-align: center;
 }
 
-
-.token-separator {
-    color: var(--tw-medium-gray);
-}
-
+/* Warning Banner */
 .token-warning {
-    background-color: rgba(255, 215, 0, 0.1);
-    margin: 0;
-    border-radius: 0;
+  width: calc(100% - 32px);
+  margin: 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--tw-warning-text);
+  background-color: var(--tw-warning-bg);
+  padding: 12px;
 }
 
+.token-warning .warning-icon {
+  color: var(--tw-warning-text);
+  font-size: 20px;
+  margin-right: 12px;
+}
+
+.token-warning .investment-warning-text {
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+/* Gas Fee Indicator */
 .gas-fee-indicator {
-    display: flex;
-    align-items: center;
-    padding: 10px 16px;
-    color: var(--tw-dark-gray);
-    font-size: 14px;
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--tw-dark-gray);
 }
 
 .gas-fee-indicator i {
-    margin-right: 5px;
-    color: var(--tw-blue) !important; /* Force blue color for gas icon */
+  color: var(--tw-blue);
+  margin-right: 8px;
 }
 
-.token-detail-content {
-    padding: 0 16px;
-}
-
-.token-detail-icon-container {
-    display: flex;
-    justify-content: center;
-    margin: 20px 0;
-    position: relative;
-    overflow: visible;
-    z-index: 1000;
-}
-
-.token-detail-large-icon {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-}
-
+/* Token Balance Display */
 .token-detail-balance {
-    text-align: center;
-    margin-bottom: 30px;
+  text-align: center;
+  margin: 24px 0;
 }
 
 .token-detail-balance h2 {
-    font-size: 28px;
-    font-weight: 600;
-    margin-bottom: 5px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--tw-black);
+  margin-bottom: 4px;
 }
 
 .token-detail-balance p {
-    font-size: 20px;
-    color: var(--tw-dark-gray);
+  font-size: 18px;
+  color: var(--tw-medium-gray);
 }
 
+/* Action Buttons */
 .token-detail-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  padding: 0 16px;
 }
 
 .detail-action {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
 }
 
 .detail-action i {
-    font-size: var(--font-md);
-    margin-bottom: var(--space-xs);
-    background-color: rgba(51, 117, 187, 0.1);
-    color: var(--tw-blue);
-    width: 36px;
-    height: 36px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(51, 117, 187, 0.08);
+  color: var(--tw-blue);
+  margin-bottom: 8px;
+  font-size: 16px;
 }
 
 .detail-action span {
-    font-size: var(--font-xs);
-    font-weight: 500;
-    color: var(--tw-dark-gray);
+  font-size: 12px;
+  color: var(--tw-dark-gray);
 }
 
 /* Staking Container */
 .staking-container {
-    display: flex;
-    align-items: center;
-    background-color: var(--tw-bg-gray);
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 30px;
+  background-color: var(--tw-bg-gray);
+  border-radius: 16px;
+  padding: 16px;
+  margin: 0 16px 24px;
+  display: flex;
+  align-items: center;
 }
 
 .staking-icon {
-    width: 50px;
-    height: 50px;
-    margin-right: 16px;
-}
-
-.staking-icon img {
-    width: 100%;
-    height: 100%;
+  width: 50px;
+  height: 50px;
+  margin-right: 16px;
 }
 
 .staking-content {
-    flex: 1;
+  flex: 1;
 }
 
 .staking-content h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tw-black);
+  margin-bottom: 4px;
 }
 
 .staking-content p {
-    font-size: 14px;
-    color: var(--tw-dark-gray);
+  font-size: 14px;
+  color: var(--tw-dark-gray);
 }
 
 .staking-arrow {
-    color: var(--tw-medium-gray);
+  color: var(--tw-medium-gray);
 }
 
-/* Transactions */
+/* Transaction Section */
 .transaction-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
 }
 
 .transaction-header h3 {
-    color: var(--tw-black);
-    font-size: var(--font-md);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tw-black);
 }
 
 .filter-button {
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--tw-dark-gray);
-    background-color: var(--tw-bg-gray);
-    border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--tw-bg-gray);
+  color: var(--tw-dark-gray);
+  border: none;
 }
 
+/* Transaction List */
 .transaction-list {
-    padding-bottom: var(--space-lg);
+  margin-bottom: 70px; /* Space for bottom tabs */
 }
 
-/* Transaction Item */
 .transaction-item {
-    display: flex;
-    align-items: center;
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--tw-bg-gray);
-    background-color: var(--tw-white);
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--tw-bg-gray);
+  cursor: pointer;
 }
 
 .transaction-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: var(--space-md);
-    background-color: var(--tw-bg-gray);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 16px;
 }
 
+/* Trust Wallet uses BLUE for receive transactions, not green */
 .transaction-receive .transaction-icon {
-    background-color: rgba(5, 196, 107, 0.1);
-    color: var(--tw-green);
+  background-color: rgba(51, 117, 187, 0.1);
+  color: var(--tw-blue);
 }
 
 .transaction-send .transaction-icon {
-    background-color: rgba(235, 87, 87, 0.1);
-    color: var(--tw-red);
+  background-color: rgba(235, 87, 87, 0.1);
+  color: var(--tw-red);
 }
 
 .transaction-info {
-    flex: 1;
+  flex: 1;
 }
 
 .transaction-type {
-    font-weight: 600;
-    color: var(--tw-black);
-    font-size: var(--font-md);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--tw-black);
+  margin-bottom: 2px;
 }
 
 .transaction-date {
-    font-size: var(--font-xs);
-    color: var(--tw-medium-gray);
-    margin-top: 2px;
+  font-size: 12px;
+  color: var(--tw-medium-gray);
 }
 
 .transaction-amount {
-    text-align: right;
+  text-align: right;
 }
 
+/* Trust Wallet uses BLUE for positive values */
 .transaction-value {
-    font-weight: 600;
-    color: var(--tw-black);
-    font-size: var(--font-md);
+  font-weight: 600;
+  font-size: 15px;
+  margin-bottom: 2px;
 }
 
-.transaction-receive .transaction-value {
-    color: var(--tw-green);
+.transaction-value.positive {
+  color: var(--tw-blue);
 }
 
-.transaction-send .transaction-value {
-    color: var(--tw-red);
+.transaction-value.negative {
+  color: var(--tw-red);
 }
 
 .transaction-usd {
-    font-size: var(--font-xs);
-    color: var(--tw-medium-gray);
-    margin-top: 2px;
+  font-size: 12px;
+  color: var(--tw-medium-gray);
 }
 
-/* Empty transactions */
-.empty-transactions {
-    padding: var(--space-xl);
-    text-align: center;
-    color: var(--tw-medium-gray);
-}
-
+/* No Transactions State */
 .no-transactions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 0;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  text-align: center;
 }
 
 .no-tx-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 16px;
-}
-
-.no-tx-icon img {
-    width: 100%;
-    opacity: 0.6;
+  width: 80px;
+  height: 80px;
+  margin-bottom: 16px;
+  opacity: 0.7;
 }
 
 .no-transactions p {
-    color: var(--tw-dark-gray);
-    font-size: 14px;
-    margin-bottom: 8px;
+  color: var(--tw-dark-gray);
+  font-size: 14px;
+  margin-bottom: 8px;
 }
 
 .explorer-link {
-    font-size: 13px;
+  font-size: 13px;
 }
 
 .explorer-link a {
-    color: var(--tw-blue);
-    text-decoration: none;
+  color: var(--tw-blue);
+  text-decoration: none;
 }
 
-/* Token Price Information */
+/* Price Information */
 .token-price-info {
-    border-top: 8px solid var(--tw-bg-gray);
-    padding-top: 20px;
-    margin-top: 20px;
+  border-top: 8px solid var(--tw-bg-gray);
+  padding: 20px 16px;
+  margin-bottom: 80px; /* Space for bottom tabs */
 }
 
 .current-price h3 {
-    font-size: 14px;
-    color: var(--tw-dark-gray);
-    margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--tw-dark-gray);
+  margin-bottom: 5px;
 }
 
 .price-with-change {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
 }
 
 #token-current-price {
-    font-size: 18px;
-    font-weight: 600;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--tw-black);
 }
 
-#token-price-change {
-    font-size: 14px;
+/* Trust Wallet uses BLUE for positive values */
+#token-price-change.positive {
+  color: var(--tw-blue);
+}
+
+#token-price-change.negative {
+  color: var(--tw-red);
 }
 
 .price-timeframe {
-    color: var(--tw-dark-gray);
-    font-size: 14px;
+  color: var(--tw-dark-gray);
+  font-size: 14px;
 }
 
 .price-disclaimer {
-    margin-top: 15px;
-    font-size: 12px;
-    color: var(--tw-dark-gray);
-    line-height: 1.5;
+  margin-top: 15px;
+  font-size: 12px;
+  color: var(--tw-dark-gray);
+  line-height: 1.5;
 }
 
-/* FIX 1: Properly position badges on token detail screen */
-.token-detail-icon-container .chain-badge-fixed {
-    position: absolute !important;
-    bottom: -8px !important; /* Adjusted from -6px */
-    right: 0px !important; /* Adjusted from -6px */
-    width: 24px !important;
-    height: 24px !important;
-    border-radius: 50% !important;
-    border: 2px solid #FFFFFF !important;
-    background: #FFFFFF !important;
-    z-index: 999 !important;
-    display: block !important;
-    visibility: none !important;
-    opacity: 1 !important;
-    overflow: visible !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+/* Important: Remove network badges in detail view */
+#token-detail .chain-badge,
+#token-detail .chain-badge-fixed {
+  display: none !important;
 }
 
-/* Make sure the container has proper positioning for badges */
-.token-detail-icon-container {
-    position: relative !important;
-    overflow: visible !important;
-    z-index: 1 !important;
-    /* Add space around container to make room for badge */
-    margin: 20px 10px !important;
-}
-
-/* Only show badges for specific tokens in token detail */
-#token-detail[data-token-id="usdt"] .chain-badge-fixed,
-#token-detail[data-token-id="twt"] .chain-badge-fixed,
-#token-detail[data-token-id="bnb"] .chain-badge-fixed {
-    display: block !important;
-}
 /* =================================================================
    PART 4: TRANSACTION VIEWS & HISTORY
    ================================================================= */
