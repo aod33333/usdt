@@ -3033,13 +3033,10 @@ const EnhancedErrorHandler = {
 
     // Categorize error type
     _categorizeError(error) {
-        // Implement error type detection logic
         const errorTypeMap = {
             'NetworkError': this._errorCategories.NETWORK,
-            'AuthenticationError': this._errorCategories.AUTHENTICATION,
-            // Add more mappings
+            'AuthenticationError': this._errorCategories.AUTHENTICATION
         };
-
         return errorTypeMap[error.name] || this._errorCategories.UI;
     },
 
@@ -3051,13 +3048,11 @@ const EnhancedErrorHandler = {
             'Error': 'High',
             'SecurityError': 'Critical'
         };
-
         return severityMap[error.name] || 'Medium';
     },
 
     // User notification mechanism
     _notifyUser(errorEntry) {
-        // Create user-friendly error notification
         const notificationContainer = document.createElement('div');
         notificationContainer.className = 'error-notification';
         notificationContainer.innerHTML = `
@@ -3070,8 +3065,6 @@ const EnhancedErrorHandler = {
         `;
 
         document.body.appendChild(notificationContainer);
-
-        // Add event listener for error details
         const detailsBtn = notificationContainer.querySelector('.error-details-btn');
         detailsBtn.addEventListener('click', () => this._showErrorDetails(errorEntry));
     },
@@ -3089,251 +3082,145 @@ const EnhancedErrorHandler = {
         `;
 
         document.body.appendChild(detailsModal);
-        
         const closeBtn = detailsModal.querySelector('.close-modal');
         closeBtn.addEventListener('click', () => {
             document.body.removeChild(detailsModal);
         });
     },
 
-    // Report to monitoring system (placeholder)
+    // Report to monitoring system
     _reportToMonitoringSystem(errorEntry) {
-        // Implement secure error reporting mechanism
-        // Could use fetch to send to a secure logging endpoint
+        // Implementation placeholder
     }
 };
 
-   // Wallet Integration and State Management Module
-
+// Wallet Integration and State Management Module
 const WalletStateManager = {
-    // Centralized state management
     _state: {
         activeWallet: 'main',
         walletData: {},
         transactions: {},
-        uiState: {
-            currentScreen: 'wallet',
-            modalOpen: false,
-            searchActive: false
-        },
-        security: {
-            authenticationMethod: 'passcode',
-            lastAuthTimestamp: null
-        }
+        uiState: { currentScreen: 'wallet', modalOpen: false, searchActive: false },
+        security: { authenticationMethod: 'passcode', lastAuthTimestamp: null }
     },
 
-    // Initialize wallet state
     initialize(initialData) {
         this._state.walletData = initialData.walletData;
         this._state.transactions = initialData.transactions;
-        
-        // Setup state persistence
         this._setupStateSync();
-        
-        // Trigger initial UI update
         this._notifyStateChange();
     },
 
-    // Update wallet state with security checks
     updateState(updates) {
-        // Implement immutable state update
-        this._state = {
-            ...this._state,
-            ...updates
-        };
-
-        // Validate state changes
+        this._state = { ...this._state, ...updates };
         this._validateStateIntegrity();
-        
-        // Notify components of state change
         this._notifyStateChange();
     },
 
-    // Validate state integrity
     _validateStateIntegrity() {
         const validations = [
             this._validateWalletData(),
             this._validateTransactions(),
             this._validateSecurityState()
         ];
-
         if (!validations.every(Boolean)) {
-            EnhancedErrorHandler.log(
-                new Error('State Integrity Compromised'),
-                { state: this._state }
-            );
+            EnhancedErrorHandler.log(new Error('State Integrity Compromised'), { state: this._state });
         }
     },
 
-    // State synchronization mechanism
     _setupStateSync() {
-        // Implement secure state persistence
-        const encryptState = (state) => {
-            // Use CryptoUtils for secure state encryption
-            return CryptoUtils.generateSecureTransactionHash(JSON.stringify(state));
-        };
-
-        // Periodic state verification
-        setInterval(() => {
-            const currentStateHash = encryptState(this._state);
-            // Verify state hasn't been tampered with
-        }, 60000); // Every minute
+        const encryptState = (state) => CryptoUtils.generateSecureTransactionHash(JSON.stringify(state));
+        setInterval(() => { const currentStateHash = encryptState(this._state); }, 60000);
     },
 
-    // Notify state changes to registered components
     _notifyStateChange() {
-        // Implement pub/sub pattern for state updates
         const stateChangeEvent = new CustomEvent('walletStateChange', {
-            detail: { 
-                state: { ...this._state },
-                timestamp: Date.now()
-            }
+            detail: { state: { ...this._state }, timestamp: Date.now() }
         });
-
         document.dispatchEvent(stateChangeEvent);
     },
 
-    // Validation methods
     _validateWalletData() {
-        // Comprehensive wallet data validation
         return Object.values(this._state.walletData).every(wallet => 
             wallet.tokens && wallet.totalBalance !== undefined
         );
     },
 
     _validateTransactions() {
-        // Ensure transaction integrity
         return Object.values(this._state.transactions).every(walletTxs => 
-            Array.isArray(walletTxs) && 
-            walletTxs.every(tx => tx.id && tx.type && tx.amount)
+            Array.isArray(walletTxs) && walletTxs.every(tx => tx.id && tx.type && tx.amount)
         );
     },
 
     _validateSecurityState() {
-        // Check security state validity
         const { authenticationMethod, lastAuthTimestamp } = this._state.security;
-        
-        return authenticationMethod && 
-               lastAuthTimestamp && 
-               (Date.now() - lastAuthTimestamp) < 3600000; // 1-hour auth window
+        return authenticationMethod && lastAuthTimestamp && (Date.now() - lastAuthTimestamp) < 3600000;
     }
 };
 
 // Event Bridge for Module Communication
 const EventBridge = {
-    // Centralized event handling
     _eventListeners: {},
 
-    // Register event listener
     on(eventName, callback) {
-        if (!this._eventListeners[eventName]) {
-            this._eventListeners[eventName] = [];
-        }
+        if (!this._eventListeners[eventName]) this._eventListeners[eventName] = [];
         this._eventListeners[eventName].push(callback);
     },
 
-    // Trigger event
     emit(eventName, eventData) {
-        if (this._eventListeners[eventName]) {
-            this._eventListeners[eventName].forEach(callback => {
-                try {
-                    callback(eventData);
-                } catch (error) {
-                    EnhancedErrorHandler.log(error, {
-                        context: 'event_emission',
-                        eventName,
-                        eventData
-                    });
-                }
-            });
-        }
+        (this._eventListeners[eventName] || []).forEach(callback => {
+            try { callback(eventData); } 
+            catch (error) { EnhancedErrorHandler.log(error, { context: 'event_emission', eventName, eventData }); }
+        });
     },
 
-    // Remove event listener
     off(eventName, callback) {
         if (this._eventListeners[eventName]) {
-            this._eventListeners[eventName] = 
-                this._eventListeners[eventName].filter(cb => cb !== callback);
+            this._eventListeners[eventName] = this._eventListeners[eventName].filter(cb => cb !== callback);
         }
     }
 };
 
 // Unified Authentication Manager
 const AuthenticationManager = {
-    // Comprehensive authentication method
     authenticate(method, credentials) {
         const authMethods = {
             passcode: this._validatePasscode,
             biometric: this._validateBiometric,
             multiFactor: this._validateMultiFactor
         };
-
-        if (!authMethods[method]) {
-            throw new Error('Invalid authentication method');
-        }
-
+        if (!authMethods[method]) throw new Error('Invalid authentication method');
         return authMethods[method](credentials);
     },
 
-    // Passcode validation
     _validatePasscode(passcode) {
         const complexityCheck = SecurityEnhancer.analyzePasscodeComplexity(passcode);
-        
-        if (!complexityCheck.valid) {
-            throw new Error('Passcode does not meet complexity requirements');
-        }
-
-        // Additional validation logic
+        if (!complexityCheck.valid) throw new Error('Passcode complexity requirements not met');
         const isValid = passcode === window.correctPasscode;
-        
-        if (isValid) {
-            WalletStateManager.updateState({
-                security: {
-                    authenticationMethod: 'passcode',
-                    lastAuthTimestamp: Date.now()
-                }
-            });
-        }
-
+        if (isValid) WalletStateManager.updateState({
+            security: { authenticationMethod: 'passcode', lastAuthTimestamp: Date.now() }
+        });
         return isValid;
     },
 
-    // Biometric validation
-    _validateBiometric(biometricData) {
+    _validateBiometric() {
         const biometricEntropy = SecurityEnhancer.biometricAuthenticationEntropy();
-        
-        // Implement biometric validation logic
         const isValid = biometricEntropy.securityLevel > 0.7;
-        
-        if (isValid) {
-            WalletStateManager.updateState({
-                security: {
-                    authenticationMethod: 'biometric',
-                    lastAuthTimestamp: Date.now()
-                }
-            });
-        }
-
+        if (isValid) WalletStateManager.updateState({
+            security: { authenticationMethod: 'biometric', lastAuthTimestamp: Date.now() }
+        });
         return isValid;
     },
 
-    // Multi-factor authentication
     _validateMultiFactor(credentials) {
-        // Implement multi-factor authentication
-        const { passcode, biometricData } = credentials;
-        
-        return this._validatePasscode(passcode) && 
-               this._validateBiometric(biometricData);
+        return this._validatePasscode(credentials.passcode) && this._validateBiometric(credentials.biometricData);
     }
 };
 
-   // Advanced Wallet Features and Design Refinement Module
-
+// Advanced Wallet Features
 const WalletAdvancedFeatures = {
-    // Price Prediction and Analytics
     TokenAnalytics: {
         predictPriceTrajectory(token, historicalData) {
-            // Machine learning-based price prediction
             const predictionModel = this._createPredictionModel(historicalData);
             return {
                 shortTermPrediction: predictionModel.predictNextDay(),
@@ -3343,162 +3230,84 @@ const WalletAdvancedFeatures = {
         },
 
         _createPredictionModel(data) {
-            // Simplified prediction logic
             return {
-                predictNextDay: () => {
-                    const lastPrice = data[data.length - 1].price;
-                    const trends = this._analyzePriceTrends(data);
-                    return lastPrice * (1 + trends.dailyMovementFactor);
-                },
-                predictNextMonth: () => {
-                    const lastPrice = data[data.length - 1].price;
-                    const trends = this._analyzePriceTrends(data);
-                    return lastPrice * (1 + trends.monthlyMovementFactor);
-                }
+                predictNextDay: () => data[data.length - 1].price * (1 + this._analyzePriceTrends(data).dailyMovementFactor),
+                predictNextMonth: () => data[data.length - 1].price * (1 + this._analyzePriceTrends(data).monthlyMovementFactor)
             };
         },
 
         _analyzePriceTrends(data) {
-            // Calculate price trend factors
-            const priceChanges = data.map((point, i) => 
-                i > 0 ? point.price - data[i-1].price : 0
-            );
-
+            const priceChanges = data.map((point, i) => i > 0 ? point.price - data[i-1].price : 0);
             return {
-                dailyMovementFactor: this._calculateMovementFactor(priceChanges, 1),
-                monthlyMovementFactor: this._calculateMovementFactor(priceChanges, 30)
+                dailyMovementFactor: priceChanges.reduce((a,b) => a + b, 0) / priceChanges.length / 1,
+                monthlyMovementFactor: priceChanges.reduce((a,b) => a + b, 0) / priceChanges.length / 30
             };
         },
 
-        _calculateMovementFactor(changes, period) {
-            const avgChange = changes.reduce((a, b) => a + b, 0) / changes.length;
-            return avgChange / period;
-        },
-
         _calculateVolatility(data) {
-            const prices = data.map(point => point.price);
-            const mean = prices.reduce((a, b) => a + b, 0) / prices.length;
-            const variance = prices.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / prices.length;
-            return Math.sqrt(variance);
+            const prices = data.map(p => p.price);
+            const mean = prices.reduce((a,b) => a + b, 0) / prices.length;
+            return Math.sqrt(prices.reduce((a,b) => a + Math.pow(b - mean, 2), 0) / prices.length);
         }
     },
 
-    // Enhanced Wallet Recovery Mechanism
     WalletRecovery: {
         generateRecoveryKit(wallet) {
             return {
                 seedPhrase: this._generateSecureSeedPhrase(),
                 recoveryTimestamp: Date.now(),
-                backupKey: this._createBackupKey(wallet),
-                securityCheckpoints: this._createRecoveryCheckpoints()
+                backupKey: CryptoUtils.generateSecureTransactionHash(JSON.stringify(wallet)),
+                securityCheckpoints: { emailVerification: false, secondaryDeviceConfirmation: false, manualReviewRequired: true }
             };
         },
 
         _generateSecureSeedPhrase() {
-            const wordList = [/* Secure word list */];
-            return Array.from({length: 12}, () => 
-                wordList[Math.floor(Math.random() * wordList.length)]
-            ).join(' ');
-        },
-
-        _createBackupKey(wallet) {
-            // Create encrypted backup key
-            const walletData = JSON.stringify(wallet);
-            return CryptoUtils.generateSecureTransactionHash(walletData);
-        },
-
-        _createRecoveryCheckpoints() {
-            return {
-                emailVerification: false,
-                secondaryDeviceConfirmation: false,
-                manualReviewRequired: true
-            };
+            const wordList = [];
+            return Array.from({length: 12}, () => wordList[Math.floor(Math.random() * wordList.length)]).join(' ');
         }
     },
 
-    // Multi-Signature Wallet Support
     MultiSignatureWallet: {
         createMultiSigWallet(owners, requiredSignatures) {
-            if (owners.length < requiredSignatures) {
-                throw new Error('Invalid multi-sig configuration');
-            }
-
-            return {
-                type: 'multi-signature',
-                owners: owners,
-                requiredSignatures: requiredSignatures,
-                transactions: [],
-                pendingTransactions: []
-            };
+            if (owners.length < requiredSignatures) throw new Error('Invalid multi-sig configuration');
+            return { type: 'multi-signature', owners, requiredSignatures, transactions: [], pendingTransactions: [] };
         },
 
         proposeTransaction(wallet, transaction) {
-            const proposedTx = {
-                ...transaction,
+            const proposedTx = { ...transaction,
                 id: CryptoUtils.generateSecureTransactionHash(transaction),
-                signatures: [],
-                status: 'pending'
+                signatures: [], status: 'pending'
             };
-
             wallet.pendingTransactions.push(proposedTx);
             return proposedTx;
         },
 
         signTransaction(wallet, transactionId, signer) {
             const tx = wallet.pendingTransactions.find(t => t.id === transactionId);
-            
-            if (!tx || tx.signatures.includes(signer)) {
-                return false;
-            }
-
+            if (!tx || tx.signatures.includes(signer)) return false;
             tx.signatures.push(signer);
-
-            if (tx.signatures.length >= wallet.requiredSignatures) {
-                this._executeFinalizedTransaction(wallet, tx);
-            }
-
+            if (tx.signatures.length >= wallet.requiredSignatures) this._executeFinalizedTransaction(wallet, tx);
             return true;
         },
 
         _executeFinalizedTransaction(wallet, transaction) {
-            // Execute transaction when enough signatures collected
             wallet.transactions.push(transaction);
-            wallet.pendingTransactions = wallet.pendingTransactions.filter(
-                tx => tx.id !== transaction.id
-            );
+            wallet.pendingTransactions = wallet.pendingTransactions.filter(t => t.id !== transaction.id);
         }
     },
 
-    // Compliance and Regulatory Features
     ComplianceManager: {
         validateTransaction(transaction) {
-            const checks = [
+            return [
                 this._checkTransactionLimit(transaction),
                 this._checkGeographicalRestrictions(transaction),
                 this._performAMLCheck(transaction)
-            ];
-
-            return checks.every(Boolean);
+            ].every(Boolean);
         },
 
-        _checkTransactionLimit(transaction) {
-            const DAILY_LIMIT = 10000; // USD equivalent
-            return transaction.value <= DAILY_LIMIT;
-        },
-
-        _checkGeographicalRestrictions(transaction) {
-            // Implement geoblocking logic
-            const restrictedCountries = ['North Korea', 'Iran'];
-            return !restrictedCountries.includes(transaction.country);
-        },
-
-        _performAMLCheck(transaction) {
-            // Anti-Money Laundering checks
-            return !(
-                transaction.isHighRisk ||
-                transaction.hasUnusualPattern
-            );
-        }
+        _checkTransactionLimit(tx) { return tx.value <= 10000; },
+        _checkGeographicalRestrictions(tx) { return !['North Korea', 'Iran'].includes(tx.country); },
+        _performAMLCheck(tx) { return !(tx.isHighRisk || tx.hasUnusualPattern); }
     }
 };
 
@@ -3512,35 +3321,28 @@ const DesignRefinement = {
     },
 
     _updateColorPalette() {
-        document.documentElement.style.setProperty('--primary-blue', '#3375BB');
-        document.documentElement.style.setProperty('--dark-text', '#1A2024');
-        document.documentElement.style.setProperty('--light-bg', '#F5F5F5');
-        document.documentElement.style.setProperty('--accent-green', '#05C46B');
-        document.documentElement.style.setProperty('--accent-red', '#EB5757');
+        const styles = document.documentElement.style;
+        styles.setProperty('--primary-blue', '#3375BB');
+        styles.setProperty('--dark-text', '#1A2024');
+        styles.setProperty('--light-bg', '#F5F5F5');
+        styles.setProperty('--accent-green', '#05C46B');
+        styles.setProperty('--accent-red', '#EB5757');
     },
 
- _applyTypography() {
-    document.body.style.fontFamily = "'Inter', sans-serif";
-    // Apply Trust Wallet-like text styles
-    const headings = document.querySelectorAll('h1, h2, h3');
-    headings.forEach(heading => {
-        heading.style.fontWeight = '600';
-        heading.style.letterSpacing = '-0.02em';
-    });
-},
-_implementMicroInteractions() {
-    // Add subtle animations and interactions
-    const interactiveElements = document.querySelectorAll('.token-item, .action-button');
-    interactiveElements.forEach(el => {
-        el.addEventListener('mousedown', () => {
-            el.style.transform = 'scale(0.98)';
+    _applyTypography() {
+        document.body.style.fontFamily = "'Inter', sans-serif";
+        document.querySelectorAll('h1, h2, h3').forEach(heading => {
+            heading.style.fontWeight = '600';
+            heading.style.letterSpacing = '-0.02em';
         });
-        el.addEventListener('mouseup', () => {
-            el.style.transform = 'scale(1)';
-        });
-    });
-}
-}; // Close the DesignRefinement object
+    },
 
-// Close the entire IIFE
+    _implementMicroInteractions() {
+        document.querySelectorAll('.token-item, .action-button').forEach(el => {
+            el.addEventListener('mousedown', () => el.style.transform = 'scale(0.98)');
+            el.addEventListener('mouseup', () => el.style.transform = 'scale(1)');
+        });
+    }
+};
+
 })();
