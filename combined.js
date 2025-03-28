@@ -484,9 +484,10 @@ function createTokenElement(token) {
        tokenItem.className = 'token-item';
        tokenItem.setAttribute('data-token-id', token.id);
        
-       // Modified chain badge logic
+       // Only show network badges for USDT, TWT, and BNB
        let chainBadgeHTML = '';
-       const showNetworkBadge = ['USDT', 'TWT', 'BNB'].includes(token.symbol);
+       const showNetworkBadge = ['usdt', 'twt', 'bnb'].includes(token.id.toLowerCase());
+       
        if (showNetworkBadge) {
            const badgeUrl = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
            chainBadgeHTML = `
@@ -2668,56 +2669,28 @@ function initPullToRefresh() {
     }
 }
 
-// Function to fix token detail network badge
+// Function to fix token detail network badges - only show for specific tokens
 function fixTokenDetailBadges() {
     const detailSymbol = document.getElementById('detail-symbol');
     if (!detailSymbol) return;
     
     const symbol = detailSymbol.textContent.toLowerCase();
+    
+    // List of tokens that should have BNB Chain badge
     const bnbTokens = ['usdt', 'bnb', 'twt'];
     
+    // Remove any existing badges first
+    const iconContainer = document.querySelector('.token-detail-icon-container');
+    if (!iconContainer) return;
+    
+    const existingBadges = iconContainer.querySelectorAll('.chain-badge, .chain-badge-fixed');
+    existingBadges.forEach(badge => badge.parentNode && badge.parentNode.removeChild(badge));
+    
+    // Only add badge for specified tokens
     if (bnbTokens.includes(symbol)) {
-        const iconContainer = document.querySelector('.token-detail-icon-container');
-        if (!iconContainer) return;
-        
-        const existingBadges = iconContainer.querySelectorAll('.chain-badge');
-        existingBadges.forEach(b => b.parentNode && b.parentNode.removeChild(b));
-        
         const badge = document.createElement('div');
         badge.className = 'chain-badge-fixed';
         badge.innerHTML = '<img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB">';
-        
-        badge.setAttribute('style', `
-            position: absolute !important;
-            bottom: -6px !important;
-            right: -6px !important;
-            width: 24px !important;
-            height: 24px !important;
-            border-radius: 50% !important;
-            border: 2px solid #FFFFFF !important;
-            background: #FFFFFF !important;
-            z-index: 999 !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            overflow: visible !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-        `);
-        
-        const img = badge.querySelector('img');
-        if (img) {
-            img.setAttribute('style', `
-                width: 100% !important;
-                height: 100% !important;
-                object-fit: contain !important;
-                padding: 2px !important;
-                display: block !important;
-            `);
-        }
-        
-        iconContainer.style.position = 'relative';
-        iconContainer.style.overflow = 'visible';
-        iconContainer.style.zIndex = '1';
         
         iconContainer.appendChild(badge);
     }
