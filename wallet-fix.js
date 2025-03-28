@@ -1639,24 +1639,6 @@ function fixAdminPanel() {
     }
   }
   
-  // Apply fake balance
-  function applyFakeBalance(tokenId, amount, expirationHours, generateHistory, walletId) {
-    if (!window.currentWalletData[walletId]) return;
-    
-    // Update token balance
-    updateWalletWithFakeBalance(tokenId, amount, walletId);
-    
-    // Generate transaction history if needed
-    if (generateHistory) {
-      generateFakeTransactionHistory(amount, tokenId, walletId);
-    }
-    
-    // Set expiration timer
-    setExpirationTimer(expirationHours, walletId);
-    
-    window.balanceModified = true;
-  }
-  
   // Update wallet with fake balance
   function updateWalletWithFakeBalance(tokenId, amount, walletId) {
     if (!window.currentWalletData[walletId]) return;
