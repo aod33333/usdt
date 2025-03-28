@@ -1736,32 +1736,6 @@ function enhanceHistoryScreen() {
     }
 } // Close enhanceHistoryScreen function
 
-function enhanceHistoryScreen() {
-    // Connect "All Networks" dropdown
-    const networksDropdown = document.querySelector('.all-networks');
-    if (networksDropdown) {
-        networksDropdown.addEventListener('click', function() {
-            // For now, just toggle a class - in a real app this would show options
-            networksDropdown.classList.toggle('active');
-        });
-    }
-    
-    // Connect "Check explorer" link
-    const explorerLink = document.querySelector('#check-explorer-link');
-    if (explorerLink) {
-        explorerLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Show explorer overlay
-            const explorerOverlay = document.getElementById('explorer-overlay');
-            if (explorerOverlay) {
-                explorerOverlay.style.display = 'flex';
-                explorerOverlay.classList.remove('hidden');
-            }
-        });
-    }
-} // Close enhanceHistoryScreen function
-
 // Connect the history button in quick actions
 function connectHistoryButton() {
     const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
