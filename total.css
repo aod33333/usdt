@@ -1295,348 +1295,400 @@ body .with-status-bar {
     color: var(--tw-white);
 }
 
+/* Updated History Screen Styles */
 .history-screen {
   background-color: var(--tw-white);
 }
 
-.history-tabs {
+/* Header with appropriate spacing and alignment */
+#history-screen .screen-header {
   display: flex;
+  align-items: center;
+  padding: 16px;
   background-color: var(--tw-white);
+  position: relative;
   border-bottom: 1px solid var(--tw-bg-gray);
 }
 
-.history-tab {
+#history-screen .back-button {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: transparent;
+  color: var(--tw-black);
+  border: none;
+}
+
+#history-screen h2 {
   flex: 1;
   text-align: center;
-  padding: 12px 0;
-  color: var(--tw-dark-gray);
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.history-tab.active {
-  color: var(--tw-blue);
+  font-size: 18px;
   font-weight: 600;
-  position: relative;
+  margin: 0;
 }
 
-.history-tab.active::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background-color: var(--tw-blue);
+/* Networks filter styled to match screenshot */
+.networks-filter {
+  padding: 12px 16px;
+  background-color: var(--tw-bg-gray);
+  display: flex;
 }
 
-.history-tab:hover {
-    color: var(--tw-blue-light);
+.wallet-selector-small {
+  margin-left: auto;
+}
+
+/* All Networks dropdown styled like in screenshot */
+.all-networks {
+  display: flex;
+  align-items: center;
+  background-color: var(--tw-white);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: var(--tw-black);
+  cursor: pointer;
+}
+
+.all-networks i {
+  margin-left: 8px;
+  font-size: 12px;
+  color: var(--tw-medium-gray);
+}
+
+/* Alternative for existing history tabs - hide by default */
+.history-tabs {
+  display: none;
+}
+
+/* Date headers styled like in screenshot */
+.transaction-date-header {
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--tw-black);
+  background-color: var(--tw-bg-gray);
 }
 
 .history-transaction-list {
   background-color: var(--tw-white);
 }
 
-.wallet-selector-small {
-    color: var(--tw-blue);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.wallet-name-small {
-    color: var(--tw-blue);
-    margin-right: 4px;
-}
-
-.no-history {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    text-align: center;
-    height: 100%;
-    opacity: 0.9;
-}
-
-.no-history-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: var(--space-md);
-    opacity: 0.8;
-}
-
-.no-history-icon img {
-    width: 100%;
-    opacity: 0.6;
-}
-
-.no-history p {
-    color: var(--tw-dark-gray);
-    font-size: var(--font-md);
-    margin-bottom: var(--space-sm);
-    max-width: 200px;
-    margin: 0 auto;
-    line-height: 1.4;
-}
-
-/* Transaction Item in History */
+/* Transaction item styling to match screenshot exactly */
 .history-transaction-list .transaction-item {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid var(--tw-bg-gray);
-    background-color: var(--tw-white);
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--tw-bg-gray);
+  background-color: var(--tw-white);
 }
 
-.transaction-token-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 16px;
-    position: relative;
+/* Icon styling with proper size and positioning */
+.transaction-token-icon,
+.transaction-icon {
+  min-width: 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 16px;
+  position: relative;
+  background-color: rgba(51, 117, 187, 0.1);
+}
+
+.transaction-receive .transaction-icon i {
+  color: var(--tw-blue);
+}
+
+.transaction-send .transaction-icon i {
+  color: var(--tw-red);
 }
 
 .transaction-token-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 24px;
+  height: 24px;
 }
 
-/* Chain badge positioning in transaction items */
-.transaction-token-icon .chain-badge {
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    border: 1.5px solid #FFFFFF;
-    background: #FFFFFF;
-    z-index: 5;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    display: none;
+/* Transaction info styling */
+.transaction-info {
+  flex: 1;
 }
 
-/* Only show chain badges for specific tokens */
-.transaction-item[data-token="usdt"] .chain-badge,
-.transaction-item[data-token="twt"] .chain-badge,
-.transaction-item[data-token="bnb"] .chain-badge {
-    display: block;
+.transaction-type {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--tw-black);
+  margin-bottom: 4px;
 }
 
-/* Transaction value styling */
+.transaction-date,
+.transaction-address {
+  font-size: 13px;
+  color: var(--tw-medium-gray);
+}
+
+/* Amount styling with proper alignment */
+.transaction-amount {
+  text-align: right;
+}
+
+.transaction-value {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
 .transaction-value.positive {
-    color: var(--tw-blue) !important;
+  color: var(--tw-blue) !important;
 }
 
-/* Filter buttons hover effect */
-.history-tab:hover {
-    color: var(--tw-blue-light);
+.transaction-value.negative {
+  color: var(--tw-red);
 }
 
-/* Empty state refinements */
+.transaction-usd {
+  font-size: 13px;
+  color: var(--tw-medium-gray);
+}
+
+/* Add Check Explorer section at bottom */
+.check-explorer {
+  display: flex;
+  justify-content: center;
+  padding: 16px;
+  border-top: 1px solid var(--tw-bg-gray);
+  color: var(--tw-medium-gray);
+  font-size: 14px;
+}
+
+.check-explorer a {
+  color: var(--tw-blue);
+  margin-left: 5px;
+  text-decoration: none;
+}
+
+/* Empty state styling */
 .no-history {
-    opacity: 0.9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  height: 100%;
+  opacity: 0.9;
+}
+
+.no-history-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: var(--space-md);
+  opacity: 0.8;
+}
+
+.no-history-icon img {
+  width: 100%;
+  opacity: 0.6;
 }
 
 .no-history p {
-    max-width: 200px;
-    margin: 0 auto;
-    line-height: 1.4;
+  color: var(--tw-dark-gray);
+  font-size: var(--font-md);
+  max-width: 200px;
+  margin: 0 auto;
+  line-height: 1.4;
 }
+
 /* Explorer Overlay */
 .explorer-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--tw-white);
-    z-index: 1500;
-    display: none;
-    flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--tw-white);
+  z-index: 1500;
+  display: none;
+  flex-direction: column;
 }
 
 .explorer-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
-    background-color: var(--tw-blue);
-    color: var(--tw-white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-md);
+  background-color: var(--tw-blue);
+  color: var(--tw-white);
 }
 
 .explorer-back-button {
-    color: var(--tw-white);
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
+  color: var(--tw-white);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
 }
 
 .explorer-body {
-    flex: 1;
-    overflow-y: auto;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .explorer-search-container {
-    padding: var(--space-md);
-    background-color: var(--tw-blue-light);
+  padding: var(--space-md);
+  background-color: var(--tw-blue-light);
 }
 
 .explorer-search {
-    display: flex;
-    align-items: center;
-    background-color: var(--tw-white);
-    border-radius: 8px;
-    padding: var(--space-sm);
+  display: flex;
+  align-items: center;
+  background-color: var(--tw-white);
+  border-radius: 8px;
+  padding: var(--space-sm);
 }
 
 .explorer-search i {
-    color: var(--tw-medium-gray);
-    margin-right: var(--space-sm);
-    margin-left: var(--space-xs);
+  color: var(--tw-medium-gray);
+  margin-right: var(--space-sm);
+  margin-left: var(--space-xs);
 }
 
 .explorer-search input {
-    flex: 1;
-    border: none;
-    outline: none;
-    font-size: var(--font-sm);
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: var(--font-sm);
 }
 
 .explorer-transaction {
-    padding: var(--space-md);
+  padding: var(--space-md);
 }
 
 .explorer-section {
-    background-color: var(--tw-white);
-    border-radius: 8px;
-    margin-bottom: var(--space-md);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
+  background-color: var(--tw-white);
+  border-radius: 8px;
+  margin-bottom: var(--space-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
 }
 
 .explorer-section-header {
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--tw-bg-gray);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--tw-bg-gray);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .explorer-section-header h3 {
-    font-size: var(--font-md);
-    font-weight: 600;
-    margin: 0;
+  font-size: var(--font-md);
+  font-weight: 600;
+  margin: 0;
 }
 
 .explorer-status.success {
-    color: var(--tw-green);
+  color: var(--tw-green);
 }
 
 .explorer-detail-rows {
-    padding: var(--space-md);
+  padding: var(--space-md);
 }
 
 .explorer-detail-row {
-    display: flex;
-    margin-bottom: var(--space-sm);
-    font-size: var(--font-sm);
+  display: flex;
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-sm);
 }
 
 .explorer-detail-row:last-child {
-    margin-bottom: 0;
+  margin-bottom: 0;
 }
 
 .explorer-detail-label {
-    color: var(--tw-dark-gray);
-    width: 140px;
-    flex-shrink: 0;
+  color: var(--tw-dark-gray);
+  width: 140px;
+  flex-shrink: 0;
 }
 
 .explorer-detail-value {
-    flex: 1;
-    word-break: break-all;
+  flex: 1;
+  word-break: break-all;
 }
 
 .explorer-detail-value.address {
-    color: var(--tw-blue);
+  color: var(--tw-blue);
 }
 
 .explorer-badge {
-    display: inline-block;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 500;
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 .explorer-badge.success {
-    background-color: rgba(5, 196, 107, 0.1);
-    color: var(--tw-green);
+  background-color: rgba(5, 196, 107, 0.1);
+  color: var(--tw-green);
 }
 
 .explorer-token-transfer {
-    padding: var(--space-md);
-    display: flex;
-    align-items: center;
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
 }
 
 .explorer-token-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: var(--space-md);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: var(--space-md);
 }
 
 .explorer-token-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .explorer-token-details {
-    flex: 1;
+  flex: 1;
 }
 
 .explorer-token-from-to {
-    display: flex;
-    align-items: center;
-    margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
 }
 
 .explorer-address-short {
-    color: var(--tw-blue);
-    font-size: var(--font-xs);
+  color: var(--tw-blue);
+  font-size: var(--font-xs);
 }
 
 .explorer-token-from-to i {
-    margin: 0 var(--space-xs);
-    color: var(--tw-medium-gray);
-    font-size: 10px;
+  margin: 0 var(--space-xs);
+  color: var(--tw-medium-gray);
+  font-size: 10px;
 }
 
 .explorer-token-info {
-    font-size: var(--font-xs);
-    color: var(--tw-dark-gray);
+  font-size: var(--font-xs);
+  color: var(--tw-dark-gray);
 }
 
 .explorer-token-amount {
-    font-weight: 600;
-    color: var(--tw-black);
-    margin-left: var(--space-xs);
+  font-weight: 600;
+  color: var(--tw-black);
+  margin-left: var(--space-xs);
 }
 
 /* =================================================================
