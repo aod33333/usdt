@@ -776,8 +776,8 @@ body .with-status-bar {
 #token-detail .detail-header {
   background-color: white;
   padding-top: 10px;
-  padding-left: 16px;
-  padding-right: 16px;
+  padding-left: 14px;
+  padding-right: 14px;
   padding-bottom: 10px;
   border-bottom: none;
   display: flex;
@@ -803,7 +803,7 @@ body .with-status-bar {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: 16px;
+  margin-top: 5px;
 }
 
 #detail-symbol {
