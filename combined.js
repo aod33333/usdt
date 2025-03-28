@@ -3215,33 +3215,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-      // Fix critical UI issues
-fixCriticalUIIssues();
+        // Fix critical UI issues
+        fixCriticalUIIssues();
 
-// Run diagnostics after a delay
-setTimeout(runDiagnostics, 2000);
+        // Run diagnostics after a delay
+        setTimeout(runDiagnostics, 2000);
 
-console.log('✅ INITIALIZATION COMPLETE');
+        console.log('✅ INITIALIZATION COMPLETE');
 
-// Add observer to make sure token detail styles are applied whenever it's shown
-// Add observer to make sure token detail styles are applied whenever it's shown
-const tokenDetail = document.getElementById('token-detail');
-if (tokenDetail) {
-  const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-          if (mutation.attributeName === 'style' && 
-              tokenDetail.style.display !== 'none') {
-              applyTokenDetailStyles();
-          }
-      });
-  });
-  observer.observe(tokenDetail, { attributes: true });
-}
-
-// Add closing brace for enhanceHistoryScreen function that was opened earlier
-}
-
-  } catch (globalError) {
-      console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
-  }
+        // Add observer to make sure token detail styles are applied whenever it's shown
+        const tokenDetail = document.getElementById('token-detail');
+        if (tokenDetail) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.attributeName === 'style' && 
+                        tokenDetail.style.display !== 'none') {
+                        applyTokenDetailStyles();
+                    }
+                });
+            });
+            observer.observe(tokenDetail, { attributes: true });
+        }
+    } catch (globalError) {
+        console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
+    }
 });
