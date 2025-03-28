@@ -652,14 +652,29 @@ button {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
-/* Hide badges on send and receive screens */
-#send-screen .chain-badge,
-#send-screen .chain-badge-fixed,
-#receive-screen .chain-badge,
-#receive-screen .chain-badge-fixed {
+/* Enhanced badge hiding for send/receive screens */
+#send-screen .token-icon > div,
+#send-screen .token-icon-large > div,
+#receive-screen .token-icon > div,
+#receive-screen .token-icon-large > div,
+#receive-screen .token-selection div > div,
+#send-screen div[class*="badge"],
+#receive-screen div[class*="badge"] {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Force icon containers to hide overflow */
+#send-screen .token-icon,
+#send-screen .token-icon-large,
+#receive-screen .token-icon,
+#receive-screen .token-icon-large,
+#receive-screen .token-selection > div:first-child {
+    overflow: hidden !important;
+    position: relative !important;
 }
 
 /* Fix token detail icon container */
@@ -1896,13 +1911,6 @@ button {
     font-weight: 600;
     font-size: var(--font-md);
     margin-bottom: 80px;
-}
-
-#send-screen .token-icon .chain-badge,
-#receive-screen .token-icon .chain-badge,
-#send-screen .transaction-token-icon .chain-badge,
-#receive-screen .transaction-token-icon .chain-badge {
-    display: none !important;
 }
 
 /* Biometric Authentication */
