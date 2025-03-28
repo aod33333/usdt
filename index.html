@@ -76,16 +76,23 @@
             </div>
         </div>
         
-       <!-- History Screen - Replace the existing history-screen div with this improved version -->
+<!-- History Screen with All Networks dropdown and Check explorer link -->
 <div id="history-screen" class="screen hidden">
     <div class="screen-header">
         <button class="back-button">
             <i class="fas fa-arrow-left"></i>
         </button>
-        <h2>Transaction History</h2>
+        <h2>History</h2>
         <div class="wallet-selector-small">
             <span class="wallet-name-small">Mnemonic 1</span>
             <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+    
+    <!-- All Networks dropdown added here -->
+    <div class="networks-filter">
+        <div class="all-networks">
+            All Networks <i class="fas fa-chevron-down"></i>
         </div>
     </div>
     
@@ -97,6 +104,11 @@
     
     <div id="history-transaction-list" class="history-transaction-list">
         <!-- Transactions will be added here dynamically by JavaScript -->
+        
+        <!-- Check explorer link added here -->
+        <div class="check-explorer">
+            Cannot find your transaction? <a href="#" id="check-explorer-link">Check explorer</a>
+        </div>
     </div>
     
     <div class="no-history hidden">
