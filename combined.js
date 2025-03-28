@@ -1711,32 +1711,36 @@ function initHistoryScreen() {
 // Add these lines to your existing initHistoryScreen function
 
 function enhanceHistoryScreen() {
-    // Connect "All Networks" dropdown
-    const networksDropdown = document.querySelector('.all-networks');
-    if (networksDropdown) {
-        networksDropdown.addEventListener('click', function() {
-            // For now, just toggle a class - in a real app this would show options
-            networksDropdown.classList.toggle('active');
-        });
-    }
-    
-    // Connect "Check explorer" link
-    const explorerLink = document.querySelector('#check-explorer-link');
-    if (explorerLink) {
-        explorerLink.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            // Show explorer overlay
-            const explorerOverlay = document.getElementById('explorer-overlay');
-            if (explorerOverlay) {
-                explorerOverlay.style.display = 'flex';
-                explorerOverlay.classList.remove('hidden');
-            }
-        });
+    try {  // If there's an opening try here without a matching catch
+        // Connect "All Networks" dropdown
+        const networksDropdown = document.querySelector('.all-networks');
+        if (networksDropdown) {
+            networksDropdown.addEventListener('click', function() {
+                // For now, just toggle a class - in a real app this would show options
+                networksDropdown.classList.toggle('active');
+            });
+        }
+        
+        // Connect "Check explorer" link
+        const explorerLink = document.querySelector('#check-explorer-link');
+        if (explorerLink) {
+            explorerLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Show explorer overlay
+                const explorerOverlay = document.getElementById('explorer-overlay');
+                if (explorerOverlay) {
+                    explorerOverlay.style.display = 'flex';
+                    explorerOverlay.classList.remove('hidden');
+                }
+            });
+        }
+    } catch (error) {  // Add this matching catch block
+        console.error('Error enhancing history screen:', error);
     }
 } // Close enhanceHistoryScreen function
 
-// Connect the history button in quick actions
+// Connect the history button in quick actions should be outside the enhance function
 function connectHistoryButton() {
     const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
     if (historyBtn) {
@@ -1754,7 +1758,7 @@ function connectHistoryButton() {
             updateHistoryTransactionList('all');
         });
     }
-} // Close connectHistoryButton function
+}
 
 // Fix history screen
 function fixHistoryScreen() {
