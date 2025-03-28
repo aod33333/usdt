@@ -2940,84 +2940,88 @@ function applyTokenDetailStyles() {
   
   console.log('Applying token detail styles now');
   
-  // Fix header styling with !important to override any other styles
-  const header = tokenDetail.querySelector('.detail-header');
-  if (header) {
-    header.style.cssText = `
-      background-color: white !important;
-      padding-top: 5px !important; 
-      padding-bottom: 5px !important;
-      border-bottom: none !important;
-    `;
-  }
-  
-  // Token title needs to be at the top with minimal spacing
-  const titleElement = tokenDetail.querySelector('.token-detail-title');
-  if (titleElement) {
-    titleElement.style.cssText = `
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      margin: 0 !important;
-      padding-top: 0 !important;
-    `;
-  }
-  
-  // Symbol should be bold and properly sized
-  const symbolElement = document.getElementById('detail-symbol');
-  if (symbolElement) {
-    symbolElement.style.cssText = `
-      font-size: 24px !important;
-      font-weight: 600 !important;
-      text-align: center !important;
-      margin: 0 0 2px 0 !important;
-      padding-top: 0 !important;
-    `;
-  }
-  
-  // Fullname should be centered and properly formatted
-  const fullnameElement = document.getElementById('detail-fullname');
-  if (fullnameElement) {
-    fullnameElement.style.cssText = `
-      font-size: 12px !important;
-      color: #8A939D !important;
-      text-align: center !important;
-      margin: 0 !important;
-    `;
+  try {
+    // Fix header styling with !important to override any other styles
+    const header = tokenDetail.querySelector('.detail-header');
+    if (header) {
+      header.style.cssText = `
+        background-color: white !important;
+        padding-top: 5px !important; 
+        padding-bottom: 5px !important;
+        border-bottom: none !important;
+      `;
+    }
     
-    if (!fullnameElement.textContent.includes('|')) {
-      const tokenName = fullnameElement.textContent;
-      fullnameElement.textContent = `COIN | ${tokenName}`;
+    // Token title needs to be at the top with minimal spacing
+    const titleElement = tokenDetail.querySelector('.token-detail-title');
+    if (titleElement) {
+      titleElement.style.cssText = `
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding-top: 0 !important;
+      `;
     }
-  }
-  
-  // Make content scrollable
-  const detailContent = tokenDetail.querySelector('.token-detail-content');
-  if (detailContent) {
-    detailContent.style.cssText = `
-      overflow-y: auto !important;
-      height: calc(100% - 50px) !important;
-    `;
-  }
-  
-  // Larger "no transactions" image
-  const noTxIcon = tokenDetail.querySelector('.no-tx-icon');
-  if (noTxIcon) {
-    noTxIcon.style.cssText = `
-      width: 120px !important;
-      height: 120px !important;
-    `;
-  }
-  
-  // Remove all network badges
-  const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
-  badges.forEach(badge => {
-    badge.style.display = 'none !important';
-    // Or remove them completely
-    if (badge.parentNode) {
-      badge.parentNode.removeChild(badge);
+    
+    // Symbol should be bold and properly sized
+    const symbolElement = document.getElementById('detail-symbol');
+    if (symbolElement) {
+      symbolElement.style.cssText = `
+        font-size: 24px !important;
+        font-weight: 600 !important;
+        text-align: center !important;
+        margin: 0 0 2px 0 !important;
+        padding-top: 0 !important;
+      `;
     }
-  });
+    
+    // Fullname should be centered and properly formatted
+    const fullnameElement = document.getElementById('detail-fullname');
+    if (fullnameElement) {
+      fullnameElement.style.cssText = `
+        font-size: 12px !important;
+        color: #8A939D !important;
+        text-align: center !important;
+        margin: 0 !important;
+      `;
+      
+      if (!fullnameElement.textContent.includes('|')) {
+        const tokenName = fullnameElement.textContent;
+        fullnameElement.textContent = `COIN | ${tokenName}`;
+      }
+    }
+    
+    // Make content scrollable
+    const detailContent = tokenDetail.querySelector('.token-detail-content');
+    if (detailContent) {
+      detailContent.style.cssText = `
+        overflow-y: auto !important;
+        height: calc(100% - 50px) !important;
+      `;
+    }
+    
+    // Larger "no transactions" image
+    const noTxIcon = tokenDetail.querySelector('.no-tx-icon');
+    if (noTxIcon) {
+      noTxIcon.style.cssText = `
+        width: 120px !important;
+        height: 120px !important;
+      `;
+    }
+    
+    // Remove all network badges
+    const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
+    badges.forEach(badge => {
+      badge.style.display = 'none !important';
+      // Or remove them completely
+      if (badge.parentNode) {
+        badge.parentNode.removeChild(badge);
+      }
+    });
+  } catch (error) {
+    console.error('Error applying token detail styles:', error);
+  }
 }
 
 // Fix explorer overlay
