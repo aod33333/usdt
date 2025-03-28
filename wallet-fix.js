@@ -1561,33 +1561,25 @@ hashSource(source) {
     }
     return Math.abs(hash).toString(16);
 }
-// Also fix the generateSecureTransactionHash function to not use await
 function generateSecureTransactionHash(txData) {
-  // Generate a secure-looking hash without async/await
   const timestamp = Date.now();
   const randomPart = Math.random().toString(36).substring(2);
   const dataStr = JSON.stringify(txData) + timestamp + randomPart;
-}
   
-  // Simple hash function that doesn't use crypto.subtle
   let hash = 0;
   for (let i = 0; i < dataStr.length; i++) {
     hash = ((hash << 5) - hash) + dataStr.charCodeAt(i);
     hash |= 0;
   }
   
-  // Format as hex string that looks like a transaction hash
   return '0x' + Array.from({ length: 64 }, () => 
     '0123456789abcdef'[Math.floor(Math.random() * 16)]
   ).join('');
 }
 
-// Make sure to connect the buttons on page load
 document.addEventListener('DOMContentLoaded', function() {
   console.log('Connecting send transaction buttons...');
-  }
   
-  // Connect the continue button in send screen
   const continueButton = document.getElementById('continue-send');
   if (continueButton) {
     continueButton.addEventListener('click', function(e) {
@@ -1596,24 +1588,23 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
-  
-  // Generate random hash
-  function generateRandomHash() {
-    return '0x' + Array.from({ length: 64 }, () => 
-      '0123456789abcdef'[Math.floor(Math.random() * 16)]
-    ).join('');
-  }
 
-  // 6. Fix admin panel
-  function fixAdminPanel() {
-    const closeAdminBtn = document.getElementById('close-admin');
-    if (closeAdminBtn) {
-      closeAdminBtn.onclick = function() {
-        hideAllScreens();
-        document.getElementById('wallet-screen').style.display = 'flex';
-        document.getElementById('wallet-screen').classList.remove('hidden');
-      };
-    }
+function generateRandomHash() {
+  return '0x' + Array.from({ length: 64 }, () => 
+    '0123456789abcdef'[Math.floor(Math.random() * 16)]
+  ).join('');
+}
+
+function fixAdminPanel() {
+  const closeAdminBtn = document.getElementById('close-admin');
+  if (closeAdminBtn) {
+    closeAdminBtn.onclick = function() {
+      hideAllScreens();
+      document.getElementById('wallet-screen').style.display = 'flex';
+      document.getElementById('wallet-screen').classList.remove('hidden');
+    };
+  }
+}
     
     const applyFakeBtn = document.getElementById('apply-fake');
     if (applyFakeBtn) {
