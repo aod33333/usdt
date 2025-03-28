@@ -51,6 +51,31 @@ function generateRandomTransactionHash() {
     return hash;
 }
 
+// Reset transactions to original data safely
+function resetTransactionsToOriginal(walletId) {
+    try {
+        if (walletId === 'all') {
+            // Reset all wallets
+            currentTransactions = JSON.parse(JSON.stringify(originalTransactions));
+            
+            // Clear global transactions
+            Object.keys(globalTransactions).forEach(id => {
+                globalTransactions[id] = [];
+            });
+        } else if (originalTransactions[walletId]) {
+            // Reset specific wallet
+            currentTransactions[walletId] = JSON.parse(JSON.stringify(originalTransactions[walletId]));
+            
+            // Clear global transactions for this wallet
+            globalTransactions[walletId] = [];
+        }
+        
+        console.log(`Transactions for ${walletId} reset to original state`);
+    } catch (error) {
+        console.error('Error resetting transactions to original:', error);
+    }
+}
+
 // Generate fake transaction history for a token
 function generateFakeTransactionHistory(amount, tokenId, walletId) {
     try {
