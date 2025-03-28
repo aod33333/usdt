@@ -3068,6 +3068,106 @@ function fixCriticalUIIssues() {
     }
 }
 
+function applyTokenDetailStyles() {
+  const tokenDetail = document.getElementById('token-detail');
+  if (!tokenDetail) return;
+  
+  // Fix header styling
+  const header = tokenDetail.querySelector('.detail-header');
+  if (header) {
+    header.style.backgroundColor = 'white';
+    header.style.paddingTop = '30px';
+    header.style.borderBottom = 'none';
+  }
+  
+  // Fix token detail title
+  const titleElement = tokenDetail.querySelector('.token-detail-title');
+  if (titleElement) {
+    titleElement.style.display = 'flex';
+    titleElement.style.flexDirection = 'column';
+    titleElement.style.alignItems = 'center';
+    titleElement.style.justifyContent = 'center';
+    titleElement.style.width = '100%';
+    
+    // Symbol styling
+    const symbolElement = document.getElementById('detail-symbol');
+    if (symbolElement) {
+      symbolElement.style.fontSize = '20px';
+      symbolElement.style.fontWeight = '600';
+      symbolElement.style.textAlign = 'center';
+      symbolElement.style.marginBottom = '4px';
+    }
+    
+    // Fullname styling (COIN | TokenName)
+    const fullnameElement = document.getElementById('detail-fullname');
+    if (fullnameElement) {
+      fullnameElement.style.fontSize = '12px';
+      fullnameElement.style.color = '#8A939D';
+      fullnameElement.style.textAlign = 'center';
+      
+      // Make sure it has the right format
+      if (!fullnameElement.textContent.includes('|')) {
+        const tokenName = fullnameElement.textContent;
+        fullnameElement.textContent = `COIN | ${tokenName}`;
+      }
+    }
+  }
+  
+  // Remove network badges
+  const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
+  badges.forEach(badge => {
+    badge.style.display = 'none';
+  });
+  
+  // Fix transaction items (blue for receive)
+  const transactions = tokenDetail.querySelectorAll('.transaction-item');
+  transactions.forEach(item => {
+    const icon = item.querySelector('.transaction-icon');
+    if (icon && item.classList.contains('transaction-receive')) {
+      icon.style.backgroundColor = 'rgba(51, 117, 187, 0.1)';
+      icon.style.color = '#3375BB';
+    }
+    
+    // Trust Wallet uses blue for positive values
+    const value = item.querySelector('.transaction-value');
+    if (value && value.classList.contains('positive')) {
+      value.style.color = '#3375BB';
+    }
+  });
+  
+  // Fix price change color
+  const priceChange = document.getElementById('token-price-change');
+  if (priceChange && priceChange.classList.contains('positive')) {
+    priceChange.style.color = '#3375BB';
+  }
+}
+
+// Initialize when document is ready
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', applyTokenDetailStyles);
+}
+
+// Also initialize after DOM changes (for dynamic content)
+if (typeof MutationObserver !== 'undefined') {
+  const observer = new MutationObserver(function(mutations) {
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        // DOM changed, check if token detail is now visible
+        const tokenDetail = document.getElementById('token-detail');
+        if (tokenDetail && !tokenDetail.classList.contains('hidden')) {
+          applyTokenDetailStyles();
+          break;
+        }
+      }
+    }
+  });
+  
+  // Start observing when document is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+}
+
 // Fix explorer overlay
 function fixExplorerOverlay() {
     const explorerOverlay = document.getElementById('explorer-overlay');
