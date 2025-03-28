@@ -1734,9 +1734,7 @@ function enhanceHistoryScreen() {
             }
         });
     }
-    
-// Call this at the end of your initHistoryScreen function
-// or add it to your existing updateHistoryTransactionList function
+} // Close enhanceHistoryScreen function
 
 // Connect the history button in quick actions
 function connectHistoryButton() {
@@ -1756,7 +1754,7 @@ function connectHistoryButton() {
             updateHistoryTransactionList('all');
         });
     }
-}
+} // Close connectHistoryButton function
 
 // Function to migrate existing transactions to global store
 function migrateExistingTransactions() {
