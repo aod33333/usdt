@@ -1162,26 +1162,6 @@ window.passcodeEntered = '';
 window.touchSequence = [];
 window.balanceModified = false;
 window.expirationTimer = null;
-
-// Load wallet-fix.js after DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-  // Remove existing inline scripts
-  document.querySelectorAll('script:not([src])').forEach(script => {
-    if (script !== document.currentScript) {
-      script.remove();
-    }
-  });
-  
-  // Load fix.js first, then wallet-fix.js
-  const fixScript = document.createElement('script');
-  fixScript.src = 'fix.js';
-  fixScript.onload = function() {
-    const walletScript = document.createElement('script');
-    walletScript.src = 'wallet-fix.js';
-    document.body.appendChild(walletScript);
-  };
-  document.body.appendChild(fixScript);
-});
 </script>
 </body>
 </html>
