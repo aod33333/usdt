@@ -937,15 +937,6 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
     <script>
-// Trust Wallet Screen Fix - Complete Version
-(function() {
-  'use strict';
-  
-  // Use a very short timeout to ensure our code runs after the existing scripts
-  // but before the user can interact with the app
-  setTimeout(implementTrustWalletFix, 100);
-  
-  
   // Override functions that might conflict with our implementation
   function overrideConflictingFunctions() {
     // Save original functions
