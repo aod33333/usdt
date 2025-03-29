@@ -869,5 +869,52 @@
     
     <!-- Main application script - all functionality moved here -->
     <script src="combined.js"></script>
+
+    <!-- Import updated UI components -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Function to load HTML file and replace target element content
+  function loadComponent(url, targetId) {
+    fetch(url)
+      .then(response => response.text())
+      .then(html => {
+        // Create a temporary div to hold the HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = html;
+        
+        // Extract the three parts (HTML, CSS, JavaScript)
+        const htmlContent = tempDiv.querySelector(`#${targetId}`);
+        const styleContent = tempDiv.querySelector('style');
+        const scriptContent = tempDiv.querySelector('script');
+        
+        // Replace the target element
+        const targetElement = document.getElementById(targetId);
+        if (targetElement && htmlContent) {
+          targetElement.parentNode.replaceChild(htmlContent, targetElement);
+        } else {
+          console.error(`Could not replace #${targetId}`);
+        }
+        
+        // Add the styles to the head
+        if (styleContent) {
+          document.head.appendChild(styleContent);
+        }
+        
+        // Execute the script
+        if (scriptContent) {
+          const newScript = document.createElement('script');
+          newScript.textContent = scriptContent.textContent;
+          document.body.appendChild(newScript);
+        }
+      })
+      .catch(error => console.error(`Error loading ${url}:`, error));
+  }
+
+  // Load updated UI components with the correct file names
+  loadComponent('USS', 'send-screen');       // Send screen
+  loadComponent('URC', 'receive-screen');    // Receive screen
+  loadComponent('UHS', 'history-screen');    // History screen
+});
+</script>
 </body>
 </html>
