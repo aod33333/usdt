@@ -3262,26 +3262,6 @@ if (detailReceiveButton) {
     }
 }
 
-// All-in-one function to fix critical UI issues
-function fixCriticalUIIssues() {
-    try {
-        // Fix bottom tabs
-        fixBottomTabs();
-
-        
-        // Fix token detail badges
-        fixTokenDetailBadges();
-        
-        // Fix transaction flows
-        fixTransactionModal();
-        
-        // Fix explorer overlay
-        fixExplorerOverlay();
-    } catch (error) {
-        console.error('Error fixing critical UI issues:', error);
-    }
-}
-
 function applyTokenDetailStyles() {
   const tokenDetail = document.getElementById('token-detail');
   if (!tokenDetail) return;
