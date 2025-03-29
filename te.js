@@ -726,4 +726,339 @@
     }
     return hash;
   }
+
+  // Add this function to the enhancer script
+function enhanceHomeScreen() {
+  const walletScreen = document.getElementById('wallet-screen');
+  if (!walletScreen) return;
+  
+  // 1. Fix wallet selector appearance
+  const walletSelector = walletScreen.querySelector('.wallet-selector');
+  if (walletSelector) {
+    walletSelector.style.padding = '8px 0';
+    
+    // Add authentic ripple effect
+    walletSelector.classList.add('tw-ripple');
+    
+    // Improve wallet name styling
+    const walletName = walletSelector.querySelector('.wallet-name');
+    if (walletName) {
+      walletName.style.fontSize = '14px';
+      walletName.style.fontWeight = '600';
+      walletName.style.color = '#1A2024';
+    }
+  }
+  
+  // 2. Fix total balance display
+  const balanceDisplay = walletScreen.querySelector('.balance-display');
+  if (balanceDisplay) {
+    balanceDisplay.style.padding = '8px 16px 16px';
+    
+    // Improve amount styling
+    const balanceAmount = balanceDisplay.querySelector('.balance-amount');
+    if (balanceAmount) {
+      balanceAmount.style.fontSize = '28px';
+      balanceAmount.style.fontWeight = '700';
+      balanceAmount.style.color = '#1A2024';
+    }
+    
+    // Fix eye icon for balance visibility
+    const visibilityToggle = balanceDisplay.querySelector('.visibility-toggle');
+    if (visibilityToggle) {
+      visibilityToggle.style.color = '#8A939D';
+      
+      // Add toggle functionality
+      visibilityToggle.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        if (icon) {
+          const isHidden = icon.classList.contains('fa-eye-slash');
+          
+          if (isHidden) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            // Show balance
+            if (balanceAmount && window.totalBalance) {
+              balanceAmount.textContent = window.totalBalance;
+            }
+          } else {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            // Save current balance for later
+            if (balanceAmount) {
+              window.totalBalance = balanceAmount.textContent;
+              balanceAmount.textContent = '••••••';
+            }
+          }
+        }
+      });
+    }
+  }
+  
+  // 3. Enhance quick action buttons
+  const quickActions = walletScreen.querySelector('.quick-actions');
+  if (quickActions) {
+    // Ensure proper spacing
+    quickActions.style.padding = '0 16px 16px';
+    
+    // Fix action buttons
+    const actionButtons = quickActions.querySelectorAll('.action-circle');
+    actionButtons.forEach(btn => {
+      // Add ripple effect
+      btn.classList.add('tw-ripple');
+      
+      // Fix icon appearance
+      const icon = btn.querySelector('i');
+      if (icon) {
+        icon.style.backgroundColor = '#F5F5F5';
+        icon.style.width = '40px';
+        icon.style.height = '40px';
+        icon.style.display = 'flex';
+        icon.style.justifyContent = 'center';
+        icon.style.alignItems = 'center';
+        icon.style.borderRadius = '50%';
+        icon.style.marginBottom = '4px';
+      }
+      
+      // Fix label appearance
+      const label = btn.querySelector('span');
+      if (label) {
+        label.style.fontSize = '10px';
+        label.style.fontWeight = '500';
+      }
+    });
+  }
+  
+  // 4. Fix tab navigation
+  const tabs = walletScreen.querySelector('.tabs');
+  if (tabs) {
+    // Ensure proper styling
+    tabs.style.padding = '0 16px';
+    tabs.style.borderBottom = '1px solid #F5F5F5';
+    
+    // Fix tab buttons
+    const tabButtons = tabs.querySelectorAll('.tab-button');
+    tabButtons.forEach(tab => {
+      tab.style.fontSize = '14px';
+      tab.style.fontWeight = '500';
+      tab.style.padding = '12px 0';
+      
+      // Add ripple effect
+      tab.classList.add('tw-ripple');
+      
+      // Fix active state with blue indicator
+      if (tab.classList.contains('active')) {
+        tab.style.color = '#3375BB';
+        
+        // Check if tab already has indicator
+        if (!tab.querySelector('.tab-indicator')) {
+          const indicator = document.createElement('div');
+          indicator.className = 'tab-indicator';
+          indicator.style.position = 'absolute';
+          indicator.style.bottom = '-1px';
+          indicator.style.left = '0';
+          indicator.style.width = '100%';
+          indicator.style.height = '2px';
+          indicator.style.backgroundColor = '#3375BB';
+          tab.appendChild(indicator);
+        }
+      } else {
+        tab.style.color = '#5F6C75';
+      }
+      
+      // Fix tab click behavior
+      tab.addEventListener('click', function() {
+        // Update all tabs
+        tabButtons.forEach(t => {
+          t.classList.remove('active');
+          t.style.color = '#5F6C75';
+          
+          // Remove indicator if exists
+          const ind = t.querySelector('.tab-indicator');
+          if (ind) ind.remove();
+        });
+        
+        // Set active state for clicked tab
+        this.classList.add('active');
+        this.style.color = '#3375BB';
+        
+        // Add indicator
+        if (!this.querySelector('.tab-indicator')) {
+          const indicator = document.createElement('div');
+          indicator.className = 'tab-indicator';
+          indicator.style.position = 'absolute';
+          indicator.style.bottom = '-1px';
+          indicator.style.left = '0';
+          indicator.style.width = '100%';
+          indicator.style.height = '2px';
+          indicator.style.backgroundColor = '#3375BB';
+          this.appendChild(indicator);
+        }
+      });
+    });
+  }
+  
+  // 5. Fix token list appearance and behavior
+  const tokenList = walletScreen.querySelector('#token-list');
+  if (tokenList) {
+    // Ensure smooth scrolling
+    tokenList.style.scrollBehavior = 'smooth';
+    
+    // Fix token items
+    const tokenItems = tokenList.querySelectorAll('.token-item');
+    tokenItems.forEach(item => {
+      // Fix spacing
+      item.style.padding = '14px 16px';
+      item.style.borderBottom = '1px solid #F5F5F5';
+      
+      // Fix token icon size
+      const tokenIcon = item.querySelector('.token-icon');
+      if (tokenIcon) {
+        tokenIcon.style.width = '36px';
+        tokenIcon.style.height = '36px';
+        tokenIcon.style.minWidth = '36px';
+        tokenIcon.style.marginRight = '16px';
+      }
+      
+      // Fix network badge
+      const badgeTokens = ['usdt', 'twt', 'bnb'];
+      const tokenId = item.getAttribute('data-token-id');
+      
+      // Fix positive value colors to match TrustWallet blue
+      const tokenValue = item.querySelector('.token-price-change');
+      if (tokenValue && tokenValue.classList.contains('positive')) {
+        tokenValue.style.color = '#3375BB';
+      }
+    });
+    
+    // Add pull-to-refresh simulation
+    addPullToRefreshSimulation(tokenList);
+  }
+  
+  // 6. Fix footer disclaimer text
+  const footerInfo = walletScreen.querySelector('.footer-info');
+  if (footerInfo) {
+    footerInfo.style.fontSize = '12px';
+    footerInfo.style.color = '#8A939D';
+    footerInfo.style.textAlign = 'center';
+    footerInfo.style.padding = '16px 16px 80px';
+    footerInfo.style.lineHeight = '1.4';
+  }
+  
+  // 7. Fix investment warning banner
+  const investmentWarning = walletScreen.querySelector('#investment-warning');
+  if (investmentWarning) {
+    investmentWarning.style.width = 'calc(100% - 32px)';
+    investmentWarning.style.margin = '16px';
+    investmentWarning.style.backgroundColor = '#FEF9E7';
+    investmentWarning.style.color = '#D4AC0D';
+    investmentWarning.style.borderRadius = '8px';
+    investmentWarning.style.borderLeft = '4px solid #D4AC0D';
+    
+    // Fix close button
+    const closeWarning = investmentWarning.querySelector('#close-investment-warning');
+    if (closeWarning) {
+      closeWarning.addEventListener('click', function() {
+        investmentWarning.style.display = 'none';
+      });
+    }
+  }
+}
+
+// Add pull-to-refresh simulation
+function addPullToRefreshSimulation(element) {
+  if (!element) return;
+  
+  let startY = 0;
+  let currentY = 0;
+  let pulling = false;
+  const pullThreshold = 60;
+  
+  // Create pull indicator
+  const indicator = document.createElement('div');
+  indicator.className = 'pull-indicator';
+  indicator.innerHTML = '<i class="fas fa-sync-alt"></i>';
+  indicator.style.position = 'absolute';
+  indicator.style.top = '-50px';
+  indicator.style.left = '50%';
+  indicator.style.transform = 'translateX(-50%)';
+  indicator.style.width = '30px';
+  indicator.style.height = '30px';
+  indicator.style.borderRadius = '50%';
+  indicator.style.backgroundColor = '#3375BB';
+  indicator.style.color = 'white';
+  indicator.style.display = 'flex';
+  indicator.style.justifyContent = 'center';
+  indicator.style.alignItems = 'center';
+  indicator.style.opacity = '0';
+  indicator.style.transition = 'opacity 0.2s';
+  
+  // Add indicator to parent
+  const parent = element.parentNode;
+  if (parent) {
+    parent.style.position = 'relative';
+    parent.appendChild(indicator);
+  }
+  
+  // Touch events
+  element.addEventListener('touchstart', function(e) {
+    if (element.scrollTop <= 0) {
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }
+  }, {passive: true});
+  
+  element.addEventListener('touchmove', function(e) {
+    if (!pulling) return;
+    
+    currentY = e.touches[0].clientY;
+    const pullDistance = currentY - startY;
+    
+    if (pullDistance > 0) {
+      // Prevent default scrolling
+      e.preventDefault();
+      
+      // Show and rotate indicator
+      indicator.style.opacity = Math.min(pullDistance / pullThreshold, 1);
+      indicator.style.transform = `translateX(-50%) rotate(${pullDistance * 3}deg)`;
+      
+      // Slow down scrolling with resistance
+      element.style.transform = `translateY(${Math.min(pullDistance / 2, 60)}px)`;
+    }
+  }, {passive: false});
+  
+  element.addEventListener('touchend', function() {
+    if (!pulling) return;
+    pulling = false;
+    
+    const pullDistance = currentY - startY;
+    
+    // Reset element position with animation
+    element.style.transition = 'transform 0.3s';
+    element.style.transform = 'translateY(0)';
+    
+    // Reset after animation completes
+    setTimeout(() => {
+      element.style.transition = '';
+    }, 300);
+    
+    if (pullDistance > pullThreshold) {
+      // Trigger refresh animation
+      indicator.querySelector('i').classList.add('fa-spin');
+      indicator.style.opacity = '1';
+      
+      // Show refresh toast
+      showToast('Refreshing...');
+      
+      // Simulate refresh completion
+      setTimeout(() => {
+        indicator.querySelector('i').classList.remove('fa-spin');
+        indicator.style.opacity = '0';
+        showToast('Refreshed successfully');
+      }, 1500);
+    } else {
+      // Hide indicator
+      indicator.style.opacity = '0';
+    }
+  });
+}
 })();
