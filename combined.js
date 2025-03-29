@@ -909,8 +909,6 @@ function showTokenDetail(tokenId) {
            updateTransactionsForToken(tokenId);
        }
 
-       // Fix the bottom tabs
-       fixBottomTabs();
    } catch (error) {
        console.error('Error showing token detail:', error);
 
@@ -1348,13 +1346,6 @@ function updateSendButtonFlow() {
 
 // Add token selection styles and initialize
 document.addEventListener('DOMContentLoaded', function() {
-    // Add the CSS
-    const style = document.createElement('style');
-    style.textContent = document.getElementById('send-flow-css').textContent;
-    document.head.appendChild(style);
-    
-    // Update send button flow
-    updateSendButtonFlow();
     
     // Update token detail send button
     const detailSendButton = document.querySelector('#token-detail .detail-action:nth-child(1)');
@@ -2106,27 +2097,6 @@ function updateExpirationDisplay(remainingMs) {
 // =================================================================
 // SECTION 7b: BALANCE RESET & ADMIN TOOLS
 // =================================================================
-
-// Reset to original balance with improved safety
-function resetToOriginalBalance(walletId) {
-    try {
-        resetWalletToOriginal(walletId);
-        resetTransactionsToOriginal(walletId);
-        
-        if (expirationTimer) {
-            clearInterval(expirationTimer);
-            expirationTimer = null;
-        }
-        
-        updateExpirationDisplay();
-        balanceModified = false;
-        
-        // Update UI
-        updateWalletUI();
-    } catch (error) {
-        console.error('Error resetting to original balance:', error);
-    }
-}
 
 // Reset wallet to original data safely
 function resetWalletToOriginal(walletId) {
@@ -3060,38 +3030,6 @@ function filterReceiveTokenList(searchTerm) {
         console.error('Error filtering receive token list:', error);
     }
 }
-
-// Select a token and proceed to receive screen
-function selectTokenForReceive(tokenId) {
-    try {
-        // Hide token select screen
-        const tokenSelectScreen = document.getElementById('receive-token-select');
-        tokenSelectScreen.style.display = 'none';
-        tokenSelectScreen.classList.add('hidden');
-        
-        // Show the receive screen with the selected token
-        showReceiveScreen(tokenId);
-    } catch (error) {
-        console.error('Error selecting token for receive:', error);
-    }
-}
-
-// Update the token detail receive button
-document.addEventListener('DOMContentLoaded', function() {
-    // Update receive button flow
-    updateReceiveButtonFlow();
-    
-    // Update token detail receive button
-    const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
-    if (detailReceiveButton) {
-        detailReceiveButton.addEventListener('click', function() {
-            const detailSymbol = document.getElementById('detail-symbol');
-            const tokenId = detailSymbol && detailSymbol.textContent ? 
-                detailSymbol.textContent.toLowerCase() : 'btc';
-            showReceiveScreen(tokenId);
-        });
-    }
-});
 
 // =================================================================
 // SECTION 9: INITIALIZATION
