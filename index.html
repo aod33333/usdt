@@ -378,15 +378,39 @@
             </div>
         </div>
 
-          <!-- Receive Screen -->
-        <div id="receive-screen" class="screen hidden receive-screen">
-            <div class="screen-header">
-                <button class="back-button">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2>Receive</h2>
-                <div class="placeholder-icon"></div>
-            </div>
+         <!-- Add this to your index.html file -->
+<div id="receive-token-select" class="screen hidden">
+    <div class="screen-header">
+        <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Receive</h2>
+        <div class="placeholder-icon"></div>
+    </div>
+    
+    <!-- Search bar for tokens -->
+    <div class="search-container">
+        <div class="search-bar token-search">
+            <i class="fas fa-search"></i>
+            <input type="text" 
+                id="receive-token-search-input" 
+                placeholder="Search" 
+                aria-label="Search tokens">
+        </div>
+    </div>
+    
+    <!-- Networks filter dropdown -->
+    <div class="networks-filter">
+        <div class="all-networks">
+            All Networks <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+    
+    <!-- Tokens list for selection -->
+    <div id="select-receive-token-list" class="token-list">
+        <!-- Tokens will be dynamically populated here -->
+    </div>
+</div>
             
             <!-- Bitcoin Warning Banner -->
             <div id="bitcoin-warning" class="bitcoin-warning hidden">
