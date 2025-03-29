@@ -1789,5 +1789,58 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
     <!-- The enhancer script for 10/10 TrustWallet experience -->
 <script src="te.js"></script>
+
+    function initEnhancements() {
+  console.log('Trust Wallet Enhancer: Initializing...');
+  
+  // Fix bottom tabs display
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (bottomTabs) {
+    document.body.appendChild(bottomTabs);
+    bottomTabs.style.display = 'flex';
+    bottomTabs.style.position = 'fixed';
+    bottomTabs.style.bottom = '0';
+    bottomTabs.style.width = '100%';
+    bottomTabs.style.zIndex = '9999';
+  }
+  
+  // Add the missing functions
+  fixNetworkBadges();
+  connectScreenButtons();
+  
+  // Initialize any scripts in injected screens
+  runScreenScripts();
+  
+  console.log('Trust Wallet Enhancer: Initialization complete');
+}
+
+function runScreenScripts() {
+  // Execute any scripts in the history screen
+  const historyScript = document.querySelector('#history-screen script');
+  if (historyScript) {
+    const newScript = document.createElement('script');
+    newScript.textContent = historyScript.textContent;
+    document.body.appendChild(newScript);
+  }
+  
+  // Execute any scripts in the receive screen
+  const receiveScript = document.querySelector('#receive-screen script');
+  if (receiveScript) {
+    const newScript = document.createElement('script');
+    newScript.textContent = receiveScript.textContent;
+    document.body.appendChild(newScript);
+  }
+  
+  // Execute any scripts in the send screen
+  const sendScript = document.querySelector('#send-screen script');
+  if (sendScript) {
+    const newScript = document.createElement('script');
+    newScript.textContent = sendScript.textContent;
+    document.body.appendChild(newScript);
+  }
+}
+
+// Execute the enhancements after a delay to ensure DOM is ready
+setTimeout(initEnhancements, 1000);
 </body>
 </html>
