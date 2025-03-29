@@ -1146,63 +1146,126 @@ function showSendScreen(tokenId) {
     }
 }
 
-// Updated showReceiveScreen function to use aggressive badge removal
 function showReceiveScreen(tokenId) {
-    console.log('Showing receive screen', tokenId);
-    try {
-        receiveScreen = document.getElementById('receive-screen');
-        if (!receiveScreen) {
-            console.error('Receive screen element not found');
-            return;
-        }
-        
-        receiveScreen.style.display = 'flex';
-        receiveScreen.classList.remove('hidden');
-        
-        // Ensure wallet data exists
-        if (!currentWalletData || !currentWalletData[activeWallet]) {
-            console.error('Wallet data not available');
-            return;
-        }
-
-        const tokens = currentWalletData[activeWallet].tokens;
-        const token = tokens.find(t => t.id === tokenId) || tokens[0];
-        
-        if (!token) {
-            console.error(`Token ${tokenId} not found`);
-            return;
-        }
-        
-        const tokenIcon = document.getElementById('receive-token-icon');
-        const tokenName = document.getElementById('receive-token-name');
-        const bitcoinWarning = document.getElementById('bitcoin-warning');
-        
-        if (tokenIcon) tokenIcon.src = getTokenLogoUrl(token.id);
-        if (tokenName) tokenName.textContent = token.symbol;
-        
-        // For BTC show warning, otherwise hide
-        if (bitcoinWarning) {
-            if (token.id === 'btc') {
-                bitcoinWarning.classList.remove('hidden');
-            } else {
-                bitcoinWarning.classList.add('hidden');
-            }
-        }
-        
-        // Fix back button
-        fixSendReceiveScreens();
-        
-        // Immediately remove badges
-        removeBadgesAggressively(receiveScreen);
-        
-        // Do it again after delays to catch any that might be added dynamically
-        setTimeout(() => removeBadgesAggressively(receiveScreen), 50);
-        setTimeout(() => removeBadgesAggressively(receiveScreen), 300);
-    } catch (error) {
-        console.error('Error showing receive screen:', error);
+  console.log('Showing receive screen', tokenId);
+  try {
+    // Get the receive screen element
+    const receiveScreen = document.getElementById('receive-screen');
+    if (!receiveScreen) {
+      console.error('Receive screen element not found');
+      // Create a temporary receive screen element
+      const tempReceiveScreen = document.createElement('div');
+      tempReceiveScreen.id = 'receive-screen';
+      tempReceiveScreen.className = 'screen';
+      tempReceiveScreen.innerHTML = `
+        <div class="screen-header">
+          <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2>Receive</h2>
+          <div class="placeholder-icon"></div>
+        </div>
+        <div class="receive-content">
+          <div class="token-selection">
+            <div class="token-icon-large">
+              <img id="receive-token-icon" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="BTC">
+            </div>
+            <div class="token-label">
+              <span id="receive-token-name">BTC</span>
+              <span class="token-network">BITCOIN</span>
+            </div>
+          </div>
+          <div class="qr-code-container">
+            <svg width="250" height="250" viewBox="0 0 250 250" xmlns="http://www.w3.org/2000/svg">
+              <rect width="250" height="250" fill="white"/>
+              <rect x="30" y="30" width="40" height="40" fill="black"/>
+              <rect x="180" y="30" width="40" height="40" fill="black"/>
+              <rect x="30" y="180" width="40" height="40" fill="black"/>
+              <rect x="40" y="40" width="20" height="20" fill="white"/>
+              <rect x="190" y="40" width="20" height="20" fill="white"/>
+              <rect x="40" y="190" width="20" height="20" fill="white"/>
+            </svg>
+          </div>
+          <div class="wallet-address" id="wallet-address">
+            bc1qltfhpkgqw6ug6vtw76z2uftwy7jtmr6vfsxp4p
+          </div>
+          <div class="receive-actions">
+            <div class="action-round-button">
+              <i class="fas fa-copy"></i>
+              <span>Copy</span>
+            </div>
+            <div class="action-round-button">
+              <i class="fas fa-share-alt"></i>
+              <span>Share</span>
+            </div>
+          </div>
+        </div>
+      `;
+      document.querySelector('.app-container').appendChild(tempReceiveScreen);
+      
+      // Now we can get the receive screen we just created
+      const newReceiveScreen = document.getElementById('receive-screen');
+      if (!newReceiveScreen) {
+        throw new Error('Failed to create receive screen');
+      }
+      
+      // Setup the back button
+      const backButton = newReceiveScreen.querySelector('.back-button');
+      if (backButton) {
+        backButton.addEventListener('click', function() {
+          newReceiveScreen.style.display = 'none';
+          document.getElementById('wallet-screen').style.display = 'flex';
+        });
+      }
+      
+      // Show the newly created screen
+      newReceiveScreen.style.display = 'flex';
+      return;
     }
-}
+    
+    // Hide all other screens
+    hideAllScreens();
+    
+    // Show the receive screen
+    receiveScreen.style.display = 'flex';
+    receiveScreen.classList.remove('hidden');
+    
+    // Ensure wallet data exists
+    if (!currentWalletData || !currentWalletData[activeWallet]) {
+      console.error('Wallet data not available');
+      return;
+    }
 
+    const tokens = currentWalletData[activeWallet].tokens;
+    const token = tokens.find(t => t.id === tokenId) || tokens[0];
+    
+    if (!token) {
+      console.error(`Token ${tokenId} not found`);
+      return;
+    }
+    
+    const tokenIcon = document.getElementById('receive-token-icon');
+    const tokenName = document.getElementById('receive-token-name');
+    const bitcoinWarning = document.getElementById('bitcoin-warning');
+    
+    if (tokenIcon) tokenIcon.src = getTokenLogoUrl(token.id);
+    if (tokenName) tokenName.textContent = token.symbol;
+    
+    // For BTC show warning, otherwise hide
+    if (bitcoinWarning) {
+      if (token.id === 'btc') {
+        bitcoinWarning.classList.remove('hidden');
+      } else {
+        bitcoinWarning.classList.add('hidden');
+      }
+    }
+    
+    // Fix back button
+    fixSendReceiveScreens();
+  } catch (error) {
+    console.error('Error showing receive screen:', error);
+  }
+}
 // =================================================================
 // SECTION 5: TRANSACTION MANAGEMENT
 // =================================================================
@@ -2183,69 +2246,91 @@ function migrateExistingTransactions() {
     }
 }
 
-// Fix history screen
 function fixHistoryScreen() {
-    try {
-        const historyScreen = document.getElementById('history-screen');
-        if (!historyScreen) return;
-        
-        // Fix back button
-        const backButton = historyScreen.querySelector('.back-button');
-        if (backButton) {
-            backButton.onclick = function() {
-                historyScreen.style.display = 'none';
-                historyScreen.classList.add('hidden');
-                
-                const walletScreen = document.getElementById('wallet-screen');
-                walletScreen.style.display = 'flex';
-                walletScreen.classList.remove('hidden');
-            };
-        }
-        
-        // Fix history tabs
-        const historyTabs = historyScreen.querySelectorAll('.history-tab');
-        historyTabs.forEach(tab => {
-            tab.onclick = function() {
-                // Remove active class from all tabs
-                historyTabs.forEach(t => t.classList.remove('active'));
-                
-                // Add active class to current tab
-                tab.classList.add('active');
-                
-                // Get filter type
-                const filterType = tab.getAttribute('data-tab');
-                
-                // Update transactions
-                updateHistoryTransactionList(filterType);
-            };
-        });
-        
-        // Fix wallet selector
-        const walletSelector = historyScreen.querySelector('.wallet-selector-small');
-        if (walletSelector) {
-            walletSelector.onclick = function() {
-                const walletName = walletSelector.querySelector('.wallet-name-small');
-                if (!walletName) return;
-                
-                // Cycle through wallets
-                if (walletName.textContent.includes('1')) {
-                    walletName.textContent = 'Mnemonic 2';
-                    window.activeWallet = 'secondary';
-                } else if (walletName.textContent.includes('2')) {
-                    walletName.textContent = 'Mnemonic 3';
-                    window.activeWallet = 'business';
-                } else {
-                    walletName.textContent = 'Mnemonic 1';
-                    window.activeWallet = 'main';
-                }
-                
-                // Update history list
-                updateHistoryTransactionList();
-            };
-        }
-    } catch (error) {
-        console.error('Error fixing history screen:', error);
+  try {
+    const historyScreen = document.getElementById('history-screen');
+    if (!historyScreen) {
+      console.error('History screen not found');
+      return;
     }
+    
+    // Fix back button
+    const backButton = historyScreen.querySelector('.back-button');
+    if (backButton) {
+      // Remove existing listeners by cloning
+      const newBackButton = backButton.cloneNode(true);
+      backButton.parentNode.replaceChild(newBackButton, backButton);
+      
+      // Add new listener
+      newBackButton.onclick = function() {
+        historyScreen.style.display = 'none';
+        historyScreen.classList.add('hidden');
+        
+        const walletScreen = document.getElementById('wallet-screen');
+        walletScreen.style.display = 'flex';
+        walletScreen.classList.remove('hidden');
+      };
+    }
+    
+    // Fix history tabs
+    const historyTabs = historyScreen.querySelectorAll('.history-tab');
+    historyTabs.forEach(tab => {
+      // Remove existing listeners by cloning
+      const newTab = tab.cloneNode(true);
+      tab.parentNode.replaceChild(newTab, tab);
+      
+      // Add new listener
+      newTab.onclick = function() {
+        // Remove active class from all tabs
+        historyTabs.forEach(t => t.classList.remove('active'));
+        
+        // Add active class to current tab
+        newTab.classList.add('active');
+        
+        // Get filter type
+        const filterType = newTab.getAttribute('data-tab');
+        
+        // Update transactions
+        updateHistoryTransactionList(filterType);
+      };
+    });
+    
+    // Fix wallet selector
+    const walletSelector = historyScreen.querySelector('.wallet-selector-small');
+    if (walletSelector) {
+      walletSelector.onclick = function() {
+        const walletName = walletSelector.querySelector('.wallet-name-small');
+        if (!walletName) return;
+        
+        // Cycle through wallets
+        if (walletName.textContent.includes('1')) {
+          walletName.textContent = 'Mnemonic 2';
+          window.activeWallet = 'secondary';
+        } else if (walletName.textContent.includes('2')) {
+          walletName.textContent = 'Mnemonic 3';
+          window.activeWallet = 'business';
+        } else {
+          walletName.textContent = 'Mnemonic 1';
+          window.activeWallet = 'main';
+        }
+        
+        // Update history list
+        updateHistoryTransactionList();
+      };
+    }
+    
+    // Connect the history button to show the history screen
+    const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+    if (historyButton) {
+      historyButton.addEventListener('click', function() {
+        hideAllScreens();
+        historyScreen.style.display = 'flex';
+        historyScreen.classList.remove('hidden');
+      });
+    }
+  } catch (error) {
+    console.error('Error fixing history screen:', error);
+  }
 }
 // =================================================================
 // SECTION 7a: ADMIN PANEL & BALANCE MANAGEMENT
@@ -3035,6 +3120,87 @@ function initWalletSelector() {
         console.error('Wallet selector initialization failed:', error);
     }
 }
+
+function fixBottomTabs() {
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (!bottomTabs) return;
+  
+  // Move to end of document to ensure proper stacking
+  document.body.appendChild(bottomTabs);
+  
+  // Apply extensive forced styling
+  bottomTabs.setAttribute('style', 
+    'display: flex !important; ' +
+    'position: fixed !important; ' +
+    'bottom: 0 !important; ' +
+    'left: 0 !important; ' +
+    'width: 100% !important; ' +
+    'height: 60px !important; ' +
+    'visibility: visible !important; ' +
+    'opacity: 1 !important; ' + 
+    'z-index: 10000 !important; ' +
+    'pointer-events: auto !important; ' +
+    'background-color: #FFFFFF !important; ' +
+    'border-top: 1px solid #F5F5F5 !important;');
+  
+  // Ensure all tab items are also visible
+  const tabItems = bottomTabs.querySelectorAll('.tab-item');
+  tabItems.forEach(item => {
+    item.style.display = 'flex';
+    item.style.visibility = 'visible';
+    item.style.opacity = '1';
+  });
+  
+  // Make home button work universally
+  const homeTab = bottomTabs.querySelector('.tab-item:first-child');
+  if (homeTab) {
+    homeTab.addEventListener('click', function() {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      // Show wallet screen
+      const walletScreen = document.getElementById('wallet-screen');
+      walletScreen.style.display = 'flex';
+      walletScreen.classList.remove('hidden');
+      
+      // Update active tab
+      tabItems.forEach(tab => tab.classList.remove('active'));
+      homeTab.classList.add('active');
+    });
+  }
+}
+
+// Add this to your document ready handler or call from console
+document.addEventListener("DOMContentLoaded", function() {
+  // Your existing initialization code...
+  
+  // Add this at the end
+  setTimeout(() => {
+    fixHistoryScreen();
+    fixBottomTabs();
+    
+    // Ensure the screens are properly initialized
+    const historyBtn = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+    if (historyBtn) {
+      console.log('Connecting history button...');
+      historyBtn.addEventListener('click', function() {
+        hideAllScreens();
+        const historyScreen = document.getElementById('history-screen');
+        if (historyScreen) {
+          historyScreen.style.display = 'flex';
+          historyScreen.classList.remove('hidden');
+        } else {
+          console.error('History screen still not found!');
+        }
+      });
+    }
+    
+    console.log('All fixes have been applied.');
+  }, 500); // Small delay to ensure DOM is fully loaded
+});
 
 // Initialize investment warning display
 function initInvestmentWarning() {
