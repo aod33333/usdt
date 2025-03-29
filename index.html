@@ -19,6 +19,64 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="total.css">
+    </head>
+
+<body>
+    <!-- Screen placeholders - added for initialization -->
+    <script>
+      // Immediately create screen placeholders to ensure they exist before initialization
+      window.onload = function() {
+        const appContainer = document.querySelector('.app-container');
+        if (appContainer) {
+          // Create history screen placeholder if needed
+          if (!document.getElementById('history-screen')) {
+            const historyScreen = document.createElement('div');
+            historyScreen.id = 'history-screen';
+            historyScreen.className = 'screen hidden';
+            appContainer.appendChild(historyScreen);
+            console.log("Added history screen placeholder");
+          }
+          
+          // Create receive screen placeholder if needed
+          if (!document.getElementById('receive-screen')) {
+            const receiveScreen = document.createElement('div');
+            receiveScreen.id = 'receive-screen';
+            receiveScreen.className = 'screen hidden';
+            appContainer.appendChild(receiveScreen);
+            console.log("Added receive screen placeholder");
+          }
+          
+          // Force fix button connections after a delay
+          setTimeout(function() {
+            // Fix history button
+            const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+            if (historyButton) {
+              historyButton.onclick = function() {
+                document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+                const historyScreen = document.getElementById('history-screen');
+                if (historyScreen) {
+                  historyScreen.style.display = 'flex';
+                  historyScreen.classList.remove('hidden');
+                }
+              };
+            }
+            
+            // Fix receive button
+            const receiveButton = document.getElementById('receive-button');
+            if (receiveButton) {
+              receiveButton.onclick = function() {
+                document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+                const receiveScreen = document.getElementById('receive-screen');
+                if (receiveScreen) {
+                  receiveScreen.style.display = 'flex';
+                  receiveScreen.classList.remove('hidden');
+                }
+              };
+            }
+          }, 800);
+        }
+      };
+    </script>
 
       <!-- Status Bar -->
     <div class="status-bar">
@@ -882,3 +940,5 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('Initialization complete');
 });
 </script>
+</body>
+</html>
