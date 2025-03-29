@@ -159,55 +159,50 @@ function integrateNewSendFlow() {
         console.log('Integrating new send flow...');
         
         // 1. Add the token selection screen to index.html
-        const appContainer = document.querySelector('.app-container');
-        if (!appContainer) {
-            console.error('App container not found');
-            return;
-        }
-        
-        // Create token selection screen element
-        const tokenSelectScreen = document.createElement('div');
-        tokenSelectScreen.id = 'send-token-select';
-        tokenSelectScreen.className = 'screen hidden';
-        
-        // Directly create the content instead of trying to get from another element
-        tokenSelectScreen.innerHTML = `
-            <div class="screen-header">
-                <button class="back-button" aria-label="Go back">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2>Send</h2>
-                <div class="placeholder-icon"></div>
-            </div>
-            
-            <div class="search-container">
-                <div class="search-bar token-search">
-                    <i class="fas fa-search"></i>
-                    <input type="text" 
-                        id="token-search-input" 
-                        placeholder="Search" 
-                        aria-label="Search tokens">
-                </div>
-            </div>
-            
-            <div class="networks-filter">
-                <div class="all-networks">
-                    All Networks <i class="fas fa-chevron-down"></i>
-                </div>
-            </div>
-            
-            <div id="select-token-list" class="token-list">
-                <!-- Tokens will be dynamically populated here -->
-            </div>
-        `;
-        
-        // Add it to the app container before the bottom tabs
-        const bottomTabs = document.querySelector('.bottom-tabs');
-        if (bottomTabs) {
-            appContainer.insertBefore(tokenSelectScreen, bottomTabs);
-        } else {
-            appContainer.appendChild(tokenSelectScreen);
-        }
+     const appContainer = document.querySelector('.app-container');
+if (!appContainer) {
+    console.error('App container not found');
+    return;
+}
+
+// Create token selection screen element
+const tokenSelectScreen = document.createElement('div');
+tokenSelectScreen.id = 'send-token-select';
+tokenSelectScreen.className = 'screen hidden';
+
+// Set the content for token selection screen
+tokenSelectScreen.innerHTML = `
+    <div class="screen-header">
+        <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Send</h2>
+        <div class="placeholder-icon"></div>
+    </div>
+    
+    <div class="search-container">
+        <div class="search-bar token-search">
+            <i class="fas fa-search"></i>
+            <input type="text" 
+                id="token-search-input" 
+                placeholder="Search" 
+                aria-label="Search tokens">
+        </div>
+    </div>
+    
+    <div class="networks-filter">
+        <div class="all-networks">
+            All Networks <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+    
+    <div id="select-token-list" class="token-list">
+        <!-- Tokens will be dynamically populated here -->
+    </div>
+`;
+
+// Add it directly to the body instead of trying to use insertBefore
+document.body.appendChild(tokenSelectScreen);
         
         // 2. Update the existing showSendScreen function
         window.originalShowSendScreen = window.showSendScreen;
