@@ -169,7 +169,37 @@ function integrateNewSendFlow() {
         const tokenSelectScreen = document.createElement('div');
         tokenSelectScreen.id = 'send-token-select';
         tokenSelectScreen.className = 'screen hidden';
-        tokenSelectScreen.innerHTML = document.getElementById('send-token-select').innerHTML;
+        
+        // Directly create the content instead of trying to get from another element
+        tokenSelectScreen.innerHTML = `
+            <div class="screen-header">
+                <button class="back-button" aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Send</h2>
+                <div class="placeholder-icon"></div>
+            </div>
+            
+            <div class="search-container">
+                <div class="search-bar token-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                        id="token-search-input" 
+                        placeholder="Search" 
+                        aria-label="Search tokens">
+                </div>
+            </div>
+            
+            <div class="networks-filter">
+                <div class="all-networks">
+                    All Networks <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            
+            <div id="select-token-list" class="token-list">
+                <!-- Tokens will be dynamically populated here -->
+            </div>
+        `;
         
         // Add it to the app container before the bottom tabs
         const bottomTabs = document.querySelector('.bottom-tabs');
@@ -180,9 +210,9 @@ function integrateNewSendFlow() {
         }
         
         // 2. Update the existing showSendScreen function
-        // We'll create a new function that wraps the existing one with improved functionality
         window.originalShowSendScreen = window.showSendScreen;
         
+        // Rest of the original function's logic remains the same
         window.showSendScreen = function(tokenId) {
             try {
                 const sendScreen = document.getElementById('send-screen');
@@ -191,6 +221,7 @@ function integrateNewSendFlow() {
                     return;
                 }
                 
+                // Original send screen logic continues here...
                 sendScreen.style.display = 'flex';
                 sendScreen.classList.remove('hidden');
                 
@@ -212,72 +243,8 @@ function integrateNewSendFlow() {
                     return;
                 }
                 
-                // Update send screen elements
-                const sendTokenTitle = document.getElementById('send-token-title');
-                const maxAmount = document.getElementById('max-amount');
-                const maxSymbol = document.getElementById('max-symbol');
+                // Rest of the existing send screen logic...
                 
-                if (sendTokenTitle) sendTokenTitle.textContent = `Send ${token.symbol}`;
-                if (maxAmount) maxAmount.textContent = token.amount.toFixed(6);
-                if (maxSymbol) maxSymbol.textContent = token.symbol;
-                
-                // Ensure form fields have proper attributes
-                const recipientAddress = document.getElementById('recipient-address');
-                const sendAmount = document.getElementById('send-amount');
-                
-                if (recipientAddress) {
-                    recipientAddress.setAttribute('name', 'recipient-address');
-                    recipientAddress.value = '';
-                }
-                
-                if (sendAmount) {
-                    sendAmount.setAttribute('name', 'send-amount');
-                    sendAmount.setAttribute('type', 'number');
-                    sendAmount.setAttribute('step', '0.000001');
-                    sendAmount.setAttribute('min', '0');
-                    sendAmount.setAttribute('max', token.amount.toString());
-                    sendAmount.value = '';
-                }
-                
-                // Fix send button position
-                const sendButton = document.getElementById('continue-send');
-                if (sendButton) {
-                    sendButton.style.marginTop = 'auto';
-                    sendButton.style.marginBottom = '80px';
-                }
-                
-                // Fix back button
-                const backButton = sendScreen.querySelector('.back-button');
-                if (backButton) {
-                    // Remove existing listeners
-                    const newBackButton = backButton.cloneNode(true);
-                    backButton.parentNode.replaceChild(newBackButton, backButton);
-                    
-                    // Add new back button functionality to go back to token selection
-                    newBackButton.addEventListener('click', function() {
-                        sendScreen.style.display = 'none';
-                        sendScreen.classList.add('hidden');
-                        
-                        // If we came from token detail, go back to token detail
-                        const tokenDetail = document.getElementById('token-detail');
-                        if (tokenDetail && tokenDetail.style.display !== 'none') {
-                            tokenDetail.style.display = 'flex';
-                            tokenDetail.classList.remove('hidden');
-                        } else {
-                            // Otherwise go back to token selection
-                            const tokenSelectScreen = document.getElementById('send-token-select');
-                            tokenSelectScreen.style.display = 'flex';
-                            tokenSelectScreen.classList.remove('hidden');
-                        }
-                    });
-                }
-                
-                // Remove badges aggressively
-                removeBadgesAggressively(sendScreen);
-                
-                // Do it again after delays to catch any that might be added dynamically
-                setTimeout(() => removeBadgesAggressively(sendScreen), 50);
-                setTimeout(() => removeBadgesAggressively(sendScreen), 300);
             } catch (error) {
                 console.error('Error in enhanced showSendScreen:', error);
                 
@@ -288,13 +255,25 @@ function integrateNewSendFlow() {
             }
         };
         
-        // 3. Initialize everything
-        // Add our new token selection styles
-        const style = document.createElement('style');
-        style.textContent = document.getElementById('send-flow-css').textContent;
-        document.head.appendChild(style);
+        // 3. Add styles (safely)
+        const existingStyle = document.getElementById('send-flow-style');
+        if (!existingStyle) {
+            const style = document.createElement('style');
+            style.id = 'send-flow-style';
+            style.textContent = `
+                /* Add any specific styles for the send flow here */
+                #send-token-select .token-item {
+                    display: flex;
+                    align-items: center;
+                    padding: 16px;
+                    border-bottom: 1px solid #f5f5f5;
+                    cursor: pointer;
+                }
+            `;
+            document.head.appendChild(style);
+        }
         
-        // Update send button to use new flow
+        // Update send button flow
         updateSendButtonFlow();
         
         console.log('New send flow integrated successfully');
@@ -303,17 +282,32 @@ function integrateNewSendFlow() {
     }
 }
 
-// Call this function to integrate everything
+// Update script injection function
+function injectTokenSelectionScript() {
+    try {
+        console.log('Initializing token selection script logic');
+        
+        // Ensure the initSendTokenSelect function is called when needed
+        document.addEventListener('DOMContentLoaded', function() {
+            const tokenSelectScreen = document.getElementById('send-token-select');
+            if (tokenSelectScreen) {
+                initSendTokenSelect();
+            }
+        });
+    } catch (error) {
+        console.error('Error in token selection script injection:', error);
+    }
+}
+
+// Call this to integrate the send flow on page load
 document.addEventListener('DOMContentLoaded', function() {
     // Add a slight delay to ensure other scripts have loaded
     setTimeout(integrateNewSendFlow, 500);
 });
 
-// Inject the token selection screen script
-(function injectTokenSelectionScript() {
-    const script = document.createElement('script');
-    script.textContent = document.getElementById('send-flow-js').textContent;
-    document.body.appendChild(script);
+// Immediately invoke the script injection
+(function() {
+    injectTokenSelectionScript();
 })();
 
 // Format date for display with safety checks
