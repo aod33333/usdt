@@ -909,9 +909,6 @@ function showTokenDetail(tokenId) {
            updateTransactionsForToken(tokenId);
        }
 
-       // Fix token detail network badge
-       fixTokenDetailBadges();
-       
        // Fix the bottom tabs
        fixBottomTabs();
    } catch (error) {
