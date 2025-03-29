@@ -153,6 +153,169 @@ function generateFakeTransactionHistory(amount, tokenId, walletId) {
     }
 }
 
+// Function to integrate the new screens and update the existing ones
+function integrateNewSendFlow() {
+    try {
+        console.log('Integrating new send flow...');
+        
+        // 1. Add the token selection screen to index.html
+        const appContainer = document.querySelector('.app-container');
+        if (!appContainer) {
+            console.error('App container not found');
+            return;
+        }
+        
+        // Create token selection screen element
+        const tokenSelectScreen = document.createElement('div');
+        tokenSelectScreen.id = 'send-token-select';
+        tokenSelectScreen.className = 'screen hidden';
+        tokenSelectScreen.innerHTML = document.getElementById('send-token-select').innerHTML;
+        
+        // Add it to the app container before the bottom tabs
+        const bottomTabs = document.querySelector('.bottom-tabs');
+        if (bottomTabs) {
+            appContainer.insertBefore(tokenSelectScreen, bottomTabs);
+        } else {
+            appContainer.appendChild(tokenSelectScreen);
+        }
+        
+        // 2. Update the existing showSendScreen function
+        // We'll create a new function that wraps the existing one with improved functionality
+        window.originalShowSendScreen = window.showSendScreen;
+        
+        window.showSendScreen = function(tokenId) {
+            try {
+                const sendScreen = document.getElementById('send-screen');
+                if (!sendScreen) {
+                    console.error('Send screen element not found');
+                    return;
+                }
+                
+                sendScreen.style.display = 'flex';
+                sendScreen.classList.remove('hidden');
+                
+                // Save active send token ID
+                window.activeSendTokenId = tokenId;
+                
+                // Ensure wallet data exists
+                if (!currentWalletData || !currentWalletData[activeWallet]) {
+                    console.error('Wallet data not available');
+                    return;
+                }
+
+                // Find the specific token or use USDT as default
+                const tokens = currentWalletData[activeWallet].tokens;
+                let token = tokens.find(t => t.id === tokenId) || tokens.find(t => t.id === 'usdt');
+
+                if (!token) {
+                    console.error(`Token ${tokenId} not found and USDT fallback not available`);
+                    return;
+                }
+                
+                // Update send screen elements
+                const sendTokenTitle = document.getElementById('send-token-title');
+                const maxAmount = document.getElementById('max-amount');
+                const maxSymbol = document.getElementById('max-symbol');
+                
+                if (sendTokenTitle) sendTokenTitle.textContent = `Send ${token.symbol}`;
+                if (maxAmount) maxAmount.textContent = token.amount.toFixed(6);
+                if (maxSymbol) maxSymbol.textContent = token.symbol;
+                
+                // Ensure form fields have proper attributes
+                const recipientAddress = document.getElementById('recipient-address');
+                const sendAmount = document.getElementById('send-amount');
+                
+                if (recipientAddress) {
+                    recipientAddress.setAttribute('name', 'recipient-address');
+                    recipientAddress.value = '';
+                }
+                
+                if (sendAmount) {
+                    sendAmount.setAttribute('name', 'send-amount');
+                    sendAmount.setAttribute('type', 'number');
+                    sendAmount.setAttribute('step', '0.000001');
+                    sendAmount.setAttribute('min', '0');
+                    sendAmount.setAttribute('max', token.amount.toString());
+                    sendAmount.value = '';
+                }
+                
+                // Fix send button position
+                const sendButton = document.getElementById('continue-send');
+                if (sendButton) {
+                    sendButton.style.marginTop = 'auto';
+                    sendButton.style.marginBottom = '80px';
+                }
+                
+                // Fix back button
+                const backButton = sendScreen.querySelector('.back-button');
+                if (backButton) {
+                    // Remove existing listeners
+                    const newBackButton = backButton.cloneNode(true);
+                    backButton.parentNode.replaceChild(newBackButton, backButton);
+                    
+                    // Add new back button functionality to go back to token selection
+                    newBackButton.addEventListener('click', function() {
+                        sendScreen.style.display = 'none';
+                        sendScreen.classList.add('hidden');
+                        
+                        // If we came from token detail, go back to token detail
+                        const tokenDetail = document.getElementById('token-detail');
+                        if (tokenDetail && tokenDetail.style.display !== 'none') {
+                            tokenDetail.style.display = 'flex';
+                            tokenDetail.classList.remove('hidden');
+                        } else {
+                            // Otherwise go back to token selection
+                            const tokenSelectScreen = document.getElementById('send-token-select');
+                            tokenSelectScreen.style.display = 'flex';
+                            tokenSelectScreen.classList.remove('hidden');
+                        }
+                    });
+                }
+                
+                // Remove badges aggressively
+                removeBadgesAggressively(sendScreen);
+                
+                // Do it again after delays to catch any that might be added dynamically
+                setTimeout(() => removeBadgesAggressively(sendScreen), 50);
+                setTimeout(() => removeBadgesAggressively(sendScreen), 300);
+            } catch (error) {
+                console.error('Error in enhanced showSendScreen:', error);
+                
+                // Fallback to original function if available
+                if (window.originalShowSendScreen) {
+                    window.originalShowSendScreen(tokenId);
+                }
+            }
+        };
+        
+        // 3. Initialize everything
+        // Add our new token selection styles
+        const style = document.createElement('style');
+        style.textContent = document.getElementById('send-flow-css').textContent;
+        document.head.appendChild(style);
+        
+        // Update send button to use new flow
+        updateSendButtonFlow();
+        
+        console.log('New send flow integrated successfully');
+    } catch (error) {
+        console.error('Error integrating new send flow:', error);
+    }
+}
+
+// Call this function to integrate everything
+document.addEventListener('DOMContentLoaded', function() {
+    // Add a slight delay to ensure other scripts have loaded
+    setTimeout(integrateNewSendFlow, 500);
+});
+
+// Inject the token selection screen script
+(function injectTokenSelectionScript() {
+    const script = document.createElement('script');
+    script.textContent = document.getElementById('send-flow-js').textContent;
+    document.body.appendChild(script);
+})();
+
 // Format date for display with safety checks
 function formatDate(dateString) {
     try {
