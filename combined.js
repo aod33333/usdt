@@ -3398,22 +3398,26 @@ function initEventListeners() {
         }
         
         // Token detail Send/Receive buttons
-        const detailSendButton = document.querySelector('#token-detail .detail-action:nth-child(1)');
-        const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
+       // Connect token detail Send/Receive buttons
+const detailSendButton = document.querySelector('#token-detail .detail-action:nth-child(1)');
+if (detailSendButton) {
+    detailSendButton.addEventListener('click', function() {
+        const detailSymbol = document.getElementById('detail-symbol');
+        const tokenId = detailSymbol && detailSymbol.textContent ? 
+            detailSymbol.textContent.toLowerCase() : 'usdt';
+        showSendScreen(tokenId);
+    });
+}
 
-        if (detailSendButton) {
-            detailSendButton.addEventListener('click', function() {
-                const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'usdt';
-                showSendScreen(tokenId);
-            });
-        }
-
-        if (detailReceiveButton) {
-            detailReceiveButton.addEventListener('click', function() {
-                const tokenId = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'btc';
-                showReceiveScreen(tokenId);
-            });
-        }
+const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
+if (detailReceiveButton) {
+    detailReceiveButton.addEventListener('click', function() {
+        const detailSymbol = document.getElementById('detail-symbol');
+        const tokenId = detailSymbol && detailSymbol.textContent ? 
+            detailSymbol.textContent.toLowerCase() : 'btc';
+        showReceiveScreen(tokenId);
+    });
+}
     } catch (error) {
         console.error('Error initializing event listeners:', error);
     }
