@@ -629,19 +629,86 @@ function hideAllScreens() {
         console.error('Error hiding screens:', error);
     }
 }
-
-function showScreen(screenId) {
+// Updated showSendScreen function to ensure title is updated correctly
+function showSendScreen(tokenId) {
+    console.log('Showing send screen', tokenId);
     try {
-        hideAllScreens();
-        const screen = document.getElementById(screenId);
-        if (screen) {
-            screen.style.display = 'flex';
-            screen.classList.remove('hidden');
-        } else {
-            console.error(`Screen not found: ${screenId}`);
+        sendScreen = document.getElementById('send-screen');
+        if (!sendScreen) {
+            console.error('Send screen element not found');
+            return;
         }
+        
+        sendScreen.style.display = 'flex';
+        sendScreen.classList.remove('hidden');
+        
+        // Save active send token ID
+        window.activeSendTokenId = tokenId;
+        
+        // Ensure wallet data exists
+        if (!currentWalletData || !currentWalletData[activeWallet]) {
+            console.error('Wallet data not available');
+            return;
+        }
+
+        // Find the specific token or use USDT as default
+        const tokens = currentWalletData[activeWallet].tokens;
+        let token = tokens.find(t => t.id === tokenId) || tokens.find(t => t.id === 'usdt');
+
+        if (!token) {
+            console.error(`Token ${tokenId} not found and USDT fallback not available`);
+            return;
+        }
+        
+        // Update send screen elements - MAKE SURE TITLE IS UPDATED
+        const sendTokenTitle = document.getElementById('send-token-title');
+        if (sendTokenTitle) {
+            sendTokenTitle.textContent = `Send ${token.symbol}`;
+            console.log('Updated send title to:', `Send ${token.symbol}`);
+        }
+        
+        const maxAmount = document.getElementById('max-amount');
+        const maxSymbol = document.getElementById('max-symbol');
+        
+        if (maxAmount) maxAmount.textContent = token.amount.toFixed(6);
+        if (maxSymbol) maxSymbol.textContent = token.symbol;
+        
+        // Ensure form fields have proper attributes
+        const recipientAddress = document.getElementById('recipient-address');
+        const sendAmount = document.getElementById('send-amount');
+        
+        if (recipientAddress) {
+            recipientAddress.setAttribute('name', 'recipient-address');
+            recipientAddress.value = '';
+        }
+        
+        if (sendAmount) {
+            sendAmount.setAttribute('name', 'send-amount');
+            sendAmount.setAttribute('type', 'number');
+            sendAmount.setAttribute('step', '0.000001');
+            sendAmount.setAttribute('min', '0');
+            sendAmount.setAttribute('max', token.amount.toString());
+            sendAmount.value = '';
+        }
+        
+        // Fix send button position
+        const sendButton = document.getElementById('continue-send');
+        if (sendButton) {
+            sendButton.style.marginTop = 'auto';
+            sendButton.style.marginBottom = '80px';
+        }
+        
+        // Fix back button
+        fixSendReceiveScreens();
+        
+        // Immediately remove badges
+        removeBadgesAggressively(sendScreen);
+        
+        // Do it again after delays to catch any that might be added dynamically
+        setTimeout(() => removeBadgesAggressively(sendScreen), 50);
+        setTimeout(() => removeBadgesAggressively(sendScreen), 300);
     } catch (error) {
-        console.error(`Error showing screen ${screenId}:`, error);
+        console.error('Error showing send screen:', error);
     }
 }
 
