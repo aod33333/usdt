@@ -756,9 +756,6 @@
     window.correctPasscode = '123456';
 </script>
 
-<!-- Main application script - all functionality moved here -->
-<script src="combined.js"></script>
-
 <!-- Combined component loading and screen connection -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -1804,6 +1801,8 @@ function runScreenScripts() {
 // Execute the enhancements after a delay to ensure DOM is ready
 setTimeout(initEnhancements, 1000);
 
+   
+<script src="combined.js"></script>
 <script src="finalfix.js" defer></script>
 </body>
 </html>
