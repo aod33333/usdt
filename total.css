@@ -1379,6 +1379,20 @@ body .with-status-bar {
   background-color: #FFFFFF;
 }
 
+/* Critical fixes for History Screen */
+#history-screen .transaction-value.positive {
+  color: #3375BB !important;
+}
+
+/* Critical fixes for Receive Screen - prevent badges from showing */
+#receive-screen .network-badge, 
+#receive-screen .chain-badge,
+#receive-screen .chain-badge-fixed {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 /* Icon styling with proper size and positioning */
 .transaction-token-icon,
 .transaction-icon {
