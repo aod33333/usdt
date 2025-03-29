@@ -747,6 +747,99 @@ document.addEventListener('DOMContentLoaded', function() {
   loadComponent('UHS', 'history-screen');    // History screen
 });
 </script>
+
+    // Connect history and receive screens to main UI
+document.addEventListener('DOMContentLoaded', function() {
+  // Connect the history button in quick actions
+  const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+  if (historyButton) {
+    historyButton.addEventListener('click', function() {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      // Show history screen
+      const historyScreen = document.getElementById('history-screen');
+      if (historyScreen) {
+        historyScreen.style.display = 'flex';
+        historyScreen.classList.remove('hidden');
+      }
+    });
+  }
+  
+  // Connect the receive button in quick actions
+  const receiveButton = document.getElementById('receive-button');
+  if (receiveButton) {
+    receiveButton.addEventListener('click', function() {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      // Show receive screen
+      const receiveScreen = document.getElementById('receive-screen');
+      if (receiveScreen) {
+        receiveScreen.style.display = 'flex';
+        receiveScreen.classList.remove('hidden');
+      }
+    });
+  }
+  
+  // Connect the token detail receive button
+  const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
+  if (detailReceiveButton) {
+    detailReceiveButton.addEventListener('click', function() {
+      // Hide all screens
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      // Show receive screen
+      const receiveScreen = document.getElementById('receive-screen');
+      if (receiveScreen) {
+        receiveScreen.style.display = 'flex';
+        receiveScreen.classList.remove('hidden');
+      }
+    });
+  }
+  
+  // Fix bottom tabs to ensure visibility
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (bottomTabs) {
+    // Move to end of document for proper stacking
+    document.body.appendChild(bottomTabs);
+    
+    // Apply critical styling
+    bottomTabs.style.display = 'flex';
+    bottomTabs.style.position = 'fixed';
+    bottomTabs.style.bottom = '0';
+    bottomTabs.style.left = '0';
+    bottomTabs.style.width = '100%';
+    bottomTabs.style.zIndex = '10000';
+    bottomTabs.style.backgroundColor = '#FFFFFF';
+    bottomTabs.style.borderTop = '1px solid #F5F5F5';
+  }
+  
+  // Keep removing network badges that might get added dynamically
+  setInterval(function() {
+    const receiveScreen = document.getElementById('receive-screen');
+    if (receiveScreen) {
+      const badges = receiveScreen.querySelectorAll('.chain-badge, .chain-badge-fixed');
+      badges.forEach(badge => {
+        if (badge.parentNode) {
+          badge.parentNode.removeChild(badge);
+        }
+      });
+    }
+  }, 500);
+  
+  console.log('History and Receive screen connections initialized');
+});
+    
 <script src="rhs.js"></script>
 </body>
 </html>
