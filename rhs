@@ -1,5 +1,6 @@
-// FIX 1: Completely rebuild the history screen with correct layout
-// This function creates a new history screen with the exact same layout as the send screen
+// rhs.js - Receive and History Screen Fixes
+
+// Rebuild history screen with correct layout
 function rebuildHistoryScreen() {
   console.log("Rebuilding history screen with correct layout...");
   
@@ -42,8 +43,6 @@ function rebuildHistoryScreen() {
     </div>
     
     <div id="history-transaction-list" class="history-transaction-list">
-      <!-- Transactions will be dynamically added here -->
-      
       <!-- Example transaction item for layout reference -->
       <div class="transaction-item transaction-receive">
         <div class="transaction-token-icon">
@@ -183,8 +182,8 @@ function rebuildHistoryScreen() {
       height: 2px;
       background-color: #3375BB;
     }
-    
-    .history-transaction-list {
+
+.history-transaction-list {
       flex: 1;
       overflow-y: auto;
       background-color: #FFFFFF;
@@ -387,7 +386,7 @@ function setupHistoryEvents() {
   }
 }
 
-// FIX 2: Completely rebuild the receive screen to fix errors
+// Rebuild the receive screen to fix errors
 function rebuildReceiveScreen() {
   console.log("Rebuilding receive screen...");
   
@@ -462,12 +461,6 @@ function rebuildReceiveScreen() {
             <rect x="50" y="90" width="10" height="10"/>
             <rect x="90" y="90" width="10" height="10"/>
             <rect x="120" y="90" width="10" height="10"/>
-            <rect x="150" y="90" width="10" height="10"/>
-            <rect x="180" y="90" width="10" height="10"/>
-            <rect x="30" y="110" width="10" height="10"/>
-            <rect x="60" y="110" width="10" height="10"/>
-            <rect x="80" y="110" width="10" height="10"/>
-            <rect x="130" y="110" width="10" height="10"/>
           </g>
         </svg>
       </div>
@@ -712,14 +705,14 @@ function setupReceiveEvents() {
     shareButton.addEventListener('click', function() {
       const walletAddress = document.getElementById('wallet-address');
       if (walletAddress) {
-        // Share functionality - this is just a placeholder
+        // Share functionality - just a placeholder
         alert('Sharing address: ' + walletAddress.textContent.trim());
       }
     });
   }
 }
 
-// FIX 3: Update showReceiveScreen function to work with the new screen
+// Update showReceiveScreen function to work with the new screen
 function showReceiveScreen(tokenId) {
   console.log('Showing receive screen for token:', tokenId);
   
@@ -782,16 +775,35 @@ function showReceiveScreen(tokenId) {
   console.log('Receive screen displayed successfully');
 }
 
-// FIX 4: Connect to History button in navbar
+// Fix bottom tabs
+function fixBottomTabs() {
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (!bottomTabs) return;
+  
+  // Move to end of document to ensure proper stacking
+  document.body.appendChild(bottomTabs);
+  
+  // Apply important styles
+  bottomTabs.setAttribute('style', 
+    'display: flex !important; ' +
+    'position: fixed !important; ' +
+    'bottom: 0 !important; ' +
+    'left: 0 !important; ' +
+    'width: 100% !important; ' +
+    'height: 60px !important; ' +
+    'visibility: visible !important; ' +
+    'opacity: 1 !important; ' + 
+    'z-index: 10000 !important; ' +
+    'pointer-events: auto !important; ' +
+    'background-color: #FFFFFF !important; ' +
+    'border-top: 1px solid #F5F5F5 !important;');
+}
+
+// Connect to History button in navbar
 function fixHistoryButton() {
   const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
   if (historyButton) {
-    // Remove existing listeners to avoid duplicates
-    const newButton = historyButton.cloneNode(true);
-    historyButton.parentNode.replaceChild(newButton, historyButton);
-    
-    // Add new listener
-    newButton.addEventListener('click', function() {
+    historyButton.addEventListener('click', function() {
       console.log('History button clicked');
       
       // Hide all screens
@@ -800,21 +812,15 @@ function fixHistoryButton() {
         screen.classList.add('hidden');
       });
       
-      // Show history screen
+      // Show history screen or rebuild if needed
       const historyScreen = document.getElementById('history-screen');
       if (!historyScreen) {
-        console.error('History screen not found, rebuilding...');
         rebuildHistoryScreen();
-        
-        // Try to get it again after rebuilding
         const newHistoryScreen = document.getElementById('history-screen');
-        if (!newHistoryScreen) {
-          console.error('Failed to rebuild history screen');
-          return;
+        if (newHistoryScreen) {
+          newHistoryScreen.style.display = 'flex';
+          newHistoryScreen.classList.remove('hidden');
         }
-        
-        newHistoryScreen.style.display = 'flex';
-        newHistoryScreen.classList.remove('hidden');
       } else {
         historyScreen.style.display = 'flex';
         historyScreen.classList.remove('hidden');
@@ -823,7 +829,7 @@ function fixHistoryButton() {
   }
 }
 
-// FIX 5: Ensure getTokenLogoUrl function exists
+// Ensure getTokenLogoUrl function exists
 function ensureTokenLogoFunction() {
   if (typeof window.getTokenLogoUrl !== 'function') {
     window.getTokenLogoUrl = function(tokenId) {
@@ -839,58 +845,31 @@ function ensureTokenLogoFunction() {
       };
       return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
     };
-    
-    console.log('getTokenLogoUrl function created');
   }
 }
 
-// MAIN FUNCTION: Apply all fixes
-function applyAllFixes() {
-  console.log('Applying all fixes...');
+// Apply all fixes
+function applyRHSFixes() {
+  console.log('Applying Receive and History Screen fixes...');
   
   // Ensure token logo function exists
   ensureTokenLogoFunction();
   
-  // Rebuild both screens
+  // Rebuild screens
   rebuildHistoryScreen();
   rebuildReceiveScreen();
   
-  // Fix the history button
+  // Fix buttons
   fixHistoryButton();
+  fixBottomTabs();
   
-  // Replace the showReceiveScreen function
+  // Override showReceiveScreen function
   window.showReceiveScreen = showReceiveScreen;
   
-  // Fix bottom tabs if needed
-  const bottomTabs = document.querySelector('.bottom-tabs');
-  if (bottomTabs) {
-    // Move to end of document to ensure proper stacking
-    document.body.appendChild(bottomTabs);
-    
-    // Apply important styles
-    bottomTabs.setAttribute('style', 
-      'display: flex !important; ' +
-      'position: fixed !important; ' +
-      'bottom: 0 !important; ' +
-      'left: 0 !important; ' +
-      'width: 100% !important; ' +
-      'height: 60px !important; ' +
-      'visibility: visible !important; ' +
-      'opacity: 1 !important; ' + 
-      'z-index: 10000 !important; ' +
-      'pointer-events: auto !important; ' +
-      'background-color: #FFFFFF !important; ' +
-      'border-top: 1px solid #F5F5F5 !important;');
-  }
-  
-  console.log('All fixes applied successfully!');
+  console.log('All fixes applied!');
 }
 
-// Apply fixes as soon as the DOM is loaded
+// Apply fixes when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // Add a small delay to ensure everything is loaded
-  setTimeout(applyAllFixes, 300);
+  setTimeout(applyRHSFixes, 500);
 });
-
-// For immediate testing in the console, you can run:
-// applyAllFixes();
