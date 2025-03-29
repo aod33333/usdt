@@ -3222,6 +3222,226 @@ function fixBottomTabs() {
     });
 }
 
+// Update receive button to show token selection first
+function updateReceiveButtonFlow() {
+    try {
+        const receiveButton = document.getElementById('receive-button');
+        if (!receiveButton) {
+            console.error('Receive button not found');
+            return;
+        }
+        
+        // Remove existing listener by cloning and replacing
+        const newReceiveButton = receiveButton.cloneNode(true);
+        receiveButton.parentNode.replaceChild(newReceiveButton, receiveButton);
+        
+        // Add new listener to show token selection screen
+        newReceiveButton.addEventListener('click', function() {
+            // Hide wallet screen
+            const walletScreen = document.getElementById('wallet-screen');
+            walletScreen.style.display = 'none';
+            walletScreen.classList.add('hidden');
+            
+            // Show token selection screen
+            const tokenSelectScreen = document.getElementById('receive-token-select');
+            tokenSelectScreen.style.display = 'flex';
+            tokenSelectScreen.classList.remove('hidden');
+            
+            // Initialize token selection screen
+            initReceiveTokenSelect();
+        });
+    } catch (error) {
+        console.error('Error updating receive button flow:', error);
+    }
+}
+
+// Initialize the receive token selection screen
+function initReceiveTokenSelect() {
+    try {
+        // Get elements
+        const tokenSelectScreen = document.getElementById('receive-token-select');
+        const tokenList = document.getElementById('select-receive-token-list');
+        const backButton = tokenSelectScreen.querySelector('.back-button');
+        const searchInput = document.getElementById('receive-token-search-input');
+        
+        // Clear token list first
+        if (tokenList) {
+            tokenList.innerHTML = '';
+        }
+        
+        // Populate token list with tokens from current wallet
+        populateReceiveTokenSelectionList();
+        
+        // Add back button functionality
+        if (backButton) {
+            backButton.addEventListener('click', function() {
+                tokenSelectScreen.style.display = 'none';
+                tokenSelectScreen.classList.add('hidden');
+                
+                // Go back to wallet screen
+                const walletScreen = document.getElementById('wallet-screen');
+                if (walletScreen) {
+                    walletScreen.style.display = 'flex';
+                    walletScreen.classList.remove('hidden');
+                }
+            });
+        }
+        
+        // Add search functionality
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                filterReceiveTokenList(searchTerm);
+            });
+        }
+    } catch (error) {
+        console.error('Error initializing receive token select screen:', error);
+    }
+}
+
+// Populate the receive token selection list
+function populateReceiveTokenSelectionList() {
+    try {
+        const tokenList = document.getElementById('select-receive-token-list');
+        if (!tokenList) {
+            console.error('Token list element not found');
+            return;
+        }
+        
+        // Clear existing items
+        tokenList.innerHTML = '';
+        
+        // Get tokens from active wallet
+        const wallet = currentWalletData[activeWallet];
+        if (!wallet || !wallet.tokens) {
+            console.error('No tokens found in active wallet');
+            return;
+        }
+        
+        // Sort tokens by value (highest first)
+        const sortedTokens = [...wallet.tokens].sort((a, b) => b.value - a.value);
+        
+        // Create token items
+        sortedTokens.forEach(token => {
+            const tokenItem = createReceiveTokenSelectionItem(token);
+            tokenList.appendChild(tokenItem);
+        });
+    } catch (error) {
+        console.error('Error populating receive token selection list:', error);
+    }
+}
+
+// Create a token selection item for receive
+function createReceiveTokenSelectionItem(token) {
+    try {
+        const tokenItem = document.createElement('div');
+        tokenItem.className = 'token-item';
+        tokenItem.setAttribute('data-token-id', token.id);
+        
+        // Show network badge for specific tokens
+        const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+        const networkBadge = showBadge ? 
+            `<span class="token-network-badge">BEP20</span>` : '';
+        
+        tokenItem.innerHTML = `
+            <div class="token-icon">
+                <img src="${getTokenLogoUrl(token.id)}" alt="${token.name}">
+            </div>
+            <div class="token-info">
+                <div class="token-name">
+                    ${token.symbol} ${networkBadge}
+                </div>
+                <div class="token-price">
+                    ${token.name}
+                </div>
+            </div>
+            <div class="token-amount-container">
+                <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
+                <div class="token-value">${formatCurrency(token.value)}</div>
+            </div>
+        `;
+        
+        // Add click handler to select this token and go to receive screen
+        tokenItem.addEventListener('click', function() {
+            selectTokenForReceive(token.id);
+        });
+        
+        return tokenItem;
+    } catch (error) {
+        console.error('Error creating receive token selection item:', error);
+        
+        // Return fallback element
+        const fallbackItem = document.createElement('div');
+        fallbackItem.className = 'token-item error';
+        fallbackItem.textContent = 'Error loading token';
+        return fallbackItem;
+    }
+}
+
+// Filter the token list based on search term
+function filterReceiveTokenList(searchTerm) {
+    try {
+        const tokenItems = document.querySelectorAll('#select-receive-token-list .token-item');
+        
+        if (!tokenItems.length) {
+            console.error('No token items found to filter');
+            return;
+        }
+        
+        tokenItems.forEach(item => {
+            const tokenId = item.getAttribute('data-token-id');
+            const tokenInfo = currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+            
+            if (!tokenInfo) return;
+            
+            const tokenName = tokenInfo.name.toLowerCase();
+            const tokenSymbol = tokenInfo.symbol.toLowerCase();
+            
+            // Check if token matches search term
+            const matches = tokenName.includes(searchTerm) || 
+                            tokenSymbol.includes(searchTerm) ||
+                            tokenId.includes(searchTerm);
+            
+            // Show/hide based on match
+            item.style.display = matches ? 'flex' : 'none';
+        });
+    } catch (error) {
+        console.error('Error filtering receive token list:', error);
+    }
+}
+
+// Select a token and proceed to receive screen
+function selectTokenForReceive(tokenId) {
+    try {
+        // Hide token select screen
+        const tokenSelectScreen = document.getElementById('receive-token-select');
+        tokenSelectScreen.style.display = 'none';
+        tokenSelectScreen.classList.add('hidden');
+        
+        // Show the receive screen with the selected token
+        showReceiveScreen(tokenId);
+    } catch (error) {
+        console.error('Error selecting token for receive:', error);
+    }
+}
+
+// Update the token detail receive button
+document.addEventListener('DOMContentLoaded', function() {
+    // Update receive button flow
+    updateReceiveButtonFlow();
+    
+    // Update token detail receive button
+    const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
+    if (detailReceiveButton) {
+        detailReceiveButton.addEventListener('click', function() {
+            const detailSymbol = document.getElementById('detail-symbol');
+            const tokenId = detailSymbol && detailSymbol.textContent ? 
+                detailSymbol.textContent.toLowerCase() : 'btc';
+            showReceiveScreen(tokenId);
+        });
+    }
+});
+
 // Fix send/receive screens
 function fixSendReceiveScreens() {
     // Fix back buttons
