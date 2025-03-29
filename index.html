@@ -940,6 +940,853 @@ document.addEventListener('DOMContentLoaded', function() {
   console.log('Initialization complete');
 });
 </script>
+
+    <script>
+// Trust Wallet Screen Fix - Complete Version
+(function() {
+  'use strict';
+  
+  // Use a very short timeout to ensure our code runs after the existing scripts
+  // but before the user can interact with the app
+  setTimeout(implementTrustWalletFix, 100);
+  
+  function implementTrustWalletFix() {
+    console.log('Implementing Trust Wallet screens fix');
+    
+    // Override any existing functions that might conflict
+    overrideConflictingFunctions();
+    
+    // 1. Create token selection screens if they don't exist
+    createMissingScreens();
+    
+    // 2. Fix screen contents
+    loadScreenContents();
+    
+    // 3. Fix navigation flows with priority handlers
+    fixNavigationFlows();
+    
+    // 4. Apply Trust Wallet styling
+    applyTrustWalletStyling();
+    
+    console.log('Trust Wallet fix implementation complete');
+    
+    // Run a final check after a delay to ensure everything worked
+    setTimeout(verifyImplementation, 500);
+  }
+  
+  // Override functions that might conflict with our implementation
+  function overrideConflictingFunctions() {
+    // Save original functions
+    window._originalShowSendScreen = window.showSendScreen;
+    window._originalShowReceiveScreen = window.showReceiveScreen;
+    window._originalShowTokenDetail = window.showTokenDetail;
+    
+    // Override with our priority functions
+    window.showSendScreen = function(tokenId) {
+      console.log('Showing send screen for token:', tokenId);
+      window.activeSendTokenId = tokenId;
+      
+      // If we should go through token selection first
+      if (!tokenId) {
+        navigateTo('send-token-select', 'wallet-screen');
+      } else {
+        navigateTo('send-screen', 'send-token-select');
+        updateSendScreenForToken(tokenId);
+      }
+    };
+    
+    window.showReceiveScreen = function() {
+      console.log('Showing receive screen');
+      navigateTo('receive-screen', 'wallet-screen');
+    };
+    
+    // Make sure we handle navigation properly
+    window.navigateTo = navigateTo;
+  }
+
+  // STEP 1: Create missing screen containers
+  function createMissingScreens() {
+    const appContainer = document.querySelector('.app-container');
+    if (!appContainer) return;
+    
+    // Create send token selection screen if not exists
+    if (!document.getElementById('send-token-select')) {
+      const sendTokenSelect = document.createElement('div');
+      sendTokenSelect.id = 'send-token-select';
+      sendTokenSelect.className = 'screen hidden';
+      sendTokenSelect.innerHTML = `
+        <div class="screen-header">
+          <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2>Send</h2>
+          <div class="placeholder-icon"></div>
+        </div>
+        
+        <div class="search-container">
+          <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="token-search-input" placeholder="Search" aria-label="Search tokens">
+          </div>
+        </div>
+        
+        <div class="networks-filter">
+          <div class="all-networks">
+            All Networks <i class="fas fa-chevron-down"></i>
+          </div>
+        </div>
+        
+        <div id="select-token-list" class="token-list">
+          <!-- Tokens will be dynamically populated here -->
+        </div>
+      `;
+      appContainer.appendChild(sendTokenSelect);
+    }
+    
+    // Check for receive screen
+    if (!document.getElementById('receive-screen')) {
+      const receiveScreen = document.createElement('div');
+      receiveScreen.id = 'receive-screen';
+      receiveScreen.className = 'screen hidden';
+      appContainer.appendChild(receiveScreen);
+    }
+    
+    // Check for history screen
+    if (!document.getElementById('history-screen')) {
+      const historyScreen = document.createElement('div');
+      historyScreen.id = 'history-screen';
+      historyScreen.className = 'screen hidden';
+      appContainer.appendChild(historyScreen);
+    }
+  }
+
+  // STEP 2: Load screen contents
+  function loadScreenContents() {
+    // Load History Screen (UHS)
+    const historyScreen = document.getElementById('history-screen');
+    if (historyScreen && historyScreen.innerHTML.trim() === '') {
+      const historyContent = document.querySelector('document[index="8"] document_content, document[source="UHS"] document_content');
+      if (historyContent) {
+        historyScreen.innerHTML = historyContent.textContent;
+        console.log('History screen content loaded');
+      }
+    }
+    
+    // Load Receive Screen (URS)
+    const receiveScreen = document.getElementById('receive-screen');
+    if (receiveScreen && receiveScreen.innerHTML.trim() === '') {
+      const receiveContent = document.querySelector('document[index="9"] document_content, document[source="URS"] document_content');
+      if (receiveContent) {
+        receiveScreen.innerHTML = receiveContent.textContent;
+        console.log('Receive screen content loaded');
+      }
+    }
+    
+    // Load Send Screen (USS)
+    const sendScreen = document.getElementById('send-screen');
+    if (sendScreen && sendScreen.innerHTML.trim() === '') {
+      const sendContent = document.querySelector('document[index="10"] document_content, document[source="USS"] document_content');
+      if (sendContent) {
+        sendScreen.innerHTML = sendContent.textContent;
+        console.log('Send screen content loaded');
+      }
+    }
+    
+    // Now populate the token selection screen
+    populateTokenSelectionScreens();
+  }
+
+  // Populate token selection screens
+  function populateTokenSelectionScreens() {
+    // Get wallet data for token population
+    const walletData = window.currentWalletData || {};
+    const activeWallet = window.activeWallet || 'main';
+    
+    // Populate send token selection
+    populateSendTokenList(walletData[activeWallet]?.tokens || []);
+  }
+
+  // Populate send token selection list
+  function populateSendTokenList(tokens) {
+    const tokenList = document.getElementById('select-token-list');
+    if (!tokenList) return;
+    
+    tokenList.innerHTML = '';
+    
+    // Sort tokens by balance value
+    const sortedTokens = [...tokens].sort((a, b) => b.value - a.value);
+    
+    // Create token items
+    sortedTokens.forEach(token => {
+      const tokenItem = document.createElement('div');
+      tokenItem.className = 'token-item';
+      tokenItem.setAttribute('data-token-id', token.id);
+      
+      // Format numbers for display
+      const formattedAmount = token.amount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+      });
+      
+      const formattedValue = '$' + token.value.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+      
+      // Show network badge for specific tokens
+      const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+      const networkBadge = showBadge ? 
+        `<span class="token-network-badge">BEP20</span>` : '';
+      
+      tokenItem.innerHTML = `
+        <div class="token-icon">
+          <img src="${getTokenLogoUrl(token.id)}" alt="${token.name}">
+        </div>
+        <div class="token-info">
+          <div class="token-name">
+            ${token.symbol} ${networkBadge}
+          </div>
+          <div class="token-price">
+            ${token.name}
+          </div>
+        </div>
+        <div class="token-amount-container">
+          <div class="token-balance">${formattedAmount} ${token.symbol}</div>
+          <div class="token-value">${formattedValue}</div>
+        </div>
+      `;
+      
+      tokenList.appendChild(tokenItem);
+    });
+    
+    // Add click handlers with priority
+    tokenList.querySelectorAll('.token-item').forEach(item => {
+      // Use direct assignment to ensure this handler takes precedence
+      item.onclick = function() {
+        const tokenId = this.getAttribute('data-token-id');
+        if (tokenId) {
+          window.activeSendTokenId = tokenId; 
+          navigateTo('send-screen', 'send-token-select');
+          updateSendScreenForToken(tokenId);
+        }
+      };
+    });
+  }
+
+  // STEP 3: Fix navigation flows
+  function fixNavigationFlows() {
+    // Fix send button navigation
+    fixSendButtonNavigation();
+    
+    // Fix receive button navigation
+    fixReceiveButtonNavigation();
+    
+    // Fix history button navigation
+    fixHistoryButtonNavigation();
+    
+    // Fix back buttons
+    fixBackButtons();
+    
+    // Fix token selection to send screen flow
+    fixTokenToSendFlow();
+    
+    // Fix search functionality
+    fixSearchFunctionality();
+    
+    // Reconnect after any DOM changes
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+          // Re-run our fixes to ensure our handlers take precedence
+          fixNavigationFlows();
+        }
+      });
+    });
+    
+    // Observe the entire document for any DOM changes
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
+
+  // Fix send button to go to token selection first
+  function fixSendButtonNavigation() {
+    const sendButtons = document.querySelectorAll('#send-button, .quick-actions .action-circle:nth-child(1)');
+    sendButtons.forEach(button => {
+      // Direct assignment to override existing handlers
+      button.onclick = function(e) {
+        if (e) e.preventDefault();
+        navigateTo('send-token-select', 'wallet-screen');
+      };
+    });
+    
+    // Also fix token detail send button
+    const detailSendButton = document.querySelector('#token-detail .detail-action:nth-child(1)');
+    if (detailSendButton) {
+      detailSendButton.onclick = function(e) {
+        if (e) e.preventDefault();
+        const tokenSymbol = document.getElementById('detail-symbol')?.textContent.toLowerCase();
+        if (tokenSymbol) {
+          // Skip token selection and go directly to send for this token
+          window.activeSendTokenId = tokenSymbol;
+          navigateTo('send-screen', 'token-detail');
+          updateSendScreenForToken(tokenSymbol);
+        } else {
+          navigateTo('send-token-select', 'token-detail');
+        }
+      };
+    }
+  }
+
+  // Fix receive button to go directly to receive screen
+  function fixReceiveButtonNavigation() {
+    const receiveButtons = document.querySelectorAll('#receive-button, .quick-actions .action-circle:nth-child(2)');
+    receiveButtons.forEach(button => {
+      // Direct assignment to override existing handlers
+      button.onclick = function(e) {
+        if (e) e.preventDefault();
+        navigateTo('receive-screen', 'wallet-screen');
+      };
+    });
+    
+    // Also fix token detail receive button
+    const detailReceiveButton = document.querySelector('#token-detail .detail-action:nth-child(2)');
+    if (detailReceiveButton) {
+      detailReceiveButton.onclick = function(e) {
+        if (e) e.preventDefault();
+        navigateTo('receive-screen', 'token-detail');
+      };
+    }
+  }
+
+  // Fix history button navigation
+  function fixHistoryButtonNavigation() {
+    const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+    if (historyButton) {
+      // Direct assignment to override existing handlers
+      historyButton.onclick = function(e) {
+        if (e) e.preventDefault();
+        navigateTo('history-screen', 'wallet-screen');
+      };
+    }
+  }
+
+  // Fix all back buttons
+  function fixBackButtons() {
+    document.querySelectorAll('.back-button').forEach(button => {
+      // Direct assignment to override existing handlers
+      button.onclick = function(e) {
+        if (e) e.preventDefault();
+        const screen = this.closest('.screen');
+        if (!screen) return;
+        
+        const returnTo = screen.dataset.returnTo || 'wallet-screen';
+        navigateTo(returnTo);
+      };
+    });
+  }
+
+  // Fix token selection to send flow
+  function fixTokenToSendFlow() {
+    // Attach click events to token items in selection screen
+    const tokenItems = document.querySelectorAll('#select-token-list .token-item');
+    tokenItems.forEach(item => {
+      // Direct assignment to override existing handlers
+      item.onclick = function(e) {
+        if (e) e.preventDefault();
+        const tokenId = this.getAttribute('data-token-id');
+        if (!tokenId) return;
+        
+        window.activeSendTokenId = tokenId;
+        navigateTo('send-screen', 'send-token-select');
+        updateSendScreenForToken(tokenId);
+      };
+    });
+  }
+
+  // Update send screen for selected token
+  function updateSendScreenForToken(tokenId) {
+    // Get token data
+    const tokens = window.currentWalletData?.[window.activeWallet]?.tokens || [];
+    const token = tokens.find(t => t.id === tokenId) || { symbol: tokenId.toUpperCase() };
+    
+    // Update title
+    const sendTitle = document.getElementById('send-token-title');
+    if (sendTitle) {
+      sendTitle.textContent = `Send ${token.symbol}`;
+    }
+    
+    // Update amount placeholder
+    const amountInput = document.getElementById('send-amount');
+    if (amountInput) {
+      amountInput.placeholder = `${token.symbol} Amount`;
+    }
+    
+    // Update network info if needed
+    if (['usdt', 'twt', 'bnb'].includes(tokenId)) {
+      const networkName = document.querySelector('.network-name');
+      if (networkName) {
+        networkName.textContent = 'BNB Smart Chain';
+      }
+      
+      const networkIcon = document.querySelector('.network-icon img');
+      if (networkIcon) {
+        networkIcon.src = 'https://cryptologos.cc/logos/bnb-bnb-logo.png';
+      }
+    } else {
+      const networkName = document.querySelector('.network-name');
+      if (networkName) {
+        networkName.textContent = token.network || token.symbol + ' Network';
+      }
+    }
+  }
+
+  // Fix search functionality
+  function fixSearchFunctionality() {
+    // Send token search
+    const sendSearch = document.getElementById('token-search-input');
+    if (sendSearch) {
+      sendSearch.oninput = function() {
+        const searchText = this.value.toLowerCase();
+        const tokenItems = document.querySelectorAll('#select-token-list .token-item');
+        
+        tokenItems.forEach(item => {
+          const tokenName = item.querySelector('.token-name').textContent.toLowerCase();
+          const visible = tokenName.includes(searchText);
+          item.style.display = visible ? 'flex' : 'none';
+        });
+      };
+    }
+    
+    // Receive search
+    const receiveSearch = document.getElementById('receive-search-input');
+    if (receiveSearch) {
+      receiveSearch.oninput = function() {
+        const searchText = this.value.toLowerCase();
+        const coinItems = document.querySelectorAll('.coin-item');
+        
+        coinItems.forEach(item => {
+          const coinName = item.querySelector('.coin-name').textContent.toLowerCase();
+          const coinAddress = item.querySelector('.coin-address').textContent.toLowerCase();
+          const visible = coinName.includes(searchText) || coinAddress.includes(searchText);
+          item.style.display = visible ? 'flex' : 'none';
+        });
+      };
+    }
+  }
+
+  // STEP 4: Apply Trust Wallet styling
+  function applyTrustWalletStyling() {
+    // Fix send token select styling
+    fixSendTokenSelectStyling();
+    
+    // Fix send screen styling
+    fixSendScreenStyling();
+    
+    // Fix receive screen styling
+    fixReceiveScreenStyling();
+    
+    // Fix history screen styling
+    fixHistoryScreenStyling();
+    
+    // Remove network badges from screens that shouldn't have them
+    removeNetworkBadges();
+    
+    // Fix bottom tabs to ensure they're always visible
+    fixBottomTabs();
+  }
+
+  // Fix send token select styling
+  function fixSendTokenSelectStyling() {
+    // Create or update style element
+    let styleElement = document.getElementById('tw-send-token-styles');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-send-token-styles';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      #send-token-select {
+        background-color: white;
+        height: 100%;
+      }
+      
+      #send-token-select .screen-header {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        position: relative;
+      }
+      
+      #send-token-select .back-button {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1A2024;
+        background: transparent;
+        border: none;
+      }
+      
+      #send-token-select h2 {
+        flex: 1;
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
+        color: #1A2024;
+      }
+      
+      #send-token-select .placeholder-icon {
+        width: 32px;
+      }
+      
+      #send-token-select .search-container {
+        padding: 0 16px 16px;
+      }
+      
+      #send-token-select .search-bar {
+        display: flex;
+        align-items: center;
+        background-color: #F5F5F5;
+        border-radius: 30px;
+        padding: 8px 16px;
+      }
+      
+      #send-token-select .search-bar i {
+        color: #8A939D;
+        margin-right: 8px;
+      }
+      
+      #send-token-select .search-bar input {
+        background: transparent;
+        border: none;
+        outline: none;
+        flex: 1;
+        color: #1A2024;
+        font-size: 14px;
+      }
+      
+      #send-token-select .token-item {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid #F5F5F5;
+        cursor: pointer;
+      }
+      
+      #send-token-select .token-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-right: 16px;
+      }
+      
+      #send-token-select .token-icon img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      
+      #send-token-select .token-info {
+        flex: 1;
+      }
+      
+      #send-token-select .token-name {
+        font-size: 16px;
+        font-weight: 500;
+        color: #1A2024;
+        margin-bottom: 4px;
+      }
+      
+      #send-token-select .token-price {
+        font-size: 13px;
+        color: #8A939D;
+      }
+      
+      #send-token-select .token-amount-container {
+        text-align: right;
+      }
+      
+      #send-token-select .token-balance {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1A2024;
+        margin-bottom: 2px;
+      }
+      
+      #send-token-select .token-value {
+        font-size: 13px;
+        color: #8A939D;
+      }
+      
+      .token-network-badge {
+        display: inline-block !important;
+        padding: 2px 6px !important;
+        font-size: 10px !important;
+        background-color: rgba(243, 186, 47, 0.1) !important;
+        color: #F3BA2F !important;
+        border-radius: 4px !important;
+        margin-left: 6px !important;
+        font-weight: 500 !important;
+      }
+    `;
+  }
+
+  // Fix send screen styling
+  function fixSendScreenStyling() {
+    // Create or update style element
+    let styleElement = document.getElementById('tw-send-screen-styles');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-send-screen-styles';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      #send-screen .screen-header {
+        padding: 16px !important;
+      }
+      
+      #send-screen .section-label {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #5F6C75 !important;
+        margin-bottom: 12px !important;
+      }
+      
+      #send-screen .address-input-wrapper,
+      #send-screen .amount-input-wrapper {
+        border-radius: 8px !important;
+        border: 1px solid #E8E8E8 !important;
+        background: white !important;
+      }
+      
+      #send-screen .network-display {
+        margin-top: auto !important;
+      }
+      
+      #send-screen .next-button {
+        background-color: #3375BB !important;
+        color: white !important;
+        border-radius: 8px !important;
+        height: 56px !important;
+        font-weight: 600 !important;
+      }
+    `;
+  }
+
+  // Fix receive screen styling
+  function fixReceiveScreenStyling() {
+    // Create or update style element
+    let styleElement = document.getElementById('tw-receive-screen-styles');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-receive-screen-styles';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      #receive-screen .screen-header {
+        padding: 16px !important;
+      }
+      
+      #receive-screen .section-title {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #5F6C75 !important;
+        padding: 8px 16px !important;
+        margin: 0 !important;
+      }
+      
+      #receive-screen .coin-icon {
+        position: relative !important;
+      }
+      
+      /* Remove all network badges in receive screen */
+      #receive-screen .network-badge {
+        display: none !important;
+      }
+      
+      #qr-modal {
+        z-index: 9999 !important;
+      }
+    `;
+  }
+
+  // Fix history screen styling
+  function fixHistoryScreenStyling() {
+    // Create or update style element
+    let styleElement = document.getElementById('tw-history-screen-styles');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-history-screen-styles';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      #history-screen .screen-header {
+        padding: 16px !important;
+      }
+      
+      #history-screen .history-tab {
+        color: #8A939D !important;
+      }
+      
+      #history-screen .history-tab.active {
+        color: #3375BB !important;
+        font-weight: 500 !important;
+      }
+      
+      #history-screen .transaction-value.positive {
+        color: #3375BB !important;
+      }
+      
+      #history-screen .transaction-value.negative {
+        color: #EB5757 !important;
+      }
+      
+      #transaction-details-modal {
+        z-index: 9999 !important;
+      }
+    `;
+  }
+
+  // Remove network badges from screens that shouldn't have them
+  function removeNetworkBadges() {
+    // Create or update style element
+    let styleElement = document.getElementById('tw-network-badge-fix');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-network-badge-fix';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      #send-screen .chain-badge,
+      #send-screen .chain-badge-fixed,
+      #send-screen .network-badge,
+      #receive-screen .chain-badge,
+      #receive-screen .chain-badge-fixed,
+      #receive-screen .network-badge {
+        display: none !important;
+      }
+    `;
+  }
+
+  // Fix bottom tabs to ensure they're always visible
+  function fixBottomTabs() {
+    const bottomTabs = document.querySelector('.bottom-tabs');
+    if (!bottomTabs) return;
+    
+    // Clone the tabs to remove existing handlers
+    const newTabs = bottomTabs.cloneNode(true);
+    
+    // Move to body for better stacking
+    document.body.appendChild(newTabs);
+    
+    // Remove original
+    bottomTabs.remove();
+    
+    // Apply critical styling
+    newTabs.style.position = 'fixed';
+    newTabs.style.bottom = '0';
+    newTabs.style.left = '0';
+    newTabs.style.width = '100%';
+    newTabs.style.zIndex = '9999';
+    newTabs.style.backgroundColor = 'white';
+    newTabs.style.borderTop = '1px solid #F5F5F5';
+    newTabs.style.display = 'flex';
+    
+    // Fix tab clicks
+    newTabs.querySelectorAll('.tab-item').forEach((tab, index) => {
+      tab.onclick = function() {
+        // Update active state
+        newTabs.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Home tab should go to wallet screen
+        if (index === 0) {
+          navigateTo('wallet-screen');
+        }
+      };
+    });
+  }
+
+  // Verify implementation worked correctly
+  function verifyImplementation() {
+    // Check important elements
+    const sendTokenSelect = document.getElementById('send-token-select');
+    const sendScreen = document.getElementById('send-screen');
+    const receiveScreen = document.getElementById('receive-screen');
+    const historyScreen = document.getElementById('history-screen');
+    
+    if (!sendTokenSelect) console.error('Send token selection screen missing');
+    if (!sendScreen) console.error('Send screen missing');
+    if (!receiveScreen) console.error('Receive screen missing');
+    if (!historyScreen) console.error('History screen missing');
+    
+    // Make sure token list is populated
+    const tokenList = document.getElementById('select-token-list');
+    if (tokenList && tokenList.children.length === 0) {
+      console.log('Token list empty, repopulating...');
+      populateTokenSelectionScreens();
+    }
+    
+    // Check if buttons have our click handlers
+    const sendButton = document.getElementById('send-button');
+    if (sendButton && !sendButton.onclick) {
+      console.log('Send button missing handler, reattaching...');
+      fixSendButtonNavigation();
+    }
+    
+    // If the fix script was loaded multiple times, ensure our version takes precedence
+    overrideConflictingFunctions();
+  }
+
+  // Helper functions
+  function navigateTo(screenId, fromScreenId) {
+    // Hide all screens
+    document.querySelectorAll('.screen').forEach(screen => {
+      screen.style.display = 'none';
+      screen.classList.add('hidden');
+    });
+    
+    // Show target screen
+    const targetScreen = document.getElementById(screenId);
+    if (targetScreen) {
+      targetScreen.style.display = 'flex';
+      targetScreen.classList.remove('hidden');
+      
+      // Remember where we came from
+      if (fromScreenId) {
+        targetScreen.dataset.returnTo = fromScreenId;
+      }
+      
+      console.log(`Navigated to ${screenId}${fromScreenId ? ' from ' + fromScreenId : ''}`);
+      return true;
+    } else {
+      console.error(`Target screen ${screenId} not found`);
+      return false;
+    }
+  }
+
+  function getTokenLogoUrl(tokenId) {
+    const logoUrls = {
+      'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+      'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+      'twt': 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png',
+      'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+      'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+      'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
+      'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png',
+      'uni': 'https://cryptologos.cc/logos/uniswap-uni-logo.png'
+    };
+    
+    return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
+  }
+})();
+</script>
     <!-- The enhancer script for 10/10 TrustWallet experience -->
 <script src="te.js"></script>
 </body>
