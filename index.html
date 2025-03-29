@@ -826,11 +826,6 @@ document.addEventListener('DOMContentLoaded', function() {
       })
       .catch(error => console.error(`Error loading ${url}:`, error));
   }
-
-  // Load components with a slight delay
-  setTimeout(function() {
-    loadComponent('UHS', 'history-screen');
-    loadComponent('URS', 'receive-screen');
     
     // Connect all button handlers after a longer delay
     setTimeout(connectButtons, 500);
@@ -950,29 +945,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // but before the user can interact with the app
   setTimeout(implementTrustWalletFix, 100);
   
-  function implementTrustWalletFix() {
-    console.log('Implementing Trust Wallet screens fix');
-    
-    // Override any existing functions that might conflict
-    overrideConflictingFunctions();
-    
-    // 1. Create token selection screens if they don't exist
-    createMissingScreens();
-    
-    // 2. Fix screen contents
-    loadScreenContents();
-    
-    // 3. Fix navigation flows with priority handlers
-    fixNavigationFlows();
-    
-    // 4. Apply Trust Wallet styling
-    applyTrustWalletStyling();
-    
-    console.log('Trust Wallet fix implementation complete');
-    
-    // Run a final check after a delay to ensure everything worked
-    setTimeout(verifyImplementation, 500);
-  }
   
   // Override functions that might conflict with our implementation
   function overrideConflictingFunctions() {
@@ -1787,9 +1759,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 })();
 </script>
-    <!-- The enhancer script for 10/10 TrustWallet experience -->
-<script src="te.js"></script>
-
+    
     function initEnhancements() {
   console.log('Trust Wallet Enhancer: Initializing...');
   
