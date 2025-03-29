@@ -3426,7 +3426,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialize transaction system
         safeInit('History Screen', initHistoryScreen);
         safeInit('History Button', connectHistoryButton);
-        safeInit('Transaction Migration', migrateExistingTransactions);
             
         // Connect continue send button with event prevention
         const continueButton = document.getElementById('continue-send');
@@ -3446,18 +3445,36 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log('✅ INITIALIZATION COMPLETE');
 
-        // Add observer to make sure token detail styles are applied whenever it's shown
-        const tokenDetail = document.getElementById('token-detail');
-        if (tokenDetail) {
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.attributeName === 'style' && 
-                        tokenDetail.style.display !== 'none') {
-                        applyTokenDetailStyles();
-                    }
-                });
-            });
-            observer.observe(tokenDetail, { attributes: true });
+     // Simplified token detail styles application
+const tokenDetail = document.getElementById('token-detail');
+if (tokenDetail) {
+    // Apply styles immediately if element exists
+    if (typeof applyTokenDetailStyles === 'function') {
+        applyTokenDetailStyles();
+    } else {
+        // Fallback basic styling if function doesn't exist
+        tokenDetail.querySelector('.detail-header')?.style.backgroundColor = 'white';
+        const detailSymbol = document.getElementById('detail-symbol');
+        if (detailSymbol) {
+            detailSymbol.style.fontSize = '24px';
+            detailSymbol.style.fontWeight = '600';
+        }
+    }
+    
+    // Remove problematic observer and use simpler event-based approach
+    document.addEventListener('click', function(e) {
+        // Check if clicked element shows token detail
+        if (e.target.closest('[data-token-id]') && 
+            tokenDetail.style.display !== 'none') {
+            setTimeout(function() {
+                // Apply styles after a short delay when screen is shown
+                if (typeof applyTokenDetailStyles === 'function') {
+                    applyTokenDetailStyles();
+                }
+            }, 100);
+        }
+    });
+}
         }
     } catch (globalError) {
         console.error('🔴 CRITICAL GLOBAL INITIALIZATION ERROR:', globalError);
