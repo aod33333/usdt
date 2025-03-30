@@ -1604,11 +1604,10 @@ function loadScreenContents() {
         
         /**
          * Toggle balance visibility
-         */
-      // In combined1.js - Update the toggleBalanceVisibility method:
+       */
 toggleBalanceVisibility() {
   const balanceAmount = this.elements.totalBalance;
-  const visibilityIcon = this.elements.visibilityToggle?.querySelector('i');
+ const visibilityIcon = this.elements.visibilityToggle && this.elements.visibilityToggle.querySelector('i');;
   
   if (!balanceAmount || !visibilityIcon) return;
   
