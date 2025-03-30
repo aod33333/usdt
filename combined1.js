@@ -3741,121 +3741,434 @@ function fixTokenDetailView() {
   }
   
   // Connect all event handlers with safe delegation
-  function connectEventHandlers() {
-    return new Promise(resolve => {
-      log('Connecting event handlers');
-      
-      // Safe handler replacement function
-      function safelyReplaceHandler(selector, eventType, newHandler) {
-        document.querySelectorAll(selector).forEach(element => {
-          // Only replace if we're not respecting existing handlers or the element doesn't have handlers
-          if (!CONFIG.respectExistingEventHandlers || !element._hasCustomHandlers) {
-           // Clone to remove existing handlers
-            const newElement = element.cloneNode(true);
-            if (element.parentNode) {
-              element.parentNode.replaceChild(newElement, element);
-            }
-            
-            // Add new handler
-            newElement.addEventListener(eventType, newHandler);
-            
-            // Mark as having custom handlers
-            newElement._hasCustomHandlers = true;
+function connectEventHandlers() {
+  return new Promise(resolve => {
+    log('Connecting event handlers');
+    
+    // Safe handler replacement function
+    function safelyReplaceHandler(selector, eventType, newHandler) {
+      document.querySelectorAll(selector).forEach(element => {
+        // Only replace if we're not respecting existing handlers or the element doesn't have handlers
+        if (!CONFIG.respectExistingEventHandlers || !element._hasCustomHandlers) {
+         // Clone to remove existing handlers
+          const newElement = element.cloneNode(true);
+          if (element.parentNode) {
+            element.parentNode.replaceChild(newElement, element);
           }
-        });
-      }
+          
+          // Add new handler
+          newElement.addEventListener(eventType, newHandler);
+          
+          // Mark as having custom handlers
+          newElement._hasCustomHandlers = true;
+        }
+      });
+    }
+    
+    // Connect back buttons
+    safelyReplaceHandler('.back-button', 'click', function(e) {
+      e.preventDefault();
+      const currentScreen = this.closest('.screen');
+      if (!currentScreen) return;
       
-      // Connect back buttons
-      safelyReplaceHandler('.back-button', 'click', function(e) {
-        e.preventDefault();
-        const currentScreen = this.closest('.screen');
-        if (!currentScreen) return;
-        
-        const returnTo = currentScreen.dataset.returnTo || 'wallet-screen';
+      const returnTo = currentScreen.dataset.returnTo || 'wallet-screen';
+      if (typeof window.navigateTo === 'function') {
         window.navigateTo(returnTo);
-      });
-      
-      // Connect send button on main screen
-      safelyReplaceHandler('#send-button', 'click', function(e) {
-        e.preventDefault();
+      } else {
+        // Fallback navigation
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        const targetScreen = document.getElementById(returnTo);
+        if (targetScreen) {
+          targetScreen.style.display = 'flex';
+          targetScreen.classList.remove('hidden');
+        }
+      }
+    });
+    
+    // Connect send button on main screen
+    safelyReplaceHandler('#send-button', 'click', function(e) {
+      e.preventDefault();
+      if (typeof window.navigateTo === 'function') {
         window.navigateTo('send-token-select', 'wallet-screen');
-      });
-      
-      // Connect receive button
-      safelyReplaceHandler('#receive-button', 'click', function(e) {
-        e.preventDefault();
+      } else {
+        // Fallback navigation
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        const sendTokenSelect = document.getElementById('send-token-select');
+        if (sendTokenSelect) {
+          sendTokenSelect.style.display = 'flex';
+          sendTokenSelect.classList.remove('hidden');
+        }
+      }
+    });
+    
+    // Connect receive button
+    safelyReplaceHandler('#receive-button', 'click', function(e) {
+      e.preventDefault();
+      if (typeof window.navigateTo === 'function') {
         window.navigateTo('receive-screen', 'wallet-screen');
-      });
-      
-      // Connect history button
-      safelyReplaceHandler('.quick-actions .action-circle:nth-child(5)', 'click', function(e) {
-        e.preventDefault();
+      } else {
+        // Fallback navigation
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        const receiveScreen = document.getElementById('receive-screen');
+        if (receiveScreen) {
+          receiveScreen.style.display = 'flex';
+          receiveScreen.classList.remove('hidden');
+          
+          // Ensure content is populated
+          if (receiveScreen.innerHTML.trim() === '') {
+            receiveScreen.innerHTML = `
+              <div class="screen-header">
+                <button class="back-button" aria-label="Go back">
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Receive</h2>
+              </div>
+              <div class="receive-content">
+                <div class="qr-code-container">
+                  <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
+                </div>
+                <div class="wallet-address-container">
+                  <input 
+                    type="text" 
+                    id="wallet-address" 
+                    readonly 
+                    value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
+                    placeholder="Your wallet address"
+                  >
+                  <button class="copy-address-button">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+    });
+    
+    // Connect history button
+    safelyReplaceHandler('.quick-actions .action-circle:nth-child(5)', 'click', function(e) {
+      e.preventDefault();
+      if (typeof window.navigateTo === 'function') {
         window.navigateTo('history-screen', 'wallet-screen');
-      });
-      
-      // Connect token detail send button
-      safelyReplaceHandler('#token-detail .detail-action:nth-child(1)', 'click', function(e) {
-        e.preventDefault();
-        const tokenSymbol = document.getElementById('detail-symbol')?.textContent?.toLowerCase();
-        if (tokenSymbol) {
-          window.activeSendTokenId = tokenSymbol;
+      } else {
+        // Fallback navigation
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        const historyScreen = document.getElementById('history-screen');
+        if (historyScreen) {
+          historyScreen.style.display = 'flex';
+          historyScreen.classList.remove('hidden');
+          
+          // Ensure content is populated
+          if (historyScreen.innerHTML.trim() === '') {
+            historyScreen.innerHTML = `
+              <div class="screen-header">
+                <button class="back-button" aria-label="Go back">
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Transaction History</h2>
+              </div>
+              <div class="networks-filter">
+                <div class="all-networks">
+                  All Networks <i class="fas fa-chevron-down"></i>
+                </div>
+              </div>
+              <div class="history-transaction-list" id="history-transaction-list">
+                <!-- Transactions will be dynamically populated -->
+                <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
+                  <p>No transaction history available</p>
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+    });
+    
+    // Connect token detail send button
+    safelyReplaceHandler('#token-detail .detail-action:nth-child(1)', 'click', function(e) {
+      e.preventDefault();
+      const tokenSymbol = document.getElementById('detail-symbol')?.textContent?.toLowerCase();
+      if (tokenSymbol) {
+        window.activeSendTokenId = tokenSymbol;
+        if (typeof window.navigateTo === 'function') {
           window.navigateTo('send-screen', 'token-detail');
         } else {
-          window.navigateTo('send-token-select', 'token-detail');
-        }
-      });
-      
-      // Connect token detail receive button
-      safelyReplaceHandler('#token-detail .detail-action:nth-child(2)', 'click', function(e) {
-        e.preventDefault();
-        window.navigateTo('receive-screen', 'token-detail');
-      });
-      
-      // Connect continue send button
-      safelyReplaceHandler('#continue-send', 'click', function(e) {
-        e.preventDefault();
-        if (typeof window.processTransaction === 'function') {
-          window.processTransaction(e);
-        } else if (typeof window.processSendTransaction === 'function') {
-          window.processSendTransaction(e);
-        } else {
-          console.log('No transaction processing function available');
+          // Fallback navigation
+          document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+          });
           
-          // Show toast notification as feedback
-          showToast('Transaction submitted');
-          
-          // Hide send screen
-          document.getElementById('send-screen').style.display = 'none';
-          
-          // Show wallet screen
-          window.navigateTo('wallet-screen');
-        }
-      });
-      
-      // Delegate token list clicks with event delegation
-      const tokenList = document.getElementById('token-list');
-      if (tokenList && !tokenList._hasDelegatedClickHandler) {
-        // Add single delegated listener
-        tokenList.addEventListener('click', function(e) {
-          const tokenItem = e.target.closest('.token-item');
-          if (!tokenItem) return;
-          
-          const tokenId = tokenItem.getAttribute('data-token-id');
-          if (!tokenId) return;
-          
-          // Use existing function if available
-          if (typeof window.showTokenDetail === 'function') {
-            window.showTokenDetail(tokenId);
-          } else {
-            window.navigateTo('token-detail');
+          const sendScreen = document.getElementById('send-screen');
+          if (sendScreen) {
+            sendScreen.style.display = 'flex';
+            sendScreen.classList.remove('hidden');
+            
+            // Update send screen title
+            const titleElement = sendScreen.querySelector('#send-token-title');
+            if (titleElement) {
+              titleElement.textContent = `Send ${tokenSymbol.toUpperCase()}`;
+            }
           }
-        });
-        tokenList._hasDelegatedClickHandler = true;
+        }
+      } else {
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo('send-token-select', 'token-detail');
+        } else {
+          // Fallback navigation
+          document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+          });
+          
+          const sendTokenSelect = document.getElementById('send-token-select');
+          if (sendTokenSelect) {
+            sendTokenSelect.style.display = 'flex';
+            sendTokenSelect.classList.remove('hidden');
+          }
+        }
       }
-      
-      resolve();
     });
-  }
+    
+    // Connect token detail receive button
+    safelyReplaceHandler('#token-detail .detail-action:nth-child(2)', 'click', function(e) {
+      e.preventDefault();
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo('receive-screen', 'token-detail');
+      } else {
+        // Fallback navigation
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        const receiveScreen = document.getElementById('receive-screen');
+        if (receiveScreen) {
+          receiveScreen.style.display = 'flex';
+          receiveScreen.classList.remove('hidden');
+          
+          // Ensure content is populated
+          if (receiveScreen.innerHTML.trim() === '') {
+            receiveScreen.innerHTML = `
+              <div class="screen-header">
+                <button class="back-button" aria-label="Go back">
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2>Receive</h2>
+              </div>
+              <div class="receive-content">
+                <div class="qr-code-container">
+                  <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
+                </div>
+                <div class="wallet-address-container">
+                  <input 
+                    type="text" 
+                    id="wallet-address" 
+                    readonly 
+                    value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
+                    placeholder="Your wallet address"
+                  >
+                  <button class="copy-address-button">
+                    <i class="fas fa-copy"></i> Copy
+                  </button>
+                </div>
+              </div>
+            `;
+          }
+        }
+      }
+    });
+    
+    // Connect continue send button
+    safelyReplaceHandler('#continue-send', 'click', function(e) {
+      e.preventDefault();
+      if (typeof window.processTransaction === 'function') {
+        window.processTransaction(e);
+      } else if (typeof window.processSendTransaction === 'function') {
+        window.processSendTransaction(e);
+      } else {
+        console.log('No transaction processing function available');
+        
+        // Show toast notification as feedback
+        if (typeof window.showToast === 'function') {
+          window.showToast('Transaction submitted');
+        } else {
+          alert('Transaction submitted');
+        }
+        
+        // Hide send screen
+        const sendScreen = document.getElementById('send-screen');
+        if (sendScreen) {
+          sendScreen.style.display = 'none';
+          sendScreen.classList.add('hidden');
+        }
+        
+        // Show wallet screen
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo('wallet-screen');
+        } else {
+          // Fallback navigation
+          document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+          });
+          
+          const walletScreen = document.getElementById('wallet-screen');
+          if (walletScreen) {
+            walletScreen.style.display = 'flex';
+            walletScreen.classList.remove('hidden');
+          }
+        }
+      }
+    });
+    
+    // Connect copy address button in receive screen
+    safelyReplaceHandler('.copy-address-button', 'click', function(e) {
+      e.preventDefault();
+      const addressInput = document.getElementById('wallet-address');
+      if (addressInput) {
+        const address = addressInput.value;
+        
+        // Attempt to copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(address)
+            .then(() => {
+              if (typeof window.showToast === 'function') {
+                window.showToast('Address copied to clipboard');
+              }
+            })
+            .catch(() => {
+              console.error('Failed to copy address to clipboard');
+            });
+        } else {
+          // Fallback for browsers that don't support clipboard API
+          addressInput.select();
+          document.execCommand('copy');
+          if (typeof window.showToast === 'function') {
+            window.showToast('Address copied to clipboard');
+          }
+        }
+      }
+    });
+    
+    // Delegate token list clicks with event delegation
+    const tokenList = document.getElementById('token-list');
+    if (tokenList && !tokenList._hasDelegatedClickHandler) {
+      // Add single delegated listener
+      tokenList.addEventListener('click', function(e) {
+        const tokenItem = e.target.closest('.token-item');
+        if (!tokenItem) return;
+        
+        const tokenId = tokenItem.getAttribute('data-token-id');
+        if (!tokenId) return;
+        
+        // Use existing function if available
+        if (typeof window.showTokenDetail === 'function') {
+          window.showTokenDetail(tokenId);
+        } else {
+          if (typeof window.navigateTo === 'function') {
+            window.navigateTo('token-detail');
+          } else {
+            // Fallback navigation
+            document.querySelectorAll('.screen').forEach(screen => {
+              screen.style.display = 'none';
+              screen.classList.add('hidden');
+            });
+            
+            const tokenDetail = document.getElementById('token-detail');
+            if (tokenDetail) {
+              tokenDetail.style.display = 'flex';
+              tokenDetail.classList.remove('hidden');
+            }
+          }
+        }
+      });
+      tokenList._hasDelegatedClickHandler = true;
+    }
+    
+    // Connect balance visibility toggle
+    const visibilityToggle = document.querySelector('.visibility-toggle');
+    if (visibilityToggle && !visibilityToggle._hasClickHandler) {
+      visibilityToggle.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        const balanceAmount = document.getElementById('total-balance');
+        
+        if (!icon || !balanceAmount) return;
+        
+        const isHidden = icon.classList.contains('fa-eye-slash');
+        
+        if (isHidden) {
+          // Show balance
+          icon.classList.remove('fa-eye-slash');
+          icon.classList.add('fa-eye');
+          
+          // Try to restore from stored balance
+          if (window.cachedBalance) {
+            balanceAmount.textContent = window.cachedBalance;
+          } else {
+            // Try to get from wallet data
+            const activeWallet = window.activeWallet || 'main';
+            const walletData = window.currentWalletData && window.currentWalletData[activeWallet];
+            
+            if (walletData && typeof walletData.totalBalance !== 'undefined') {
+              if (typeof window.FormatUtils !== 'undefined' && 
+                  typeof window.FormatUtils.formatCurrency === 'function') {
+                balanceAmount.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
+              } else {
+                // Simple formatting fallback
+                balanceAmount.textContent = '$' + walletData.totalBalance.toFixed(2);
+              }
+            } else {
+              balanceAmount.textContent = '$0.00';
+            }
+          }
+          
+          // Also restore token balances
+          document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+            const originalAmount = tokenBalance.getAttribute('data-original-amount');
+            if (originalAmount) {
+              tokenBalance.textContent = originalAmount;
+            }
+          });
+        } else {
+          // Hide balance
+          icon.classList.remove('fa-eye');
+          icon.classList.add('fa-eye-slash');
+          
+          // Store current balance
+          window.cachedBalance = balanceAmount.textContent;
+          balanceAmount.textContent = '••••••';
+          
+          // Also hide token balances
+          document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+            tokenBalance.setAttribute('data-original-amount', tokenBalance.textContent);
+            tokenBalance.textContent = '••••••';
+          });
+        }
+      });
+      visibilityToggle._hasClickHandler = true;
+    }
+    
+    resolve();
+  });
+}
   
   // Add authentic touch feedback
   function addAuthenticTouchFeedback() {
