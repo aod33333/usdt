@@ -906,10 +906,8 @@ function showTokenDetail(tokenId) {
 
    } catch (error) {
        console.error('Error showing token detail:', error);
-
-setTimeout(applyTokenDetailStyles, 50);
-   }
 }
+  
 // =================================================================
 // SECTION 5: TRANSACTION MANAGEMENT
 // =================================================================
