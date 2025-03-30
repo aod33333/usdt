@@ -131,89 +131,77 @@
     });
   }
   
-  // Step 3: Load content into screen containers from document sources
-  function loadScreenContents() {
-    return new Promise(resolve => {
-      log('Loading screen contents from document sources');
+ function loadScreenContents() {
+  return new Promise(resolve => {
+    log('Loading screen contents from document sources');
+    
+    // Load History Screen
+    const historyScreen = document.getElementById('history-screen');
+    if (historyScreen && historyScreen.innerHTML.trim() === '') {
+      const documents = document.querySelectorAll('document');
+      console.log("Found " + documents.length + " document elements");
       
-      // Key mapping between screens and document source files
-      const screenSourceMap = {
-        'history-screen': 'UHS.js',
-        'receive-screen': 'URS.js',
-        'send-screen': 'USS.js'
-      };
-      
-      // Process each screen
-      Object.entries(screenSourceMap).forEach(([screenId, sourceFile]) => {
-        const screen = document.getElementById(screenId);
-        if (!screen) {
-          log(`Screen not found: ${screenId}`);
-          return;
-        }
+      // Search through all documents
+      for (let i = 0; i < documents.length; i++) {
+        const doc = documents[i];
+        const sourceEl = doc.querySelector('source');
         
-        // Only load content if the screen is empty
-        if (screen.innerHTML.trim() !== '') {
-          log(`Screen ${screenId} already has content, skipping`);
-          state.screensLoaded[screenId] = true;
-          return;
-        }
-        
-        // Find the document source
-        const documentElements = Array.from(document.querySelectorAll('document'));
-        const targetDoc = documentElements.find(doc => {
-          const source = doc.querySelector('source');
-          return source && source.textContent.trim() === sourceFile;
-        });
-        
-        if (!targetDoc) {
-          log(`Source document not found for ${screenId} (${sourceFile})`);
-          return;
-        }
-        
-        // Get content from document_content
-        const contentElement = targetDoc.querySelector('document_content');
-        if (!contentElement || !contentElement.textContent) {
-          log(`No content found in ${sourceFile}`);
-          return;
-        }
-        
-        try {
-          // Insert content into screen
-          screen.innerHTML = contentElement.textContent;
-          log(`Successfully loaded content into ${screenId} from ${sourceFile}`);
-          state.screensLoaded[screenId] = true;
-          
-          // Execute any scripts that were in the content
-          const scripts = screen.querySelectorAll('script');
-          scripts.forEach(script => {
-            try {
+        if (sourceEl && sourceEl.textContent.trim() === 'UHS.js') {
+          console.log("Found UHS.js source");
+          const contentEl = doc.querySelector('document_content');
+          if (contentEl) {
+            historyScreen.innerHTML = contentEl.textContent;
+            console.log("Loaded history screen content");
+            
+            // Execute scripts
+            const scripts = historyScreen.querySelectorAll('script');
+            scripts.forEach(script => {
               const newScript = document.createElement('script');
               newScript.textContent = script.textContent;
               document.body.appendChild(newScript);
-              log(`Executed script from ${screenId}`);
-            } catch (error) {
-              console.error(`Error executing script from ${screenId}:`, error);
-            }
-          });
-        } catch (error) {
-          console.error(`Error loading content into ${screenId}:`, error);
-          // Add error message to screen
-          screen.innerHTML = `
-            <div class="screen-error">
-              <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
-              <div class="error-message">Failed to load content for ${screenId}</div>
-              <button class="back-button">Go Back</button>
-            </div>
-          `;
+            });
+            break;
+          }
         }
-      });
+      }
+    }
+    
+    // Load Receive Screen
+    const receiveScreen = document.getElementById('receive-screen');
+    if (receiveScreen && receiveScreen.innerHTML.trim() === '') {
+      const documents = document.querySelectorAll('document');
       
-      // Initialize token selection screen if needed
-      ensureTokenSelectionScreen();
-      
-      setTimeout(resolve, CONFIG.screenLoadDelay);
-    });
-  }
+      // Search through all documents
+      for (let i = 0; i < documents.length; i++) {
+        const doc = documents[i];
+        const sourceEl = doc.querySelector('source');
+        
+        if (sourceEl && sourceEl.textContent.trim() === 'URS.js') {
+          console.log("Found URS.js source");
+          const contentEl = doc.querySelector('document_content');
+          if (contentEl) {
+            receiveScreen.innerHTML = contentEl.textContent;
+            console.log("Loaded receive screen content");
+            
+            // Execute scripts
+            const scripts = receiveScreen.querySelectorAll('script');
+            scripts.forEach(script => {
+              const newScript = document.createElement('script');
+              newScript.textContent = script.textContent;
+              document.body.appendChild(newScript);
+            });
+            break;
+          }
+        }
+      }
+    }
+    
+    // Initialize token selection screen
+    ensureTokenSelectionScreen();
+    
+    setTimeout(resolve, CONFIG.screenLoadDelay);
+  });
+}
   
   // Create token selection screen if it doesn't exist
   function ensureTokenSelectionScreen() {
