@@ -548,55 +548,60 @@
       return resolve();
     }
 
-    // Screen configurations with default content
-    const screenConfigurations = {
-      'history-screen': {
-        className: 'screen hidden',
-        content: `
-          <div class="screen-header">
-            <button class="back-button" aria-label="Go back">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <h2>Transaction History</h2>
-          </div>
-          <div class="networks-filter">
-            <div class="all-networks">
-              All Networks <i class="fas fa-chevron-down"></i>
-            </div>
-          </div>
-          <div class="history-transaction-list" id="history-transaction-list">
-            <!-- Transactions will be dynamically populated -->
-            <div class="no-transactions">
-              <p>No transaction history available</p>
-            </div>
-          </div>
+    // In combined1.js - Update the 'history-screen' content in loadScreenContents function:
+'history-screen': {
+  className: 'screen hidden',
+  content: `
+    <div class="screen-header">
+      <button class="back-button" aria-label="Go back">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2>Transaction History</h2>
+    </div>
+    <div class="networks-filter">
+      <div class="all-networks">
+        All Networks <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+    <div class="history-transaction-list" id="history-transaction-list">
+      <!-- Transactions will be dynamically populated -->
+      <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
+        <p>No transaction history available</p>
+      </div>
+    </div>
+  `
+}
         `
       },
-      'receive-screen': {
-        className: 'screen hidden',
-        content: `
-          <div class="screen-header">
-            <button class="back-button" aria-label="Go back">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <h2>Receive</h2>
-          </div>
-          <div class="receive-content">
-            <div class="qr-code-container">
-              <img id="receive-qr-code" alt="Wallet QR Code" />
-            </div>
-            <div class="wallet-address-container">
-              <input 
-                type="text" 
-                id="wallet-address" 
-                readonly 
-                placeholder="Your wallet address"
-              >
-              <button class="copy-address-button">
-                <i class="fas fa-copy"></i> Copy
-              </button>
-            </div>
-          </div>
+     // In combined1.js - Update the 'receive-screen' content in loadScreenContents function:
+'receive-screen': {
+  className: 'screen hidden',
+  content: `
+    <div class="screen-header">
+      <button class="back-button" aria-label="Go back">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2>Receive</h2>
+    </div>
+    <div class="receive-content">
+      <div class="qr-code-container">
+        <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
+      </div>
+      <div class="wallet-address-container">
+        <input 
+          type="text" 
+          id="wallet-address" 
+          readonly 
+          value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
+          placeholder="Your wallet address"
+        >
+        <button class="copy-address-button">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>
+    </div>
+  `
+}
         `
       },
       'send-screen': {
@@ -1698,28 +1703,54 @@
         /**
          * Toggle balance visibility
          */
-        toggleBalanceVisibility() {
-          const balanceAmount = this.elements.totalBalance;
-          const visibilityIcon = this.elements.visibilityToggle.querySelector('i');
-          
-          if (!balanceAmount || !visibilityIcon) return;
-          
-          const isHidden = visibilityIcon.classList.contains('fa-eye-slash');
-          
-          if (isHidden) {
-            // Show balance
-            visibilityIcon.classList.remove('fa-eye-slash');
-            visibilityIcon.classList.add('fa-eye');
-            balanceAmount.textContent = this.cachedBalance || '$0.00';
-          } else {
-            // Hide balance
-            visibilityIcon.classList.remove('fa-eye');
-            visibilityIcon.classList.add('fa-eye-slash');
-            this.cachedBalance = balanceAmount.textContent;
-            balanceAmount.textContent = '••••••';
-          }
-        }
+      // In combined1.js - Update the toggleBalanceVisibility method:
+toggleBalanceVisibility() {
+  const balanceAmount = this.elements.totalBalance;
+  const visibilityIcon = this.elements.visibilityToggle?.querySelector('i');
+  
+  if (!balanceAmount || !visibilityIcon) return;
+  
+  const isHidden = visibilityIcon.classList.contains('fa-eye-slash');
+  
+  if (isHidden) {
+    // Show balance
+    visibilityIcon.classList.remove('fa-eye-slash');
+    visibilityIcon.classList.add('fa-eye');
+    // Restore the cached balance if it exists
+    if (this.cachedBalance) {
+      balanceAmount.textContent = this.cachedBalance;
+    } else {
+      // If no cached balance, update from wallet data
+      const activeWallet = window.activeWallet || 'main';
+      const walletData = window.currentWalletData[activeWallet];
+      if (walletData && typeof walletData.totalBalance !== 'undefined') {
+        balanceAmount.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
+      } else {
+        balanceAmount.textContent = '$0.00';
       }
+    }
+    
+    // Also show token amounts
+    document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+      const originalAmount = tokenBalance.dataset.originalAmount;
+      if (originalAmount) {
+        tokenBalance.textContent = originalAmount;
+      }
+    });
+  } else {
+    // Hide balance
+    visibilityIcon.classList.remove('fa-eye');
+    visibilityIcon.classList.add('fa-eye-slash');
+    this.cachedBalance = balanceAmount.textContent;
+    balanceAmount.textContent = '••••••';
+    
+    // Also hide token amounts
+    document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+      tokenBalance.dataset.originalAmount = tokenBalance.textContent;
+      tokenBalance.textContent = '••••••';
+    });
+  }
+}
       
       // Create global instance
       window.uiManager = new WalletUIManager();
@@ -3513,118 +3544,152 @@
   }
   
   // Fix token detail view (thorough fix)
-  function fixTokenDetailView() {
-    return new Promise(resolve => {
-      log('Fixing token detail view');
-      
-      const tokenDetail = document.getElementById('token-detail');
-      if (!tokenDetail) {
-        resolve();
-        return;
-      }
-      
-      try {
-        // Fix header styling
-        const header = tokenDetail.querySelector('.detail-header');
-        if (header) {
-          header.style.cssText = `
-            background-color: white !important;
-            padding: 12px 16px !important; 
-            border-bottom: none !important;
-            display: flex !important;
-            justify-content: space-between !important;
-            align-items: center !important;
-          `;
-        }
-        
-        // Token title needs to be at the top with minimal spacing
-        const titleElement = tokenDetail.querySelector('.token-detail-title');
-        if (titleElement) {
-          titleElement.style.cssText = `
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            margin: 0 auto !important;
-            padding-top: 0 !important;
-          `;
-        }
-        
-        // Symbol should be bold and properly sized
-        const symbolElement = document.getElementById('detail-symbol');
-        if (symbolElement) {
-          symbolElement.style.cssText = `
-            font-size: 24px !important;
-            font-weight: 600 !important;
-            text-align: center !important;
-            margin: 0 0 2px 0 !important;
-            padding-top: 0 !important;
-          `;
-        }
-        
-        // Fullname should be centered and properly formatted
-        const fullnameElement = document.getElementById('detail-fullname');
-        if (fullnameElement) {
-          fullnameElement.style.cssText = `
-            font-size: 12px !important;
-            color: #8A939D !important;
-            text-align: center !important;
-            margin: 0 !important;
-          `;
-          
-          if (!fullnameElement.textContent.includes('|')) {
-            const tokenName = fullnameElement.textContent;
-            fullnameElement.textContent = `COIN | ${tokenName}`;
-          }
-        }
-        
-        // Remove all network badges
-        const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
-        badges.forEach(badge => {
-          badge.style.display = 'none !important';
-          // Or remove them completely
-          if (badge.parentNode) {
-            badge.parentNode.removeChild(badge);
-          }
-        });
-        
-        // Make positive values blue
-        const priceChangeElement = document.getElementById('token-price-change');
-        if (priceChangeElement && priceChangeElement.classList.contains('positive')) {
-          priceChangeElement.style.color = '#3375BB !important';
-        }
-        
-        // Fix action buttons
-        const actions = tokenDetail.querySelectorAll('.detail-action');
-        actions.forEach(action => {
-          action.classList.add('tw-ripple');
-          
-          const actionIcon = action.querySelector('i');
-          if (actionIcon) {
-            actionIcon.style.backgroundColor = 'rgba(51, 117, 187, 0.08)';
-            actionIcon.style.color = '#3375BB';
-          }
-          
-          // Make sure actions have proper font
-          const actionText = action.querySelector('span');
-          if (actionText) {
-            actionText.style.fontSize = '12px';
-            actionText.style.marginTop = '4px';
-          }
-        });
-        
-        // Fix token icon container
-        const iconContainer = tokenDetail.querySelector('.token-detail-icon-container');
-        if (iconContainer) {
-          iconContainer.style.position = 'relative';
-          iconContainer.style.overflow = 'visible';
-        }
-      } catch (error) {
-        console.error('Error fixing token detail view:', error);
-      }
-      
+ // Fix token detail view (thorough fix)
+function fixTokenDetailView() {
+  return new Promise(resolve => {
+    log('Fixing token detail view');
+    
+    const tokenDetail = document.getElementById('token-detail');
+    if (!tokenDetail) {
       resolve();
-    });
-  }
+      return;
+    }
+    
+    try {
+      // Fix header styling with more specific rules
+      const header = tokenDetail.querySelector('.detail-header');
+      if (header) {
+        header.style.cssText = `
+          background-color: white !important;
+          padding: 12px 16px !important; 
+          border-bottom: none !important;
+          display: flex !important;
+          justify-content: space-between !important;
+          align-items: center !important;
+          width: 100% !important;
+          box-sizing: border-box !important;
+        `;
+      }
+      
+      // Fix back button
+      const backButton = tokenDetail.querySelector('#back-button');
+      if (backButton) {
+        backButton.style.cssText = `
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          width: 32px !important;
+          height: 32px !important;
+          background: transparent !important;
+          color: #1A2024 !important;
+        `;
+      }
+      
+      // Token title needs to be centered
+      const titleElement = tokenDetail.querySelector('.token-detail-title');
+      if (titleElement) {
+        titleElement.style.cssText = `
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          margin: 0 auto !important;
+          padding-top: 0 !important;
+          position: absolute !important;
+          left: 50% !important;
+          transform: translateX(-50%) !important;
+        `;
+      }
+
+      // Symbol should be bold and properly sized
+      const symbolElement = document.getElementById('detail-symbol');
+      if (symbolElement) {
+        symbolElement.style.cssText = `
+          font-size: 24px !important;
+          font-weight: 600 !important;
+          text-align: center !important;
+          margin: 0 0 2px 0 !important;
+          padding-top: 0 !important;
+        `;
+      }
+      
+      // Fullname should be centered and properly formatted
+      const fullnameElement = document.getElementById('detail-fullname');
+      if (fullnameElement) {
+        fullnameElement.style.cssText = `
+          font-size: 12px !important;
+          color: #8A939D !important;
+          text-align: center !important;
+          margin: 0 !important;
+        `;
+        
+        if (!fullnameElement.textContent.includes('|')) {
+          const tokenName = fullnameElement.textContent;
+          fullnameElement.textContent = `COIN | ${tokenName}`;
+        }
+      }
+      
+      // Remove all network badges
+      const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
+      badges.forEach(badge => {
+        badge.style.display = 'none !important';
+        // Or remove them completely
+        if (badge.parentNode) {
+          badge.parentNode.removeChild(badge);
+        }
+      });
+      
+      // Make positive values blue
+      const priceChangeElement = document.getElementById('token-price-change');
+      if (priceChangeElement && priceChangeElement.classList.contains('positive')) {
+        priceChangeElement.style.color = '#3375BB !important';
+      }
+      
+      // Fix action buttons
+      const actions = tokenDetail.querySelectorAll('.detail-action');
+      actions.forEach(action => {
+        action.classList.add('tw-ripple');
+        
+        const actionIcon = action.querySelector('i');
+        if (actionIcon) {
+          actionIcon.style.backgroundColor = 'rgba(51, 117, 187, 0.08)';
+          actionIcon.style.color = '#3375BB';
+        }
+        
+        // Make sure actions have proper font
+        const actionText = action.querySelector('span');
+        if (actionText) {
+          actionText.style.fontSize = '12px';
+          actionText.style.marginTop = '4px';
+        }
+      });
+      
+      // Fix token icon container
+      const iconContainer = tokenDetail.querySelector('.token-detail-icon-container');
+      if (iconContainer) {
+        iconContainer.style.position = 'relative';
+        iconContainer.style.overflow = 'visible';
+      }
+
+      // Fix token balance display
+      const balanceContainer = tokenDetail.querySelector('.token-detail-balance');
+      if (balanceContainer) {
+        balanceContainer.style.marginTop = '32px';
+        balanceContainer.style.marginBottom = '24px';
+      }
+
+      // Fix staking container
+      const stakingContainer = tokenDetail.querySelector('.staking-container');
+      if (stakingContainer) {
+        stakingContainer.style.marginTop = '16px';
+      }
+
+    } catch (error) {
+      console.error('Error fixing token detail view:', error);
+    }
+    
+    resolve();
+  });
+}
   
   // Enhance transactions
   function enhanceTransactions() {
