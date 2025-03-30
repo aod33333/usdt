@@ -681,7 +681,7 @@ function addEnhancementStyles() {
           maximumFractionDigits: 6
         });
         
-        const formattedValue = '
+        const formattedValue = '$' + token.value.toFixed(2);
   
   // Step 1: Ensure all screen containers exist
   function ensureScreenContainers() {
