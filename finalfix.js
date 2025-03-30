@@ -943,67 +943,69 @@
     });
   }
   
-  // Step 4: Fix global navigation system (harmonize with combined.js)
   function fixGlobalNavigation() {
-    return new Promise(resolve => {
-      log('Installing definitive navigation system');
+  return new Promise(resolve => {
+    log('Installing definitive navigation system');
+    
+    // If combined.js has already set up navigation, use it
+    if (window.app && window.app.screenManager && typeof window.app.screenManager.navigateTo === 'function') {
+      log('Using existing navigateTo function from combined.js');
       
-      // If we should respect the original navigation system from combined.js
-      if (CONFIG.useOriginalNavigationSystem && typeof window.navigateTo === 'function') {
-        log('Using existing navigateTo function from combined.js');
+      // Store original function
+      const originalNavigateTo = window.app.screenManager.navigateTo.bind(window.app.screenManager);
+      
+      // Replace with enhanced version
+      window.app.screenManager.navigateTo = function(screenId, fromScreenId) {
+        log(`Enhanced navigation to ${screenId} from ${fromScreenId || 'unknown'}`);
         
-        // Store the original function to reference
-        window._originalNavigateTo = window.navigateTo;
+        // Add transition classes
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+          targetScreen.classList.add('tw-slide-in');
+        }
         
-        // Create a wrapper that provides our enhanced functionality
-        window.navigateTo = function(screenId, fromScreenId) {
-          log(`Enhanced navigation to ${screenId} from ${fromScreenId || 'unknown'}`);
+        // Call original method
+        return originalNavigateTo(screenId, fromScreenId);
+      };
+      
+      // Update global navigation function
+      window.navigateTo = window.app.screenManager.navigateTo.bind(window.app.screenManager);
+    } else {
+      // Define our own navigation function
+      window.navigateTo = function(screenId, fromScreenId) {
+        log(`Standalone navigation to ${screenId}${fromScreenId ? ' from ' + fromScreenId : ''}`);
+        
+        // Hide all screens
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        // Show target screen
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+          targetScreen.style.display = 'flex';
+          targetScreen.classList.remove('hidden');
           
-          // Add transition classes here if needed
-          const targetScreen = document.getElementById(screenId);
-          if (targetScreen) {
-            targetScreen.classList.add('tw-slide-in');
+          // Remember where we came from
+          if (fromScreenId) {
+            targetScreen.dataset.returnTo = fromScreenId;
           }
           
-          // Call the original function
-          return window._originalNavigateTo(screenId, fromScreenId);
-        };
-      } else {
-        // Define our own navigation function if none exists
-        window.navigateTo = function(screenId, fromScreenId) {
-          log(`Navigating to ${screenId}${fromScreenId ? ' from ' + fromScreenId : ''}`);
-          
-          // Hide all screens
-          document.querySelectorAll('.screen').forEach(screen => {
-            screen.style.display = 'none';
-            screen.classList.add('hidden');
-          });
-          
-          // Show target screen
-          const targetScreen = document.getElementById(screenId);
-          if (targetScreen) {
-            targetScreen.style.display = 'flex';
-            targetScreen.classList.remove('hidden');
-            
-            // Remember where we came from
-            if (fromScreenId) {
-              targetScreen.dataset.returnTo = fromScreenId;
-            }
-            
-            return true;
-          } else {
-            console.error(`Target screen ${screenId} not found`);
-            return false;
-          }
-        };
-      }
-      
-      // Shorthand function for navigation
-      window.navigateToScreen = window.navigateTo;
-      
-      resolve();
-    });
-  }
+          return true;
+        } else {
+          console.error(`Target screen ${screenId} not found`);
+          return false;
+        }
+      };
+    }
+    
+    // Shorthand function for navigation
+    window.navigateToScreen = window.navigateTo;
+    
+    resolve();
+  });
+}
   
   // Step 5: Apply UI styling enhancements
   function enhanceUIStyling() {
