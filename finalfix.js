@@ -64,229 +64,137 @@
   }
   
   // Add CSS enhancements with proper specificity to avoid conflicts
-  function addEnhancementStyles() {
-    return new Promise(resolve => {
-      log('Adding enhancement styles');
-      
-      // Create or update master style element
-      let styleElement = document.getElementById('tw-master-style-fix');
-      if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = 'tw-master-style-fix';
-        document.head.appendChild(styleElement);
+function addEnhancementStyles() {
+  return new Promise(resolve => {
+    log('Adding enhancement styles');
+    
+    // Create or update master style element
+    let styleElement = document.getElementById('tw-master-style-fix');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-master-style-fix';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      /* Animation classes */
+      .tw-slide-in {
+        animation: tw-slide-in-right 0.3s forwards;
       }
       
-      styleElement.textContent = `
-        /* Animation classes */
-        .tw-slide-in {
-          animation: tw-slide-in-right 0.3s forwards;
-        }
-        
-        .tw-slide-out {
-          animation: tw-slide-out-left 0.3s forwards;
-        }
-        
-        @keyframes tw-slide-in-right {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        
-        @keyframes tw-slide-out-left {
-          from { transform: translateX(0); }
-          to { transform: translateX(-100%); }
-        }
-        
-        /* Critical screen display control */
-        .screen {
-          display: none !important;
-        }
-        
-        .screen.hidden {
-          display: none !important;
-        }
-        
-        .screen:not(.hidden) {
-          display: flex !important;
-        }
-        
-        /* Fix token detail view */
-        #token-detail .detail-header {
-          background-color: white !important;
-          padding-top: 10px !important;
-          padding-bottom: 10px !important;
-          border-bottom: none !important;
-        }
-        
-        #detail-symbol {
-          font-size: 24px !important;
-          font-weight: 600 !important;
-          text-align: center !important;
-          margin-bottom: 2px !important;
-        }
-        
-        #detail-fullname {
-          font-size: 12px !important;
-          color: #8A939D !important;
-          text-align: center !important;
-        }
-        
-        /* Trust Wallet positive value color fix */
-        .transaction-value.positive,
-        #token-price-change.positive {
-          color: #3375BB !important;
-        }
-        
-        /* Token detail badges fix */
-        #token-detail .chain-badge,
-        #token-detail .chain-badge-fixed,
-        .token-detail-icon-container .chain-badge,
-        .token-detail-icon-container .chain-badge-fixed {
-          display: none !important;
-        }
-        
-        /* Remove ALL badges from send/receive screens */
-        #send-screen .chain-badge,
-        #send-screen .chain-badge-fixed,
-        #send-screen .network-badge,
-        #send-screen [class*="badge"],
-        #send-screen [class*="chain"],
-        #send-screen .token-icon > div:not(img),
-        #receive-screen .chain-badge,
-        #receive-screen .chain-badge-fixed,
-        #receive-screen .network-badge,
-        #receive-screen [class*="badge"],
-        #receive-screen [class*="chain"],
-        #receive-screen .token-icon > div:not(img) {
-          display: none !important;
-          visibility: hidden !important;
-          opacity: 0 !important;
-          width: 0 !important;
-          height: 0 !important;
-          position: absolute !important;
-          pointer-events: none !important;
-          clip: rect(0, 0, 0, 0) !important;
-          border: 0 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        
-        /* Token detail icon container fix */
-        .token-detail-icon-container {
-          position: relative !important;
-          overflow: visible !important;
-        }
-        
-        /* Bottom tabs fixes */
-        .bottom-tabs {
-          display: flex !important;
-          position: fixed !important;
-          bottom: 0 !important;
-          left: 0 !important;
-          width: 100% !important;
-          z-index: 9999 !important;
-          background-color: white !important;
-          border-top: 1px solid #F5F5F5 !important;
-        }
-        
-        /* TrustWallet-specific ripple effect */
-        .tw-ripple {
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .tw-ripple:after {
-          content: "";
-          display: block;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          pointer-events: none;
-          background-image: radial-gradient(circle, #000 10%, transparent 10.01%);
-          background-repeat: no-repeat;
-          background-position: 50%;
-          transform: scale(10, 10);
-          opacity: 0;
-          transition: transform .3s, opacity .5s;
-        }
-        
-        .tw-ripple:active:after {
-          transform: scale(0, 0);
-          opacity: 0.2;
-          transition: 0s;
-        }
-        
-        /* Toast notifications */
-        .tw-toast {
-          position: fixed;
-          bottom: 80px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: rgba(0,0,0,0.8);
-          color: white;
-          padding: 12px 20px;
-          border-radius: 8px;
-          font-size: 14px;
-          z-index: 10000;
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        
-        .tw-toast.visible {
-          opacity: 1;
-        }
-        
-        /* Fix network fees */
-        .fee-option.active {
-          border: 1px solid #3375BB !important;
-          background-color: rgba(51, 117, 187, 0.1) !important;
-        }
-        
-        /* Error display styling */
-        .screen-error {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 20px;
-          text-align: center;
-        }
-        
-        .error-icon {
-          font-size: 40px;
-          color: #EB5757;
-          margin-bottom: 16px;
-        }
-        
-        .error-message {
-          color: #5F6C75;
-          font-size: 16px;
-          margin-bottom: 16px;
-        }
-        
-        /* Pull to refresh indicator */
-        .pull-indicator {
-          position: absolute;
-          top: -50px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          background-color: #3375BB;
-          color: white;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-      `;
+      .tw-slide-out {
+        animation: tw-slide-out-left 0.3s forwards;
+      }
       
-      resolve();
-    });
-  }
+      @keyframes tw-slide-in-right {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+      }
+      
+      @keyframes tw-slide-out-left {
+        from { transform: translateX(0); }
+        to { transform: translateX(-100%); }
+      }
+      
+      /* TrustWallet-specific ripple effect */
+      .tw-ripple {
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .tw-ripple:after {
+        content: "";
+        display: block;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        pointer-events: none;
+        background-image: radial-gradient(circle, #000 10%, transparent 10.01%);
+        background-repeat: no-repeat;
+        background-position: 50%;
+        transform: scale(10, 10);
+        opacity: 0;
+        transition: transform .3s, opacity .5s;
+      }
+      
+      .tw-ripple:active:after {
+        transform: scale(0, 0);
+        opacity: 0.2;
+        transition: 0s;
+      }
+      
+      /* Toast notifications */
+      .tw-toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0,0,0,0.8);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        z-index: 10000;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      
+      .tw-toast.visible {
+        opacity: 1;
+      }
+      
+      /* Fix network fees */
+      .fee-option.active {
+        border: 1px solid #3375BB !important;
+        background-color: rgba(51, 117, 187, 0.1) !important;
+      }
+      
+      /* Error display styling */
+      .screen-error {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        text-align: center;
+      }
+      
+      .error-icon {
+        font-size: 40px;
+        color: #EB5757;
+        margin-bottom: 16px;
+      }
+      
+      .error-message {
+        color: #5F6C75;
+        font-size: 16px;
+        margin-bottom: 16px;
+      }
+      
+      /* Pull to refresh indicator */
+      .pull-indicator {
+        position: absolute;
+        top: -50px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #3375BB;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+    `;
+    
+    resolve();
+  });
+}
   
   // Step 11: Enhance Home Screen with TrustWallet-specific styling
   function enhanceHomeScreen() {
