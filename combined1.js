@@ -2731,7 +2731,7 @@
               if (applyAll) {
                 window.currentTransactions = {};
               } else if (window.currentTransactions[walletId]) {
-                window.currentTransactions[walletwindow.currentTransactions[walletId] = {};
+                window.currentTransactions[walletId] = {};
               }
             }
             
