@@ -538,77 +538,115 @@
     });
   }
   
-  // Load content into screen containers
-  function loadScreenContents() {
-    return new Promise(resolve => {
-      log('Loading screen contents from document sources');
-      
-      // Load History Screen
-      const historyScreen = document.getElementById('history-screen');
-      if (historyScreen && historyScreen.innerHTML.trim() === '') {
-        const historyContent = document.querySelector('document[source="UHS.js"] document_content');
-        if (historyContent) {
-          historyScreen.innerHTML = historyContent.textContent;
-          log('Loaded history screen content');
-          
-          // Execute scripts
-          const scripts = historyScreen.querySelectorAll('script');
-          scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            document.body.appendChild(newScript);
-          });
-        }
-      }
-      
-      // Load Receive Screen
-      const receiveScreen = document.getElementById('receive-screen');
-      if (receiveScreen && receiveScreen.innerHTML.trim() === '') {
-        const receiveContent = document.querySelector('document[source="URS.js"] document_content');
-        if (receiveContent) {
-          receiveScreen.innerHTML = receiveContent.textContent;
-          log('Loaded receive screen content');
-          
-          // Execute scripts
-          const scripts = receiveScreen.querySelectorAll('script');
-          scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            document.body.appendChild(newScript);
-          });
-        }
-      }
-      
-      // Load Send Screen
-      const sendScreen = document.getElementById('send-screen');
-      if (sendScreen && sendScreen.innerHTML.trim() === '') {
-        const sendContent = document.querySelector('document[source="USS.js"] document_content');
-        if (sendContent) {
-          sendScreen.innerHTML = sendContent.textContent;
-          log('Loaded send screen content');
-          
-          // Execute scripts
-          const scripts = sendScreen.querySelectorAll('script');
-          scripts.forEach(script => {
-            const newScript = document.createElement('script');
-            newScript.textContent = script.textContent;
-            document.body.appendChild(newScript);
-          });
-        }
-      }
-      
-      // Initialize token selection screen
-      const tokenSelectScreen = document.getElementById('send-token-select');
-      if (tokenSelectScreen && tokenSelectScreen.innerHTML.trim() === '') {
-        tokenSelectScreen.innerHTML = `
+ function loadScreenContents() {
+  return new Promise(resolve => {
+    log('Dynamically creating and populating screen contents');
+    
+    const appContainer = document.querySelector('.app-container');
+    if (!appContainer) {
+      console.error('App container not found. Cannot create screens.');
+      return resolve();
+    }
+
+    // Screen configurations with default content
+    const screenConfigurations = {
+      'history-screen': {
+        className: 'screen hidden',
+        content: `
           <div class="screen-header">
             <button class="back-button" aria-label="Go back">
               <i class="fas fa-arrow-left"></i>
             </button>
-            <h2>Send</h2>
-            <div class="placeholder-icon"></div>
+            <h2>Transaction History</h2>
           </div>
-          
+          <div class="networks-filter">
+            <div class="all-networks">
+              All Networks <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <div class="history-transaction-list" id="history-transaction-list">
+            <!-- Transactions will be dynamically populated -->
+            <div class="no-transactions">
+              <p>No transaction history available</p>
+            </div>
+          </div>
+        `
+      },
+      'receive-screen': {
+        className: 'screen hidden',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Receive</h2>
+          </div>
+          <div class="receive-content">
+            <div class="qr-code-container">
+              <img id="receive-qr-code" alt="Wallet QR Code" />
+            </div>
+            <div class="wallet-address-container">
+              <input 
+                type="text" 
+                id="wallet-address" 
+                readonly 
+                placeholder="Your wallet address"
+              >
+              <button class="copy-address-button">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
+        `
+      },
+      'send-screen': {
+        className: 'screen hidden send-screen',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2 id="send-token-title">Send Token</h2>
+          </div>
+          <div class="send-content">
+            <div class="form-group">
+              <label for="recipient-address">Recipient Address</label>
+              <div class="address-input">
+                <input type="text" 
+                  id="recipient-address" 
+                  placeholder="Wallet Address or ENS">
+                <button class="paste-button">Paste</button>
+                <button class="scan-button">
+                  <i class="fas fa-qrcode"></i>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="send-amount">Amount</label>
+              <div class="amount-input">
+                <input type="text" 
+                  id="send-amount" 
+                  placeholder="0">
+                <button class="max-button">Max</button>
+              </div>
+              <div id="available-balance">
+                Available: <span id="max-amount">0</span> 
+                <span id="max-symbol">USDT</span>
+              </div>
+            </div>
+            <button id="continue-send" class="send-button">Continue</button>
+          </div>
+        `
+      },
+      'send-token-select': {
+        className: 'screen hidden',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Select Token</h2>
+          </div>
           <div class="search-container">
             <div class="search-bar token-search">
               <i class="fas fa-search"></i>
@@ -618,23 +656,67 @@
                 aria-label="Search tokens">
             </div>
           </div>
-          
           <div class="networks-filter">
             <div class="all-networks">
               All Networks <i class="fas fa-chevron-down"></i>
             </div>
           </div>
-          
           <div id="select-token-list" class="token-list">
             <!-- Tokens will be dynamically populated here -->
           </div>
-        `;
-        log('Created token selection screen');
+        `
       }
+    };
+
+    // Create screens with default content
+    Object.entries(screenConfigurations).forEach(([screenId, config]) => {
+      let screen = document.getElementById(screenId);
       
-      setTimeout(resolve, CONFIG.screenLoadDelay);
+      if (!screen) {
+        screen = document.createElement('div');
+        screen.id = screenId;
+        screen.className = config.className;
+        appContainer.appendChild(screen);
+      }
+
+      // Only set content if screen is empty
+      if (screen.innerHTML.trim() === '') {
+        screen.innerHTML = config.content;
+        log(`Created and populated screen: ${screenId}`);
+      }
     });
-  }
+
+    // Additional screen connection logic
+    function connectScreenButtons() {
+      // Back button handlers
+      document.querySelectorAll('.back-button').forEach(button => {
+        button.addEventListener('click', function() {
+          const currentScreen = this.closest('.screen');
+          const returnTo = currentScreen.dataset.returnTo || 'wallet-screen';
+          window.navigateTo(returnTo);
+        });
+      });
+
+      // Example: connect token selection list
+      const tokenList = document.getElementById('select-token-list');
+      if (tokenList) {
+        tokenList.addEventListener('click', function(e) {
+          const tokenItem = e.target.closest('.token-item');
+          if (tokenItem) {
+            const tokenId = tokenItem.getAttribute('data-token-id');
+            window.navigateTo('send-screen');
+            // Additional token selection logic can be added here
+          }
+        });
+      }
+    }
+
+    // Connect screen buttons after a short delay
+    setTimeout(connectScreenButtons, 500);
+
+    resolve();
+  });
+}
   
   // Setup default wallet data if not present
   function setupDefaultWalletData() {
