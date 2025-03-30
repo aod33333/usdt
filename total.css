@@ -29,7 +29,7 @@
     --tw-warning-bg: #FEF9E7;
     --tw-warning-text: #D4AC0D;
     
-    /* Font sizes - adjusted to match Trust Wallet */
+    /* Font sizes */
     --font-xs: 10px;
     --font-sm: 12px;
     --font-md: 14px;
@@ -105,7 +105,7 @@ button {
     top: 0;
     left: 0;
     width: 100%;
-    height: 20px; /* Reduced from 24px */
+    height: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -114,75 +114,42 @@ button {
     z-index: 2000;
     background-color: var(--tw-white);
     font-family: 'Roboto', sans-serif;
-    font-size: 10px; /* Reduced from 12px */
+    font-size: 10px;
 }
 
 .status-time {
     font-weight: 600;
-    font-size: 12px; /* Reduced from 14px */
+    font-size: 12px;
 }
 
 .status-icons {
     display: flex;
-    gap: 2px; /* Reduced from 4px */
+    gap: 2px;
     align-items: center;
 }
 
-.status-icons i {
-    font-size: 10px; /* Reduced from 12px */
-}
-
-.status-icons span {
-    font-size: 10px; /* Reduced from 12px */
+.status-icons i, .status-icons span {
+    font-size: 10px;
 }
 
 /* Add padding for screens after login */
 .with-status-bar {
-    padding-top: 20px; /* Reduced from 24px */
-}
-
-body .with-status-bar {
-    padding-top: 20px; /* Reduced from 24px */
+    padding-top: 20px;
 }
 
 /* Utility Classes */
-.text-center {
-    text-align: center;
-}
-
-.flex {
-    display: flex;
-}
-
-.flex-column {
-    flex-direction: column;
-}
-
-.flex-row {
-    flex-direction: row;
-}
-
+.text-center { text-align: center; }
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.flex-row { flex-direction: row; }
 .flex-center {
     justify-content: center;
     align-items: center;
 }
+.space-between { justify-content: space-between; }
 
-.space-between {
-    justify-content: space-between;
-}
-
-.positive {
-    color: var(--tw-blue) !important;
-}
-
-/* Specific fix for token price change */
-.token-price-change.positive {
-    color: var(--tw-blue) !important;
-}
-
-.negative {
-    color: var(--tw-red);
-}
+.positive { color: var(--tw-blue) !important; }
+.negative { color: var(--tw-red); }
 
 .loading {
     position: relative;
@@ -208,21 +175,10 @@ body .with-status-bar {
     to { transform: rotate(360deg); }
 }
 
-.font-regular {
-    font-weight: 400;
-}
-
-.font-medium {
-    font-weight: 500;
-}
-
-.font-semibold {
-    font-weight: 600;
-}
-
-.font-bold {
-    font-weight: 700;
-}
+.font-regular { font-weight: 400; }
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
 
 /* Accessibility helper */
 .visually-hidden {
@@ -236,9 +192,72 @@ body .with-status-bar {
     border: 0;
 }
 
-/* Add padding for screens after login */
-.with-status-bar {
-    padding-top: 24px; /* For status bar */
+/* TrustWallet ripple effect */
+.tw-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.tw-ripple:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #000 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform .3s, opacity .5s;
+}
+
+.tw-ripple:active:after {
+    transform: scale(0, 0);
+    opacity: 0.2;
+    transition: 0s;
+}
+
+/* Toast notifications */
+.tw-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0,0,0,0.8);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.tw-toast.visible {
+    opacity: 1;
+}
+
+/* Animation classes */
+.tw-slide-in {
+    animation: tw-slide-in-right 0.3s forwards;
+}
+
+.tw-slide-out {
+    animation: tw-slide-out-left 0.3s forwards;
+}
+
+@keyframes tw-slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes tw-slide-out-left {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
 }
 
 /* =================================================================
@@ -272,13 +291,47 @@ body .with-status-bar {
     background-color: transparent;
 }
 
+/* Screen header (universal) */
+.screen-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background-color: var(--tw-white);
+    position: relative;
+}
+
+.screen-header .back-button, 
+.screen-header .icon-button {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: transparent;
+    color: var(--tw-black);
+    border: none;
+}
+
+.screen-header h2 {
+    flex: 1;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.placeholder-icon {
+    width: 32px;
+    height: 32px;
+}
+
 /* Investment Warning banners */
 .investment-warning {
     width: calc(100% - (2 * var(--space-md)));
     background-color: var(--tw-warning-bg);
     color: var(--tw-warning-text);
     padding: 8px;
-    font-size: 10px !important; /* Reduced from 11px */
+    font-size: 10px !important;
     margin: 8px;
     border-radius: 8px;
     border-left: 4px solid var(--tw-warning-text);
@@ -286,34 +339,38 @@ body .with-status-bar {
     align-items: flex-start;
     box-sizing: border-box;
 }
+
 .investment-warning-content {
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     width: 100%;
 }
+
 .warning-icon {
     font-size: 20px;
     color: var(--tw-warning-text);
     flex-shrink: 0;
     margin-right: 12px;
     align-self: flex-start;
-    margin-top: 2px; /* Adjusted from 4px for better alignment */
+    margin-top: 2px;
 }
+
 .investment-warning-text {
     flex: 1;
     padding-right: 8px;
-    line-height: 1.4 !important; /* Consistent line height for all content */
+    line-height: 1.4 !important;
 }
-/* 4. Fix transaction warning text spacing */
+
 .investment-warning-text p {
-    line-height: 1.4 !important; /* Consistent line height */
-    margin-bottom: 3px !important; /* Reduced from 4px */
+    line-height: 1.4 !important;
+    margin-bottom: 3px !important;
 }
+
 .learn-more {
     display: inline-block !important;
-    margin-top: 0 !important; /* Reduced from 2px to even out spacing */
-    line-height: 1.4 !important; /* Match other line heights */
+    margin-top: 0 !important;
+    line-height: 1.4 !important;
 }
 
 .close-warning {
@@ -324,30 +381,6 @@ body .with-status-bar {
     padding: 0;
     margin-left: auto;
     align-self: flex-start;
-}
-
-/* Bitcoin Warning Banner */
-.bitcoin-warning {
-    background-color: var(--tw-warning-bg);
-    padding: var(--space-sm) var(--space-md);
-    margin-bottom: var(--space-sm);
-}
-
-.bitcoin-warning-content {
-    display: flex;
-    align-items: flex-start;
-}
-
-.bitcoin-warning-text {
-    flex: 1;
-    margin-left: var(--space-sm);
-}
-
-.bitcoin-warning-text p {
-    font-size: var(--font-xs);
-    color: var(--tw-black);
-    margin: 0;
-    line-height: 1.4;
 }
 
 /* Search Container */
@@ -551,6 +584,7 @@ body .with-status-bar {
 }
 
 .token-network {
+    display: inline-block;
     background-color: rgba(128,128,128,0.2);
     padding: 2px 6px;
     border-radius: 4px;
@@ -570,6 +604,10 @@ body .with-status-bar {
     font-weight: 500;
 }
 
+.token-price-change.positive {
+    color: var(--tw-blue) !important;
+}
+
 .token-amount {
     text-align: right;
 }
@@ -586,28 +624,34 @@ body .with-status-bar {
     color: var(--tw-medium-gray);
 }
 
+/* Token Network Badge */
+.token-network-badge {
+    display: inline-block;
+    background-color: rgba(240, 185, 11, 0.1);
+    color: #F0B90B;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 500;
+}
+
 /* Chain Badge */
-.token-wrapper {
-    position: relative;
-    margin-right: 16px;
-}
-
 .chain-badge {
-  position: absolute !important;
-  bottom: -6px !important;
-  right: -6px !important;
-  width: 20px !important;
-  height: 20px !important;
-  border-radius: 50% !important;
-  border: 2px solid #FFFFFF !important;
-  background: #FFFFFF !important;
-  z-index: 1000 !important;
-  overflow: visible !important; /* Changed from hidden to visible */
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-  display: block !important; /* Make sure it's always visible */
+    position: absolute !important;
+    bottom: -6px !important;
+    right: -6px !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50% !important;
+    border: 2px solid #FFFFFF !important;
+    background: #FFFFFF !important;
+    z-index: 1000 !important;
+    overflow: visible !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
+    display: block !important;
 }
 
-/* Badge image styling */
 .chain-badge img,
 .chain-badge-fixed img {
     width: 100% !important;
@@ -617,31 +661,9 @@ body .with-status-bar {
     display: block !important;
 }
 
-.token-icon {
-    position: relative !important;
-    z-index: 1 !important;
-    overflow: visible !important; /* Added overflow: visible */
-}
-
-.chain-badge[data-network="bsc"] img, img[src*="bnb-bnb-logo"] {
+.chain-badge[data-network="bsc"] img, 
+img[src*="bnb-bnb-logo"] {
     content: url('https://cryptologos.cc/logos/bnb-bnb-logo.png') !important;
-}
-
-.chain-badge:hover {
-    transform: scale(1.15);
-    z-index: 3;
-}
-
-.chain-badge:focus {
-    outline: 2px solid var(--tw-blue);
-    outline-offset: 2px;
-}
-
-/* Only show chain badges on specific token items in the main list */
-.token-item[data-token-id="usdt"] .chain-badge,
-.token-item[data-token-id="twt"] .chain-badge,
-.token-item[data-token-id="bnb"] .chain-badge {
-    display: block !important;
 }
 
 .chain-badge-fixed {
@@ -657,63 +679,22 @@ body .with-status-bar {
     display: block !important;
     visibility: visible !important;
     opacity: 1 !important;
-    overflow: visible !important; /* Ensure this is visible too */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
-}
-
-/* FIX 2: Completely nuke badges on send/receive screens */
-/* Target every possible badge and container element */
-#send-screen .chain-badge,
-#send-screen .chain-badge-fixed,
-#send-screen div[class*="badge"],
-#send-screen div[class*="chain"],
-#send-screen .token-icon > div,
-#send-screen .token-icon-large > div,
-#receive-screen .chain-badge,
-#receive-screen .chain-badge-fixed,
-#receive-screen div[class*="badge"],
-#receive-screen div[class*="chain"],
-#receive-screen .token-icon > div,
-#receive-screen .token-icon-large > div,
-#receive-screen .token-selection div > div:not(img) {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-    position: absolute !important;
-    pointer-events: none !important;
-    clip: rect(0, 0, 0, 0) !important;
-    border: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-}
-
-#token-detail .chain-badge,
-#token-detail .chain-badge-fixed,
-.token-detail-icon-container .chain-badge,
-.token-detail-icon-container .chain-badge-fixed {
-    display: none !important;
-}
-
-/* Fix token detail icon container */
-.token-detail-icon-container {
-    position: relative !important;
     overflow: visible !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
 }
 
 /* Bottom Tabs */
 .bottom-tabs {
-    display: flex;
+    display: flex !important;
     justify-content: space-around;
-    background-color: var(--tw-white);
-    border-top: 1px solid var(--tw-bg-gray);
+    background-color: var(--tw-white) !important;
+    border-top: 1px solid var(--tw-bg-gray) !important;
     padding: var(--space-xs) 0;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 100;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    z-index: 9999 !important;
 }
 
 .tab-item {
@@ -767,445 +748,380 @@ body .with-status-bar {
 }
 
 /* =================================================================
-   PART 3: TOKEN DETAIL VIEW
+   PART 3: TOKEN DETAIL VIEW & TRANSACTIONS
    ================================================================= */
-
-/* [Rest of the existing code remains the same until Token Detail Header] */
 
 /* Token Detail Header */
 #token-detail .detail-header {
-  background-color: white;
-  padding-top: 10px;
-  padding-left: 14px;
-  padding-right: 14px;
-  padding-bottom: 10px;
-  border-bottom: none;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+    background-color: white !important;
+    padding: 12px 16px !important; 
+    border-bottom: none !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 #token-detail .back-button {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: var(--tw-black);
-  background: transparent;
-  border: none;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--tw-black);
+    background: transparent;
+    border: none;
 }
 
 /* Token Detail Title */
 .token-detail-title {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 5px;
 }
 
 #detail-symbol {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  text-align: center;
-  color: var(--tw-black);
+    font-size: 24px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    margin-bottom: 2px !important;
 }
 
 #detail-fullname {
-  font-size: 12px;
-  color: var(--tw-medium-gray);
-  text-align: center;
+    font-size: 12px !important;
+    color: var(--tw-medium-gray) !important;
+    text-align: center !important;
 }
 
 /* Token Balance Display */
+.token-detail-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 70px; /* Space for bottom tabs */
+}
+
 .token-detail-balance {
-  text-align: center;
-  margin: 16px 0;
+    text-align: center;
+    margin: 16px 0;
 }
 
 .token-detail-balance h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: var(--tw-black);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--tw-black);
 }
 
 .token-detail-balance p {
-  font-size: 16px;
-  color: var(--tw-medium-gray);
+    font-size: 16px;
+    color: var(--tw-medium-gray);
 }
 
 /* Token Detail Icon Container */
 .token-detail-icon-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 16px 0;
-  position: relative;
-  z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 16px 0;
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 10;
 }
 
 .token-detail-large-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: contain;
-  max-width: 100%;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: contain;
+    max-width: 100%;
 }
 
 /* Action Buttons */
 .token-detail-actions {
-  display: flex;
-  justify-content: space-between;
-  margin: 16px 0;
-  padding: 0 16px;
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+    padding: 0 16px;
 }
 
 .detail-action {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .detail-action i {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(51, 117, 187, 0.08);
-  color: var(--tw-blue);
-  margin-bottom: 8px;
-  font-size: 18px;
-}
-
-.detail-action span {
-  font-size: 12px;
-  color: var(--tw-dark-gray);
-}
-
-/* Remove any potential large background graphics */
-.token-detail-content::after {
-  content: none;
-}
-
-/* Hide network badges */
-#token-detail .chain-badge,
-#token-detail .chain-badge-fixed,
-.token-detail-icon-container .chain-badge,
-.token-detail-icon-container .chain-badge-fixed {
-  display: none !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 375px) {
-  .token-detail-large-icon {
     width: 40px;
     height: 40px;
-  }
-  
-  .token-detail-balance h2 {
-    font-size: 18px;
-  }
-  
-  .token-detail-balance p {
-    font-size: 14px;
-  }
-}
-
-/* Action Buttons */
-.token-detail-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-  padding: 0 16px;
-}
-
-.detail-action {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: transparent;
-  border: none;
-}
-
-.detail-action i {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(51, 117, 187, 0.08);
-  color: var(--tw-blue);
-  margin-bottom: 8px;
-  font-size: 16px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(51, 117, 187, 0.08);
+    color: var(--tw-blue);
+    margin-bottom: 8px;
+    font-size: 16px;
 }
 
 .detail-action span {
-  font-size: 12px;
-  color: var(--tw-dark-gray);
+    font-size: 12px;
+    color: var(--tw-dark-gray);
 }
 
-/* Staking Container Precise Fixes */
+/* Staking Container */
 .staking-container {
-  background-color: var(--tw-bg-gray);
-  border-radius: 16px;
-  padding: 16px;
-  margin: 0 16px 24px;
-  display: flex;
-  align-items: center;
-  position: relative; /* Ensure proper positioning */
+    background-color: var(--tw-bg-gray);
+    border-radius: 16px;
+    padding: 16px;
+    margin: 0 16px 24px;
+    display: flex;
+    align-items: center;
+    position: relative;
 }
 
 .staking-icon {
-  width: 50px;
-  height: 50px;
-  margin-right: 16px;
+    width: 50px;
+    height: 50px;
+    margin-right: 16px;
 }
 
 .staking-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .staking-content {
-  flex: 1;
+    flex: 1;
 }
 
 .staking-content h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--tw-black);
-  margin-bottom: 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tw-black);
+    margin-bottom: 4px;
 }
 
 .staking-content p {
-  font-size: 14px;
-  color: var(--tw-dark-gray);
+    font-size: 14px;
+    color: var(--tw-dark-gray);
 }
 
 .staking-arrow {
-  color: var(--tw-medium-gray);
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
+    color: var(--tw-medium-gray);
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
-/* Gas Fee Indicator Fixes */
+/* Gas Fee Indicator */
 .gas-fee-indicator {
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  font-size: 13px;
-  color: var(--tw-dark-gray);
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--tw-dark-gray);
 }
 
 .gas-fee-indicator i {
-  color: var(--tw-blue) !important; /* Ensure blue color */
-  margin-right: 12px; /* Slightly more margin */
-  font-size: 16px; /* Adjust icon size if needed */
+    color: var(--tw-blue) !important;
+    margin-right: 12px;
+    font-size: 16px;
 }
 
 /* Transaction Section */
 .transaction-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
 }
 
 .transaction-header h3 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--tw-black);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--tw-black);
 }
 
 .filter-button {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--tw-bg-gray);
-  color: var(--tw-dark-gray);
-  border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--tw-bg-gray);
+    color: var(--tw-dark-gray);
+    border: none;
 }
 
 /* Transaction List */
 .transaction-list {
-  margin-bottom: 70px; /* Space for bottom tabs */
+    margin-bottom: 20px;
 }
 
 .transaction-item {
-  display: flex;
-  align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid var(--tw-bg-gray);
-  cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--tw-bg-gray);
+    cursor: pointer;
 }
 
 .transaction-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
 }
 
-/* Trust Wallet uses BLUE for receive transactions, not green */
+/* Trust Wallet uses BLUE for receive transactions */
 .transaction-receive .transaction-icon {
-  background-color: rgba(51, 117, 187, 0.1);
-  color: var(--tw-blue);
+    background-color: rgba(51, 117, 187, 0.1);
+    color: var(--tw-blue);
 }
 
 .transaction-send .transaction-icon {
-  background-color: rgba(235, 87, 87, 0.1);
-  color: var(--tw-red);
+    background-color: rgba(235, 87, 87, 0.1);
+    color: var(--tw-red);
 }
 
 .transaction-info {
-  flex: 1;
+    flex: 1;
 }
 
 .transaction-type {
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--tw-black);
-  margin-bottom: 2px;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--tw-black);
+    margin-bottom: 2px;
 }
 
 .transaction-date {
-  font-size: 12px;
-  color: var(--tw-medium-gray);
+    font-size: 12px;
+    color: var(--tw-medium-gray);
 }
 
 .transaction-amount {
-  text-align: right;
+    text-align: right;
 }
 
-/* Trust Wallet uses BLUE for positive values */
 .transaction-value {
-  font-weight: 600;
-  font-size: 15px;
-  margin-bottom: 2px;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 2px;
 }
 
 .transaction-value.positive {
-  color: var(--tw-blue);
+    color: var(--tw-blue) !important;
 }
 
 .transaction-value.negative {
-  color: var(--tw-red);
+    color: var(--tw-red);
 }
 
 .transaction-usd {
-  font-size: 12px;
-  color: var(--tw-medium-gray);
+    font-size: 12px;
+    color: var(--tw-medium-gray);
 }
 
 /* No Transactions State */
 .no-transactions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 20px;
-  text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+    text-align: center;
 }
 
 .no-tx-icon {
-  width: 80px;
-  height: 80px;
-  margin-bottom: 16px;
-  opacity: 0.7;
+    width: 80px;
+    height: 80px;
+    margin-bottom: 16px;
+    opacity: 0.7;
 }
 
 .no-transactions p {
-  color: var(--tw-dark-gray);
-  font-size: 14px;
-  margin-bottom: 8px;
+    color: var(--tw-dark-gray);
+    font-size: 14px;
+    margin-bottom: 8px;
 }
 
 .explorer-link {
-  font-size: 13px;
+    font-size: 13px;
 }
 
 .explorer-link a {
-  color: var(--tw-blue);
-  text-decoration: none;
+    color: var(--tw-blue);
+    text-decoration: none;
 }
 
 /* Price Information */
 .token-price-info {
-  border-top: 8px solid var(--tw-bg-gray);
-  padding: 20px 16px;
-  margin-bottom: 80px; /* Space for bottom tabs */
+    border-top: 8px solid var(--tw-bg-gray);
+    padding: 20px 16px;
+    margin-bottom: 80px; /* Space for bottom tabs */
 }
 
 .current-price h3 {
-  font-size: 14px;
-  color: var(--tw-dark-gray);
-  margin-bottom: 5px;
+    font-size: 14px;
+    color: var(--tw-dark-gray);
+    margin-bottom: 5px;
 }
 
 .price-with-change {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
 }
 
 #token-current-price {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--tw-black);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--tw-black);
 }
 
 /* Trust Wallet uses BLUE for positive values */
 #token-price-change.positive {
-  color: var(--tw-blue);
+    color: var(--tw-blue) !important;
 }
 
 #token-price-change.negative {
-  color: var(--tw-red);
+    color: var(--tw-red);
 }
 
 .price-timeframe {
-  color: var(--tw-dark-gray);
-  font-size: 14px;
+    color: var(--tw-dark-gray);
+    font-size: 14px;
 }
 
 .price-disclaimer {
-  margin-top: 15px;
-  font-size: 12px;
-  color: var(--tw-dark-gray);
-  line-height: 1.5;
+    margin-top: 15px;
+    font-size: 12px;
+    color: var(--tw-dark-gray);
+    line-height: 1.5;
 }
 
 /* Important: Remove network badges in detail view */
 #token-detail .chain-badge,
-#token-detail .chain-badge-fixed {
-  display: none !important;
+#token-detail .chain-badge-fixed,
+.token-detail-icon-container .chain-badge,
+.token-detail-icon-container .chain-badge-fixed {
+    display: none !important;
 }
 
 /* =================================================================
-   PART 4: TRANSACTION VIEWS & HISTORY
+   PART 4: TRANSACTION VIEWS & MODALS
    ================================================================= */
 
 /* Transaction Status Modal */
-.tx-status-modal {
-    z-index: 9999;
-}
-
 .modal {
     position: fixed;
     top: 0;
@@ -1295,197 +1211,385 @@ body .with-status-bar {
     color: var(--tw-white);
 }
 
-/* Updated History Screen Styles */
+/* Explorer Overlay */
+.explorer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--tw-white);
+    z-index: 1500;
+    display: none;
+    flex-direction: column;
+}
+
+.explorer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background-color: var(--tw-blue);
+    color: var(--tw-white);
+}
+
+.explorer-back-button {
+    color: var(--tw-white);
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+}
+
+.explorer-body {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.explorer-search-container {
+    padding: var(--space-md);
+    background-color: var(--tw-blue-light);
+}
+
+.explorer-search {
+    display: flex;
+    align-items: center;
+    background-color: var(--tw-white);
+    border-radius: 8px;
+    padding: var(--space-sm);
+}
+
+.explorer-search i {
+    color: var(--tw-medium-gray);
+    margin-right: var(--space-sm);
+    margin-left: var(--space-xs);
+}
+
+.explorer-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: var(--font-sm);
+}
+
+.explorer-transaction {
+    padding: var(--space-md);
+}
+
+.explorer-section {
+    background-color: var(--tw-white);
+    border-radius: 8px;
+    margin-bottom: var(--space-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.explorer-section-header {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--tw-bg-gray);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.explorer-section-header h3 {
+    font-size: var(--font-md);
+    font-weight: 600;
+    margin: 0;
+}
+
+.explorer-status.success {
+    color: var(--tw-green);
+}
+
+.explorer-detail-rows {
+    padding: var(--space-md);
+}
+
+.explorer-detail-row {
+    display: flex;
+    margin-bottom: var(--space-sm);
+    font-size: var(--font-sm);
+}
+
+.explorer-detail-row:last-child {
+    margin-bottom: 0;
+}
+
+.explorer-detail-label {
+    color: var(--tw-dark-gray);
+    width: 140px;
+    flex-shrink: 0;
+}
+
+.explorer-detail-value {
+    flex: 1;
+    word-break: break-all;
+}
+
+.explorer-detail-value.address {
+    color: var(--tw-blue);
+}
+
+.explorer-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.explorer-badge.success {
+    background-color: rgba(5, 196, 107, 0.1);
+    color: var(--tw-green);
+}
+
+.explorer-token-transfer {
+    padding: var(--space-md);
+    display: flex;
+    align-items: center;
+}
+
+.explorer-token-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: var(--space-md);
+}
+
+.explorer-token-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.explorer-token-details {
+    flex: 1;
+}
+
+.explorer-token-from-to {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.explorer-address-short {
+    color: var(--tw-blue);
+    font-size: var(--font-xs);
+}
+
+.explorer-token-from-to i {
+    margin: 0 var(--space-xs);
+    color: var(--tw-medium-gray);
+    font-size: 10px;
+}
+
+.explorer-token-info {
+    font-size: var(--font-xs);
+    color: var(--tw-dark-gray);
+}
+
+.explorer-token-amount {
+    font-weight: 600;
+    color: var(--tw-black);
+    margin-left: var(--space-xs);
+}
+
+/* History Screen Styles */
 .history-screen {
-  background-color: #FFFFFF;
+    background-color: #FFFFFF;
+    overflow-y: auto;
 }
 
-/* Header with appropriate spacing and alignment */
-#history-screen .screen-header {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  background-color: #FFFFFF;
-  position: relative;
-  border-bottom: none;
-}
-
-#history-screen .back-button {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: transparent;
-  color: var(--tw-black);
-  border: none;
-}
-
-#history-screen h2 {
-  flex: 1;
-  text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0;
-}
-
-/* Networks filter styled to match screenshot */
 .networks-filter {
-  padding: 8px 16px;
-  background-color: #F5F5F5;
-  display: flex;
-  align-items: center;
+    padding: 8px 16px;
+    background-color: #F5F5F5;
+    display: flex;
+    align-items: center;
 }
 
-/* All Networks dropdown styled like in screenshot */
 .all-networks {
-  display: flex;
-  align-items: center;
-  background-color: #FFFFFF;
-  border-radius: 16px;
-  padding: 6px 12px;
-  font-size: 12px;
-  color: var(--tw-black);
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-  margin-right: auto;
+    display: flex;
+    align-items: center;
+    background-color: #FFFFFF;
+    border-radius: 16px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: var(--tw-black);
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin-right: auto;
 }
 
 .all-networks i {
-  margin-left: 4px;
-  font-size: 10px;
-  color: var(--tw-medium-gray);
+    margin-left: 4px;
+    font-size: 10px;
+    color: var(--tw-medium-gray);
 }
 
-/* Date headers styled like in screenshot */
 .transaction-date-header {
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--tw-black);
-  background-color: #F5F5F5;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--tw-black);
+    background-color: #F5F5F5;
 }
 
 .history-transaction-list {
-  background-color: #FFFFFF;
+    background-color: #FFFFFF;
 }
 
-/* Transaction item styling to match screenshot exactly */
 .history-transaction-list .transaction-item {
-  display: flex;
-  align-items: center;
-  padding: 12px 16px;
-  border-bottom: 1px solid #F5F5F5;
-  background-color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #F5F5F5;
+    background-color: #FFFFFF;
 }
 
-/* Critical fixes for History Screen */
 #history-screen .transaction-value.positive {
-  color: #3375BB !important;
+    color: #3375BB !important;
 }
 
-/* Critical fixes for Receive Screen - prevent badges from showing */
-#receive-screen .network-badge, 
-#receive-screen .chain-badge,
-#receive-screen .chain-badge-fixed {
-  display: none !important;
-  visibility: hidden !important;
-  opacity: 0 !important;
-}
-
-/* Icon styling with proper size and positioning */
-.transaction-token-icon,
-.transaction-icon {
-  min-width: 36px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: 12px;
-  position: relative;
-  background-color: rgba(51, 117, 187, 0.1);
+.transaction-token-icon {
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 12px;
+    position: relative;
+    background-color: rgba(51, 117, 187, 0.1);
 }
 
 .transaction-token-icon img {
-  width: 20px;
-  height: 20px;
+    width: 20px;
+    height: 20px;
 }
 
-/* Transaction info styling */
-.transaction-info {
-  flex: 1;
-}
-
-.transaction-type {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--tw-black);
-  margin-bottom: 3px;
-}
-
-.transaction-date,
-.transaction-address {
-  font-size: 12px;
-  color: var(--tw-medium-gray);
-}
-
-/* Amount styling with proper alignment */
-.transaction-amount {
-  text-align: right;
-}
-
-.transaction-value {
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 3px;
-}
-
-.transaction-value.positive {
-  color: var(--tw-blue) !important;
-}
-
-.transaction-value.negative {
-  color: var(--tw-red);
-}
-
-.transaction-usd {
-  font-size: 12px;
-  color: var(--tw-medium-gray);
-}
-
-/* Token Selection Screen Styles */
-#send-token-select {
-    background-color: var(--tw-white);
+/* Send Screen */
+.send-content {
+    padding: var(--space-md);
+    flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-#send-token-select .screen-header {
-    display: flex;
-    align-items: center;
-    padding: 16px 12px;
-    background-color: var(--tw-white);
+.form-group {
+    margin-bottom: var(--space-md);
 }
 
-#send-token-select .back-button {
-    width: 32px;
-    height: 32px;
+.form-group label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    color: var(--tw-dark-gray);
+    font-weight: 500;
+}
+
+.address-input, .amount-input {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--tw-light-gray);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.address-input input, .amount-input input {
+    flex: 1;
+    padding: var(--space-md);
+    background: none;
+    border: none;
+    color: var(--tw-black);
+    font-size: var(--font-md);
+}
+
+.address-input input::placeholder, .amount-input input::placeholder {
+    color: var(--tw-medium-gray);
+}
+
+.paste-button, .max-button {
+    padding: 0 var(--space-md);
+    color: var(--tw-blue);
+    font-weight: 500;
+}
+
+.scan-button {
+    width: 44px;
+    height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--tw-black);
-    background: transparent;
-    border: none;
+    color: var(--tw-blue);
+    font-size: 20px;
 }
 
-#send-token-select h2 {
+#available-balance {
+    margin-top: var(--space-xs);
+    font-size: var(--font-xs);
+    color: var(--tw-medium-gray);
+    text-align: right;
+}
+
+.fee-options {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.fee-option {
     flex: 1;
+    background-color: var(--tw-bg-gray);
+    border-radius: 8px;
+    padding: var(--space-sm);
     text-align: center;
-    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.fee-option.active {
+    background-color: rgba(51, 117, 187, 0.1);
+    border: 1px solid var(--tw-blue);
+}
+
+.fee-name {
     font-weight: 600;
-    margin: 0;
+    font-size: var(--font-sm);
+    margin-bottom: 2px;
+}
+
+.fee-value {
+    font-size: var(--font-xs);
+    color: var(--tw-dark-gray);
+    margin-bottom: 2px;
+}
+
+.fee-time {
+    font-size: var(--font-xs);
+    color: var(--tw-medium-gray);
+}
+
+.send-button {
+    margin-top: auto;
+    width: 100%;
+    padding: var(--space-md);
+    border-radius: 8px;
+    background-color: var(--tw-blue);
+    color: var(--tw-white);
+    font-weight: 600;
+    font-size: var(--font-md);
+    margin-bottom: 80px;
+}
+
+/* Token Selection Screen */
+#send-token-select {
+    background-color: var(--tw-white);
+    display: flex;
+    flex-direction: column;
 }
 
 #send-token-select .search-container {
@@ -1498,7 +1602,6 @@ body .with-status-bar {
     padding: 8px 16px;
 }
 
-/* Token list item for selection */
 #select-token-list .token-item {
     display: flex;
     align-items: center;
@@ -1511,7 +1614,6 @@ body .with-status-bar {
     background-color: var(--tw-bg-gray);
 }
 
-/* Token amount display with warning */
 .token-amount-container {
     display: flex;
     flex-direction: column;
@@ -1524,208 +1626,103 @@ body .with-status-bar {
     margin-top: 2px;
 }
 
-/* BEP20 badge */
-.token-network-badge {
-    display: inline-block;
-    background-color: rgba(240, 185, 11, 0.1);
-    color: #F0B90B;
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 4px;
-    margin-left: 6px;
+/* Receive Screen */
+.receive-content {
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.token-selection {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-lg);
+}
+
+.token-icon-large {
+    width: 40px;
+    height: 40px;
+}
+
+.token-icon-large img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.qr-code-container {
+    background-color: white;
+    padding: var(--space-md);
+    border-radius: 16px;
+    margin-bottom: var(--space-lg);
+}
+
+.wallet-address-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--space-md);
+}
+
+.wallet-address-container input {
+    width: 100%;
+    padding: var(--space-sm);
+    font-size: var(--font-sm);
+    text-align: center;
+    border: 1px solid var(--tw-light-gray);
+    border-radius: 8px;
+    margin-bottom: var(--space-sm);
+}
+
+.copy-address-button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--tw-bg-gray);
+    color: var(--tw-blue);
+    border-radius: 8px;
     font-weight: 500;
 }
 
-/* Explorer Overlay */
-.explorer-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--tw-white);
-  z-index: 1500;
-  display: none;
-  flex-direction: column;
+.receive-actions {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-bottom: 70px;
 }
 
-.explorer-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-md);
-  background-color: var(--tw-blue);
-  color: var(--tw-white);
-}
-
-.explorer-back-button {
-  color: var(--tw-white);
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-}
-
-.explorer-body {
-  flex: 1;
-  overflow-y: auto;
-}
-
-.explorer-search-container {
-  padding: var(--space-md);
-  background-color: var(--tw-blue-light);
-}
-
-.explorer-search {
-  display: flex;
-  align-items: center;
-  background-color: var(--tw-white);
-  border-radius: 8px;
-  padding: var(--space-sm);
-}
-
-.explorer-search i {
-  color: var(--tw-medium-gray);
-  margin-right: var(--space-sm);
-  margin-left: var(--space-xs);
-}
-
-.explorer-search input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: var(--font-sm);
-}
-
-.explorer-transaction {
-  padding: var(--space-md);
-}
-
-.explorer-section {
-  background-color: var(--tw-white);
-  border-radius: 8px;
-  margin-bottom: var(--space-md);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-}
-
-.explorer-section-header {
-  padding: var(--space-md);
-  border-bottom: 1px solid var(--tw-bg-gray);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.explorer-section-header h3 {
-  font-size: var(--font-md);
-  font-weight: 600;
-  margin: 0;
-}
-
-.explorer-status.success {
-  color: var(--tw-green);
-}
-
-.explorer-detail-rows {
-  padding: var(--space-md);
-}
-
-.explorer-detail-row {
-  display: flex;
-  margin-bottom: var(--space-sm);
-  font-size: var(--font-sm);
-}
-
-.explorer-detail-row:last-child {
-  margin-bottom: 0;
-}
-
-.explorer-detail-label {
-  color: var(--tw-dark-gray);
-  width: 140px;
-  flex-shrink: 0;
-}
-
-.explorer-detail-value {
-  flex: 1;
-  word-break: break-all;
-}
-
-.explorer-detail-value.address {
-  color: var(--tw-blue);
-}
-
-.explorer-badge {
-  display: inline-block;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 500;
-}
-
-.explorer-badge.success {
-  background-color: rgba(5, 196, 107, 0.1);
-  color: var(--tw-green);
-}
-
-.explorer-token-transfer {
-  padding: var(--space-md);
-  display: flex;
-  align-items: center;
-}
-
-.explorer-token-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  overflow: hidden;
-  margin-right: var(--space-md);
-}
-
-.explorer-token-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.explorer-token-details {
-  flex: 1;
-}
-
-.explorer-token-from-to {
-  display: flex;
-  align-items: center;
-  margin-bottom: 4px;
-}
-
-.explorer-address-short {
-  color: var(--tw-blue);
-  font-size: var(--font-xs);
-}
-
-.explorer-token-from-to i {
-  margin: 0 var(--space-xs);
-  color: var(--tw-medium-gray);
-  font-size: 10px;
-}
-
-.explorer-token-info {
-  font-size: var(--font-xs);
-  color: var(--tw-dark-gray);
-}
-
-.explorer-token-amount {
-  font-weight: 600;
-  color: var(--tw-black);
-  margin-left: var(--space-xs);
+/* Badge Fix for Send/Receive Screens */
+#send-screen .chain-badge,
+#send-screen .chain-badge-fixed,
+#send-screen .network-badge,
+#send-screen [class*="badge"],
+#send-screen [class*="chain"],
+#send-screen .token-icon > div:not(img),
+#receive-screen .chain-badge,
+#receive-screen .chain-badge-fixed,
+#receive-screen .network-badge,
+#receive-screen [class*="badge"],
+#receive-screen [class*="chain"],
+#receive-screen .token-icon > div:not(img) {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 /* =================================================================
-   PART 5: FUNCTIONAL SCREENS & ANIMATIONS
+   PART 5: AUTHENTICATION, ADMIN PANEL & ANIMATIONS
    ================================================================= */
 
 /* Lock Screen */
@@ -1853,193 +1850,6 @@ body .with-status-bar {
     color: var(--tw-blue);
     font-weight: 500;
     font-size: var(--font-xs);
-}
-
-/* Receive Screen */
-.receive-content {
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.token-selection {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
-}
-
-.token-icon-large {
-    width: 40px;
-    height: 40px;
-}
-
-.token-icon-large img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-.qr-code-container {
-    background-color: white;
-    padding: var(--space-md);
-    border-radius: 16px;
-    margin-bottom: var(--space-lg);
-}
-
-.wallet-address {
-    font-size: var(--font-sm);
-    color: var(--tw-black);
-    margin-bottom: var(--space-xl);
-    text-align: center;
-    word-break: break-all;
-    max-width: 300px;
-}
-
-.receive-actions {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    margin-bottom: 70px;
-}
-
-.action-round-button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-xs);
-}
-
-.action-round-button i {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: var(--tw-bg-gray);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    margin-bottom: var(--space-xs);
-    color: var(--tw-black);
-}
-
-.action-round-button span {
-    font-size: var(--font-sm);
-    font-weight: 500;
-    color: var(--tw-black);
-}
-
-/* Send Screen */
-.send-content {
-    padding: var(--space-md);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-group {
-    margin-bottom: var(--space-md);
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: var(--space-xs);
-    color: var(--tw-dark-gray);
-    font-weight: 500;
-}
-
-.address-input, .amount-input {
-    display: flex;
-    align-items: center;
-    border: 1px solid var(--tw-light-gray);
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-.address-input input, .amount-input input {
-    flex: 1;
-    padding: var(--space-md);
-    background: none;
-    border: none;
-    color: var(--tw-black);
-    font-size: var(--font-md);
-}
-
-.address-input input::placeholder, .amount-input input::placeholder {
-    color: var(--tw-medium-gray);
-}
-
-.paste-button, .max-button {
-    padding: 0 var(--space-md);
-    color: var(--tw-blue);
-    font-weight: 500;
-}
-
-.scan-button {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--tw-blue);
-    font-size: 20px;
-}
-
-#available-balance {
-    margin-top: var(--space-xs);
-    font-size: var(--font-xs);
-    color: var(--tw-medium-gray);
-    text-align: right;
-}
-
-.fee-options {
-    display: flex;
-    gap: var(--space-xs);
-}
-
-.fee-option {
-    flex: 1;
-    background-color: var(--tw-bg-gray);
-    border-radius: 8px;
-    padding: var(--space-sm);
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.fee-option.active {
-    background-color: rgba(51, 117, 187, 0.1);
-    border: 1px solid var(--tw-blue);
-}
-
-.fee-name {
-    font-weight: 600;
-    font-size: var(--font-sm);
-    margin-bottom: 2px;
-}
-
-.fee-value {
-    font-size: var(--font-xs);
-    color: var(--tw-dark-gray);
-    margin-bottom: 2px;
-}
-
-.fee-time {
-    font-size: var(--font-xs);
-    color: var(--tw-medium-gray);
-}
-
-.send-button {
-    margin-top: auto;
-    width: 100%;
-    padding: var(--space-md);
-    border-radius: 8px;
-    background-color: var(--tw-blue);
-    color: var(--tw-white);
-    font-weight: 600;
-    font-size: var(--font-md);
-    margin-bottom: 80px;
 }
 
 /* Biometric Authentication */
@@ -2298,14 +2108,6 @@ body .with-status-bar {
 }
 
 /* Admin Panel Access */
-.touch-target {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    opacity: 0;
-    z-index: 10;
-}
-
 #admin-touch-target {
     position: fixed;
     top: 25px;
@@ -2314,6 +2116,46 @@ body .with-status-bar {
     height: 100px;
     z-index: 99999;
     background-color: transparent;
+}
+
+/* Error Display Styling */
+.screen-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.error-icon {
+    font-size: 40px;
+    color: #EB5757;
+    margin-bottom: 16px;
+}
+
+.error-message {
+    color: #5F6C75;
+    font-size: 16px;
+    margin-bottom: 16px;
+}
+
+/* Pull to refresh indicator */
+.pull-indicator {
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #3375BB;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
 
 /* Password entry animation */
@@ -2336,4 +2178,37 @@ body .with-status-bar {
 
 .shake {
     animation: shake 0.5s;
+}
+
+/* Responsive adjustments */
+@media (max-width: 375px) {
+    .numpad-key {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .token-detail-large-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .token-detail-balance h2 {
+        font-size: 18px;
+    }
+    
+    .token-detail-balance p {
+        font-size: 14px;
+    }
+    
+    .detail-action i {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+}
+
+/* Fix network fees */
+.fee-option.active {
+    border: 1px solid #3375BB !important;
+    background-color: rgba(51, 117, 187, 0.1) !important;
 }
