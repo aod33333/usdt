@@ -538,7 +538,7 @@
     });
   }
   
- function loadScreenContents() {
+function loadScreenContents() {
   return new Promise(resolve => {
     log('Dynamically creating and populating screen contents');
     
@@ -548,60 +548,56 @@
       return resolve();
     }
 
-    // In combined1.js - Update the 'history-screen' content in loadScreenContents function:
-'history-screen': {
-  className: 'screen hidden',
-  content: `
-    <div class="screen-header">
-      <button class="back-button" aria-label="Go back">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h2>Transaction History</h2>
-    </div>
-    <div class="networks-filter">
-      <div class="all-networks">
-        All Networks <i class="fas fa-chevron-down"></i>
-      </div>
-    </div>
-    <div class="history-transaction-list" id="history-transaction-list">
-      <!-- Transactions will be dynamically populated -->
-      <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
-        <p>No transaction history available</p>
-      </div>
-    </div>
-  `
-}
+    // Define screen configurations
+    const screenConfigurations = {
+      'history-screen': {
+        className: 'screen hidden',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Transaction History</h2>
+          </div>
+          <div class="networks-filter">
+            <div class="all-networks">
+              All Networks <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <div class="history-transaction-list" id="history-transaction-list">
+            <!-- Transactions will be dynamically populated -->
+            <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
+              <p>No transaction history available</p>
+            </div>
+          </div>
         `
       },
-     // In combined1.js - Update the 'receive-screen' content in loadScreenContents function:
-'receive-screen': {
-  className: 'screen hidden',
-  content: `
-    <div class="screen-header">
-      <button class="back-button" aria-label="Go back">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h2>Receive</h2>
-    </div>
-    <div class="receive-content">
-      <div class="qr-code-container">
-        <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
-      </div>
-      <div class="wallet-address-container">
-        <input 
-          type="text" 
-          id="wallet-address" 
-          readonly 
-          value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
-          placeholder="Your wallet address"
-        >
-        <button class="copy-address-button">
-          <i class="fas fa-copy"></i> Copy
-        </button>
-      </div>
-    </div>
-  `
-}
+      'receive-screen': {
+        className: 'screen hidden',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Receive</h2>
+          </div>
+          <div class="receive-content">
+            <div class="qr-code-container">
+              <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
+            </div>
+            <div class="wallet-address-container">
+              <input 
+                type="text" 
+                id="wallet-address" 
+                readonly 
+                value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
+                placeholder="Your wallet address"
+              >
+              <button class="copy-address-button">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+          </div>
         `
       },
       'send-screen': {
