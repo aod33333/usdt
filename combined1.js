@@ -341,202 +341,108 @@
     });
   }
   
-  // Add CSS enhancements with proper specificity to avoid conflicts
   function addEnhancementStyles() {
-    return new Promise(resolve => {
-      log('Adding enhancement styles');
+  return new Promise(resolve => {
+    log('Adding enhancement styles');
+    
+    // Create or update master style element
+    let styleElement = document.getElementById('tw-master-style-fix');
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = 'tw-master-style-fix';
+      document.head.appendChild(styleElement);
+    }
+    
+    styleElement.textContent = `
+      /* TrustWallet Enhancements - Dynamic Styles */
+      /* These styles complement total.css with dynamic and runtime-specific enhancements */
       
-      // Create or update master style element
-      let styleElement = document.getElementById('tw-master-style-fix');
-      if (!styleElement) {
-        styleElement = document.createElement('style');
-        styleElement.id = 'tw-master-style-fix';
-        document.head.appendChild(styleElement);
+      /* Runtime animation classes - only added dynamically */
+      .tw-slide-in-active {
+        animation: tw-slide-in-right 0.3s forwards;
       }
       
-      styleElement.textContent = `
-        /* Animation classes */
-        .tw-slide-in {
-          animation: tw-slide-in-right 0.3s forwards;
-        }
-        
-        .tw-slide-out {
-          animation: tw-slide-out-left 0.3s forwards;
-        }
-        
-        @keyframes tw-slide-in-right {
-          from { transform: translateX(100%); }
-          to { transform: translateX(0); }
-        }
-        
-        @keyframes tw-slide-out-left {
-          from { transform: translateX(0); }
-          to { transform: translateX(-100%); }
-        }
-        
-        /* TrustWallet-specific ripple effect */
-        .tw-ripple {
-          position: relative;
-          overflow: hidden;
-        }
-        
-        .tw-ripple:after {
-          content: "";
-          display: block;
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          top: 0;
-          left: 0;
-          pointer-events: none;
-          background-image: radial-gradient(circle, #000 10%, transparent 10.01%);
-          background-repeat: no-repeat;
-          background-position: 50%;
-          transform: scale(10, 10);
-          opacity: 0;
-          transition: transform .3s, opacity .5s;
-        }
-        
-        .tw-ripple:active:after {
-          transform: scale(0, 0);
-          opacity: 0.2;
-          transition: 0s;
-        }
-        
-        /* Toast notifications */
-        .tw-toast {
-          position: fixed;
-          bottom: 80px;
-          left: 50%;
-          transform: translateX(-50%);
-          background-color: rgba(0,0,0,0.8);
-          color: white;
-          padding: 12px 20px;
-          border-radius: 8px;
-          font-size: 14px;
-          z-index: 10000;
-          opacity: 0;
-          transition: opacity 0.3s;
-        }
-        
-        .tw-toast.visible {
-          opacity: 1;
-        }
-        
-        /* Fix network fees */
-        .fee-option.active {
-          border: 1px solid #3375BB !important;
-          background-color: rgba(51, 117, 187, 0.1) !important;
-        }
-        
-        /* Error display styling */
-        .screen-error {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 20px;
-          text-align: center;
-        }
-        
-        .error-icon {
-          font-size: 40px;
-          color: #EB5757;
-          margin-bottom: 16px;
-        }
-        
-        .error-message {
-          color: #5F6C75;
-          font-size: 16px;
-          margin-bottom: 16px;
-        }
-        
-        /* Pull to refresh indicator */
-        .pull-indicator {
-          position: absolute;
-          top: -50px;
-          left: 50%;
-          transform: translateX(-50%);
-          width: 30px;
-          height: 30px;
-          border-radius: 50%;
-          background-color: #3375BB;
-          color: white;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          opacity: 0;
-          transition: opacity 0.2s;
-        }
-        
-        /* Critical badge fixes - highest specificity */
-        #send-screen .chain-badge,
-        #send-screen .chain-badge-fixed,
-        #send-screen .network-badge,
-        #send-screen [class*="badge"],
-        #send-screen [class*="chain"],
-        #send-screen .token-icon > div:not(img),
-        #receive-screen .chain-badge,
-        #receive-screen .chain-badge-fixed,
-        #receive-screen .network-badge,
-        #receive-screen [class*="badge"],
-        #receive-screen [class*="chain"],
-        #receive-screen .token-icon > div:not(img) {
-          display: none !important;
-          visibility: hidden !important;
-          opacity: 0 !important;
-          width: 0 !important;
-          height: 0 !important;
-          position: absolute !important;
-          pointer-events: none !important;
-          clip: rect(0, 0, 0, 0) !important;
-          border: 0 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        
-        /* Fix token detail view */
-        #token-detail .detail-header {
-          background-color: white !important;
-          padding: 12px 16px !important; 
-          border-bottom: none !important;
-        }
-        
-        #detail-symbol {
-          font-size: 24px !important;
-          font-weight: 600 !important;
-          text-align: center !important;
-          margin-bottom: 2px !important;
-        }
-        
-        #detail-fullname {
-          font-size: 12px !important;
-          color: #8A939D !important;
-          text-align: center !important;
-        }
-        
-        /* Trust Wallet uses blue for positive values */
-        .transaction-value.positive, 
-        #token-price-change.positive {
-          color: #3375BB !important;
-        }
-        
-        /* Fix bottom tabs */
-        .bottom-tabs {
-          display: flex !important;
-          position: fixed !important;
-          bottom: 0 !important;
-          left: 0 !important;
-          width: 100% !important;
-          z-index: 9999 !important;
-          background-color: white !important;
-          border-top: 1px solid #F5F5F5 !important;
-        }
-      `;
+      .tw-slide-out-active {
+        animation: tw-slide-out-left 0.3s forwards;
+      }
       
-      resolve();
-    });
-  }
+      /* Dynamic toast positioning based on current screen */
+      .screen-specific-toast {
+        position: fixed;
+        bottom: 80px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10001;
+      }
+      
+      /* Runtime-added error indicators */
+      .input-error {
+        border-color: var(--tw-red) !important;
+        animation: shake 0.5s;
+      }
+      
+      /* Dynamic loading indicators */
+      .button-loading::after {
+        content: "";
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        top: 50%;
+        left: 50%;
+        margin-top: -10px;
+        margin-left: -10px;
+      }
+      
+      /* Pull-to-refresh dynamic states */
+      .pulling {
+        transition: transform 0.2s;
+      }
+      
+      .refreshing .refresh-icon {
+        animation: spin 1s linear infinite;
+      }
+      
+      /* Dynamically injected badges for new tokens */
+      .new-token-badge {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background-color: var(--tw-red);
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      }
+      
+      /* Focus states for keyboard navigation - accessibility enhancement */
+      .keyboard-focus:focus {
+        outline: 2px solid var(--tw-blue);
+        outline-offset: 2px;
+      }
+      
+      /* Dark mode overrides that need to be applied dynamically */
+      body.dark-mode-enabled .dynamic-color {
+        color: #FFFFFF;
+      }
+      
+      body.dark-mode-enabled .dynamic-background {
+        background-color: #1F2128;
+      }
+    `;
+    
+    resolve();
+  });
+}
   
 function loadScreenContents() {
   return new Promise(resolve => {
