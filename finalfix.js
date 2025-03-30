@@ -1624,23 +1624,62 @@ function addEnhancementStyles() {
       }
     }
     
-    // Touch events
-    element.addEventListener('touchstart', function(e) {
-      if (element.scrollTop <= 0) {
-        startY = e.touches[0].clientY;
-        pulling = true;
-      }
-    }, {passive: true});
+element.addEventListener('touchmove', function(e) {
+  if (!pulling) return;
+  
+  currentY = e.touches[0].clientY;
+  const pullDistance = currentY - startY;
+  
+  if (pullDistance > 0) {
+    // Prevent default scrolling
+    e.preventDefault();
     
-    element.addEventListener('touchmove', function(e) {
-      if (!pulling) return;
-      
-      currentY = e.touches[0].clientY;
-      const pullDistance = currentY - startY;
-      
-      if (pullDistance > 0) {
-        // Prevent default scrolling
-        e.
+    // Show and rotate indicator
+    indicator.style.opacity = Math.min(pullDistance / pullThreshold, 1);
+    indicator.style.transform = `translateX(-50%) rotate(${pullDistance * 3}deg)`;
+    
+    // Slow down scrolling with resistance
+    element.style.transform = `translateY(${Math.min(pullDistance / 2, 60)}px)`;
+  }
+}, {passive: false});
+
+element.addEventListener('touchend', function() {
+  if (!pulling) return;
+  pulling = false;
+  
+  const pullDistance = currentY - startY;
+  
+  // Reset element position with animation
+  element.style.transition = 'transform 0.3s';
+  element.style.transform = 'translateY(0)';
+  
+  // Reset after animation completes
+  setTimeout(() => {
+    element.style.transition = '';
+  }, 300);
+  
+  if (pullDistance > pullThreshold) {
+    // Trigger refresh animation
+    indicator.querySelector('i').classList.add('fa-spin');
+    indicator.style.opacity = '1';
+    
+    // Show refresh toast
+    showToast('Refreshing...');
+    
+    // Simulate refresh completion
+    setTimeout(() => {
+      indicator.querySelector('i').classList.remove('fa-spin');
+      indicator.style.opacity = '0';
+      showToast('Refreshed successfully');
+    }, 1500);
+  } else {
+    // Hide indicator
+    indicator.style.opacity = '0';
+  }
+});
+
+element._hasRefreshSimulation = true;
+}
   
   // Step 1: Ensure all screen containers exist
   function ensureScreenContainers() {
