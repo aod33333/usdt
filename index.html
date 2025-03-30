@@ -821,14 +821,14 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log(`Script from ${url} executed`);
         }
       })
-      .catch(error => console.error(`Error loading ${url}:`, error));
+.catch(error => console.error(`Error loading ${url}:`, error));
   }
-    
-    // Connect all button handlers after a longer delay
-    setTimeout(connectButtons, 500);
-  });
   
-<!-- Combined component loading and screen connection -->
+  // Connect all button handlers after a longer delay
+  setTimeout(connectButtons, 500);
+});
+</script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   console.log("DOM loaded - initializing components and connections");
