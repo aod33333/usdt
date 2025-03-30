@@ -931,36 +931,6 @@ function connectButtons() {
   console.log('Initialization complete');
 }
 
-// Override functions that might conflict with our implementation
-function overrideConflictingFunctions() {
-  // Save original functions
-  window._originalShowSendScreen = window.showSendScreen;
-  window._originalShowReceiveScreen = window.showReceiveScreen;
-  window._originalShowTokenDetail = window.showTokenDetail;
-  
-  // Override with our priority functions
-  window.showSendScreen = function(tokenId) {
-    console.log('Showing send screen for token:', tokenId);
-    window.activeSendTokenId = tokenId;
-    
-    // If we should go through token selection first
-    if (!tokenId) {
-      navigateTo('send-token-select', 'wallet-screen');
-    } else {
-      navigateTo('send-screen', 'send-token-select');
-      updateSendScreenForToken(tokenId);
-    }
-  };
-  
-  window.showReceiveScreen = function() {
-    console.log('Showing receive screen');
-    navigateTo('receive-screen', 'wallet-screen');
-  };
-  
-  // Make sure we handle navigation properly
-  window.navigateTo = navigateTo;
-}
-
 // STEP 1: Create missing screen containers
 function createMissingScreens() {
   const appContainer = document.querySelector('.app-container');
@@ -1014,33 +984,6 @@ function createMissingScreens() {
     historyScreen.id = 'history-screen';
     historyScreen.className = 'screen hidden';
     appContainer.appendChild(historyScreen);
-  }
-}
-
-// Helper functions for navigation
-function navigateTo(screenId, fromScreenId) {
-  // Hide all screens
-  document.querySelectorAll('.screen').forEach(screen => {
-    screen.style.display = 'none';
-    screen.classList.add('hidden');
-  });
-  
-  // Show target screen
-  const targetScreen = document.getElementById(screenId);
-  if (targetScreen) {
-    targetScreen.style.display = 'flex';
-    targetScreen.classList.remove('hidden');
-    
-    // Remember where we came from
-    if (fromScreenId) {
-      targetScreen.dataset.returnTo = fromScreenId;
-    }
-    
-    console.log(`Navigated to ${screenId}${fromScreenId ? ' from ' + fromScreenId : ''}`);
-    return true;
-  } else {
-    console.error(`Target screen ${screenId} not found`);
-    return false;
   }
 }
 
