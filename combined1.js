@@ -1715,8 +1715,9 @@ toggleBalanceVisibility() {
       // Create global instance
       window.uiManager = new WalletUIManager();
       
-      // Expose global UI update method
-      window.updateWalletUI = window.uiManager.updateWalletUI.bind(window.uiManager);
+      window.updateWalletUI = function(activeWallet) {
+  return window.uiManager.updateWalletUI(activeWallet);
+};
       
       // Initial UI update
       window.uiManager.updateWalletUI(window.activeWallet);
