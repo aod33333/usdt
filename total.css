@@ -2212,16 +2212,3 @@ img[src*="bnb-bnb-logo"] {
     border: 1px solid #3375BB !important;
     background-color: rgba(51, 117, 187, 0.1) !important;
 }
-
-/* ===== Fix header overlap with status bar ===== */
-.detail-header, .send-header, .receive-header, .history-header {
-  padding-top: 5px !important; /* Adjust this value (e.g., 20px-40px) */
-  min-height: 80px !important; /* Ensures header height accounts for padding */
-}
-
-/* For iOS notch/safe area (optional but recommended) */
-@supports (padding-top: env(safe-area-inset-top)) {
-  .detail-header, .send-header, .receive-header, .history-header {
-    padding-top: calc(30px + env(safe-area-inset-top)) !important;
-  }
-}
