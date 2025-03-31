@@ -1546,127 +1546,45 @@ function setupScreenManager() {
           }
         }
         
-        /**
-         * Update wallet UI with current data
-         * @param {string} activeWallet - Currently active wallet
-         */
-        updateWalletUI(activeWallet) {
-          try {
-            const walletData = window.currentWalletData[activeWallet];
-            
-            if (!walletData) {
-              console.error('Wallet data not found:', activeWallet);
-              return;
-            }
-            
-            // Update total balance
-            if (this.elements.totalBalance) {
-              this.elements.totalBalance.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
-            }
-            
-            // Update wallet name
-            if (this.elements.walletName) {
-              const walletNames = {
-                'main': 'Mnemonic 1',
-                'secondary': 'Mnemonic 2',
-                'business': 'Mnemonic 3'
-              };
-              this.elements.walletName.textContent = walletNames[activeWallet] || 'Wallet';
-            }
-            
-            // Update token list
-            this.updateTokenList(walletData.tokens);
-          } catch (error) {
-            console.error('Error updating wallet UI:', error);
-          }
-        }
-        
-        /**
-         * Update token list in the UI
-         * @param {Array} tokens - List of tokens to display
-         */
-        updateTokenList(tokens) {
-          if (!this.elements.tokenList) {
-            console.error('Token list element not found');
-            return;
-          }
-          
-          // Clear existing list
-          this.elements.tokenList.innerHTML = '';
-          
-          // Sort tokens by value (highest first)
-          const sortedTokens = [...tokens].sort((a, b) => b.value - a.value);
-          
-          // Create token elements
-          sortedTokens.forEach(token => {
-            const tokenElement = this.createTokenElement(token);
-            this.elements.tokenList.appendChild(tokenElement);
-          });
-        }
-        
-        /**
-         * Create token list item element
-         * @param {Object} token - Token data
-         * @returns {HTMLElement} Token list item
-         */
-        createTokenElement(token) {
-          const tokenItem = document.createElement('div');
-          tokenItem.className = 'token-item';
-          tokenItem.setAttribute('data-token-id', token.id);
-          
-          // Determine if token should have network badge
-          const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
-          const badgeHTML = showBadge 
-              ? `<div class="chain-badge">
-                   <img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain">
-                 </div>` 
-              : '';
-          
-          // Format amounts and prices
-          const formattedAmount = token.amount.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 6
-          });
-          const formattedValue = window.FormatUtils.formatCurrency(token.value);
-          const changeClass = token.change >= 0 ? 'positive' : 'negative';
-          const changeSign = token.change >= 0 ? '+' : '';
-          
-          tokenItem.innerHTML = `
-              <div class="token-icon">
-                  <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
-                  ${badgeHTML}
-              </div>
-              <div class="token-info">
-                  <div class="token-name">
-                      ${token.symbol} <span class="token-network">${token.name}</span>
-                  </div>
-                  <div class="token-price">
-                      $${token.price.toLocaleString()} 
-                      <span class="token-price-change ${changeClass}">
-                          ${changeSign}${token.change}%
-                      </span>
-                  </div>
-              </div>
-              <div class="token-amount">
-                  <div class="token-balance">${formattedAmount}</div>
-                  <div class="token-value">${formattedValue}</div>
-              </div>
-          `;
-          
-          // Add click event to show token details
-          tokenItem.addEventListener('click', () => {
-              window.showTokenDetail(token.id);
-          });
-          
-          return tokenItem;
-        }
-        
-        /**
-         * Toggle balance visibility
-       */
-toggleBalanceVisibility() {
-  const balanceAmount = this.elements.totalBalance;
-  const visibilityIcon = this.elements.visibilityToggle ? this.elements.visibilityToggle.querySelector('i') : null;
+   // Update wallet UI function
+function updateWalletUI(activeWallet) {
+  try {
+    const walletData = window.currentWalletData[activeWallet];
+    
+    if (!walletData) {
+      console.error('Wallet data not found:', activeWallet);
+      return;
+    }
+    
+    // Update total balance
+    const totalBalanceElement = document.getElementById('total-balance');
+    if (totalBalanceElement) {
+      totalBalanceElement.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
+    }
+    
+    // Update wallet name
+    const walletNameElement = document.querySelector('.wallet-name');
+    if (walletNameElement) {
+      const walletNames = {
+        'main': 'Mnemonic 1',
+        'secondary': 'Mnemonic 2',
+        'business': 'Mnemonic 3'
+      };
+      walletNameElement.textContent = walletNames[activeWallet] || 'Wallet';
+    }
+    
+    // Update token list
+    updateTokenList(walletData.tokens);
+  } catch (error) {
+    console.error('Error updating wallet UI:', error);
+  }
+}
+
+// Toggle balance visibility function
+function toggleBalanceVisibility() {
+  const balanceAmount = document.getElementById('total-balance');
+  const visibilityToggle = document.querySelector('.visibility-toggle');
+  const visibilityIcon = visibilityToggle ? visibilityToggle.querySelector('i') : null;
   
   if (!balanceAmount || !visibilityIcon) return;
   
@@ -1677,8 +1595,8 @@ toggleBalanceVisibility() {
     visibilityIcon.classList.remove('fa-eye-slash');
     visibilityIcon.classList.add('fa-eye');
     // Restore the cached balance if it exists
-    if (this.cachedBalance) {
-      balanceAmount.textContent = this.cachedBalance;
+    if (window.cachedBalance) {
+      balanceAmount.textContent = window.cachedBalance;
     } else {
       // If no cached balance, update from wallet data
       const activeWallet = window.activeWallet || 'main';
@@ -1691,8 +1609,8 @@ toggleBalanceVisibility() {
     }
     
     // Also show token amounts
-    document.querySelectorAll('.token-balance').forEach(tokenBalance => {
-      const originalAmount = tokenBalance.dataset.originalAmount;
+    document.querySelectorAll('.token-balance').forEach(function(tokenBalance) {
+      var originalAmount = tokenBalance.dataset.originalAmount;
       if (originalAmount) {
         tokenBalance.textContent = originalAmount;
       }
@@ -1701,47 +1619,16 @@ toggleBalanceVisibility() {
     // Hide balance
     visibilityIcon.classList.remove('fa-eye');
     visibilityIcon.classList.add('fa-eye-slash');
-    this.cachedBalance = balanceAmount.textContent;
+    window.cachedBalance = balanceAmount.textContent;
     balanceAmount.textContent = '••••••';
     
     // Also hide token amounts
-    document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+    document.querySelectorAll('.token-balance').forEach(function(tokenBalance) {
       tokenBalance.dataset.originalAmount = tokenBalance.textContent;
       tokenBalance.textContent = '••••••';
     });
   }
 }
-      
- // Create UI manager instance only if the class exists
-try {
-  if (typeof WalletUIManager === 'function') {
-    window.uiManager = new WalletUIManager();
-  } else {
-    // Create a minimal placeholder if class doesn't exist
-    window.uiManager = {
-      updateWalletUI: function() { console.log("UI update called but manager not available"); }
-    };
-  }
-} catch(e) {
-  console.error("Could not create UI manager:", e);
-  // Fallback manager
-  window.uiManager = {
-    updateWalletUI: function() {}
-  };
-}
-
-// Create a simple function that doesn't rely on anything complex
-window.updateWalletUI = function(wallet) {
-  try {
-    if (window.uiManager && typeof window.uiManager.updateWalletUI === 'function') {
-      window.uiManager.updateWalletUI(wallet);
-    }
-  } catch(e) {
-    console.error("UI update failed:", e);
-  }
-};
-
-resolve();
   
 // Setup Wallet Selector
   function setupWalletSelector() {
