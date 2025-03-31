@@ -1057,6 +1057,429 @@ function runScreenScripts() {
 // Execute the enhancements after a delay to ensure DOM is ready
 setTimeout(initEnhancements, 1000);
 </script>
+
+    <!-- Trust Wallet Fix Injector -->
+<!-- Add this near the end of the body tag in index.html -->
+
+<script>
+// TrustWallet-Fix.js
+// This script fixes the issues with the Trust Wallet UI
+// 1. Missing tokens in wallet
+// 2. Header styling issues in send, receive, and history screens
+
+// ====== PART 1: WALLET TOKEN DISPLAY FIX ======
+// Auto-populate tokens and fix initialization sequence
+
+(function() {
+  // Create and populate wallet data if empty
+  function initializeWalletData() {
+    console.log("Initializing wallet data...");
+    
+    // Check if walletData exists and tokens are empty
+    if (!window.walletData || 
+        !window.walletData.main || 
+        !window.walletData.main.tokens || 
+        window.walletData.main.tokens.length === 0) {
+      
+      // Create default wallet data structure
+      window.walletData = {
+        main: {
+          totalBalance: 0,
+          tokens: [
+            {
+              id: 'btc',
+              name: 'Bitcoin',
+              symbol: 'BTC',
+              network: 'Bitcoin',
+              icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+              amount: 0,
+              value: 0,
+              price: 83984.74,
+              change: -0.59,
+              chainBadge: null
+            },
+            {
+              id: 'eth',
+              name: 'Ethereum',
+              symbol: 'ETH',
+              network: 'Ethereum',
+              icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+              amount: 0,
+              value: 0,
+              price: 1973.81,
+              change: -0.71,
+              chainBadge: null
+            },
+            {
+              id: 'usdt',
+              name: 'Tether',
+              symbol: 'USDT',
+              network: 'BNB Smart Chain',
+              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              amount: 0,
+              value: 0,
+              price: 1.00,
+              change: 0.00,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            }
+          ]
+        }
+      };
+    }
+    
+    // Initialize wallet state with deep copies
+    window.originalWalletData = JSON.parse(JSON.stringify(window.walletData));
+    window.currentWalletData = JSON.parse(JSON.stringify(window.walletData));
+  }
+  
+  // Manually populate token list with wallet data
+  function populateTokenList() {
+    console.log("Manually populating token list...");
+    const tokenList = document.getElementById('token-list');
+    
+    if (!tokenList) {
+      console.error("Token list element not found");
+      return;
+    }
+    
+    // Clear existing items
+    tokenList.innerHTML = '';
+    
+    // Get tokens from active wallet
+    const activeWallet = window.activeWallet || 'main';
+    const wallet = window.currentWalletData[activeWallet];
+    
+    if (!wallet || !wallet.tokens || wallet.tokens.length === 0) {
+      console.error("No tokens found in active wallet");
+      
+      // Add sample tokens if none exist
+      setupDemoBalance();
+      return;
+    }
+    
+    // Create token items
+    wallet.tokens.forEach(token => {
+      // Create token item element
+      const tokenItem = document.createElement('div');
+      tokenItem.className = 'token-item';
+      tokenItem.setAttribute('data-token-id', token.id);
+      
+      // Set token content
+      tokenItem.innerHTML = `
+        <div class="token-icon">
+          <img src="${token.icon || getTokenLogoUrl(token.id)}" alt="${token.name}">
+          ${token.chainBadge ? `<div class="chain-badge"><img src="${token.chainBadge}" alt="Network"></div>` : ''}
+        </div>
+        <div class="token-info">
+          <div class="token-name">${token.symbol}</div>
+          <div class="token-price">${token.name} <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">${token.change >= 0 ? '+' : ''}${token.change}%</span></div>
+        </div>
+        <div class="token-amount">
+          <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
+          <div class="token-value">$${token.value.toFixed(2)}</div>
+        </div>
+      `;
+      
+      // Add click event
+      tokenItem.addEventListener('click', function() {
+        console.log(`Token ${token.id} clicked`);
+        if (typeof window.showTokenDetail === 'function') {
+          window.showTokenDetail(token.id);
+        } else if (typeof window.navigateTo === 'function') {
+          window.navigateTo('token-detail');
+        }
+      });
+      
+      // Add to token list
+      tokenList.appendChild(tokenItem);
+    });
+    
+    console.log(`Successfully populated ${wallet.tokens.length} tokens`);
+  }
+  
+  // Get token logo URL helper function
+  function getTokenLogoUrl(tokenId) {
+    const logoUrls = {
+      'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+      'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+      'twt': 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png'
+    };
+    
+    return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
+  }
+  
+  // Setup demo balance
+  function setupDemoBalance() {
+    console.log("Setting up demo balance...");
+    
+    if (!window.currentWalletData || !window.currentWalletData.main) {
+      initializeWalletData();
+    }
+    
+    const mainWallet = window.currentWalletData.main;
+    
+    // BTC
+    const btcToken = mainWallet.tokens.find(t => t.id === 'btc');
+    if (btcToken) {
+      btcToken.amount = 0.25;
+      btcToken.value = btcToken.amount * btcToken.price;
+    }
+    
+    // ETH
+    const ethToken = mainWallet.tokens.find(t => t.id === 'eth');
+    if (ethToken) {
+      ethToken.amount = 5.75;
+      ethToken.value = ethToken.amount * ethToken.price;
+    }
+    
+    // USDT
+    const usdtToken = mainWallet.tokens.find(t => t.id === 'usdt');
+    if (usdtToken) {
+      usdtToken.amount = 10000;
+      usdtToken.value = usdtToken.amount * usdtToken.price;
+    }
+    
+    // Update total balance
+    mainWallet.totalBalance = mainWallet.tokens.reduce(
+      (total, token) => total + token.value, 0
+    );
+    
+    // Update UI
+    updateWalletUI();
+    
+    // Update token list display
+    populateTokenList();
+    
+    console.log("Demo balance setup complete");
+  }
+  
+  // Update wallet UI display
+  function updateWalletUI() {
+    const activeWallet = window.activeWallet || 'main';
+    const walletData = window.currentWalletData[activeWallet];
+    
+    if (walletData && typeof walletData.totalBalance !== 'undefined') {
+      // Update total balance display
+      const totalBalanceElement = document.getElementById('total-balance');
+      if (totalBalanceElement) {
+        totalBalanceElement.textContent = formatCurrency(walletData.totalBalance);
+      }
+    }
+  }
+  
+  // Format currency helper
+  function formatCurrency(amount) {
+    return '$' + amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  
+  // ====== PART 2: HEADER STYLING FIX ======
+  // Fix styling issues in screen headers
+  
+  function fixScreenHeaders() {
+    console.log("Fixing screen headers...");
+    
+    // Add consistent styling to all screen headers
+    const screenHeaders = document.querySelectorAll('.screen-header');
+    screenHeaders.forEach(header => {
+      // Apply critical styling
+      header.style.display = 'flex';
+      header.style.alignItems = 'center';
+      header.style.justifyContent = 'space-between';
+      header.style.padding = '16px';
+      header.style.backgroundColor = 'white';
+      header.style.borderBottom = '1px solid #F5F5F5';
+      
+      // Fix title styling
+      const title = header.querySelector('h2');
+      if (title) {
+        title.style.flex = '1';
+        title.style.textAlign = 'center';
+        title.style.margin = '0';
+        title.style.fontSize = '16px';
+        title.style.fontWeight = '600';
+        title.style.color = '#1A2024';
+      }
+      
+      // Fix back button styling
+      const backButton = header.querySelector('.back-button');
+      if (backButton) {
+        backButton.style.backgroundColor = 'transparent';
+        backButton.style.border = 'none';
+        backButton.style.padding = '0';
+        backButton.style.width = '32px';
+        backButton.style.height = '32px';
+        backButton.style.display = 'flex';
+        backButton.style.justifyContent = 'center';
+        backButton.style.alignItems = 'center';
+        backButton.style.color = '#1A2024';
+      }
+    });
+    
+    // Specific fixes for each screen
+    fixScreenHeader('history-screen', 'Transaction History');
+    fixScreenHeader('receive-screen', 'Receive');
+    fixScreenHeader('send-screen', 'Send Token');
+    
+    console.log("Screen headers fixed");
+  }
+  
+  // Fix specific screen header
+  function fixScreenHeader(screenId, defaultTitle) {
+    const screen = document.getElementById(screenId);
+    if (!screen) {
+      console.log(`Screen ${screenId} not found`);
+      return;
+    }
+    
+    let header = screen.querySelector('.screen-header');
+    
+    // Create header if it doesn't exist
+    if (!header) {
+      console.log(`Creating header for ${screenId}`);
+      header = document.createElement('div');
+      header.className = 'screen-header';
+      
+      // Basic header template
+      header.innerHTML = `
+        <button class="back-button" aria-label="Go back">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>${defaultTitle}</h2>
+        <div class="placeholder-icon"></div>
+      `;
+      
+      // Add to beginning of screen
+      screen.insertBefore(header, screen.firstChild);
+    } else {
+      console.log(`Fixing existing header for ${screenId}`);
+      
+      // Make sure header has title
+      if (!header.querySelector('h2')) {
+        const titleEl = document.createElement('h2');
+        titleEl.textContent = defaultTitle;
+        header.appendChild(titleEl);
+      }
+      
+      // Make sure header has back button
+      if (!header.querySelector('.back-button')) {
+        const backBtn = document.createElement('button');
+        backBtn.className = 'back-button';
+        backBtn.setAttribute('aria-label', 'Go back');
+        backBtn.innerHTML = '<i class="fas fa-arrow-left"></i>';
+        header.insertBefore(backBtn, header.firstChild);
+      }
+    }
+    
+    // Add event listener to back button
+    const backButton = header.querySelector('.back-button');
+    if (backButton) {
+      backButton.addEventListener('click', function() {
+        console.log(`Back button clicked on ${screenId}`);
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo('wallet-screen');
+        } else {
+          // Fallback navigation
+          document.querySelectorAll('.screen').forEach(s => {
+            s.style.display = 'none';
+            s.classList.add('hidden');
+          });
+          
+          const walletScreen = document.getElementById('wallet-screen');
+          if (walletScreen) {
+            walletScreen.style.display = 'flex';
+            walletScreen.classList.remove('hidden');
+          }
+        }
+      });
+    }
+  }
+  
+  // ====== PART 3: INITIALIZATION AND EXECUTION ======
+  
+  // Main initialization function
+  function initialize() {
+    console.log("Trust Wallet Fix: Initializing...");
+    
+    // Initialize wallet data first
+    initializeWalletData();
+    
+    // Set up demo balance
+    setupDemoBalance();
+    
+    // Fix screen headers
+    fixScreenHeaders();
+    
+    // Fix navigation and event handlers
+    fixEventHandlers();
+    
+    console.log("Trust Wallet Fix: Initialization complete");
+  }
+  
+  // Fix event handlers and re-connect buttons
+  function fixEventHandlers() {
+    console.log("Fixing event handlers...");
+    
+    // Connect back buttons
+    document.querySelectorAll('.back-button').forEach(button => {
+      button.addEventListener('click', function() {
+        const currentScreen = this.closest('.screen');
+        if (currentScreen) {
+          const returnTo = currentScreen.dataset.returnTo || 'wallet-screen';
+          if (typeof window.navigateTo === 'function') {
+            window.navigateTo(returnTo);
+          } else {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+              screen.style.display = 'none';
+              screen.classList.add('hidden');
+            });
+            
+            // Show wallet screen
+            const walletScreen = document.getElementById('wallet-screen');
+            if (walletScreen) {
+              walletScreen.style.display = 'flex';
+              walletScreen.classList.remove('hidden');
+            }
+          }
+        }
+      });
+    });
+    
+    // Make sure bottom tabs are visible
+    const bottomTabs = document.querySelector('.bottom-tabs');
+    if (bottomTabs) {
+      bottomTabs.style.display = 'flex';
+      bottomTabs.style.position = 'fixed';
+      bottomTabs.style.bottom = '0';
+      bottomTabs.style.left = '0';
+      bottomTabs.style.width = '100%';
+      bottomTabs.style.zIndex = '9999';
+      
+      // Move to end of document
+      document.body.appendChild(bottomTabs);
+    }
+  }
+  
+  // Call initialize function after a short delay to ensure DOM is ready
+  setTimeout(initialize, 500);
+  
+  // Define public globals to prevent errors
+  window.setupDemoBalance = setupDemoBalance;
+  window.populateTokenList = populateTokenList;
+  
+  // Execute immediately if DOM already loaded
+  if (document.readyState === "complete" || document.readyState === "interactive") {
+    initialize();
+  } else {
+    // Otherwise wait for DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initialize, 500);
+    });
+  }
+})();
+</script>
 <script src="combined1.js"></script>
 </body>
 </html>
