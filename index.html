@@ -752,6 +752,7 @@
     window.currentWalletData = null;
     window.activeWallet = 'main';
     window.correctPasscode = '123456';
+    window.passcodeEntered = '';
 </script>
 
 <!-- Combined component loading and screen connection -->
@@ -819,7 +820,7 @@ document.addEventListener('DOMContentLoaded', function() {
           console.log(`Script from ${url} executed`);
         }
       })
-.catch(error => console.error(`Error loading ${url}:`, error));
+      .catch(error => console.error(`Error loading ${url}:`, error));
   }
   
   // Connect all button handlers after a longer delay
@@ -993,7 +994,7 @@ function getTokenLogoUrl(tokenId) {
     'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
     'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
     'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-    'twt': 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png',
+    'twt': 'https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png',
     'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
     'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
     'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
@@ -1058,8 +1059,8 @@ function runScreenScripts() {
 setTimeout(initEnhancements, 1000);
 </script>
 
+<script>
 // Connect paste button in send screen
-</script>
 const pasteButton = document.querySelector('.paste-button');
 if (pasteButton && !pasteButton._hasEventListener) {
   pasteButton.addEventListener('click', function() {
@@ -1127,104 +1128,364 @@ document.querySelectorAll('.fee-option').forEach(option => {
   }
 });
 
-resolve();
-});
+// Function to navigate to specific screen
+function navigateToScreen(screenId) {
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.style.display = 'none';
+    screen.classList.add('hidden');
+  });
+  
+  // Show target screen
+  const targetScreen = document.getElementById(screenId);
+  if (targetScreen) {
+    targetScreen.style.display = 'flex';
+    targetScreen.classList.remove('hidden');
+  }
 }
 
-// Final cleanup
-function finalCleanup() {
-return new Promise(resolve => {
-  log('Performing final cleanup');
-  
-  // Fix bottom tabs visibility
-  const bottomTabs = document.querySelector('.bottom-tabs');
-  if (bottomTabs) {
-    bottomTabs.style.display = 'flex';
-    bottomTabs.style.position = 'fixed';
-    bottomTabs.style.bottom = '0';
-    bottomTabs.style.left = '0';
-    bottomTabs.style.width = '100%';
-    bottomTabs.style.zIndex = '9999';
+// Function to show toast messages
+function showToast(message, duration = 2000) {
+  // Remove any existing toast
+  const existingToast = document.querySelector('.toast-message');
+  if (existingToast) {
+    document.body.removeChild(existingToast);
   }
   
-  // Handle navigation if not already defined
-  if (typeof window.navigateTo !== 'function') {
-    window.navigateTo = navigateToScreen;
-  }
+  // Create new toast
+  const toast = document.createElement('div');
+  toast.className = 'toast-message';
+  toast.textContent = message;
+  document.body.appendChild(toast);
   
-  // Define showTokenDetail if not already defined
-  if (typeof window.showTokenDetail !== 'function') {
-    window.showTokenDetail = function(tokenId) {
-      navigateToScreen('token-detail');
-      updateTokenDetailView(tokenId);
-    };
-  }
+  // Show toast
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
   
-  // Define showToast if not already defined
-  window.showToast = showToast;
+  // Hide toast after duration
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentNode) {
+        document.body.removeChild(toast);
+      }
+    }, 300);
+  }, duration);
+}
+
+// Token detail view updater
+function updateTokenDetailView(tokenId) {
+  const activeWallet = window.activeWallet || 'main';
+  const tokens = window.currentWalletData?.[activeWallet]?.tokens || [];
+  const token = tokens.find(t => t.id === tokenId);
   
-  // Define setupDemoBalance if not already defined
-  window.setupDemoBalance = setupDemoBalance;
+  if (!token) return;
   
-  // Define populateTokenList if not already defined
-  window.populateTokenList = populateTokenList;
+  // Update token details
+  const elements = {
+    'detail-symbol': token.symbol,
+    'detail-fullname': token.name,
+    'token-balance-amount': token.amount.toFixed(6) + ' ' + token.symbol,
+    'token-balance-value': '$' + token.value.toFixed(2),
+    'token-staking-symbol': token.symbol,
+    'token-price-symbol': token.symbol,
+    'token-current-price': '$' + token.price.toLocaleString()
+  };
   
-  // Check if wallet screen has tokens
-  const tokenList = document.getElementById('token-list');
-  if (tokenList && (!tokenList.innerHTML || tokenList.innerHTML.trim() === '')) {
-    // Initialize wallet data
-    if (!window.currentWalletData || !window.currentWalletData.main) {
-      setupDefaultWalletData();
+  // Update all elements
+  for (const id in elements) {
+    const element = document.getElementById(id);
+    if (element) {
+      element.textContent = elements[id];
     }
-    
-    // Set up demo balance
-    setupDemoBalance();
   }
   
-  // Fix visibility toggle
+  // Update token icon
+  const tokenDetailIcon = document.getElementById('token-detail-icon');
+  if (tokenDetailIcon) {
+    tokenDetailIcon.src = token.icon || getTokenLogoUrl(token.id);
+  }
+  
+  // Update price change
+  const priceChangeElement = document.getElementById('token-price-change');
+  if (priceChangeElement) {
+    priceChangeElement.className = token.change >= 0 ? 'positive' : 'negative';
+    priceChangeElement.textContent = (token.change >= 0 ? '+' : '') + token.change + '%';
+  }
+}
+
+// Function to populate token lists
+function populateTokenList() {
+  // Get token list container
+  const tokenList = document.getElementById('token-list');
+  if (!tokenList) return;
+  
+  // Clear existing content
+  tokenList.innerHTML = '';
+  
+  // Get active wallet data
+  const activeWallet = window.activeWallet || 'main';
+  if (!window.currentWalletData || !window.currentWalletData[activeWallet]) {
+    setupDefaultWalletData();
+  }
+  
+  const walletData = window.currentWalletData[activeWallet];
+  const tokens = walletData.tokens || [];
+  
+  // Create token items
+  tokens.forEach(token => {
+    // Create token item element
+    const tokenItem = document.createElement('div');
+    tokenItem.className = 'token-item';
+    tokenItem.setAttribute('data-token-id', token.id);
+    
+    // Get token icon URL directly without template literal
+    const iconUrl = token.icon || getTokenLogoUrl(token.id);
+    
+    // Set token content
+    tokenItem.innerHTML = `
+      <div class="token-icon">
+        <img src="${iconUrl}" alt="${token.name}">
+        ${['usdt', 'bnb', 'twt'].includes(token.id) ? 
+          '<div class="chain-badge"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="Network"></div>' : ''}
+      </div>
+      <div class="token-info">
+        <div class="token-name">${token.symbol}</div>
+        <div class="token-price">${token.name} 
+          <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">
+            ${(token.change >= 0 ? '+' : '') + token.change}%
+          </span>
+        </div>
+      </div>
+      <div class="token-amount">
+        <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
+        <div class="token-value">$${token.value.toFixed(2)}</div>
+      </div>
+    `;
+    
+    // Add click event
+    tokenItem.addEventListener('click', function() {
+      // Navigate to token detail screen
+      navigateToScreen('token-detail');
+      // Update token detail view
+      updateTokenDetailView(token.id);
+    });
+    
+    // Append to token list
+    tokenList.appendChild(tokenItem);
+  });
+  
+  // Update total balance
+  const totalBalanceElement = document.getElementById('total-balance');
+  if (totalBalanceElement) {
+    totalBalanceElement.textContent = '$' + walletData.totalBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+}
+
+// Setup default wallet data
+function setupDefaultWalletData() {
+  const defaultTokens = [
+    {
+      id: 'btc',
+      name: 'Bitcoin',
+      symbol: 'BTC',
+      network: 'Bitcoin',
+      icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+      amount: 0.25,
+      value: 20996.19,
+      price: 83984.74,
+      change: -0.59
+    },
+    {
+      id: 'eth',
+      name: 'Ethereum',
+      symbol: 'ETH',
+      network: 'Ethereum',
+      icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      amount: 5.75,
+      value: 11349.41,
+      price: 1973.81,
+      change: -0.71
+    },
+    {
+      id: 'usdt',
+      name: 'Tether',
+      symbol: 'USDT',
+      network: 'BNB Smart Chain',
+      icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+      amount: 10000,
+      value: 10000,
+      price: 1.00,
+      change: 0.00
+    },
+    {
+      id: 'bnb',
+      name: 'BNB',
+      symbol: 'BNB',
+      network: 'BNB Smart Chain',
+      icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      amount: 25.5,
+      value: 8926.56,
+      price: 349.67,
+      change: 2.35
+    }
+  ];
+  
+  // Calculate total balance
+  const totalBalance = defaultTokens.reduce((total, token) => total + token.value, 0);
+  
+  // Create wallet data
+  window.currentWalletData = {
+    main: {
+      totalBalance: totalBalance,
+      tokens: defaultTokens
+    }
+  };
+  
+  // Create a copy for original data
+  window.originalWalletData = JSON.parse(JSON.stringify(window.currentWalletData));
+}
+
+// Function to show token detail
+function showTokenDetail(tokenId) {
+  navigateToScreen('token-detail');
+  updateTokenDetailView(tokenId);
+}
+
+// Function to show send screen
+function showSendScreen(tokenId) {
+  const activeWallet = window.activeWallet || 'main';
+  const tokens = window.currentWalletData?.[activeWallet]?.tokens || [];
+  const token = tokens.find(t => t.id === tokenId);
+  
+  if (!token) return;
+  
+  // Update send screen with token details
+  const sendTokenTitle = document.getElementById('send-token-title');
+  if (sendTokenTitle) {
+    sendTokenTitle.textContent = 'Send ' + token.symbol;
+  }
+  
+  const maxAmount = document.getElementById('max-amount');
+  if (maxAmount) {
+    maxAmount.textContent = token.amount.toFixed(6);
+  }
+  
+  const maxSymbol = document.getElementById('max-symbol');
+  if (maxSymbol) {
+    maxSymbol.textContent = token.symbol;
+  }
+  
+  // Show send screen
+  navigateToScreen('send-screen');
+}
+
+// Make functions globally available
+window.navigateToScreen = navigateToScreen;
+window.showToast = showToast;
+window.updateTokenDetailView = updateTokenDetailView;
+window.populateTokenList = populateTokenList;
+window.setupDefaultWalletData = setupDefaultWalletData;
+window.showTokenDetail = showTokenDetail;
+window.showSendScreen = showSendScreen;
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Setup wallet data
+  setupDefaultWalletData();
+  
+  // Populate token list
+  populateTokenList();
+  
+  // Connect back buttons
+  document.querySelectorAll('.back-button, #back-button').forEach(button => {
+    button.addEventListener('click', function() {
+      navigateToScreen('wallet-screen');
+    });
+  });
+  
+  // Connect unlock button
+  const unlockButton = document.getElementById('unlock-button');
+  if (unlockButton) {
+    unlockButton.addEventListener('click', function() {
+      if (window.passcodeEntered === window.correctPasscode) {
+        navigateToScreen('wallet-screen');
+        window.passcodeEntered = '';
+      } else {
+        showToast('Incorrect passcode');
+        window.passcodeEntered = '';
+        document.querySelectorAll('.passcode-dots .dot').forEach(dot => {
+          dot.classList.remove('filled');
+        });
+      }
+    });
+  }
+  
+  // Connect numpad keys
+  document.querySelectorAll('.numpad-key').forEach(key => {
+    key.addEventListener('click', function() {
+      const keyValue = this.getAttribute('data-key');
+      
+      if (keyValue === 'bio') {
+        // Simulate biometric success
+        setTimeout(() => {
+          navigateToScreen('wallet-screen');
+        }, 1000);
+      } else if (keyValue === 'back') {
+        // Remove last digit
+        window.passcodeEntered = window.passcodeEntered.slice(0, -1);
+      } else {
+        // Add digit if less than 6
+        if (window.passcodeEntered.length < 6) {
+          window.passcodeEntered += keyValue;
+        }
+      }
+      
+      // Update dots
+      document.querySelectorAll('.passcode-dots .dot').forEach((dot, index) => {
+        if (index < window.passcodeEntered.length) {
+          dot.classList.add('filled');
+        } else {
+          dot.classList.remove('filled');
+        }
+      });
+      
+      // Check if complete
+      if (window.passcodeEntered.length === 6) {
+        if (window.passcodeEntered === window.correctPasscode) {
+          setTimeout(() => {
+            navigateToScreen('wallet-screen');
+            window.passcodeEntered = '';
+          }, 300);
+        } else {
+          const dots = document.querySelector('.passcode-dots');
+          if (dots) {
+            dots.classList.add('shake');
+            setTimeout(() => {
+              dots.classList.remove('shake');
+              window.passcodeEntered = '';
+              document.querySelectorAll('.passcode-dots .dot').forEach(dot => {
+                dot.classList.remove('filled');
+              });
+            }, 500);
+          }
+        }
+      }
+    });
+  });
+  
+  // Connect visibility toggle
   const visibilityToggle = document.querySelector('.visibility-toggle');
-  if (visibilityToggle && !visibilityToggle._hasEventListener) {
+  if (visibilityToggle) {
     visibilityToggle.addEventListener('click', function() {
       const icon = this.querySelector('i');
       const balanceAmount = document.getElementById('total-balance');
       
-      if (!icon || !balanceAmount) return;
-      
-      const isHidden = icon.classList.contains('fa-eye-slash');
-      
-      if (isHidden) {
-        // Show balance
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-        
-        // Try to restore from stored balance
-        if (window.cachedBalance) {
-          balanceAmount.textContent = window.cachedBalance;
-        } else {
-          // Try to get from wallet data
-          const activeWallet = window.activeWallet || 'main';
-          const walletData = window.currentWalletData && window.currentWalletData[activeWallet];
-          
-          if (walletData && typeof walletData.totalBalance !== 'undefined') {
-            balanceAmount.textContent = formatCurrency(walletData.totalBalance);
-          } else {
-            balanceAmount.textContent = '$0.00';
-          }
-        }
-        
-        // Also restore token balances
-        document.querySelectorAll('.token-balance').forEach(tokenBalance => {
-          const originalAmount = tokenBalance.getAttribute('data-original-amount');
-          if (originalAmount) {
-            tokenBalance.textContent = originalAmount;
-          }
-        });
-      } else {
+      if (icon.classList.contains('fa-eye')) {
         // Hide balance
         icon.classList.remove('fa-eye');
         icon.classList.add('fa-eye-slash');
-        
-        // Store current balance
         window.cachedBalance = balanceAmount.textContent;
         balanceAmount.textContent = '••••••';
         
@@ -1233,206 +1494,87 @@ return new Promise(resolve => {
           tokenBalance.setAttribute('data-original-amount', tokenBalance.textContent);
           tokenBalance.textContent = '••••••';
         });
-      }
-    });
-    visibilityToggle._hasEventListener = true;
-  }
-  
-  // Connect wallet selector
-  const walletSelector = document.querySelector('.wallet-selector');
-  if (walletSelector && !walletSelector._hasEventListener) {
-    walletSelector.addEventListener('click', function() {
-      const walletOptions = ['main', 'secondary', 'business'];
-      const currentIndex = walletOptions.indexOf(window.activeWallet);
-      const nextIndex = (currentIndex + 1) % walletOptions.length;
-      window.activeWallet = walletOptions[nextIndex];
-      
-      // Update wallet name
-      const walletName = document.querySelector('.wallet-name');
-      if (walletName) {
-        walletName.textContent = window.activeWallet === 'main' ? 'Main Wallet 1' : 
-                                window.activeWallet === 'secondary' ? 'Main Wallet 2' : 
-                                'Business Wallet';
-      }
-      
-      // Update UI
-      updateWalletUI();
-      populateTokenList();
-    });
-    walletSelector._hasEventListener = true;
-  }
-  
-  // One time fix for the passcode dots
-  const passcode = document.querySelector('.passcode-dots');
-  if (passcode) {
-    const dots = passcode.querySelectorAll('.dot');
-    dots.forEach((dot, index) => {
-      if (index < window.passcodeEntered.length) {
-        dot.classList.add('filled');
       } else {
-        dot.classList.remove('filled');
+        // Show balance
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        
+        if (window.cachedBalance) {
+          balanceAmount.textContent = window.cachedBalance;
+        } else {
+          const activeWallet = window.activeWallet || 'main';
+          if (window.currentWalletData && window.currentWalletData[activeWallet]) {
+            balanceAmount.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+          } else {
+            balanceAmount.textContent = '$0.00';
+          }
+        }
+        
+        // Restore token balances
+        document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+          const originalAmount = tokenBalance.getAttribute('data-original-amount');
+          if (originalAmount) {
+            tokenBalance.textContent = originalAmount;
+          }
+        });
       }
     });
   }
   
-  // Connect numpad keys
-  document.querySelectorAll('.numpad-key').forEach(key => {
-    if (!key._hasEventListener) {
-      key.addEventListener('click', function() {
-        const keyValue = this.getAttribute('data-key');
-        
-        if (!keyValue) return;
-        
-        if (keyValue === 'bio') {
-          // Biometric authentication
-          const biometricOverlay = document.getElementById('biometric-overlay');
-          if (biometricOverlay) {
-            biometricOverlay.style.display = 'flex';
-            
-            // Simulate biometric success after 1.5 seconds
-            setTimeout(() => {
-              const status = document.getElementById('biometric-status');
-              if (status) {
-                status.textContent = 'Fingerprint recognized';
-                status.style.color = '#05C46B';
-              }
-              
-              // Hide overlay and unlock wallet after 2 seconds
-              setTimeout(() => {
-                biometricOverlay.style.display = 'none';
-                navigateToScreen('wallet-screen');
-              }, 500);
-            }, 1500);
-          }
-        } else if (keyValue === 'back') {
-          // Backspace
-          if (window.passcodeEntered.length > 0) {
-            window.passcodeEntered = window.passcodeEntered.slice(0, -1);
-            
-            // Update dots
-            const dots = document.querySelectorAll('.passcode-dots .dot');
-            dots.forEach((dot, index) => {
-              if (index < window.passcodeEntered.length) {
-                dot.classList.add('filled');
-              } else {
-                dot.classList.remove('filled');
-              }
-            });
-          }
-        } else {
-          // Add digit to passcode
-          if (window.passcodeEntered.length < 6) {
-            window.passcodeEntered += keyValue;
-            
-            // Update dots
-            const dots = document.querySelectorAll('.passcode-dots .dot');
-            dots.forEach((dot, index) => {
-              if (index < window.passcodeEntered.length) {
-                dot.classList.add('filled');
-              } else {
-                dot.classList.remove('filled');
-              }
-            });
-            
-            // Check if complete
-            if (window.passcodeEntered.length === 6) {
-              if (window.passcodeEntered === window.correctPasscode) {
-                // Unlock wallet
-                setTimeout(() => {
-                  navigateToScreen('wallet-screen');
-                  window.passcodeEntered = '';
-                }, 300);
-              } else {
-                // Wrong passcode
-                const dotsContainer = document.querySelector('.passcode-dots');
-                if (dotsContainer) {
-                  dotsContainer.classList.add('shake');
-                  setTimeout(() => {
-                    dotsContainer.classList.remove('shake');
-                    window.passcodeEntered = '';
-                    
-                    // Clear dots
-                    const dots = document.querySelectorAll('.passcode-dots .dot');
-                    dots.forEach(dot => {
-                      dot.classList.remove('filled');
-                    });
-                  }, 500);
-                }
-              }
-            }
-          }
-        }
-      });
-      key._hasEventListener = true;
-    }
-  });
-  
-  // Connect unlock button
-  const unlockButton = document.getElementById('unlock-button');
-  if (unlockButton && !unlockButton._hasEventListener) {
-    unlockButton.addEventListener('click', function() {
-      if (window.passcodeEntered.length === 6) {
-        if (window.passcodeEntered === window.correctPasscode) {
-          // Unlock wallet
-          navigateToScreen('wallet-screen');
-          window.passcodeEntered = '';
-        } else {
-          // Wrong passcode
-          const dotsContainer = document.querySelector('.passcode-dots');
-          if (dotsContainer) {
-            dotsContainer.classList.add('shake');
-            setTimeout(() => {
-              dotsContainer.classList.remove('shake');
-              window.passcodeEntered = '';
-              
-              // Clear dots
-              const dots = document.querySelectorAll('.passcode-dots .dot');
-              dots.forEach(dot => {
-                dot.classList.remove('filled');
-              });
-            }, 500);
-          }
-        }
-      }
+  // Connect send button
+  const sendButton = document.getElementById('send-button');
+  if (sendButton) {
+    sendButton.addEventListener('click', function() {
+      navigateToScreen('send-token-select');
     });
-    unlockButton._hasEventListener = true;
   }
   
-  resolve();
+  // Connect continue send button
+  const continueButton = document.getElementById('continue-send');
+  if (continueButton) {
+    continueButton.addEventListener('click', function() {
+      // Show transaction status modal
+      const txStatusModal = document.getElementById('tx-status-modal');
+      if (txStatusModal) {
+        txStatusModal.style.display = 'flex';
+        
+        // Show pending view
+        const pendingView = document.getElementById('tx-pending');
+        const successView = document.getElementById('tx-success');
+        
+        if (pendingView) pendingView.classList.remove('hidden');
+        if (successView) successView.classList.add('hidden');
+        
+        // Simulate transaction completion
+        setTimeout(() => {
+          if (pendingView) pendingView.classList.add('hidden');
+          if (successView) successView.classList.remove('hidden');
+          
+          // Update transaction details
+          const txAmount = document.getElementById('tx-amount');
+          const sendAmount = document.getElementById('send-amount');
+          const maxSymbol = document.getElementById('max-symbol');
+          
+          if (txAmount && sendAmount && maxSymbol) {
+            txAmount.textContent = parseFloat(sendAmount.value || 0).toFixed(2) + ' ' + maxSymbol.textContent;
+          }
+          
+          const txTo = document.getElementById('tx-to');
+          const recipientAddress = document.getElementById('recipient-address');
+          
+          if (txTo && recipientAddress) {
+            const address = recipientAddress.value || '';
+            txTo.textContent = address.substring(0, 6) + '...' + address.substring(address.length - 4);
+          }
+        }, 2000);
+      }
+    });
+  }
 });
-}
 
-// Initialize on load
-init();
-
-// Export public API
-window.TrustWallet = {
-// Core functions
-navigateTo: navigateToScreen,
-showToast: showToast,
-setupDemoBalance: setupDemoBalance,
-populateTokenList: populateTokenList,
-showTokenDetail: function(tokenId) {
-  navigateToScreen('token-detail');
-  updateTokenDetailView(tokenId);
-},
-fixNetworkBadges: fixNetworkBadges,
-addMissingTokens: addMissingTokens,
-fixBottomTabs: fixBottomTabs
-};
-
-})();
-<script>
-
-<script src="combined1.js"></script>
-    
 // TrustWallet UI Comprehensive Fixes
-// This fixes all UI issues with token details, screen headers, and visibility toggle
-</script>
 (function() {
   'use strict';
-  
-  console.log('TrustWallet UI Fixes: Starting...');
   
   // Wait for DOM to be fully loaded
   function waitForDOM(callback) {
@@ -1443,12 +1585,8 @@ fixBottomTabs: fixBottomTabs
     }
   }
   
-  // ========================================
-  // FIX 1: SCREEN HEADERS
-  // ========================================
+  // Fix screen headers
   function fixScreenHeaders() {
-    console.log('Fixing screen headers...');
-    
     const headerSelectors = [
       '#send-screen .screen-header', 
       '#receive-screen .screen-header', 
@@ -1469,51 +1607,12 @@ fixBottomTabs: fixBottomTabs
         header.style.borderBottom = '1px solid #F5F5F5';
         header.style.position = 'relative';
         header.style.width = '100%';
-        
-        // Fix header title
-        const title = header.querySelector('h2');
-        if (title) {
-          title.style.fontSize = '18px';
-          title.style.fontWeight = '600';
-          title.style.margin = '0';
-          title.style.flex = '1';
-          title.style.textAlign = 'center';
-        }
-        
-        // Fix back button
-        const backButton = header.querySelector('.back-button');
-        if (backButton) {
-          backButton.style.width = '32px';
-          backButton.style.height = '32px';
-          backButton.style.display = 'flex';
-          backButton.style.justifyContent = 'center';
-          backButton.style.alignItems = 'center';
-          backButton.style.background = 'transparent';
-          backButton.style.border = 'none';
-          backButton.style.padding = '0';
-          
-          // Add ripple effect
-          backButton.classList.add('tw-ripple');
-          
-          // Ensure the icon is visible
-          const icon = backButton.querySelector('i');
-          if (icon) {
-            icon.style.fontSize = '18px';
-            icon.style.color = '#1A2024';
-          }
-        }
       });
     });
-    
-    console.log('Screen headers fixed');
   }
   
-  // ========================================
-  // FIX 2: TOKEN DETAILS
-  // ========================================
+  // Fix token detail view
   function fixTokenDetailView() {
-    console.log('Fixing token detail view...');
-    
     const tokenDetail = document.getElementById('token-detail');
     if (!tokenDetail) return;
     
@@ -1523,35 +1622,6 @@ fixBottomTabs: fixBottomTabs
       detailHeader.style.backgroundColor = '#FFFFFF';
       detailHeader.style.zIndex = '10';
       detailHeader.style.position = 'relative';
-      
-      // Fix alignment of title
-      const tokenDetailTitle = detailHeader.querySelector('.token-detail-title');
-      if (tokenDetailTitle) {
-        tokenDetailTitle.style.display = 'flex';
-        tokenDetailTitle.style.flexDirection = 'column';
-        tokenDetailTitle.style.alignItems = 'center';
-        tokenDetailTitle.style.position = 'absolute';
-        tokenDetailTitle.style.left = '50%';
-        tokenDetailTitle.style.transform = 'translateX(-50%)';
-        tokenDetailTitle.style.width = 'auto';
-      }
-    }
-    
-    // Fix token name and symbol
-    const symbolElement = tokenDetail.querySelector('#detail-symbol');
-    if (symbolElement) {
-      symbolElement.style.fontSize = '24px';
-      symbolElement.style.fontWeight = '600';
-      symbolElement.style.textAlign = 'center';
-      symbolElement.style.margin = '0 0 2px 0';
-    }
-    
-    const nameElement = tokenDetail.querySelector('#detail-fullname');
-    if (nameElement) {
-      nameElement.style.fontSize = '12px';
-      nameElement.style.color = '#8A939D';
-      nameElement.style.textAlign = 'center';
-      nameElement.style.margin = '0';
     }
     
     // Fix token balance display
@@ -1570,604 +1640,10 @@ fixBottomTabs: fixBottomTabs
       iconContainer.style.overflow = 'visible';
       iconContainer.style.margin = '24px auto 16px';
     }
-    
-    // Fix detail action buttons (Send, Receive, etc.)
-    const actionButtons = tokenDetail.querySelectorAll('.detail-action');
-    actionButtons.forEach(button => {
-      button.style.display = 'flex';
-      button.style.flexDirection = 'column';
-      button.style.alignItems = 'center';
-      
-      // Add ripple effect
-      button.classList.add('tw-ripple');
-      
-      // Fix icon styling
-      const icon = button.querySelector('i');
-      if (icon) {
-        icon.style.width = '40px';
-        icon.style.height = '40px';
-        icon.style.borderRadius = '50%';
-        icon.style.display = 'flex';
-        icon.style.justifyContent = 'center';
-        icon.style.alignItems = 'center';
-        icon.style.backgroundColor = 'rgba(51, 117, 187, 0.08)';
-        icon.style.color = '#3375BB';
-        icon.style.marginBottom = '8px';
-      }
-      
-      // Fix text label
-      const span = button.querySelector('span');
-      if (span) {
-        span.style.fontSize = '12px';
-        span.style.color = '#5F6C75';
-      }
-    });
-    
-    // Fix transaction list
-    const transactionList = tokenDetail.querySelector('#transaction-list');
-    if (transactionList) {
-      // Ensure 'positive' classes use Trust Wallet blue color
-      const positiveValues = transactionList.querySelectorAll('.positive');
-      positiveValues.forEach(value => {
-        value.style.color = '#3375BB';
-      });
-    }
-    
-    // Fix price change indicator
-    const priceChange = tokenDetail.querySelector('#token-price-change');
-    if (priceChange && priceChange.classList.contains('positive')) {
-      priceChange.style.color = '#3375BB';
-    }
-    
-    // Remove all network badges from token detail view
-    const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed, .network-badge');
-    badges.forEach(badge => {
-      badge.style.display = 'none';
-    });
-    
-    console.log('Token detail view fixed');
   }
   
-  // ========================================
-  // FIX 3: VISIBILITY TOGGLE
-  // ========================================
-  function fixVisibilityToggle() {
-    console.log('Fixing balance visibility toggle...');
-    
-    const visibilityToggle = document.querySelector('.visibility-toggle');
-    if (!visibilityToggle) return;
-    
-    // Clear any existing event handlers by cloning the element
-    const newToggle = visibilityToggle.cloneNode(true);
-    if (visibilityToggle.parentNode) {
-      visibilityToggle.parentNode.replaceChild(newToggle, visibilityToggle);
-    }
-    
-    // Add the fixed event listener
-    newToggle.addEventListener('click', function() {
-      const icon = this.querySelector('i');
-      const balanceAmount = document.getElementById('total-balance');
-      
-      if (!icon || !balanceAmount) return;
-      
-      // Check if balance is currently hidden
-      const isHidden = icon.classList.contains('fa-eye-slash');
-      
-      if (isHidden) {
-        // Show balance - switch to eye icon
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-        
-        // Restore cached balance
-        if (window.cachedBalance) {
-          balanceAmount.textContent = window.cachedBalance;
-        } else {
-          // Fallback to calculating from active wallet
-          const activeWallet = window.activeWallet || 'main';
-          if (window.currentWalletData && window.currentWalletData[activeWallet]) {
-            const totalBalance = window.currentWalletData[activeWallet].totalBalance || 0;
-            balanceAmount.textContent = '$' + totalBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-          } else {
-            balanceAmount.textContent = '$0.00';
-          }
-        }
-        
-        // Restore token balances
-        document.querySelectorAll('.token-balance').forEach(element => {
-          const originalValue = element.getAttribute('data-original-balance');
-          if (originalValue) {
-            element.textContent = originalValue;
-          }
-        });
-      } else {
-        // Hide balance - switch to eye-slash icon
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-        
-        // Cache current balance
-        window.cachedBalance = balanceAmount.textContent;
-        balanceAmount.textContent = '••••••';
-        
-        // Hide token balances
-        document.querySelectorAll('.token-balance').forEach(element => {
-          // Save original value
-          element.setAttribute('data-original-balance', element.textContent);
-          element.textContent = '••••••';
-        });
-      }
-    });
-    
-    console.log('Balance visibility toggle fixed');
-  }
-  
-  // ========================================
-  // FIX 4: RECEIVE SCREEN
-  // ========================================
-  function fixReceiveScreen() {
-    console.log('Fixing receive screen...');
-    
-    const receiveScreen = document.getElementById('receive-screen');
-    if (!receiveScreen) return;
-    
-    // Enhanced receive screen with token selection
-    receiveScreen.innerHTML = `
-      <div class="screen-header">
-        <button class="back-button" aria-label="Go back">
-          <i class="fas fa-arrow-left"></i>
-        </button>
-        <h2>Receive</h2>
-        <div class="placeholder-icon"></div>
-      </div>
-      
-      <div class="search-container">
-        <div class="search-bar token-search">
-          <i class="fas fa-search"></i>
-          <input type="text" id="receive-token-search" placeholder="Search" aria-label="Search tokens">
-        </div>
-      </div>
-      
-      <div class="networks-filter">
-        <div class="all-networks">
-          All Networks <i class="fas fa-chevron-down"></i>
-        </div>
-      </div>
-      
-      <div id="receive-token-list" class="token-list">
-        <!-- Tokens will be dynamically populated here -->
-      </div>
-    `;
-    
-    // Create QR Screen as separate screen
-    const appContainer = document.querySelector('.app-container');
-    if (appContainer) {
-      let qrScreen = document.getElementById('receive-qr-screen');
-      if (!qrScreen) {
-        qrScreen = document.createElement('div');
-        qrScreen.id = 'receive-qr-screen';
-        qrScreen.className = 'screen hidden';
-        qrScreen.innerHTML = `
-          <div class="screen-header">
-            <button class="back-button" aria-label="Go back">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <h2>Receive <span id="receive-token-symbol">BTC</span></h2>
-            <div class="placeholder-icon"></div>
-          </div>
-          
-          <div class="receive-content">
-            <div class="qr-code-container">
-              <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
-            </div>
-            <div class="wallet-address-container">
-              <input type="text" id="wallet-address" readonly value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71" placeholder="Your wallet address">
-              <button class="copy-address-button">
-                <i class="fas fa-copy"></i> Copy
-              </button>
-            </div>
-          </div>
-        `;
-        appContainer.appendChild(qrScreen);
-      }
-      
-      // Fix back button on QR screen
-      const backButton = qrScreen.querySelector('.back-button');
-      if (backButton) {
-        backButton.addEventListener('click', function() {
-          qrScreen.style.display = 'none';
-          qrScreen.classList.add('hidden');
-          receiveScreen.style.display = 'flex';
-          receiveScreen.classList.remove('hidden');
-        });
-      }
-      
-      // Fix QR code styling
-      const qrCodeContainer = qrScreen.querySelector('.qr-code-container');
-      if (qrCodeContainer) {
-        qrCodeContainer.style.padding = '20px';
-        qrCodeContainer.style.backgroundColor = '#FFFFFF';
-        qrCodeContainer.style.borderRadius = '16px';
-        qrCodeContainer.style.boxShadow = '0 2px 8px rgba(0,0,0,0.05)';
-        qrCodeContainer.style.margin = '32px auto';
-      }
-      
-      // Fix address input styling
-      const addressInput = qrScreen.querySelector('#wallet-address');
-      if (addressInput) {
-        addressInput.style.width = '100%';
-        addressInput.style.padding = '12px';
-        addressInput.style.fontSize = '14px';
-        addressInput.style.border = '1px solid #C4C9CC';
-        addressInput.style.borderRadius = '8px';
-        addressInput.style.textAlign = 'center';
-        addressInput.style.marginBottom = '16px';
-        addressInput.style.color = '#1A2024';
-      }
-      
-      // Fix copy button
-      const copyButton = qrScreen.querySelector('.copy-address-button');
-      if (copyButton) {
-        copyButton.style.display = 'flex';
-        copyButton.style.alignItems = 'center';
-        copyButton.style.justifyContent = 'center';
-        copyButton.style.padding = '10px 24px';
-        copyButton.style.backgroundColor = '#F5F5F5';
-        copyButton.style.color = '#3375BB';
-        copyButton.style.borderRadius = '8px';
-        copyButton.style.fontWeight = '500';
-        copyButton.style.border = 'none';
-        copyButton.style.fontSize = '14px';
-        
-        // Add ripple effect
-        copyButton.classList.add('tw-ripple');
-        
-        // Add copy functionality
-        copyButton.addEventListener('click', function() {
-          if (addressInput) {
-            addressInput.select();
-            document.execCommand('copy');
-            
-            // Show toast notification
-            showToast('Address copied to clipboard');
-          }
-        });
-      }
-    }
-    
-    console.log('Receive screen fixed');
-  }
-  
-  // ========================================
-  // FIX 5: POPULATE TOKEN LIST
-  // ========================================
-  function populateTokenList() {
-    console.log('Populating token lists...');
-    
-    // Return if token data is not available
-    if (!window.currentWalletData) {
-      console.log('No wallet data available');
-      return;
-    }
-    
-    // Populate main wallet token list
-    const mainTokenList = document.getElementById('token-list');
-    if (mainTokenList) {
-      populateSpecificTokenList(mainTokenList);
-    }
-    
-    // Populate receive token list
-    const receiveTokenList = document.getElementById('receive-token-list');
-    if (receiveTokenList) {
-      populateReceiveTokenList(receiveTokenList);
-    }
-    
-    // Populate send token list
-    const sendTokenList = document.getElementById('select-token-list');
-    if (sendTokenList) {
-      populateSendTokenList(sendTokenList);
-    }
-  }
-  
-  function populateSpecificTokenList(tokenList) {
-    // Clear existing list
-    tokenList.innerHTML = '';
-    
-    // Get tokens from active wallet
-    const activeWallet = window.activeWallet || 'main';
-    let tokens = [];
-    
-    if (window.currentWalletData && 
-        window.currentWalletData[activeWallet] && 
-        window.currentWalletData[activeWallet].tokens) {
-      tokens = window.currentWalletData[activeWallet].tokens;
-    } else if (window.walletData && 
-               window.walletData[activeWallet] && 
-               window.walletData[activeWallet].tokens) {
-      tokens = window.walletData[activeWallet].tokens;
-    } else {
-      // Fallback tokens if no wallet data
-      tokens = [
-        {
-          id: 'btc',
-          name: 'Bitcoin',
-          symbol: 'BTC',
-          network: 'Bitcoin',
-          icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-          amount: 0.25,
-          value: 20996.19,
-          price: 83984.74,
-          change: -0.59
-        },
-        {
-          id: 'eth',
-          name: 'Ethereum',
-          symbol: 'ETH',
-          network: 'Ethereum',
-          icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-          amount: 5.75,
-          value: 11349.41,
-          price: 1973.81,
-          change: -0.71
-        },
-        {
-          id: 'usdt',
-          name: 'Tether',
-          symbol: 'USDT',
-          network: 'BNB Smart Chain',
-          icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-          amount: 10000,
-          value: 10000,
-          price: 1.00,
-          change: 0.00
-        }
-      ];
-    }
-    
-    // Create token items
-    tokens.forEach(token => {
-      // Create token item element
-      const tokenItem = document.createElement('div');
-      tokenItem.className = 'token-item';
-      tokenItem.setAttribute('data-token-id', token.id);
-      
-      // Safely handle chain badge (fix the 404 error)
-      let chainBadgeHtml = '';
-      if (token.id === 'usdt' || token.id === 'twt' || token.id === 'bnb') {
-        chainBadgeHtml = `<div class="chain-badge"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="Network"></div>`;
-      }
-      
-      // Set token content
-      tokenItem.innerHTML = `
-        <div class="token-icon">
-          <img src="${token.icon || getTokenLogoUrl(token.id)}" alt="${token.name}">
-          ${chainBadgeHtml}
-        </div>
-        <div class="token-info">
-          <div class="token-name">${token.symbol}</div>
-          <div class="token-price">${token.name} 
-            <span class="token-price-change ${(token.change >= 0) ? 'positive' : 'negative'}">
-              ${(token.change >= 0) ? '+' : ''}${token.change || 0}%
-            </span>
-          </div>
-        </div>
-        <div class="token-amount">
-          <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
-          <div class="token-value">$${token.value.toFixed(2)}</div>
-        </div>
-      `;
-      
-      // Add click event to navigate to token detail
-      tokenItem.addEventListener('click', function() {
-        if (typeof window.showTokenDetail === 'function') {
-          window.showTokenDetail(token.id);
-        } else {
-          navigateToTokenDetail(token.id);
-        }
-      });
-      
-      // Add to token list
-      tokenList.appendChild(tokenItem);
-    });
-    
-    // Update total balance in UI
-    const totalBalanceElement = document.getElementById('total-balance');
-    if (totalBalanceElement) {
-      const wallet = window.currentWalletData[activeWallet];
-      if (wallet) {
-        totalBalanceElement.textContent = '$' + wallet.totalBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-      }
-    }
-  }
-  
-  function populateReceiveTokenList(tokenList) {
-    // Clear existing list
-    tokenList.innerHTML = '';
-    
-    // Get tokens from active wallet
-    const activeWallet = window.activeWallet || 'main';
-    let tokens = [];
-    
-    if (window.currentWalletData && 
-        window.currentWalletData[activeWallet] && 
-        window.currentWalletData[activeWallet].tokens) {
-      tokens = window.currentWalletData[activeWallet].tokens;
-    } else if (window.walletData && 
-               window.walletData[activeWallet] && 
-               window.walletData[activeWallet].tokens) {
-      tokens = window.walletData[activeWallet].tokens;
-    } else {
-      // Fallback tokens
-      tokens = [
-        {
-          id: 'btc',
-          name: 'Bitcoin',
-          symbol: 'BTC',
-          network: 'Bitcoin',
-          icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-          amount: 0.25,
-          value: 20996.19
-        },
-        {
-          id: 'eth',
-          name: 'Ethereum',
-          symbol: 'ETH',
-          network: 'Ethereum',
-          icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-          amount: 5.75,
-          value: 11349.41
-        },
-        {
-          id: 'usdt',
-          name: 'Tether',
-          symbol: 'USDT',
-          network: 'BNB Smart Chain',
-          icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-          amount: 10000,
-          value: 10000
-        }
-      ];
-    }
-    
-    // Create token items
-    tokens.forEach(token => {
-      const tokenItem = document.createElement('div');
-      tokenItem.className = 'token-item';
-      tokenItem.setAttribute('data-token-id', token.id);
-      
-      // Set token content
-      tokenItem.innerHTML = `
-        <div class="token-icon">
-          <img src="${token.icon || getTokenLogoUrl(token.id)}" alt="${token.name}">
-        </div>
-        <div class="token-info">
-          <div class="token-name">${token.symbol}</div>
-          <div class="token-price">${token.name}</div>
-        </div>
-        <div class="token-amount">
-          <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
-          <div class="token-value">$${token.value.toFixed(2)}</div>
-        </div>
-      `;
-      
-      // Add click event
-      tokenItem.addEventListener('click', function() {
-        const qrScreen = document.getElementById('receive-qr-screen');
-        const receiveScreen = document.getElementById('receive-screen');
-        
-        if (qrScreen && receiveScreen) {
-          // Update token symbol
-          const tokenSymbol = qrScreen.querySelector('#receive-token-symbol');
-          if (tokenSymbol) {
-            tokenSymbol.textContent = token.symbol;
-          }
-          
-          // Update QR image (in a real app, this would generate a unique QR)
-          const qrImage = qrScreen.querySelector('#receive-qr-code');
-          if (qrImage) {
-            qrImage.src = token.icon || getTokenLogoUrl(token.id);
-          }
-          
-          // Hide receive screen and show QR screen
-          receiveScreen.style.display = 'none';
-          qrScreen.style.display = 'flex';
-          qrScreen.classList.remove('hidden');
-        }
-      });
-      
-      // Add to token list
-      tokenList.appendChild(tokenItem);
-    });
-  }
-  
-  function populateSendTokenList(tokenList) {
-    // Clear existing list
-    tokenList.innerHTML = '';
-    
-    // Get tokens from active wallet
-    const activeWallet = window.activeWallet || 'main';
-    let tokens = [];
-    
-    if (window.currentWalletData && 
-        window.currentWalletData[activeWallet] && 
-        window.currentWalletData[activeWallet].tokens) {
-      tokens = window.currentWalletData[activeWallet].tokens;
-    } else if (window.walletData && 
-               window.walletData[activeWallet] && 
-               window.walletData[activeWallet].tokens) {
-      tokens = window.walletData[activeWallet].tokens;
-    } else {
-      // Fallback tokens
-      tokens = [
-        {
-          id: 'btc',
-          name: 'Bitcoin',
-          symbol: 'BTC',
-          network: 'Bitcoin',
-          icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-          amount: 0.25,
-          value: 20996.19
-        },
-        {
-          id: 'eth',
-          name: 'Ethereum',
-          symbol: 'ETH',
-          network: 'Ethereum',
-          icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-          amount: 5.75,
-          value: 11349.41
-        },
-        {
-          id: 'usdt',
-          name: 'Tether',
-          symbol: 'USDT',
-          network: 'BNB Smart Chain',
-          icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-          amount: 10000,
-          value: 10000
-        }
-      ];
-    }
-    
-    // Create token items
-    tokens.forEach(token => {
-      const tokenItem = document.createElement('div');
-      tokenItem.className = 'token-item';
-      tokenItem.setAttribute('data-token-id', token.id);
-      
-      // Set token content
-      tokenItem.innerHTML = `
-        <div class="token-icon">
-          <img src="${token.icon || getTokenLogoUrl(token.id)}" alt="${token.name}">
-        </div>
-        <div class="token-info">
-          <div class="token-name">${token.symbol}</div>
-          <div class="token-price">${token.name}</div>
-        </div>
-        <div class="token-amount">
-          <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
-          <div class="token-value">$${token.value.toFixed(2)}</div>
-        </div>
-      `;
-      
-      // Add click event
-      tokenItem.addEventListener('click', function() {
-        if (typeof window.showSendScreen === 'function') {
-          window.showSendScreen(token.id);
-        } else {
-          navigateToSendScreen(token.id);
-        }
-      });
-      
-      // Add to token list
-      tokenList.appendChild(tokenItem);
-    });
-  }
-  
-  // ========================================
-  // FIX 6: NETWORK BADGES
-  // ========================================
+  // Fix network badges
   function fixNetworkBadges() {
-    console.log('Fixing network badges...');
-    
     // Remove network badges from receive and send screens
     const screensToFix = ['#receive-screen', '#send-screen', '#receive-qr-screen'];
     
@@ -2217,34 +1693,14 @@ fixBottomTabs: fixBottomTabs
         badge.style.border = '2px solid white';
         badge.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
         badge.style.display = 'block';
-        badge.style.zIndex = '5';
-        
-        const badgeImg = badge.querySelector('img');
-        if (badgeImg) {
-          badgeImg.style.width = '100%';
-          badgeImg.style.height = '100%';
-          badgeImg.style.objectFit = 'contain';
-        }
-      } else if (badge && !shouldHaveBadge) {
-        // Remove badge if token shouldn't have one
-        badge.style.display = 'none';
       }
     });
-    
-    console.log('Network badges fixed');
   }
   
-  // ========================================
-  // FIX 7: BOTTOM TABS
-  // ========================================
+  // Fix bottom tabs
   function fixBottomTabs() {
-    console.log('Fixing bottom tabs...');
-    
     const bottomTabs = document.querySelector('.bottom-tabs');
-    if (!bottomTabs) {
-      console.error('Bottom tabs not found');
-      return;
-    }
+    if (!bottomTabs) return;
     
     // Ensure bottom tabs have the right styling
     bottomTabs.style.display = 'flex';
@@ -2258,655 +1714,287 @@ fixBottomTabs: fixBottomTabs
     bottomTabs.style.padding = '8px 0';
     bottomTabs.style.justifyContent = 'space-around';
     
-    // Fix tab items
-    const tabItems = bottomTabs.querySelectorAll('.tab-item');
-    tabItems.forEach(tab => {
-      tab.style.display = 'flex';
-      tab.style.flexDirection = 'column';
-      tab.style.alignItems = 'center';
-      
-      // Add ripple effect
-      tab.classList.add('tw-ripple');
-      
-      // Fix tab icon
-      const tabIcon = tab.querySelector('i');
-      if (tabIcon) {
-        tabIcon.style.fontSize = '20px';
-        tabIcon.style.marginBottom = '4px';
-      }
-      
-      // Fix tab text
-      const tabText = tab.querySelector('span');
-      if (tabText) {
-        tabText.style.fontSize = '10px';
-      }
-    });
-    
     // Make sure to append bottom tabs to body for proper stacking
     document.body.appendChild(bottomTabs);
-    
-    console.log('Bottom tabs fixed');
   }
   
-  // ========================================
-  // FIX 8: SETUP DEFAULT WALLET DATA (with required tokens)
-  // ========================================
-  function setupDefaultWalletData() {
-    console.log('Setting up default wallet data with all tokens...');
+  // Fix receive screen
+  function fixReceiveScreen() {
+    const receiveScreen = document.getElementById('receive-screen');
+    if (!receiveScreen) return;
     
-    // Only set up if wallet data doesn't exist or we need to add tokens
-    if (!window.walletData) {
-      window.walletData = {
-        main: {
-          totalBalance: 0,
-          tokens: [
-            {
-              id: 'btc',
-              name: 'Bitcoin',
-              symbol: 'BTC',
-              network: 'Bitcoin',
-              icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-              amount: 0.25,
-              value: 20996.19,
-              price: 83984.74,
-              change: -0.59,
-              chainBadge: null
-            },
-            {
-              id: 'eth',
-              name: 'Ethereum',
-              symbol: 'ETH',
-              network: 'Ethereum',
-              icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-              amount: 5.75,
-              value: 11349.41,
-              price: 1973.81,
-              change: -0.71,
-              chainBadge: null
-            },
-            {
-              id: 'usdt',
-              name: 'Tether',
-              symbol: 'USDT',
-              network: 'BNB Smart Chain',
-              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-              amount: 10000,
-              value: 10000,
-              price: 1.00,
-              change: 0.00,
-              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-            },
-            {
-              id: 'bnb',
-              name: 'BNB',
-              symbol: 'BNB',
-              network: 'BNB Smart Chain',
-              icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
-              amount: 25.5,
-              value: 8926.56,
-              price: 349.67,
-              change: 2.35,
-              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-            },
-            {
-              id: 'twt',
-              name: 'Trust Wallet Token',
-              symbol: 'TWT',
-              network: 'BNB Smart Chain',
-              icon: 'https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png',
-              amount: 5000,
-              value: 5450,
-              price: 1.09,
-              change: 3.45,
-              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-            },
-            {
-              id: 'pol',
-              name: 'Polygon',
-              symbol: 'MATIC',
-              network: 'Polygon',
-              icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-              amount: 7500,
-              value: 6525,
-              price: 0.87,
-              change: -1.24,
-              chainBadge: null
-            }
-          ]
-        }
-      };
+    // Enhanced receive screen with token selection
+    receiveScreen.innerHTML = `
+      <div class="screen-header">
+        <button class="back-button" aria-label="Go back">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <h2>Receive</h2>
+        <div class="placeholder-icon"></div>
+      </div>
       
-      // Calculate total balance
-      window.walletData.main.totalBalance = window.walletData.main.tokens.reduce(
-        (total, token) => total + token.value, 0
-      );
+      <div class="search-container">
+        <div class="search-bar token-search">
+          <i class="fas fa-search"></i>
+          <input type="text" id="receive-token-search" placeholder="Search" aria-label="Search tokens">
+        </div>
+      </div>
       
-      // Create copies
-      window.originalWalletData = JSON.parse(JSON.stringify(window.walletData));
-      window.currentWalletData = JSON.parse(JSON.stringify(window.walletData));
+      <div class="networks-filter">
+        <div class="all-networks">
+          All Networks <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
       
-      // Set active wallet
-      window.activeWallet = 'main';
+      <div id="receive-token-list" class="token-list">
+        <!-- Tokens will be dynamically populated here -->
+      </div>
+    `;
+    
+    // Connect back button
+    const backButton = receiveScreen.querySelector('.back-button');
+    if (backButton) {
+      backButton.addEventListener('click', function() {
+        navigateToScreen('wallet-screen');
+      });
+    }
+    
+    // Populate receive token list
+    const receiveTokenList = receiveScreen.querySelector('#receive-token-list');
+    if (receiveTokenList) {
+      populateReceiveTokenList(receiveTokenList);
+    }
+  }
+  
+  // Populate receive token list
+  function populateReceiveTokenList(tokenList) {
+    // Clear existing list
+    tokenList.innerHTML = '';
+    
+    // Get tokens from active wallet
+    const activeWallet = window.activeWallet || 'main';
+    let tokens = [];
+    
+    if (window.currentWalletData && 
+        window.currentWalletData[activeWallet] && 
+        window.currentWalletData[activeWallet].tokens) {
+      tokens = window.currentWalletData[activeWallet].tokens;
     } else {
-      // Make sure all required tokens are in the wallet
-      const requiredTokens = ['btc', 'eth', 'usdt', 'bnb', 'twt', 'pol'];
-      const activeWallet = window.activeWallet || 'main';
+      return;
+    }
+    
+    // Create token items
+    tokens.forEach(token => {
+      const tokenItem = document.createElement('div');
+      tokenItem.className = 'token-item';
+      tokenItem.setAttribute('data-token-id', token.id);
       
-      if (window.currentWalletData && window.currentWalletData[activeWallet]) {
-        const tokens = window.currentWalletData[activeWallet].tokens;
-        const existingTokenIds = tokens.map(t => t.id);
+      // Set token content
+      tokenItem.innerHTML = `
+        <div class="token-icon">
+          <img src="${token.icon || getTokenLogoUrl(token.id)}" alt="${token.name}">
+        </div>
+        <div class="token-info">
+          <div class="token-name">${token.symbol}</div>
+          <div class="token-price">${token.name}</div>
+        </div>
+        <div class="token-amount">
+          <div class="token-balance">${token.amount.toFixed(6)} ${token.symbol}</div>
+          <div class="token-value">$${token.value.toFixed(2)}</div>
+        </div>
+      `;
+      
+      // Add click event
+      tokenItem.addEventListener('click', function() {
+        showQRScreen(token);
+      });
+      
+      // Add to token list
+      tokenList.appendChild(tokenItem);
+    });
+  }
+  
+  // Show QR screen
+  function showQRScreen(token) {
+    // Create QR screen if it doesn't exist
+    let qrScreen = document.getElementById('receive-qr-screen');
+    if (!qrScreen) {
+      qrScreen = document.createElement('div');
+      qrScreen.id = 'receive-qr-screen';
+      qrScreen.className = 'screen hidden';
+      qrScreen.innerHTML = `
+        <div class="screen-header">
+          <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2>Receive <span id="receive-token-symbol">${token.symbol}</span></h2>
+          <div class="placeholder-icon"></div>
+        </div>
         
-        // Add any missing tokens
-        requiredTokens.forEach(tokenId => {
-          if (!existingTokenIds.includes(tokenId)) {
-            const newToken = {
-              id: tokenId,
-              name: getTokenName(tokenId),
-              symbol: getTokenSymbol(tokenId),
-              network: getTokenNetwork(tokenId),
-              icon: getTokenLogoUrl(tokenId),
-              amount: getDefaultAmount(tokenId),
-              value: getDefaultValue(tokenId),
-              price: getDefaultPrice(tokenId),
-              change: getDefaultChange(tokenId),
-              chainBadge: getNeedsBadge(tokenId) ? 'https://cryptologos.cc/logos/bnb-bnb-logo.png' : null
-            };
-            
-            tokens.push(newToken);
+        <div class="receive-content">
+          <div class="qr-code-container">
+            <img id="receive-qr-code" src="${token.icon || getTokenLogoUrl(token.id)}" alt="Wallet QR Code" style="width: 200px; height: 200px;">
+          </div>
+          <div class="wallet-address-container">
+            <input type="text" id="wallet-address" readonly value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71" placeholder="Your wallet address">
+            <button class="copy-address-button">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.querySelector('.app-container').appendChild(qrScreen);
+      
+      // Connect back button
+      const backButton = qrScreen.querySelector('.back-button');
+      if (backButton) {
+        backButton.addEventListener('click', function() {
+          qrScreen.style.display = 'none';
+          qrScreen.classList.add('hidden');
+          document.getElementById('receive-screen').style.display = 'flex';
+          document.getElementById('receive-screen').classList.remove('hidden');
+        });
+      }
+      
+      // Connect copy button
+      const copyButton = qrScreen.querySelector('.copy-address-button');
+      if (copyButton) {
+        copyButton.addEventListener('click', function() {
+          const addressInput = document.getElementById('wallet-address');
+          if (addressInput) {
+            addressInput.select();
+            document.execCommand('copy');
+            showToast('Address copied to clipboard');
           }
         });
-        
-        // Recalculate total balance
-        window.currentWalletData[activeWallet].totalBalance = tokens.reduce(
-          (total, token) => total + token.value, 0
-        );
       }
-    }
-    
-    // Helper functions for token data
-    function getTokenName(id) {
-      const names = {
-        'btc': 'Bitcoin',
-        'eth': 'Ethereum',
-        'usdt': 'Tether',
-        'bnb': 'BNB',
-        'twt': 'Trust Wallet Token',
-        'pol': 'Polygon'
-      };
-      return names[id] || id.toUpperCase();
-    }
-    
-    function getTokenSymbol(id) {
-      const symbols = {
-        'btc': 'BTC',
-        'eth': 'ETH',
-        'usdt': 'USDT',
-        'bnb': 'BNB',
-        'twt': 'TWT',
-        'pol': 'MATIC'
-      };
-      return symbols[id] || id.toUpperCase();
-    }
-    
-    function getTokenNetwork(id) {
-      const networks = {
-        'btc': 'Bitcoin',
-        'eth': 'Ethereum',
-        'usdt': 'BNB Smart Chain',
-        'bnb': 'BNB Smart Chain',
-        'twt': 'BNB Smart Chain',
-        'pol': 'Polygon'
-      };
-      return networks[id] || 'Ethereum';
-    }
-    
-    function getDefaultAmount(id) {
-      const amounts = {
-        'btc': 0.25,
-        'eth': 5.75,
-        'usdt': 10000,
-        'bnb': 25.5,
-        'twt': 5000,
-        'pol': 7500
-      };
-      return amounts[id] || 100;
-    }
-    
-    function getDefaultValue(id) {
-      const values = {
-        'btc': 20996.19,
-        'eth': 11349.41,
-        'usdt': 10000,
-        'bnb': 8926.56,
-        'twt': 5450,
-        'pol': 6525
-      };
-      return values[id] || 1000;
-    }
-    
-    function getDefaultPrice(id) {
-      const prices = {
-        'btc': 83984.74,
-        'eth': 1973.81,
-        'usdt': 1.00,
-        'bnb': 349.67,
-        'twt': 1.09,
-        'pol': 0.87
-      };
-      return prices[id] || 10;
-    }
-    
-    function getDefaultChange(id) {
-      const changes = {
-        'btc': -0.59,
-        'eth': -0.71,
-        'usdt': 0.00,
-        'bnb': 2.35,
-        'twt': 3.45,
-        'pol': -1.24
-      };
-      return changes[id] || 0;
-    }
-    
-    function getNeedsBadge(id) {
-      return ['usdt', 'bnb', 'twt'].includes(id);
-    }
-    
-    console.log('Default wallet data setup complete');
-  }
-  
-  // ========================================
-  // UTILITY FUNCTIONS
-  // ========================================
-  function getTokenLogoUrl(tokenId) {
-    const logoUrls = {
-      'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-      'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-      'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
-      'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-      'twt': 'https://cryptologos.cc/logos/trust-wallet-token-twt-logo.png',
-      'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-      'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
-      'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
-      'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png',
-      'uni': 'https://cryptologos.cc/logos/uniswap-uni-logo.png'
-    };
-    
-    return logoUrls[tokenId] || 'https://cryptologos.cc/logos/default-logo.png';
-  }
-  
-  function navigateToTokenDetail(tokenId) {
-    // Fallback for when window.showTokenDetail is not available
-    const tokenDetail = document.getElementById('token-detail');
-    const walletScreen = document.getElementById('wallet-screen');
-    
-    if (!tokenDetail || !walletScreen) return;
-    
-    // Hide all screens
-    document.querySelectorAll('.screen').forEach(screen => {
-      screen.style.display = 'none';
-      screen.classList.add('hidden');
-    });
-    
-    // Update token details
-    updateTokenDetailView(tokenId);
-    
-    // Show token detail screen
-    tokenDetail.style.display = 'flex';
-    tokenDetail.classList.remove('hidden');
-  }
-  
-  function updateTokenDetailView(tokenId) {
-    const activeWallet = window.activeWallet || 'main';
-    const tokens = window.currentWalletData?.[activeWallet]?.tokens || [];
-    const token = tokens.find(t => t.id === tokenId);
-    
-    if (!token) return;
-    
-    // Update elements
-    const elements = {
-      'detail-symbol': token.symbol,
-      'detail-fullname': token.name,
-      'token-balance-amount': token.amount.toFixed(6) + ' ' + token.symbol,
-      'token-balance-value': ' + token.value.toFixed(2),
-      'token-staking-symbol': token.symbol,
-      'token-price-symbol': token.symbol,
-      'token-current-price': ' + token.price.toLocaleString()
-    };
-    
-    for (const id in elements) {
-      const element = document.getElementById(id);
-      if (element) element.textContent = elements[id];
-    }
-    
-    // Update token icon
-    const tokenDetailIcon = document.getElementById('token-detail-icon');
-    if (tokenDetailIcon) {
-      tokenDetailIcon.src = token.icon || getTokenLogoUrl(token.id);
-    }
-    
-    // Update price change
-    const priceChangeElement = document.getElementById('token-price-change');
-    if (priceChangeElement) {
-      priceChangeElement.className = token.change >= 0 ? 'positive' : 'negative';
-      priceChangeElement.textContent = (token.change >= 0 ? '+' : '') + token.change + '%';
+    } else {
+      // Update token symbol
+      const tokenSymbol = qrScreen.querySelector('#receive-token-symbol');
+      if (tokenSymbol) {
+        tokenSymbol.textContent = token.symbol;
+      }
       
-      // Make sure positive values are Trust Wallet blue
-      if (token.change >= 0) {
-        priceChangeElement.style.color = '#3375BB';
+      // Update QR image
+      const qrImage = qrScreen.querySelector('#receive-qr-code');
+      if (qrImage) {
+        qrImage.src = token.icon || getTokenLogoUrl(token.id);
       }
     }
+    
+    // Hide receive screen
+    document.getElementById('receive-screen').style.display = 'none';
+    
+    // Show QR screen
+    qrScreen.style.display = 'flex';
+    qrScreen.classList.remove('hidden');
   }
   
-  function navigateToSendScreen(tokenId) {
-    // Fallback for when window.showSendScreen is not available
-    const sendScreen = document.getElementById('send-screen');
-    
-    if (!sendScreen) return;
-    
-    // Hide all screens
-    document.querySelectorAll('.screen').forEach(screen => {
-      screen.style.display = 'none';
-      screen.classList.add('hidden');
-    });
-    
-    // Update send screen elements
-    updateSendScreenForToken(tokenId);
-    
-    // Show send screen
-    sendScreen.style.display = 'flex';
-    sendScreen.classList.remove('hidden');
-  }
-  
-  function updateSendScreenForToken(tokenId) {
-    const activeWallet = window.activeWallet || 'main';
-    const tokens = window.currentWalletData?.[activeWallet]?.tokens || [];
-    const token = tokens.find(t => t.id === tokenId);
-    
-    if (!token) return;
-    
-    // Store selected token ID globally
-    window.activeSendTokenId = tokenId;
-    
-    // Update send screen elements
-    const sendTitle = document.getElementById('send-token-title');
-    if (sendTitle) {
-      sendTitle.textContent = 'Send ' + token.symbol;
-    }
-    
-    const maxAmount = document.getElementById('max-amount');
-    if (maxAmount) {
-      maxAmount.textContent = token.amount.toFixed(6);
-    }
-    
-    const maxSymbol = document.getElementById('max-symbol');
-    if (maxSymbol) {
-      maxSymbol.textContent = token.symbol;
-    }
-  }
-  
-  function showToast(message, duration = 2000) {
-    // Remove any existing toast
-    const existingToast = document.querySelector('.tw-toast');
-    if (existingToast) {
-      existingToast.remove();
-    }
-    
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.className = 'tw-toast';
-    toast.textContent = message;
-    document.body.appendChild(toast);
-    
-    // Show toast with animation
-    setTimeout(() => {
-      toast.classList.add('visible');
-    }, 10);
-    
-    // Hide and remove after duration
-    setTimeout(() => {
-      toast.classList.remove('visible');
-      setTimeout(() => {
-        toast.remove();
-      }, 300);
-    }, duration);
-  }
-  
-  // ========================================
-  // FIX 9: CONNECT EVENT HANDLERS
-  // ========================================
-  function connectEventHandlers() {
-    console.log('Connecting event handlers...');
-    
-    // Connect back buttons
-    document.querySelectorAll('.back-button').forEach(button => {
-      button.addEventListener('click', function() {
-        const currentScreen = this.closest('.screen');
-        if (!currentScreen) return;
-        
-        // Hide current screen
-        currentScreen.style.display = 'none';
-        currentScreen.classList.add('hidden');
-        
-        // Determine target screen based on data attribute or default to wallet screen
-        const returnTo = currentScreen.dataset.returnTo || 'wallet-screen';
-        
-        // Show target screen
-        const targetScreen = document.getElementById(returnTo);
-        if (targetScreen) {
-          targetScreen.style.display = 'flex';
-          targetScreen.classList.remove('hidden');
-        }
-      });
-    });
-    
-    // Connect receive button on main wallet screen
-    const receiveButton = document.getElementById('receive-button');
-    if (receiveButton) {
-      receiveButton.addEventListener('click', function() {
-        // Hide wallet screen
-        const walletScreen = document.getElementById('wallet-screen');
-        if (walletScreen) {
-          walletScreen.style.display = 'none';
-          walletScreen.classList.add('hidden');
-        }
-        
-        // Show receive screen
-        const receiveScreen = document.getElementById('receive-screen');
-        if (receiveScreen) {
-          receiveScreen.style.display = 'flex';
-          receiveScreen.classList.remove('hidden');
-          receiveScreen.dataset.returnTo = 'wallet-screen';
-        }
-      });
-    }
-    
-    // Connect send button on main wallet screen
-    const sendButton = document.getElementById('send-button');
-    if (sendButton) {
-      sendButton.addEventListener('click', function() {
-        // Hide wallet screen
-        const walletScreen = document.getElementById('wallet-screen');
-        if (walletScreen) {
-          walletScreen.style.display = 'none';
-          walletScreen.classList.add('hidden');
-        }
-        
-        // Show send token select screen
-        const sendTokenSelect = document.getElementById('send-token-select');
-        if (sendTokenSelect) {
-          sendTokenSelect.style.display = 'flex';
-          sendTokenSelect.classList.remove('hidden');
-          sendTokenSelect.dataset.returnTo = 'wallet-screen';
-        }
-      });
-    }
-    
-    // Connect history button
-    const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
-    if (historyButton) {
-      historyButton.addEventListener('click', function() {
-        // Hide wallet screen
-        const walletScreen = document.getElementById('wallet-screen');
-        if (walletScreen) {
-          walletScreen.style.display = 'none';
-          walletScreen.classList.add('hidden');
-        }
-        
-        // Show history screen
-        const historyScreen = document.getElementById('history-screen');
-        if (historyScreen) {
-          historyScreen.style.display = 'flex';
-          historyScreen.classList.remove('hidden');
-          historyScreen.dataset.returnTo = 'wallet-screen';
-        }
-      });
-    }
-    
-    // Connect copy address button
-    document.querySelectorAll('.copy-address-button').forEach(button => {
-      button.addEventListener('click', function() {
-        const addressInput = document.getElementById('wallet-address');
-        if (addressInput) {
-          addressInput.select();
-          document.execCommand('copy');
-          
-          // Show toast notification
-          showToast('Address copied to clipboard');
-        }
-      });
-    });
-    
-    // Connect continue button on send screen
-    const continueButton = document.getElementById('continue-send');
-    if (continueButton) {
-      continueButton.addEventListener('click', function() {
-        // Validate inputs
-        const recipientInput = document.getElementById('recipient-address');
-        const amountInput = document.getElementById('send-amount');
-        
-        if (!recipientInput || !amountInput) return;
-        
-        const recipient = recipientInput.value.trim();
-        const amount = parseFloat(amountInput.value);
-        
-        if (!recipient) {
-          showToast('Please enter a recipient address');
-          return;
-        }
-        
-        if (isNaN(amount) || amount <= 0) {
-          showToast('Please enter a valid amount');
-          return;
-        }
-        
-        // Show transaction status modal
-        const txStatusModal = document.getElementById('tx-status-modal');
-        if (txStatusModal) {
-          txStatusModal.style.display = 'flex';
-          
-          // Show pending view, hide success view
-          const pendingView = document.getElementById('tx-pending');
-          const successView = document.getElementById('tx-success');
-          
-          if (pendingView) pendingView.classList.remove('hidden');
-          if (successView) successView.classList.add('hidden');
-          
-          // Simulate processing - show success after delay
-          setTimeout(() => {
-            if (pendingView) pendingView.classList.add('hidden');
-            if (successView) successView.classList.remove('hidden');
-            
-            // Update transaction details
-            const txAmount = document.getElementById('tx-amount');
-            if (txAmount) {
-              const tokenId = window.activeSendTokenId || 'usdt';
-              const activeWallet = window.activeWallet || 'main';
-              const tokens = window.currentWalletData?.[activeWallet]?.tokens || [];
-              const token = tokens.find(t => t.id === tokenId);
-              
-              txAmount.textContent = amount + ' ' + (token ? token.symbol : 'USDT');
-            }
-            
-            const txTo = document.getElementById('tx-to');
-            if (txTo && recipient) {
-              txTo.textContent = recipient.substring(0, 6) + '...';
-            }
-          }, 2000);
-        }
-      });
-    }
-    
-    // Connect close button on transaction success
-    const closeTxSuccess = document.getElementById('close-tx-success');
-    if (closeTxSuccess) {
-      closeTxSuccess.addEventListener('click', function() {
-        // Hide transaction status modal
-        const txStatusModal = document.getElementById('tx-status-modal');
-        if (txStatusModal) {
-          txStatusModal.style.display = 'none';
-        }
-        
-        // Navigate to wallet screen
-        const walletScreen = document.getElementById('wallet-screen');
-        if (walletScreen) {
-          // Hide all screens
-          document.querySelectorAll('.screen').forEach(screen => {
-            screen.style.display = 'none';
-            screen.classList.add('hidden');
-          });
-          
-          walletScreen.style.display = 'flex';
-          walletScreen.classList.remove('hidden');
-        }
-      });
-    }
-    
-    // Make global navigation functions available
-    window.showTokenDetail = navigateToTokenDetail;
-    window.showSendScreen = navigateToSendScreen;
-    window.showToast = showToast;
-    
-    console.log('Event handlers connected');
-  }
-  
-  // ========================================
-  // MAIN EXECUTION
-  // ========================================
+  // Apply all fixes
   function applyAllFixes() {
     try {
-      // Set up wallet data with all required tokens
-      setupDefaultWalletData();
-      
-      // Fix UI components
       fixScreenHeaders();
       fixTokenDetailView();
-      fixVisibilityToggle();
-      fixReceiveScreen();
       fixNetworkBadges();
       fixBottomTabs();
-      
-      // Populate token lists
-      populateTokenList();
-      
-      // Connect event handlers
-      connectEventHandlers();
-      
-      // Add toast functionality to window
-      window.showToast = showToast;
-      
-      console.log('All UI fixes applied successfully');
+      fixReceiveScreen();
     } catch (error) {
       console.error('Error applying UI fixes:', error);
     }
   }
   
-  // Apply all fixes after DOM is loaded
+  // Apply fixes after DOM is loaded
   waitForDOM(function() {
     // Add a delay to ensure other scripts have initialized
     setTimeout(applyAllFixes, 500);
   });
 })();
+
+// Add ripple effect to buttons
+function addRippleEffect() {
+  const buttons = document.querySelectorAll('button, .action-circle, .tab-item, .fee-option');
+  
+  buttons.forEach(button => {
+    button.addEventListener('click', function(e) {
+      const rect = button.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple-effect';
+      ripple.style.left = x + 'px';
+      ripple.style.top = y + 'px';
+      
+      button.appendChild(ripple);
+      
+      setTimeout(() => {
+        ripple.remove();
+      }, 600);
+    });
+  });
+}
+
+// Add CSS for ripple effect
+function addRippleCSS() {
+  const style = document.createElement('style');
+  style.textContent = `
+    button, .action-circle, .tab-item, .fee-option {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .ripple-effect {
+      position: absolute;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      width: 100px;
+      height: 100px;
+      margin-top: -50px;
+      margin-left: -50px;
+      animation: ripple 0.6s;
+      pointer-events: none;
+    }
+    
+    @keyframes ripple {
+      from {
+        transform: scale(0);
+        opacity: 1;
+      }
+      to {
+        transform: scale(4);
+        opacity: 0;
+      }
+    }
+    
+    .toast-message {
+      position: fixed;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      z-index: 10000;
+      transition: transform 0.3s ease-out;
+    }
+    
+    .toast-message.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  `;
+  
+  document.head.appendChild(style);
+}
+
+// Initialize ripple effect on DOM load
+document.addEventListener('DOMContentLoaded', function() {
+  addRippleCSS();
+  addRippleEffect();
+});
 </script>
+
+<script src="combined1.js"></script>
 </body>
 </html>
