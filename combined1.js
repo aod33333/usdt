@@ -1712,20 +1712,9 @@ toggleBalanceVisibility() {
   }
 }
       
-   // Create global instance
+  // Simplified manager setup
 window.uiManager = new WalletUIManager();
-
-// Create wrapper function
-function updateWalletUIWrapper(activeWallet) {
-  window.uiManager.updateWalletUI(activeWallet);
-}
-
-// Assign wrapper function to global
-window.updateWalletUI = updateWalletUIWrapper;
-
-// Initial UI update
-window.uiManager.updateWalletUI(window.activeWallet);
-
+window.updateWalletUI = function() {};  // Empty function as placeholder
 resolve();
   
   // Setup Wallet Selector
