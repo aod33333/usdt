@@ -1018,6 +1018,7 @@ function loadScreenContents() {
  * Setup Screen Manager
  * @returns {Promise} A promise that resolves when setup is complete
  */
+// Setup Screen Manager
 function setupScreenManager() {
   return new Promise(function(resolve) {
     console.log('Setting up screen manager');
@@ -1234,7 +1235,7 @@ function setupScreenManager() {
         // Clear existing transactions
         transactionList.innerHTML = '';
         
-        // Get transactions
+        // Get transactions safely (without optional chaining)
         var transactions = [];
         if (window.currentTransactions && 
             window.currentTransactions[activeWallet] && 
@@ -1442,7 +1443,7 @@ function setupScreenManager() {
     // Initialize screen visibility
     window.screenManager.initializeScreenVisibility();
     
-    // Expose global navigation methods
+    // Expose global navigation methods (FIXED VERSION - using regular functions instead of .bind)
     window.navigateTo = function(targetScreenId, fromScreenId) {
       return window.screenManager.navigateTo(targetScreenId, fromScreenId);
     };
