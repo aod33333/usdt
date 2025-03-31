@@ -3427,23 +3427,24 @@ function fixTokenDetailView() {
     
     try {
       // Modify header to match Trust Wallet style
-      const headerContainer = tokenDetail.querySelector('.detail-header');
-      if (headerContainer) {
-        headerContainer.innerHTML = `
-          <button id="back-button" class="back-button">
-            <i class="fas fa-arrow-left"></i>
-          </button>
-          <div class="token-detail-title">
-            <div class="token-text-content">
-              <span id="detail-symbol" class="token-symbol">BTC</span>
-              <div id="detail-fullname" class="token-fullname">Coin | Bitcoin</div>
-            </div>
-          </div>
-          <div class="header-icons">
-            <button class="icon-button"><i class="fas fa-bell-slash"></i></button>
-            <button class="icon-button"><i class="fas fa-info-circle"></i></button>
-          </div>
-        `;
+const headerContainer = tokenDetail.querySelector('.detail-header');
+if (headerContainer) {
+  headerContainer.innerHTML = `
+    <button id="back-button" class="back-button">
+      <i class="fas fa-arrow-left"></i>
+    </button>
+    <div class="token-detail-title">
+      <div class="token-text-content">
+        <span id="detail-symbol" class="token-symbol">${token.symbol}</span> <!-- Dynamic symbol -->
+        <div id="detail-fullname" class="token-fullname">Coin | ${token.name}</div> <!-- Dynamic name -->
+      </div>
+    </div>
+    <div class="header-icons">
+      <button class="icon-button"><i class="fas fa-bell-slash"></i></button>
+      <button class="icon-button"><i class="fas fa-info-circle"></i></button>
+    </div>
+  `;
+}
 
         // Apply specific styling
         const symbolElement = headerContainer.querySelector('#detail-symbol');
@@ -3546,7 +3547,7 @@ function fixTokenDetailView() {
   }
   
   if (fullnameElement) {
-    fullnameElement.textContent = `Coin | ${token.name}`; // Explicitly use "Coin"
+  fullnameElement.textContent = `Coin | ${token.name}`; // Keep this as fallback
   }
   
   // Update token icon
@@ -4416,15 +4417,56 @@ function connectEventHandlers() {
     // Transaction handling
     processTransaction: () => window.processTransaction,
     
-    // Configuration
-    getConfig: () => ({...CONFIG}),
-    setDebugMode: (enabled) => {
-      CONFIG.debug = enabled;
+  // Configuration
+  getConfig: () => {
+    // Return deep clone to prevent external modification
+    try {
+      return JSON.parse(JSON.stringify(CONFIG));
+    } catch (error) {
+      console.error('Configuration serialization error:', error);
+      return {...CONFIG};
+    }
+  },
+  
+  setDebugMode: (enabled) => {
+    // Add type validation and logging
+    if (typeof enabled !== 'boolean') {
+      console.warn('setDebugMode requires boolean value');
       return CONFIG.debug;
     }
-  };
-  
-  // Log completion
-  console.log('TrustWallet global object initialized');
+    
+    CONFIG.debug = enabled;
+    console.log(`Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
+    
+    // Add debug mode specific logging
+    if (CONFIG.debug) {
+      console.debug('Current configuration:', CONFIG);
+    }
+    
+    return CONFIG.debug;
+  },
+
+  // New: Add configuration reset method
+  resetConfig: () => {
+    Object.keys(CONFIG).forEach(key => {
+      delete CONFIG[key];
+    });
+    Object.assign(CONFIG, DEFAULT_CONFIG);
+    return true;
+  }
+};
+
+// Add error handling for initialization
+try {
+  // Log completion with debug check
+  if (CONFIG.debug) {
+    console.info('TrustWallet global object initialized with debug mode');
+    console.table(CONFIG);
+  } else {
+    console.log('TrustWallet global object initialized');
+  }
+} catch (error) {
+  console.error('Initialization error:', error);
+}
 
 })();
