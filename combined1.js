@@ -1468,179 +1468,220 @@ function setupScreenManager() {
   // PART 4: UI MANAGERS & HANDLERS
   // =================================================================
   
-  // Setup UI Manager
-  function setupUIManager() {
-    return new Promise(resolve => {
-      log('Setting up UI manager');
+ // Simple logging function
+function log(message) {
+  console.log(`[Wallet UI] ${message}`);
+}
+
+// Setup UI Manager
+function setupUIManager() {
+  return new Promise(resolve => {
+    log('Setting up UI manager');
+    
+    /**
+     * Wallet UI Management Class
+     * Handles wallet-specific UI updates and interactions
+     */
+    class WalletUIManager {
+      constructor() {
+        // Initialize critical UI elements
+        this.initializeUIElements();
+      }
       
       /**
-       * Wallet UI Management Class
-       * Handles wallet-specific UI updates and interactions
+       * Initialize critical UI references
        */
-      class WalletUIManager {
-        constructor() {
-          // Initialize critical UI elements
-          this.initializeUIElements();
+      initializeUIElements() {
+        this.elements = {
+          totalBalance: document.getElementById('total-balance'),
+          tokenList: document.getElementById('token-list'),
+          walletName: document.querySelector('.wallet-name'),
+          visibilityToggle: document.querySelector('.visibility-toggle'),
+          sendButton: document.getElementById('send-button'),
+          receiveButton: document.getElementById('receive-button'),
+          historyButton: document.querySelector('.quick-actions .action-circle:nth-child(5)'),
+          investmentWarning: document.getElementById('investment-warning'),
+          closeWarningButton: document.getElementById('close-investment-warning')
+        };
+        
+        // Setup event listeners
+        this.setupEventListeners();
+      }
+      
+      /**
+       * Setup event listeners for wallet UI interactions
+       */
+      setupEventListeners() {
+        // Setup investment warning close button
+        if (this.elements.closeWarningButton && this.elements.investmentWarning) {
+          this.elements.closeWarningButton.addEventListener('click', () => {
+            this.elements.investmentWarning.style.display = 'none';
+          });
         }
         
-        /**
-         * Initialize critical UI references
-         */
-        initializeUIElements() {
-          this.elements = {
-            totalBalance: document.getElementById('total-balance'),
-            tokenList: document.getElementById('token-list'),
-            walletName: document.querySelector('.wallet-name'),
-            visibilityToggle: document.querySelector('.visibility-toggle'),
-            sendButton: document.getElementById('send-button'),
-            receiveButton: document.getElementById('receive-button'),
-            historyButton: document.querySelector('.quick-actions .action-circle:nth-child(5)'),
-            investmentWarning: document.getElementById('investment-warning'),
-            closeWarningButton: document.getElementById('close-investment-warning')
-          };
-          
-          // Setup event listeners
-          this.setupEventListeners();
+        // Setup balance visibility toggle
+        if (this.elements.visibilityToggle) {
+          this.elements.visibilityToggle.addEventListener('click', () => {
+            this.toggleBalanceVisibility();
+          });
         }
         
-        /**
-         * Setup event listeners for wallet UI interactions
-         */
-        setupEventListeners() {
-          // Setup investment warning close button
-          if (this.elements.closeWarningButton && this.elements.investmentWarning) {
-            this.elements.closeWarningButton.addEventListener('click', () => {
-              this.elements.investmentWarning.style.display = 'none';
+        // Setup navigation buttons if screen manager is available
+        if (window.screenManager) {
+          // Send button
+          if (this.elements.sendButton) {
+            this.elements.sendButton.addEventListener('click', () => {
+              window.screenManager.navigateTo('send-token-select', 'wallet-screen');
             });
           }
           
-          // Setup balance visibility toggle
-          if (this.elements.visibilityToggle) {
-            this.elements.visibilityToggle.addEventListener('click', () => {
-              this.toggleBalanceVisibility();
+          // Receive button
+          if (this.elements.receiveButton) {
+            this.elements.receiveButton.addEventListener('click', () => {
+              window.screenManager.showReceiveScreen();
             });
           }
           
-          // Setup navigation buttons if screen manager is available
-          if (window.screenManager) {
-            // Send button
-            if (this.elements.sendButton) {
-              this.elements.sendButton.addEventListener('click', () => {
-                window.screenManager.navigateTo('send-token-select', 'wallet-screen');
-              });
-            }
-            
-            // Receive button
-            if (this.elements.receiveButton) {
-              this.elements.receiveButton.addEventListener('click', () => {
-                window.screenManager.showReceiveScreen();
-              });
-            }
-            
-            // History button
-            if (this.elements.historyButton) {
-              this.elements.historyButton.addEventListener('click', () => {
-                window.screenManager.navigateTo('history-screen', 'wallet-screen');
-              });
-            }
+          // History button
+          if (this.elements.historyButton) {
+            this.elements.historyButton.addEventListener('click', () => {
+              window.screenManager.navigateTo('history-screen', 'wallet-screen');
+            });
           }
         }
+      }
 
-// Toggle balance visibility function
-function toggleBalanceVisibility() {
-  const balanceAmount = document.getElementById('total-balance');
-  const visibilityToggle = document.querySelector('.visibility-toggle');
-  const visibilityIcon = visibilityToggle ? visibilityToggle.querySelector('i') : null;
-  
-  if (!balanceAmount || !visibilityIcon) return;
-  
-  const isHidden = visibilityIcon.classList.contains('fa-eye-slash');
-  
-  if (isHidden) {
-    // Show balance
-    visibilityIcon.classList.remove('fa-eye-slash');
-    visibilityIcon.classList.add('fa-eye');
-    // Restore the cached balance if it exists
-    if (window.cachedBalance) {
-      balanceAmount.textContent = window.cachedBalance;
-    } else {
-      // If no cached balance, update from wallet data
-      const activeWallet = window.activeWallet || 'main';
-      const walletData = window.currentWalletData[activeWallet];
-      if (walletData && typeof walletData.totalBalance !== 'undefined') {
-        balanceAmount.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
-      } else {
-        balanceAmount.textContent = '$0.00';
+      /**
+       * Toggle balance visibility
+       */
+      toggleBalanceVisibility() {
+        const balanceAmount = document.getElementById('total-balance');
+        const visibilityToggle = document.querySelector('.visibility-toggle');
+        const visibilityIcon = visibilityToggle ? visibilityToggle.querySelector('i') : null;
+        
+        if (!balanceAmount || !visibilityIcon) return;
+        
+        const isHidden = visibilityIcon.classList.contains('fa-eye-slash');
+        
+        if (isHidden) {
+          // Show balance
+          visibilityIcon.classList.remove('fa-eye-slash');
+          visibilityIcon.classList.add('fa-eye');
+          // Restore the cached balance if it exists
+          if (window.cachedBalance) {
+            balanceAmount.textContent = window.cachedBalance;
+          } else {
+            // If no cached balance, update from wallet data
+            const activeWallet = window.activeWallet || 'main';
+            const walletData = window.currentWalletData[activeWallet];
+            if (walletData && typeof walletData.totalBalance !== 'undefined') {
+              balanceAmount.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
+            } else {
+              balanceAmount.textContent = '$0.00';
+            }
+          }
+          
+          // Also show token amounts
+          document.querySelectorAll('.token-balance').forEach(function(tokenBalance) {
+            var originalAmount = tokenBalance.dataset.originalAmount;
+            if (originalAmount) {
+              tokenBalance.textContent = originalAmount;
+            }
+          });
+        } else {
+          // Hide balance
+          visibilityIcon.classList.remove('fa-eye');
+          visibilityIcon.classList.add('fa-eye-slash');
+          window.cachedBalance = balanceAmount.textContent;
+          balanceAmount.textContent = '••••••';
+          
+          // Also hide token amounts
+          document.querySelectorAll('.token-balance').forEach(function(tokenBalance) {
+            tokenBalance.dataset.originalAmount = tokenBalance.textContent;
+            tokenBalance.textContent = '••••••';
+          });
+        }
       }
     }
     
-    // Also show token amounts
-    document.querySelectorAll('.token-balance').forEach(function(tokenBalance) {
-      var originalAmount = tokenBalance.dataset.originalAmount;
-      if (originalAmount) {
-        tokenBalance.textContent = originalAmount;
-      }
-    });
-  } else {
-    // Hide balance
-    visibilityIcon.classList.remove('fa-eye');
-    visibilityIcon.classList.add('fa-eye-slash');
-    window.cachedBalance = balanceAmount.textContent;
-    balanceAmount.textContent = '••••••';
+    // Create and export the UI manager instance
+    window.uiManager = new WalletUIManager();
     
-    // Also hide token amounts
-    document.querySelectorAll('.token-balance').forEach(function(tokenBalance) {
-      tokenBalance.dataset.originalAmount = tokenBalance.textContent;
-      tokenBalance.textContent = '••••••';
-    });
-  }
+    // Setup update wallet UI function
+    window.updateWalletUI = function(activeWallet) {
+      try {
+        // Only update the balance display
+        const walletData = window.currentWalletData[activeWallet];
+        if (walletData && document.getElementById('total-balance')) {
+          document.getElementById('total-balance').textContent = 
+            window.FormatUtils.formatCurrency(walletData.totalBalance);
+        }
+      } catch (e) {
+        console.error("Simple UI update failed:", e);
+      }
+    };
+    
+    resolve(window.uiManager);
+  });
 }
-  
+
 // Setup Wallet Selector
-  function setupWalletSelector() {
-    return new Promise(resolve => {
-      log('Setting up wallet selector');
+function setupWalletSelector() {
+  return new Promise(resolve => {
+    log('Setting up wallet selector');
+    
+    /**
+     * Wallet Selector Management
+     */
+    class WalletSelectorManager {
+      constructor() {
+        this.initializeWalletSelector();
+      }
       
       /**
-       * Wallet Selector Management
+       * Initialize wallet selector functionality
        */
-      class WalletSelectorManager {
-        constructor() {
-          this.initializeWalletSelector();
-        }
+      initializeWalletSelector() {
+        const walletNameContainer = document.querySelector('.wallet-name');
         
-        /**
-         * Initialize wallet selector functionality
-         */
-        initializeWalletSelector() {
-          const walletNameContainer = document.querySelector('.wallet-name');
-          
-          if (walletNameContainer) {
-            walletNameContainer.addEventListener('click', this.cycleWallets.bind(this));
-          }
-        }
-        
-        /**
-         * Cycle through available wallets
-         */
-        cycleWallets() {
-          const walletOrder = ['main', 'secondary', 'business'];
-          const currentIndex = walletOrder.indexOf(window.activeWallet);
-          const nextIndex = (currentIndex + 1) % walletOrder.length;
-          
-          window.activeWallet = walletOrder[nextIndex];
-          
-          // Update UI for selected wallet
-          window.updateWalletUI(window.activeWallet);
+        if (walletNameContainer) {
+          walletNameContainer.addEventListener('click', this.cycleWallets.bind(this));
         }
       }
       
-      // Create global instance
-      window.walletSelector = new WalletSelectorManager();
-      
-      resolve();
-    });
+      /**
+       * Cycle through available wallets
+       */
+      cycleWallets() {
+        const walletOrder = ['main', 'secondary', 'business'];
+        const currentIndex = walletOrder.indexOf(window.activeWallet);
+        const nextIndex = (currentIndex + 1) % walletOrder.length;
+        
+        window.activeWallet = walletOrder[nextIndex];
+        
+        // Update UI for selected wallet
+        window.updateWalletUI(window.activeWallet);
+      }
+    }
+    
+    // Create global instance
+    window.walletSelector = new WalletSelectorManager();
+    
+    resolve(window.walletSelector);
+  });
+}
+
+// Initialize required globals if not already defined
+window.currentWalletData = window.currentWalletData || {};
+window.activeWallet = window.activeWallet || 'main';
+window.cachedBalance = window.cachedBalance || '';
+
+// Format utility if not already defined
+window.FormatUtils = window.FormatUtils || {
+  formatCurrency: function(amount) {
+    return '$' + parseFloat(amount).toFixed(2);
   }
+};
   
   // Setup Authentication Manager
   function setupAuthManager() {
