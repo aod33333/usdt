@@ -3436,7 +3436,7 @@ function fixTokenDetailView() {
           <div class="token-detail-title">
             <div class="token-text-content">
               <span id="detail-symbol" class="token-symbol">BTC</span>
-              <div id="detail-fullname" class="token-fullname">COIN | Bitcoin</div>
+              <div id="detail-fullname" class="token-fullname">Coin | Bitcoin</div>
             </div>
           </div>
           <div class="header-icons">
@@ -3468,10 +3468,27 @@ function fixTokenDetailView() {
         }
       }
       
-      // Remove the weird bottom image/section
-      const stakingContainer = tokenDetail.querySelector('.staking-container');
-      if (stakingContainer) {
-        stakingContainer.style.display = 'none';
+      // Remove all unnecessary bottom sections
+      const unnecessarySections = tokenDetail.querySelectorAll('.staking-container, .no-transactions img, .token-price-info');
+      unnecessarySections.forEach(section => {
+        section.style.display = 'none';
+      });
+      
+      // Modify no transactions section
+      const noTransactionsSection = tokenDetail.querySelector('.no-transactions');
+      if (noTransactionsSection) {
+        noTransactionsSection.innerHTML = `
+          <p>Transactions will appear here.</p>
+          <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
+        `;
+        
+        // Ensure no overlay
+        noTransactionsSection.style.cssText = `
+          position: static;
+          display: block;
+          text-align: center;
+          padding: 20px;
+        `;
       }
       
       // Modify investment warning to match screenshot
