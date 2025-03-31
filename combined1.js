@@ -1712,19 +1712,17 @@ toggleBalanceVisibility() {
   }
 }
       
-      // Create global instance
-      window.uiManager = new WalletUIManager();
+    // Create global instance
+window.uiManager = new WalletUIManager();
       
-      window.updateWalletUI = function(activeWallet) {
-  return window.uiManager.updateWalletUI(activeWallet);
+window.updateWalletUI = function(activeWallet) {
+      return window.uiManager.updateWalletUI(activeWallet);
 };
       
-      // Initial UI update
-      window.uiManager.updateWalletUI(window.activeWallet);
+// Initial UI update
+window.uiManager.updateWalletUI(window.activeWallet);
       
-      resolve();
-    });
-  }
+resolve();
   
   // Setup Wallet Selector
   function setupWalletSelector() {
