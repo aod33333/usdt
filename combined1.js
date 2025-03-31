@@ -3416,7 +3416,6 @@ window.FormatUtils = window.FormatUtils || {
   }
   
   // Fix token detail view (thorough fix)
- // Fix token detail view (thorough fix)
 function fixTokenDetailView() {
   return new Promise(resolve => {
     log('Fixing token detail view');
@@ -3443,118 +3442,78 @@ function fixTokenDetailView() {
         `;
       }
       
-      // Fix back button
-      const backButton = tokenDetail.querySelector('#back-button');
-      if (backButton) {
-        backButton.style.cssText = `
-          display: flex !important;
-          justify-content: center !important;
-          align-items: center !important;
-          width: 32px !important;
-          height: 32px !important;
-          background: transparent !important;
-          color: #1A2024 !important;
-        `;
-      }
-      
-      // Token title needs to be centered
+      // Enhance title section
       const titleElement = tokenDetail.querySelector('.token-detail-title');
       if (titleElement) {
+        // Symbol and full name
+        const symbolElement = document.getElementById('detail-symbol');
+        const fullnameElement = document.getElementById('detail-fullname');
+        
+        if (symbolElement && fullnameElement) {
+          symbolElement.style.cssText = `
+            font-size: 24px !important;
+            font-weight: 600 !important;
+            margin-bottom: 4px !important;
+            color: var(--tw-black) !important;
+          `;
+          
+          fullnameElement.style.cssText = `
+            font-size: 14px !important;
+            color: var(--tw-medium-gray) !important;
+          `;
+          
+          // Add 'Coin |' prefix to full name
+          if (!fullnameElement.textContent.includes('Coin |')) {
+            const tokenName = fullnameElement.textContent;
+            fullnameElement.textContent = `Coin | ${tokenName}`;
+          }
+        }
+        
         titleElement.style.cssText = `
           display: flex !important;
           flex-direction: column !important;
           align-items: center !important;
-          margin: 0 auto !important;
-          padding-top: 0 !important;
-          position: absolute !important;
-          left: 50% !important;
-          transform: translateX(-50%) !important;
-        `;
-      }
-
-      // Symbol should be bold and properly sized
-      const symbolElement = document.getElementById('detail-symbol');
-      if (symbolElement) {
-        symbolElement.style.cssText = `
-          font-size: 24px !important;
-          font-weight: 600 !important;
           text-align: center !important;
-          margin: 0 0 2px 0 !important;
-          padding-top: 0 !important;
+          margin-top: 16px !important;
         `;
       }
       
-      // Fullname should be centered and properly formatted
-      const fullnameElement = document.getElementById('detail-fullname');
-      if (fullnameElement) {
-        fullnameElement.style.cssText = `
-          font-size: 12px !important;
-          color: #8A939D !important;
-          text-align: center !important;
-          margin: 0 !important;
+      // Fix token icon
+      const tokenIconContainer = tokenDetail.querySelector('.token-detail-icon-container');
+      const tokenIcon = tokenDetail.querySelector('#token-detail-icon');
+      if (tokenIconContainer && tokenIcon) {
+        tokenIconContainer.style.cssText = `
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          margin-bottom: 16px !important;
         `;
         
-        if (!fullnameElement.textContent.includes('|')) {
-          const tokenName = fullnameElement.textContent;
-          fullnameElement.textContent = `COIN | ${tokenName}`;
-        }
+        tokenIcon.style.cssText = `
+          width: 64px !important;
+          height: 64px !important;
+          object-fit: contain !important;
+          border-radius: 50% !important;
+        `;
       }
       
-      // Remove all network badges
+      // Fix investment warning banner
+      const investmentWarning = tokenDetail.querySelector('.investment-warning');
+      if (investmentWarning) {
+        investmentWarning.style.cssText = `
+          width: calc(100% - 32px) !important;
+          margin: 0 16px 16px !important;
+          background-color: var(--tw-warning-bg) !important;
+          border-left: 4px solid var(--tw-warning-text) !important;
+        `;
+      }
+      
+      // Remove network badges
       const badges = tokenDetail.querySelectorAll('.chain-badge, .chain-badge-fixed');
       badges.forEach(badge => {
-        badge.style.display = 'none !important';
-        // Or remove them completely
-        if (badge.parentNode) {
-          badge.parentNode.removeChild(badge);
-        }
+        badge.style.display = 'none';
       });
       
-      // Make positive values blue
-      const priceChangeElement = document.getElementById('token-price-change');
-      if (priceChangeElement && priceChangeElement.classList.contains('positive')) {
-        priceChangeElement.style.color = '#3375BB !important';
-      }
-      
-      // Fix action buttons
-      const actions = tokenDetail.querySelectorAll('.detail-action');
-      actions.forEach(action => {
-        action.classList.add('tw-ripple');
-        
-        const actionIcon = action.querySelector('i');
-        if (actionIcon) {
-          actionIcon.style.backgroundColor = 'rgba(51, 117, 187, 0.08)';
-          actionIcon.style.color = '#3375BB';
-        }
-        
-        // Make sure actions have proper font
-        const actionText = action.querySelector('span');
-        if (actionText) {
-          actionText.style.fontSize = '12px';
-          actionText.style.marginTop = '4px';
-        }
-      });
-      
-      // Fix token icon container
-      const iconContainer = tokenDetail.querySelector('.token-detail-icon-container');
-      if (iconContainer) {
-        iconContainer.style.position = 'relative';
-        iconContainer.style.overflow = 'visible';
-      }
-
-      // Fix token balance display
-      const balanceContainer = tokenDetail.querySelector('.token-detail-balance');
-      if (balanceContainer) {
-        balanceContainer.style.marginTop = '32px';
-        balanceContainer.style.marginBottom = '24px';
-      }
-
-      // Fix staking container
-      const stakingContainer = tokenDetail.querySelector('.staking-container');
-      if (stakingContainer) {
-        stakingContainer.style.marginTop = '16px';
-      }
-
     } catch (error) {
       console.error('Error fixing token detail view:', error);
     }
