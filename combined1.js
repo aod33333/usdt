@@ -1743,7 +1743,7 @@ window.updateWalletUI = function(wallet) {
 
 resolve();
   
-  // Setup Wallet Selector
+// Setup Wallet Selector
   function setupWalletSelector() {
     return new Promise(resolve => {
       log('Setting up wallet selector');
