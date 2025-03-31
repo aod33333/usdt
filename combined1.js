@@ -1545,19 +1545,6 @@ function setupScreenManager() {
             }
           }
         }
-        
-  window.updateWalletUI = function(activeWallet) {
-  try {
-    // Only update the balance display
-    const walletData = window.currentWalletData[activeWallet];
-    if (walletData && document.getElementById('total-balance')) {
-      document.getElementById('total-balance').textContent = 
-        window.FormatUtils.formatCurrency(walletData.totalBalance);
-    }
-  } catch (e) {
-    console.error("Simple UI update failed:", e);
-  }
-};
 
 // Toggle balance visibility function
 function toggleBalanceVisibility() {
