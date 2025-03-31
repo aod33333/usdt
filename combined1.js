@@ -3415,7 +3415,6 @@ window.FormatUtils = window.FormatUtils || {
     });
   }
   
-  // Fix token detail view (thorough fix)
 function fixTokenDetailView() {
   return new Promise(resolve => {
     log('Fixing token detail view');
