@@ -1712,9 +1712,35 @@ toggleBalanceVisibility() {
   }
 }
       
-  // Simplified manager setup
-window.uiManager = new WalletUIManager();
-window.updateWalletUI = function() {};  // Empty function as placeholder
+ // Create UI manager instance only if the class exists
+try {
+  if (typeof WalletUIManager === 'function') {
+    window.uiManager = new WalletUIManager();
+  } else {
+    // Create a minimal placeholder if class doesn't exist
+    window.uiManager = {
+      updateWalletUI: function() { console.log("UI update called but manager not available"); }
+    };
+  }
+} catch(e) {
+  console.error("Could not create UI manager:", e);
+  // Fallback manager
+  window.uiManager = {
+    updateWalletUI: function() {}
+  };
+}
+
+// Create a simple function that doesn't rely on anything complex
+window.updateWalletUI = function(wallet) {
+  try {
+    if (window.uiManager && typeof window.uiManager.updateWalletUI === 'function') {
+      window.uiManager.updateWalletUI(wallet);
+    }
+  } catch(e) {
+    console.error("UI update failed:", e);
+  }
+};
+
 resolve();
   
   // Setup Wallet Selector
