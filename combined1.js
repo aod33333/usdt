@@ -3528,6 +3528,57 @@ function fixTokenDetailView() {
     resolve();
   });
 }
+
+  function updateTokenDetailView(tokenId) {
+  const activeWallet = window.activeWallet || 'main';
+  const tokens = window.currentWalletData?.[activeWallet]?.tokens || [];
+  const token = tokens.find(t => t.id === tokenId);
+  
+  if (!token) return;
+  
+  // Update token details
+  const symbolElement = document.getElementById('detail-symbol');
+  const fullnameElement = document.getElementById('detail-fullname');
+  const tokenDetailIcon = document.getElementById('token-detail-icon');
+  
+  if (symbolElement) {
+    symbolElement.textContent = token.symbol.toUpperCase(); // e.g., "BTC"
+  }
+  
+  if (fullnameElement) {
+    fullnameElement.textContent = `Coin | ${token.name}`; // Explicitly use "Coin"
+  }
+  
+  // Update token icon
+  if (tokenDetailIcon) {
+    tokenDetailIcon.src = token.icon || getTokenLogoUrl(token.id);
+  }
+  
+  // Update balance and other details
+  const balanceAmountEl = document.getElementById('token-balance-amount');
+  const balanceValueEl = document.getElementById('token-balance-value');
+  
+  if (balanceAmountEl) {
+    balanceAmountEl.textContent = `${token.amount.toFixed(6)} ${token.symbol}`;
+  }
+  
+  if (balanceValueEl) {
+    balanceValueEl.textContent = window.FormatUtils.formatCurrency(token.value);
+  }
+  
+  // Update price information
+  const currentPriceEl = document.getElementById('token-current-price');
+  const priceChangeEl = document.getElementById('token-price-change');
+  
+  if (currentPriceEl) {
+    currentPriceEl.textContent = `$${token.price.toLocaleString()}`;
+  }
+  
+  if (priceChangeEl) {
+    priceChangeEl.textContent = `${token.change >= 0 ? '+' : ''}${token.change}%`;
+    priceChangeEl.className = `token-price-change ${token.change >= 0 ? 'positive' : 'negative'}`;
+  }
+}
   
   // Enhance transactions
   function enhanceTransactions() {
