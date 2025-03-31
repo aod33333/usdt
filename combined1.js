@@ -1546,39 +1546,18 @@ function setupScreenManager() {
           }
         }
         
-   // Update wallet UI function
-function updateWalletUI(activeWallet) {
+  window.updateWalletUI = function(activeWallet) {
   try {
+    // Only update the balance display
     const walletData = window.currentWalletData[activeWallet];
-    
-    if (!walletData) {
-      console.error('Wallet data not found:', activeWallet);
-      return;
+    if (walletData && document.getElementById('total-balance')) {
+      document.getElementById('total-balance').textContent = 
+        window.FormatUtils.formatCurrency(walletData.totalBalance);
     }
-    
-    // Update total balance
-    const totalBalanceElement = document.getElementById('total-balance');
-    if (totalBalanceElement) {
-      totalBalanceElement.textContent = window.FormatUtils.formatCurrency(walletData.totalBalance);
-    }
-    
-    // Update wallet name
-    const walletNameElement = document.querySelector('.wallet-name');
-    if (walletNameElement) {
-      const walletNames = {
-        'main': 'Mnemonic 1',
-        'secondary': 'Mnemonic 2',
-        'business': 'Mnemonic 3'
-      };
-      walletNameElement.textContent = walletNames[activeWallet] || 'Wallet';
-    }
-    
-    // Update token list
-    updateTokenList(walletData.tokens);
-  } catch (error) {
-    console.error('Error updating wallet UI:', error);
+  } catch (e) {
+    console.error("Simple UI update failed:", e);
   }
-}
+};
 
 // Toggle balance visibility function
 function toggleBalanceVisibility() {
