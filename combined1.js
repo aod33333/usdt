@@ -3427,17 +3427,17 @@ function fixTokenDetailView() {
     }
     
     try {
-      // Modify header
+      // Modify header to match Trust Wallet style
       const headerContainer = tokenDetail.querySelector('.detail-header');
       if (headerContainer) {
         headerContainer.innerHTML = `
-          <button id="back-button" class="icon-button">
+          <button id="back-button" class="back-button">
             <i class="fas fa-arrow-left"></i>
           </button>
           <div class="token-detail-title">
-            <div class="token-symbol-container">
-              <span id="detail-symbol">ETH</span>
-              <span class="token-network-label">COIN | Ethereum</span>
+            <div class="token-text-content">
+              <span id="detail-symbol" class="token-symbol">BTC</span>
+              <div id="detail-fullname" class="token-fullname">COIN | Bitcoin</div>
             </div>
           </div>
           <div class="header-icons">
@@ -3445,9 +3445,37 @@ function fixTokenDetailView() {
             <button class="icon-button"><i class="fas fa-info-circle"></i></button>
           </div>
         `;
+
+        // Apply specific styling
+        const symbolElement = headerContainer.querySelector('#detail-symbol');
+        const fullnameElement = headerContainer.querySelector('#detail-fullname');
+        
+        if (symbolElement) {
+          symbolElement.style.cssText = `
+            font-size: 24px;
+            font-weight: 600;
+            color: #1A2024;
+            display: block;
+            margin-bottom: 2px;
+          `;
+        }
+        
+        if (fullnameElement) {
+          fullnameElement.style.cssText = `
+            font-size: 12px;
+            color: #8A939D;
+            display: block;
+          `;
+        }
       }
       
-      // Investment warning banner
+      // Remove the weird bottom image/section
+      const stakingContainer = tokenDetail.querySelector('.staking-container');
+      if (stakingContainer) {
+        stakingContainer.style.display = 'none';
+      }
+      
+      // Modify investment warning to match screenshot
       const warningBanner = tokenDetail.querySelector('.investment-warning');
       if (warningBanner) {
         warningBanner.innerHTML = `
@@ -3461,104 +3489,20 @@ function fixTokenDetailView() {
             </button>
           </div>
         `;
-      }
-      
-      // Gas fee indicator
-      const gasFeeIndicator = document.createElement('div');
-      gasFeeIndicator.className = 'gas-fee-indicator';
-      gasFeeIndicator.innerHTML = `
-        <i class="fas fa-gas-pump"></i>
-        <span id="gas-fee-amount">$0.01</span>
-      `;
-      
-      // Token icon and balance
-      const tokenIconContainer = tokenDetail.querySelector('.token-detail-icon-container');
-      if (tokenIconContainer) {
-        tokenIconContainer.innerHTML = `
-          <img id="token-detail-icon" src="" alt="Token" class="token-detail-large-icon">
+        
+        warningBanner.style.cssText = `
+          width: calc(100% - 32px);
+          margin: 0 16px 16px;
+          background-color: #FEF9E7;
+          border-left: 4px solid #D4AC0D;
+          border-radius: 4px;
         `;
       }
       
-      const tokenBalanceContainer = tokenDetail.querySelector('.token-detail-balance');
-      if (tokenBalanceContainer) {
-        tokenBalanceContainer.innerHTML = `
-          <h2 id="token-balance-amount">0 ETH</h2>
-          <p id="token-balance-value">$0.00</p>
-        `;
-      }
-      
-      // Action buttons
-      const actionButtons = tokenDetail.querySelector('.token-detail-actions');
-      if (actionButtons) {
-        actionButtons.innerHTML = `
-          <button class="detail-action action-circle">
-            <i class="fas fa-arrow-up"></i>
-            <span>Send</span>
-          </button>
-          <button class="detail-action action-circle">
-            <i class="fas fa-arrow-down"></i>
-            <span>Receive</span>
-          </button>
-          <button class="detail-action action-circle">
-            <i class="fas fa-exchange-alt"></i>
-            <span>Swap</span>
-          </button>
-          <button class="detail-action action-circle">
-            <i class="fas fa-credit-card"></i>
-            <span>Buy</span>
-          </button>
-          <button class="detail-action action-circle">
-            <i class="fas fa-university"></i>
-            <span>Sell</span>
-          </button>
-        `;
-      }
-      
-      // Staking container
-      const stakingContainer = tokenDetail.querySelector('.staking-container');
-      if (stakingContainer) {
-        stakingContainer.innerHTML = `
-          <div class="staking-icon">
-            <img src="https://i.ibb.co/tpJRYLq7/Screenshot-20250325-033954-Trust-Wallet.jpg" alt="Staking">
-          </div>
-          <div class="staking-content">
-            <h3>Start earning</h3>
-            <p>Start earning on your <span id="token-staking-symbol">ETH</span></p>
-          </div>
-          <div class="staking-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        `;
-      }
-      
-      // Transactions section
-      const transactionList = tokenDetail.querySelector('.transaction-list');
-      const noTransactionsSection = tokenDetail.querySelector('.no-transactions');
-      if (transactionList && noTransactionsSection) {
-        transactionList.innerHTML = ''; // Clear existing transactions
-        noTransactionsSection.innerHTML = `
-          <div class="no-tx-icon">
-            <img src="https://i.ibb.co/p6nYxhpw/Screenshot-20250327-203752-Trust-Wallet.jpg" alt="No transactions">
-          </div>
-          <p>Transactions will appear here.</p>
-          <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
-        `;
-      }
-      
-      // Price information
-      const priceInfoContainer = tokenDetail.querySelector('.token-price-info');
-      if (priceInfoContainer) {
-        priceInfoContainer.innerHTML = `
-          <div class="current-price">
-            <h3>Current <span id="token-price-symbol">ETH</span> price</h3>
-            <div class="price-with-change">
-              <span id="token-current-price">$1,997.80</span>
-              <span id="token-price-change" class="positive">+71967.63%</span>
-            </div>
-            <span class="price-timeframe">• All</span>
-          </div>
-          <p class="price-disclaimer">Past performance is not a reliable indicator of future results. Data source is from CoinMarketCap. <a href="#">Learn more about risks.</a></p>
-        `;
+      // Additional styling tweaks
+      const detailContent = tokenDetail.querySelector('.token-detail-content');
+      if (detailContent) {
+        detailContent.style.paddingBottom = '70px';
       }
       
     } catch (error) {
