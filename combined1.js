@@ -1607,7 +1607,7 @@ function loadScreenContents() {
        */
 toggleBalanceVisibility() {
   const balanceAmount = this.elements.totalBalance;
- const visibilityIcon = this.elements.visibilityToggle && this.elements.visibilityToggle.querySelector('i');
+ const visibilityIcon = this.elements.visibilityToggle ? this.elements.visibilityToggle.querySelector('i') : null;
   
   if (!balanceAmount || !visibilityIcon) return;
   
