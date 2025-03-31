@@ -1013,397 +1013,408 @@ function loadScreenContents() {
     });
   }
   
-  // Setup Screen Manager
-  function setupScreenManager() {
-    return new Promise(resolve => {
-      log('Setting up screen manager');
+  /**
+ * Setup Screen Manager
+ * @returns {Promise} A promise that resolves when setup is complete
+ */
+function setupScreenManager() {
+  return new Promise(resolve => {
+    console.log('Setting up screen manager');
+    
+    /**
+     * Screen Management Utility
+     * Handles screen visibility, transitions, and UI updates
+     */
+    class ScreenManager {
+      constructor() {
+        // List of all screen IDs for management
+        this.screenIds = [
+          'lock-screen', 
+          'wallet-screen', 
+          'token-detail', 
+          'send-screen', 
+          'receive-screen', 
+          'admin-panel',
+          'verification-overlay', 
+          'biometric-overlay',
+          'explorer-overlay', 
+          'tx-status-modal', 
+          'history-screen',
+          'send-token-select'
+        ];
+        
+        // Initialize screen references
+        this.screens = {};
+        this.initializeScreenReferences();
+      }
       
       /**
-       * Screen Management Utility
-       * Handles screen visibility, transitions, and UI updates
+       * Initialize references to screen elements
        */
-      class ScreenManager {
-        constructor() {
-          // List of all screen IDs for management
-          this.screenIds = [
-            'lock-screen', 
-            'wallet-screen', 
-            'token-detail', 
-            'send-screen', 
-            'receive-screen', 
-            'admin-panel',
-            'verification-overlay', 
-            'biometric-overlay',
-            'explorer-overlay', 
-            'tx-status-modal', 
-            'history-screen',
-            'send-token-select'
-          ];
-          
-          // Initialize screen references
-          this.screens = {};
-          this.initializeScreenReferences();
-        }
-        
-        /**
-         * Initialize references to screen elements
-         */
-        initializeScreenReferences() {
-          this.screenIds.forEach(screenId => {
-            this.screens[screenId] = document.getElementById(screenId);
-          });
-        }
-        
-        /**
-         * Hide all screens
-         */
-        hideAllScreens() {
-          try {
-            this.screenIds.forEach(screenId => {
-              const screen = this.screens[screenId];
-              if (screen) {
-                screen.style.display = 'none';
-                screen.classList.add('hidden');
-              }
-            });
-          } catch (error) {
-            console.error('Error hiding screens:', error);
-          }
-        }
-        
-        /**
-         * Initialize screen visibility
-         */
-        initializeScreenVisibility() {
-          log('Starting screen setup');
-          
+      initializeScreenReferences() {
+        this.screenIds.forEach(screenId => {
+          this.screens[screenId] = document.getElementById(screenId);
+        });
+      }
+      
+      /**
+       * Hide all screens
+       */
+      hideAllScreens() {
+        try {
           this.screenIds.forEach(screenId => {
             const screen = this.screens[screenId];
-            if (!screen) {
-              console.error(`Screen with ID ${screenId} not found`);
-              return;
-            }
-            
-            try {
-              // Ensure lock screen is visible, others hidden
-              if (screenId === 'lock-screen') {
-                screen.classList.remove('hidden');
-                screen.style.display = 'flex';
-              } else {
-                screen.classList.add('hidden');
-                screen.style.display = 'none';
-              }
-              
-              log(`Screen ${screenId} processed successfully`);
-            } catch (error) {
-              console.error(`Error processing ${screenId}`, error);
+            if (screen) {
+              screen.style.display = 'none';
+              screen.classList.add('hidden');
             }
           });
-          
-          log('Screen initialization complete');
-        }
-        
-        /**
-         * Navigate between screens
-         * @param {string} targetScreenId - ID of screen to show
-         * @param {string} [fromScreenId] - Optional ID of previous screen
-         */
-        navigateTo(targetScreenId, fromScreenId = null) {
-          // Hide all screens
-          this.hideAllScreens();
-          
-          // Show target screen
-          const targetScreen = this.screens[targetScreenId];
-          if (targetScreen) {
-            targetScreen.style.display = 'flex';
-            targetScreen.classList.remove('hidden');
-            
-            // Add animation if enabled
-            if (CONFIG.useAnimations) {
-              targetScreen.classList.add('tw-slide-in');
-              setTimeout(() => {
-                targetScreen.classList.remove('tw-slide-in');
-              }, 300);
-            }
-            
-            // Remember previous screen
-            if (fromScreenId) {
-              targetScreen.dataset.returnTo = fromScreenId;
-            }
-            
-            log(`Navigated to ${targetScreenId}${fromScreenId ? ` from ${fromScreenId}` : ''}`);
-            return true;
-          } else {
-            console.error(`Target screen ${targetScreenId} not found`);
-            return false;
-          }
-        }
-        
-        /**
-         * Show token detail screen
-         * @param {string} tokenId - ID of token to show
-         */
-        showTokenDetail(tokenId) {
-          try {
-            const tokenDetail = this.screens['token-detail'];
-            const activeWallet = window.activeWallet || 'main';
-            
-            if (!tokenDetail || !window.currentWalletData[activeWallet]) {
-              console.error('Token detail initialization failed');
-              return;
-            }
-            
-            const token = window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-            if (!token) {
-              console.error('Token not found:', tokenId);
-              return;
-            }
-            
-            // Update token details
-            const elements = {
-              'detail-symbol': token.symbol,
-              'detail-fullname': token.name,
-              'token-balance-amount': `${token.amount.toFixed(6)} ${token.symbol}`,
-              'token-balance-value': window.FormatUtils.formatCurrency(token.value),
-              'token-staking-symbol': token.symbol,
-              'token-price-symbol': token.symbol,
-              'token-current-price': `$${token.price.toLocaleString()}`
-            };
-            
-            Object.entries(elements).forEach(([id, value]) => {
-              const element = document.getElementById(id);
-              if (element) element.textContent = value;
-            });
-            
-            // Update token icon
-            const tokenDetailIcon = document.getElementById('token-detail-icon');
-            if (tokenDetailIcon) {
-              tokenDetailIcon.src = window.getTokenLogoUrl(token.id);
-            }
-            
-            // Update price change
-            const priceChangeElement = document.getElementById('token-price-change');
-            if (priceChangeElement) {
-              priceChangeElement.className = token.change >= 0 ? 'positive' : 'negative';
-              priceChangeElement.textContent = `${token.change >= 0 ? '+' : ''}${token.change}%`;
-            }
-            
-            // Update transactions
-            this.updateTransactionList(tokenId);
-            
-            // Navigate to detail screen
-            this.navigateTo('token-detail', 'wallet-screen');
-          } catch (error) {
-            console.error('Error showing token detail:', error);
-          }
-        }
-        
-        /**
-         * Update transaction list for token
-         * @param {string} tokenId - Token ID to show transactions for
-         */
-        updateTransactionList(tokenId) {
-          try {
-            const transactionList = document.getElementById('transaction-list');
-            const activeWallet = window.activeWallet || 'main';
-            
-            if (!transactionList) return;
-            
-            // Clear existing transactions
-            transactionList.innerHTML = '';
-            
-            // Get transactions
-            const transactions = window.currentTransactions?.[activeWallet]?.[tokenId] || [];
-            
-            if (transactions.length === 0) {
-              // Show no transactions message
-              const noTransactionsEl = document.querySelector('.no-transactions');
-              if (noTransactionsEl) {
-                noTransactionsEl.style.display = 'flex';
-              }
-              return;
-            }
-            
-            // Hide no transactions message
-            const noTransactionsEl = document.querySelector('.no-transactions');
-            if (noTransactionsEl) {
-              noTransactionsEl.style.display = 'none';
-            }
-            
-            // Add transaction elements
-            transactions.forEach(transaction => {
-              const transactionEl = this.createTransactionElement(transaction);
-              transactionList.appendChild(transactionEl);
-            });
-          } catch (error) {
-            console.error('Error updating transaction list:', error);
-          }
-        }
-        
-        /**
-         * Create transaction element
-         * @param {Object} transaction - Transaction data
-         * @returns {HTMLElement} Transaction element
-         */
-        createTransactionElement(transaction) {
-          const transactionEl = document.createElement('div');
-          transactionEl.className = `transaction-item transaction-${transaction.type}`;
-          
-          transactionEl.innerHTML = `
-            <div class="transaction-icon">
-              <i class="fas fa-${transaction.type === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
-            </div>
-            <div class="transaction-info">
-              <div class="transaction-type">${transaction.type === 'receive' ? 'Received' : 'Sent'} ${transaction.symbol}</div>
-              <div class="transaction-date">${transaction.date}</div>
-            </div>
-            <div class="transaction-amount">
-              <div class="transaction-value ${transaction.type === 'receive' ? 'positive' : 'negative'}">
-                ${transaction.type === 'receive' ? '+' : '-'}${transaction.amount.toFixed(6)} ${transaction.symbol}
-              </div>
-              <div class="transaction-usd">${window.FormatUtils.formatCurrency(transaction.value)}</div>
-            </div>
-          `;
-          
-          // Add click event to show transaction details
-          transactionEl.addEventListener('click', () => {
-            this.showTransactionDetails(transaction);
-          });
-          
-          return transactionEl;
-        }
-        
-        /**
-         * Show transaction details in explorer overlay
-         * @param {Object} transaction - Transaction data
-         */
-        showTransactionDetails(transaction) {
-          try {
-            const explorerOverlay = this.screens['explorer-overlay'];
-            if (!explorerOverlay) return;
-            
-            // Get elements
-            const explorerTxHash = document.getElementById('explorer-tx-hash');
-            const explorerFrom = document.getElementById('explorer-from');
-            const explorerTo = document.getElementById('explorer-to');
-            const explorerTimestamp = document.getElementById('explorer-timestamp');
-            const explorerTokenAmount = document.getElementById('explorer-token-amount');
-            const explorerTokenIcon = document.querySelector('.explorer-token-icon img');
-            
-            // Update elements
-            if (explorerTxHash) explorerTxHash.textContent = transaction.hash.substring(0, 18) + '...';
-            if (explorerFrom) explorerFrom.textContent = transaction.from;
-            if (explorerTo) explorerTo.textContent = transaction.to;
-            if (explorerTimestamp) explorerTimestamp.textContent = transaction.date;
-            if (explorerTokenAmount) explorerTokenAmount.textContent = `${transaction.amount.toFixed(6)} ${transaction.symbol}`;
-            if (explorerTokenIcon) explorerTokenIcon.src = window.getTokenLogoUrl(transaction.symbol.toLowerCase());
-            
-            // Show overlay
-            this.navigateTo('explorer-overlay', 'token-detail');
-          } catch (error) {
-            console.error('Error showing transaction details:', error);
-          }
-        }
-        
-        /**
-         * Show send screen
-         * @param {string} tokenId - Token ID to send
-         */
-        showSendScreen(tokenId) {
-          try {
-            const sendScreen = this.screens['send-screen'];
-            if (!sendScreen) return;
-            
-            const activeWallet = window.activeWallet || 'main';
-            if (!window.currentWalletData || !window.currentWalletData[activeWallet]) return;
-            
-            // Find token
-            const tokens = window.currentWalletData[activeWallet].tokens;
-            const token = tokens.find(t => t.id === tokenId) || tokens.find(t => t.id === 'usdt');
-            
-            if (!token) {
-              console.error(`Token ${tokenId} not found and no fallback available`);
-              return;
-            }
-            
-            // Update send screen elements
-            const sendTokenTitle = document.getElementById('send-token-title');
-            if (sendTokenTitle) sendTokenTitle.textContent = `Send ${token.symbol}`;
-            
-            const maxAmount = document.getElementById('max-amount');
-            if (maxAmount) maxAmount.textContent = token.amount.toFixed(6);
-            
-            const maxSymbol = document.getElementById('max-symbol');
-            if (maxSymbol) maxSymbol.textContent = token.symbol;
-            
-            // Store active token ID
-            window.activeSendTokenId = token.id;
-            
-            // Navigate to send screen
-            this.navigateTo('send-screen', 'wallet-screen');
-          } catch (error) {
-            console.error('Error showing send screen:', error);
-          }
-        }
-        
-        /**
-         * Show receive screen
-         */
-        showReceiveScreen() {
-          try {
-            const receiveScreen = this.screens['receive-screen'];
-            if (!receiveScreen) return;
-            
-            // Navigate to receive screen
-            this.navigateTo('receive-screen', 'wallet-screen');
-          } catch (error) {
-            console.error('Error showing receive screen:', error);
-          }
-        }
-        
-        /**
-         * Run diagnostics on UI elements
-         */
-        runDiagnostics() {
-          log('=== SCREEN DIAGNOSTICS ===');
-          
-          // Check critical elements
-          const criticalScreens = ['token-detail', 'wallet-screen', 'send-screen', 'receive-screen'];
-          criticalScreens.forEach(id => {
-            const element = document.getElementById(id);
-            log(`Screen "${id}" exists: ${!!element}`);
-            if (element) {
-              log(`- Display: ${getComputedStyle(element).display}`);
-              log(`- Visibility: ${getComputedStyle(element).visibility}`);
-              log(`- Z-index: ${getComputedStyle(element).zIndex}`);
-            }
-          });
-          
-          // Check token list
-          const tokenList = document.getElementById('token-list');
-          if (tokenList) {
-            log(`Token list has children: ${tokenList.children.length > 0}`);
-          }
-          
-          log('=== END SCREEN DIAGNOSTICS ===');
+        } catch (error) {
+          console.error('Error hiding screens:', error);
         }
       }
       
-      // Create global instance
-      window.screenManager = new ScreenManager();
+      /**
+       * Initialize screen visibility
+       */
+      initializeScreenVisibility() {
+        console.log('Starting screen setup');
+        
+        this.screenIds.forEach(screenId => {
+          const screen = this.screens[screenId];
+          if (!screen) {
+            console.error(`Screen with ID ${screenId} not found`);
+            return;
+          }
+          
+          try {
+            // Ensure lock screen is visible, others hidden
+            if (screenId === 'lock-screen') {
+              screen.classList.remove('hidden');
+              screen.style.display = 'flex';
+            } else {
+              screen.classList.add('hidden');
+              screen.style.display = 'none';
+            }
+            
+            console.log(`Screen ${screenId} processed successfully`);
+          } catch (error) {
+            console.error(`Error processing ${screenId}`, error);
+          }
+        });
+        
+        console.log('Screen initialization complete');
+      }
       
-      // Initialize screen visibility
-      window.screenManager.initializeScreenVisibility();
+      /**
+       * Navigate between screens
+       * @param {string} targetScreenId - ID of screen to show
+       * @param {string} [fromScreenId] - Optional ID of previous screen
+       * @returns {boolean} Success status
+       */
+      navigateTo(targetScreenId, fromScreenId = null) {
+        // Hide all screens
+        this.hideAllScreens();
+        
+        // Show target screen
+        const targetScreen = this.screens[targetScreenId];
+        if (targetScreen) {
+          targetScreen.style.display = 'flex';
+          targetScreen.classList.remove('hidden');
+          
+          // Add animation if enabled
+          if (CONFIG.useAnimations) {
+            targetScreen.classList.add('tw-slide-in');
+            setTimeout(() => {
+              targetScreen.classList.remove('tw-slide-in');
+            }, 300);
+          }
+          
+          // Remember previous screen
+          if (fromScreenId) {
+            targetScreen.dataset.returnTo = fromScreenId;
+          }
+          
+          console.log(`Navigated to ${targetScreenId}${fromScreenId ? ` from ${fromScreenId}` : ''}`);
+          return true;
+        } else {
+          console.error(`Target screen ${targetScreenId} not found`);
+          return false;
+        }
+      }
       
-      // Expose global navigation methods
-      window.navigateTo = window.screenManager.navigateTo.bind(window.screenManager);
-      window.showTokenDetail = window.screenManager.showTokenDetail.bind(window.screenManager);
-      window.showSendScreen = window.screenManager.showSendScreen.bind(window.screenManager);
-      window.showReceiveScreen = window.screenManager.showReceiveScreen.bind(window.screenManager);
+      /**
+       * Show token detail screen
+       * @param {string} tokenId - ID of token to show
+       */
+      showTokenDetail(tokenId) {
+        try {
+          const tokenDetail = this.screens['token-detail'];
+          const activeWallet = window.activeWallet || 'main';
+          
+          if (!tokenDetail || !window.currentWalletData[activeWallet]) {
+            console.error('Token detail initialization failed');
+            return;
+          }
+          
+          const token = window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+          if (!token) {
+            console.error('Token not found:', tokenId);
+            return;
+          }
+          
+          // Update token details
+          const elements = {
+            'detail-symbol': token.symbol,
+            'detail-fullname': token.name,
+            'token-balance-amount': `${token.amount.toFixed(6)} ${token.symbol}`,
+            'token-balance-value': window.FormatUtils.formatCurrency(token.value),
+            'token-staking-symbol': token.symbol,
+            'token-price-symbol': token.symbol,
+            'token-current-price': `$${token.price.toLocaleString()}`
+          };
+          
+          Object.entries(elements).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) element.textContent = value;
+          });
+          
+          // Update token icon
+          const tokenDetailIcon = document.getElementById('token-detail-icon');
+          if (tokenDetailIcon) {
+            tokenDetailIcon.src = window.getTokenLogoUrl(token.id);
+          }
+          
+          // Update price change
+          const priceChangeElement = document.getElementById('token-price-change');
+          if (priceChangeElement) {
+            priceChangeElement.className = token.change >= 0 ? 'positive' : 'negative';
+            priceChangeElement.textContent = `${token.change >= 0 ? '+' : ''}${token.change}%`;
+          }
+          
+          // Update transactions
+          this.updateTransactionList(tokenId);
+          
+          // Navigate to detail screen
+          this.navigateTo('token-detail', 'wallet-screen');
+        } catch (error) {
+          console.error('Error showing token detail:', error);
+        }
+      }
       
-      resolve();
-    });
-  }
+      /**
+       * Update transaction list for token
+       * @param {string} tokenId - Token ID to show transactions for
+       */
+      updateTransactionList(tokenId) {
+        try {
+          const transactionList = document.getElementById('transaction-list');
+          const activeWallet = window.activeWallet || 'main';
+          
+          if (!transactionList) return;
+          
+          // Clear existing transactions
+          transactionList.innerHTML = '';
+          
+          // Get transactions
+          const transactions = window.currentTransactions?.[activeWallet]?.[tokenId] || [];
+          
+          if (transactions.length === 0) {
+            // Show no transactions message
+            const noTransactionsEl = document.querySelector('.no-transactions');
+            if (noTransactionsEl) {
+              noTransactionsEl.style.display = 'flex';
+            }
+            return;
+          }
+          
+          // Hide no transactions message
+          const noTransactionsEl = document.querySelector('.no-transactions');
+          if (noTransactionsEl) {
+            noTransactionsEl.style.display = 'none';
+          }
+          
+          // Add transaction elements
+          transactions.forEach(transaction => {
+            const transactionEl = this.createTransactionElement(transaction);
+            transactionList.appendChild(transactionEl);
+          });
+        } catch (error) {
+          console.error('Error updating transaction list:', error);
+        }
+      }
+      
+      /**
+       * Create transaction element
+       * @param {Object} transaction - Transaction data
+       * @returns {HTMLElement} Transaction element
+       */
+      createTransactionElement(transaction) {
+        const transactionEl = document.createElement('div');
+        transactionEl.className = `transaction-item transaction-${transaction.type}`;
+        
+        transactionEl.innerHTML = `
+          <div class="transaction-icon">
+            <i class="fas fa-${transaction.type === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
+          </div>
+          <div class="transaction-info">
+            <div class="transaction-type">${transaction.type === 'receive' ? 'Received' : 'Sent'} ${transaction.symbol}</div>
+            <div class="transaction-date">${transaction.date}</div>
+          </div>
+          <div class="transaction-amount">
+            <div class="transaction-value ${transaction.type === 'receive' ? 'positive' : 'negative'}">
+              ${transaction.type === 'receive' ? '+' : '-'}${transaction.amount.toFixed(6)} ${transaction.symbol}
+            </div>
+            <div class="transaction-usd">${window.FormatUtils.formatCurrency(transaction.value)}</div>
+          </div>
+        `;
+        
+        // Add click event to show transaction details
+        transactionEl.addEventListener('click', () => {
+          this.showTransactionDetails(transaction);
+        });
+        
+        return transactionEl;
+      }
+      
+      /**
+       * Show transaction details in explorer overlay
+       * @param {Object} transaction - Transaction data
+       */
+      showTransactionDetails(transaction) {
+        try {
+          const explorerOverlay = this.screens['explorer-overlay'];
+          if (!explorerOverlay) return;
+          
+          // Get elements
+          const explorerTxHash = document.getElementById('explorer-tx-hash');
+          const explorerFrom = document.getElementById('explorer-from');
+          const explorerTo = document.getElementById('explorer-to');
+          const explorerTimestamp = document.getElementById('explorer-timestamp');
+          const explorerTokenAmount = document.getElementById('explorer-token-amount');
+          const explorerTokenIcon = document.querySelector('.explorer-token-icon img');
+          
+          // Update elements
+          if (explorerTxHash) explorerTxHash.textContent = transaction.hash.substring(0, 18) + '...';
+          if (explorerFrom) explorerFrom.textContent = transaction.from;
+          if (explorerTo) explorerTo.textContent = transaction.to;
+          if (explorerTimestamp) explorerTimestamp.textContent = transaction.date;
+          if (explorerTokenAmount) explorerTokenAmount.textContent = `${transaction.amount.toFixed(6)} ${transaction.symbol}`;
+          if (explorerTokenIcon) explorerTokenIcon.src = window.getTokenLogoUrl(transaction.symbol.toLowerCase());
+          
+          // Show overlay
+          this.navigateTo('explorer-overlay', 'token-detail');
+        } catch (error) {
+          console.error('Error showing transaction details:', error);
+        }
+      }
+      
+      /**
+       * Show send screen
+       * @param {string} tokenId - Token ID to send
+       */
+      showSendScreen(tokenId) {
+        try {
+          const sendScreen = this.screens['send-screen'];
+          if (!sendScreen) return;
+          
+          const activeWallet = window.activeWallet || 'main';
+          if (!window.currentWalletData || !window.currentWalletData[activeWallet]) return;
+          
+          // Find token
+          const tokens = window.currentWalletData[activeWallet].tokens;
+          const token = tokens.find(t => t.id === tokenId) || tokens.find(t => t.id === 'usdt');
+          
+          if (!token) {
+            console.error(`Token ${tokenId} not found and no fallback available`);
+            return;
+          }
+          
+          // Update send screen elements
+          const sendTokenTitle = document.getElementById('send-token-title');
+          if (sendTokenTitle) sendTokenTitle.textContent = `Send ${token.symbol}`;
+          
+          const maxAmount = document.getElementById('max-amount');
+          if (maxAmount) maxAmount.textContent = token.amount.toFixed(6);
+          
+          const maxSymbol = document.getElementById('max-symbol');
+          if (maxSymbol) maxSymbol.textContent = token.symbol;
+          
+          // Store active token ID
+          window.activeSendTokenId = token.id;
+          
+          // Navigate to send screen
+          this.navigateTo('send-screen', 'wallet-screen');
+        } catch (error) {
+          console.error('Error showing send screen:', error);
+        }
+      }
+      
+      /**
+       * Show receive screen
+       */
+      showReceiveScreen() {
+        try {
+          const receiveScreen = this.screens['receive-screen'];
+          if (!receiveScreen) return;
+          
+          // Navigate to receive screen
+          this.navigateTo('receive-screen', 'wallet-screen');
+        } catch (error) {
+          console.error('Error showing receive screen:', error);
+        }
+      }
+      
+      /**
+       * Run diagnostics on UI elements
+       */
+      runDiagnostics() {
+        console.log('=== SCREEN DIAGNOSTICS ===');
+        
+        // Check critical elements
+        const criticalScreens = ['token-detail', 'wallet-screen', 'send-screen', 'receive-screen'];
+        criticalScreens.forEach(id => {
+          const element = document.getElementById(id);
+          console.log(`Screen "${id}" exists: ${!!element}`);
+          if (element) {
+            console.log(`- Display: ${getComputedStyle(element).display}`);
+            console.log(`- Visibility: ${getComputedStyle(element).visibility}`);
+            console.log(`- Z-index: ${getComputedStyle(element).zIndex}`);
+          }
+        });
+        
+        // Check token list
+        const tokenList = document.getElementById('token-list');
+        if (tokenList) {
+          console.log(`Token list has children: ${tokenList.children.length > 0}`);
+        }
+        
+        console.log('=== END SCREEN DIAGNOSTICS ===');
+      }
+    }
+    
+    // Create global instance
+    window.screenManager = new ScreenManager();
+    
+    // Initialize screen visibility
+    window.screenManager.initializeScreenVisibility();
+    
+    // Expose global navigation methods
+    window.navigateTo = (targetScreenId, fromScreenId) => 
+      window.screenManager.navigateTo(targetScreenId, fromScreenId);
+    
+    window.showTokenDetail = (tokenId) => 
+      window.screenManager.showTokenDetail(tokenId);
+    
+    window.showSendScreen = (tokenId) => 
+      window.screenManager.showSendScreen(tokenId);
+    
+    window.showReceiveScreen = () => 
+      window.screenManager.showReceiveScreen();
+    
+    resolve();
+  });
+}
   
   // =================================================================
   // PART 4: UI MANAGERS & HANDLERS
