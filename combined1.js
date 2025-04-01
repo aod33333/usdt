@@ -4751,4 +4751,8 @@ try {
 } catch (error) {
   console.error('Initialization error:', error);
 }
-})(); // Single closing parenthesis for the IIFE
+
+// Proper IIFE closure
+})().catch(error => {
+  console.error('Unhandled initialization error:', error);
+});
