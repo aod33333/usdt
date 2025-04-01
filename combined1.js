@@ -4701,6 +4701,11 @@ function connectEventHandlers() {
   // Transaction handling
   processTransaction: () => window.processTransaction,
   
+// Define CONFIG and DEFAULT_CONFIG (or make sure they are defined elsewhere)
+const CONFIG = { debug: false };
+const DEFAULT_CONFIG = {};
+
+const myConfigObject = {
   // Configuration
   getConfig: () => {
     // Return deep clone to prevent external modification
@@ -4708,13 +4713,10 @@ function connectEventHandlers() {
       return JSON.parse(JSON.stringify(CONFIG));
     } catch (error) {
       console.error('Configuration serialization error:', error);
-      return {...CONFIG};
+      return { ...CONFIG };
     }
   },
 
-console.log(CONFIG); // Now this works!
-
-const myConfigObject = {
   setDebugMode: (enabled) => {
     // Add type validation and logging
     if (typeof enabled !== 'boolean') {
@@ -4742,8 +4744,10 @@ const myConfigObject = {
   },
 };
 
+console.log(CONFIG); // Now this works!
+
 // IIFE for initialization
-(function() {
+(function () {
   try {
     if (CONFIG.debug) {
       console.info('TrustWallet initialized with debug mode');
