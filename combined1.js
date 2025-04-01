@@ -55,12 +55,21 @@ if (document.readyState === 'loading') {
 // Main initialization function
 function init() {
   console.log('TrustWallet: Starting comprehensive initialization');
-  // Run functions in sequence with proper error handling
-  setupSecurityUtils()
+  
+  // Immediately set up critical wallet data
+  setupDefaultWalletData()
+    .then(() => {
+      // Update UI with what we have
+      if (window.updateWalletUI) {
+        window.updateWalletUI(window.activeWallet || 'main');
+      }
+      
+      // Continue with the rest of initialization
+      return setupSecurityUtils();
+    })
     .then(() => setupFormatUtils())
     .then(() => ensureScreenContainers())
     .then(() => loadScreenContents())
-    .then(() => setupDefaultWalletData())
     .then(() => setupStateManager())
     .then(() => setupScreenManager())
     .then(() => setupUIManager())
@@ -93,6 +102,9 @@ function init() {
     .catch(error => {
       console.error('TrustWallet: Error during initialization', error);
       // Continue with available functionality
+      if (window.updateWalletUI) {
+        window.updateWalletUI(window.activeWallet || 'main');
+      }
       finalCleanup();
     });
 }
@@ -781,13 +793,17 @@ function setupDefaultWalletData() {
       window.currentWalletData = JSON.parse(JSON.stringify(window.walletData));
     }
     
-    // Ensure token list is populated
-    // Move this inside the Promise chain to guarantee data is set
-    requestAnimationFrame(() => {
-      if (window.populateMainWalletTokenList) {
+    // Set active wallet if not already set
+    window.activeWallet = window.activeWallet || 'main';
+    
+    // Populate token list immediately
+    try {
+      if (typeof window.populateMainWalletTokenList === 'function') {
         window.populateMainWalletTokenList();
       }
-    });
+    } catch (e) {
+      console.error('Error in initial token list population:', e);
+    }
     
     resolve();
   });
@@ -796,70 +812,100 @@ function setupDefaultWalletData() {
 // Token list population function
 function populateMainWalletTokenList() {
   const tokenList = document.getElementById('token-list');
-  if (!tokenList) return;
+  if (!tokenList) {
+    console.error('Token list element not found');
+    return;
+  }
   
   // Clear list
   tokenList.innerHTML = '';
   
-  // Get active wallet data
+  // Get active wallet data with better fallback
   const activeWallet = window.activeWallet || 'main';
   const wallet = window.currentWalletData && window.currentWalletData[activeWallet];
   
   if (!wallet || !wallet.tokens || !wallet.tokens.length) {
     console.error('No tokens available for main wallet display');
+    
+    // Add placeholder tokens
+    tokenList.innerHTML = `
+      <div class="token-item">
+        <div class="token-icon">
+          <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Bitcoin">
+        </div>
+        <div class="token-info">
+          <div class="token-name">BTC</div>
+          <div class="token-price">
+            Bitcoin
+            <span class="token-price-change positive">+0.32%</span>
+          </div>
+        </div>
+        <div class="token-amount">
+          <div class="token-balance">0.00 BTC</div>
+          <div class="token-value">$0.00</div>
+        </div>
+      </div>
+    `;
     return;
   }
   
   // Create token items
   wallet.tokens.forEach(token => {
-    const tokenItem = document.createElement('div');
-    tokenItem.className = 'token-item';
-    tokenItem.setAttribute('data-token-id', token.id);
-    
-    // Format numbers for display
-    const formattedAmount = token.amount.toLocaleString(undefined, {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 6
-    });
-    
-    const formattedValue = window.FormatUtils.formatCurrency(token.value);
-    
-    // Show network badge for specific tokens
-    const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
-    const networkBadge = showBadge ? 
-      `<div class="chain-badge"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain"></div>` : '';
-    
-    tokenItem.innerHTML = `
-      <div class="token-icon">
-        <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
-        ${networkBadge}
-      </div>
-      <div class="token-info">
-        <div class="token-name">${token.symbol}</div>
-        <div class="token-price">
-          ${token.name}
-          <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">
-            ${token.change >= 0 ? '+' : ''}${token.change}%
-          </span>
+    try {
+      const tokenItem = document.createElement('div');
+      tokenItem.className = 'token-item';
+      tokenItem.setAttribute('data-token-id', token.id);
+      
+      // Format numbers for display
+      const formattedAmount = token.amount.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+      });
+      
+      const formattedValue = window.FormatUtils && typeof window.FormatUtils.formatCurrency === 'function' ?
+        window.FormatUtils.formatCurrency(token.value) : 
+        '$' + token.value.toFixed(2);
+      
+      // Show network badge for specific tokens
+      const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+      const networkBadge = showBadge ? 
+        `<div class="chain-badge"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain"></div>` : '';
+      
+      tokenItem.innerHTML = `
+        <div class="token-icon">
+          <img src="${window.getTokenLogoUrl ? window.getTokenLogoUrl(token.id) : token.icon}" alt="${token.name}">
+          ${networkBadge}
         </div>
-      </div>
-      <div class="token-amount">
-        <div class="token-balance">${formattedAmount} ${token.symbol}</div>
-        <div class="token-value">${formattedValue}</div>
-      </div>
-    `;
-    
-    // Add click handler
-    tokenItem.addEventListener('click', function() {
-      if (typeof window.showTokenDetail === 'function') {
-        window.showTokenDetail(token.id);
-      }
-    });
-    
-    tokenList.appendChild(tokenItem);
+        <div class="token-info">
+          <div class="token-name">${token.symbol}</div>
+          <div class="token-price">
+            ${token.name}
+            <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">
+              ${token.change >= 0 ? '+' : ''}${token.change}%
+            </span>
+          </div>
+        </div>
+        <div class="token-amount">
+          <div class="token-balance">${formattedAmount} ${token.symbol}</div>
+          <div class="token-value">${formattedValue}</div>
+        </div>
+      `;
+      
+      // Add click handler
+      tokenItem.addEventListener('click', function() {
+        if (typeof window.showTokenDetail === 'function') {
+          window.showTokenDetail(token.id);
+        } else {
+          console.log('Token clicked:', token.id);
+        }
+      });
+      
+      tokenList.appendChild(tokenItem);
+    } catch (error) {
+      console.error('Error creating token item:', error);
+    }
   });
 }
-
 // =================================================================
 // PART 3: STATE MANAGEMENT & APP COMPONENTS
 // =================================================================
@@ -4697,4 +4743,43 @@ function finalCleanup() {
     // Transaction handling
     processTransaction: window.processTransaction
   };
+
+  // Add this to combined1.js, perhaps near the end before the final closing brackets
+window.setupDemoBalance = function() {
+  console.log('Demo balance setup called');
+  
+  // Make sure data exists
+  if (!window.walletData) {
+    setupDefaultWalletData();
+  }
+  
+  // Ensure currentWalletData exists
+  if (!window.currentWalletData) {
+    window.currentWalletData = JSON.parse(JSON.stringify(window.walletData || {}));
+  }
+  
+  // Get active wallet
+  const activeWallet = window.activeWallet || 'main';
+  
+  // Update UI
+  if (typeof window.updateWalletUI === 'function') {
+    window.updateWalletUI(activeWallet);
+  }
+  
+  // Simple balance update as fallback
+  const totalBalance = document.getElementById('total-balance');
+  if (totalBalance && window.currentWalletData && window.currentWalletData[activeWallet]) {
+    totalBalance.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2);
+    
+    // Force token list population
+    if (typeof window.populateMainWalletTokenList === 'function') {
+      setTimeout(window.populateMainWalletTokenList, 100);
+    }
+    
+    return true;
+  } else {
+    console.error('Elements not available for demo balance');
+    return false;
+  }
+};
 })();
