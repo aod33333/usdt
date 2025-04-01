@@ -4739,20 +4739,14 @@ function connectEventHandlers() {
   }
 };
 
-// Add error handling for initialization
 try {
-  // Log completion with debug check
-  if (CONFIG.debug) {
-    console.info('TrustWallet global object initialized with debug mode');
-    console.table(CONFIG);
-  } else {
-    console.log('TrustWallet global object initialized');
+    if (CONFIG.debug) {
+      console.info('TrustWallet initialized with debug mode');
+      console.table(CONFIG);
+    } else {
+      console.log('TrustWallet initialized');
+    }
+  } catch (error) {
+    console.error('Initialization error:', error);
   }
-} catch (error) {
-  console.error('Initialization error:', error);
-}
-
-// Proper IIFE closure
-})().catch(error => {
-  console.error('Unhandled initialization error:', error);
-});
+}()); // <-- CORRECT IIFE CLOSURE: "}());"
