@@ -52,16 +52,19 @@ if (document.readyState === 'loading') {
   setTimeout(init, CONFIG.initDelay);
 }
 
-// Main initialization function
 function init() {
   console.log('TrustWallet: Starting comprehensive initialization');
   
-  // Immediately set up critical wallet data
   setupDefaultWalletData()
     .then(() => {
       // Update UI with what we have
       if (window.updateWalletUI) {
         window.updateWalletUI(window.activeWallet || 'main');
+      }
+      
+      // Immediately populate token list
+      if (typeof window.populateMainWalletTokenList === 'function') {
+        window.populateMainWalletTokenList();
       }
       
       // Continue with the rest of initialization
@@ -2456,7 +2459,6 @@ function setupTokenSelectionManager() {
   });
 }
 
-// Setup Receive Token Manager
 function setupReceiveTokenManager() {
   return new Promise(resolve => {
     log('Setting up receive token manager');
@@ -5068,62 +5070,53 @@ function enhanceHistoryScreen() {
 }
 
 function populateHistoryTransactionList() {
-  const transactionList = document.getElementById('history-transaction-list');
-  if (!transactionList) return;
+  console.log('Populating History Transaction List for wallet:', window.activeWallet);
   
-  // Clear list
+  const transactionList = document.getElementById('history-transaction-list');
+  if (!transactionList) {
+    console.warn('History transaction list container not found. Creating container.');
+    
+    const historyScreen = document.getElementById('history-screen');
+    if (historyScreen) {
+      const newTransactionList = document.createElement('div');
+      newTransactionList.id = 'history-transaction-list';
+      newTransactionList.className = 'transaction-list';
+      historyScreen.appendChild(newTransactionList);
+    }
+    return;
+  }
+  
+  // Clear existing list
   transactionList.innerHTML = '';
   
   // Get active wallet
   const activeWallet = window.activeWallet || 'main';
   
-  // Gather all transactions from all tokens
-  let allTransactions = [];
+  // Gather transactions from all tokens
+  const allTransactions = [];
   
+  // Check if transactions exist
   if (window.currentTransactions && window.currentTransactions[activeWallet]) {
     const tokenTransactions = window.currentTransactions[activeWallet];
     
-    // Iterate through each token's transactions
     Object.keys(tokenTransactions).forEach(tokenId => {
       if (Array.isArray(tokenTransactions[tokenId])) {
-        // Get token info for display
         const token = window.currentWalletData?.[activeWallet]?.tokens?.find(t => t.id === tokenId);
+        
         if (token) {
-          // Add token info to each transaction
           const txWithToken = tokenTransactions[tokenId].map(tx => ({
             ...tx,
             tokenIcon: window.getTokenLogoUrl ? window.getTokenLogoUrl(tokenId) : token.icon,
             tokenName: token.name
           }));
-          allTransactions = allTransactions.concat(txWithToken);
+          
+          allTransactions.push(...txWithToken);
         }
       }
     });
   }
   
-  // If no transactions, create some demo ones
-  if (allTransactions.length === 0) {
-    createSampleTransactions(activeWallet);
-    
-    // Try to get transactions again
-    if (window.currentTransactions && window.currentTransactions[activeWallet]) {
-      Object.keys(window.currentTransactions[activeWallet]).forEach(tokenId => {
-        if (Array.isArray(window.currentTransactions[activeWallet][tokenId])) {
-          const token = window.currentWalletData?.[activeWallet]?.tokens?.find(t => t.id === tokenId);
-          if (token) {
-            const txWithToken = window.currentTransactions[activeWallet][tokenId].map(tx => ({
-              ...tx,
-              tokenIcon: window.getTokenLogoUrl ? window.getTokenLogoUrl(tokenId) : token.icon,
-              tokenName: token.name
-            }));
-            allTransactions = allTransactions.concat(txWithToken);
-          }
-        }
-      });
-    }
-  }
-  
-  // If still no transactions, show empty state
+  // If no transactions, show empty state
   if (allTransactions.length === 0) {
     transactionList.innerHTML = `
       <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
@@ -5134,11 +5127,7 @@ function populateHistoryTransactionList() {
   }
   
   // Sort transactions by date (newest first)
-  allTransactions.sort((a, b) => {
-    const dateA = new Date(a.date);
-    const dateB = new Date(b.date);
-    return dateB - dateA;
-  });
+  allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
   
   // Add transactions to list
   allTransactions.forEach(tx => {
@@ -5161,9 +5150,13 @@ function populateHistoryTransactionList() {
       </div>
     `;
     
-    // Add click handler to show transaction details
-    txItem.addEventListener('click', function() {
-      showTransactionDetails(tx);
+    // Add click handler for transaction details
+    txItem.addEventListener('click', () => {
+      if (typeof showTransactionDetails === 'function') {
+        showTransactionDetails(tx);
+      } else {
+        console.warn('showTransactionDetails function not found');
+      }
     });
     
     transactionList.appendChild(txItem);
