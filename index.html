@@ -486,6 +486,24 @@
     window.activeWallet = 'main';
     window.correctPasscode = '123456';
     window.passcodeEntered = '';
+
+    // Setup demo balance function
+    window.setupDemoBalance = function() {
+      console.log('Demo balance setup called');
+      
+      // Get active wallet
+      const activeWallet = window.activeWallet || 'main';
+      
+      // Simple balance update
+      const totalBalance = document.getElementById('total-balance');
+      if (totalBalance && window.currentWalletData && window.currentWalletData[activeWallet]) {
+        totalBalance.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2);
+        return true;
+      } else {
+        console.error('Elements not available for demo balance');
+        return false;
+      }
+    };
 </script>
 
 <!-- Load combined1.js - this should be the only script besides our minimal initialization -->
