@@ -4669,7 +4669,7 @@ function connectEventHandlers() {
 }); // Add this line to close the Promise
 } // Add this line to close the finalCleanup function
   
- (function() {
+(function() {
   'use strict';
   
   // =================================================================
@@ -4678,13 +4678,13 @@ function connectEventHandlers() {
   
   // Export public API
   window.TrustWallet = {
-    // Core functions
+    // Core functions 
     init: window.init,
     navigateTo: window.navigateTo,
     showToast: window.showToast,
     
     // State management
-    updateWalletUI: window.updateWalletUI,
+    updateWalletUI: window.updateWalletUI,  
     setupDemoBalance: window.setupDemoBalance,
     
     // Screen functions
@@ -4696,13 +4696,13 @@ function connectEventHandlers() {
     showAdminPanel: window.showAdminPanel,
     startVerification: window.startVerification,
     
-    // Transaction handling
+    // Transaction handling  
     processTransaction: window.processTransaction
   }; // <-- Properly close the object literal
 
-(function() { // Inner IIFE
+  (function() { // Inner IIFE
     'use strict';
     window.TrustWallet = { /* ... */ };
   })(); // Closes inner IIFE
 
-})(); // Closes MAIN IIFE <-- THIS WAS MISSING
+})(); // Closes MAIN IIFE - This was missing
