@@ -4674,8 +4674,9 @@ function connectEventHandlers() {
 }); // Add this line to close the Promise
 } // Add this line to close the finalCleanup function
   
-  (function() {
+ (function() {
   'use strict';
+  
   // =================================================================
   // STARTUP: AUTO-INITIALIZATION
   // =================================================================
@@ -4683,25 +4684,26 @@ function connectEventHandlers() {
   // Export public API
   window.TrustWallet = {
     // Core functions
-    init: window.init, // Assuming init is defined elsewhere
-    navigateTo: window.navigateTo, // Assuming navigateTo is defined elsewhere
-    showToast: window.showToast, // Assuming showToast is defined elsewhere
+    init: window.init,
+    navigateTo: window.navigateTo, 
+    showToast: window.showToast,
     
     // State management
-    updateWalletUI: window.updateWalletUI, // Assuming updateWalletUI is defined elsewhere
-    setupDemoBalance: window.setupDemoBalance, // Assuming setupDemoBalance is defined elsewhere
+    updateWalletUI: window.updateWalletUI,
+    setupDemoBalance: window.setupDemoBalance,
     
     // Screen functions
-    showTokenDetail: window.showTokenDetail, // Assuming showTokenDetail is defined elsewhere
-    showSendScreen: window.showSendScreen, // Assuming showSendScreen is defined elsewhere
-    showReceiveScreen: window.showReceiveScreen, // Assuming showReceiveScreen is defined elsewhere
+    showTokenDetail: window.showTokenDetail,
+    showSendScreen: window.showSendScreen,
+    showReceiveScreen: window.showReceiveScreen,
     
     // Admin panel
-    showAdminPanel: window.showAdminPanel, // Assuming showAdminPanel is defined elsewhere
-    startVerification: window.startVerification, // Assuming startVerification is defined elsewhere
+    showAdminPanel: window.showAdminPanel,
+    startVerification: window.startVerification,
     
     // Transaction handling
-    processTransaction: window.processTransaction, // Assuming processTransaction is defined elsewhere
-  };
-}()); // End of the IIFE
+    processTransaction: window.processTransaction,
+  }; // ← Properly close the object literal
+
+})(); // ← Correctly closes the outer IIFE
 // End of file
