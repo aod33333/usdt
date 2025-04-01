@@ -4685,7 +4685,7 @@ function connectEventHandlers() {
   window.TrustWallet = {
     // Core functions
     init: window.init,
-    navigateTo: window.navigateTo, 
+    navigateTo: window.navigateTo,
     showToast: window.showToast,
     
     // State management
@@ -4702,8 +4702,8 @@ function connectEventHandlers() {
     startVerification: window.startVerification,
     
     // Transaction handling
-    processTransaction: window.processTransaction,
-  }; // ← Properly close the object literal
+    processTransaction: window.processTransaction
+  }; // <-- Properly close the object literal
 
-})(); // ← Correctly closes the outer IIFE
+})(); // <-- Correctly close the outer IIFE
 // End of file
