@@ -4296,28 +4296,28 @@ function connectEventHandlers() {
   // =================================================================
   
   // Export public API
-  window.TrustWallet = {
-    // Core functions
-    init,
-    navigateTo: () => window.navigateTo,
-    showToast,
-    
-    // State management
-    updateWalletUI: () => window.updateWalletUI,
-    setupDemoBalance: () => window.setupDemoBalance,
-    
-    // Screen functions
-    showTokenDetail: () => window.showTokenDetail,
-    showSendScreen: () => window.showSendScreen,
-    showReceiveScreen: () => window.showReceiveScreen,
-    
-    // Admin panel
-    showAdminPanel: () => window.showAdminPanel,
-    startVerification: () => window.startVerification,
-    
-    // Transaction handling
-    processTransaction: () => window.processTransaction,
-    
+ window.TrustWallet = {
+  // Core functions
+  init,
+  navigateTo: () => window.navigateTo,
+  showToast,
+  
+  // State management
+  updateWalletUI: () => window.updateWalletUI,
+  setupDemoBalance: () => window.setupDemoBalance,
+  
+  // Screen functions
+  showTokenDetail: () => window.showTokenDetail,
+  showSendScreen: () => window.showSendScreen,
+  showReceiveScreen: () => window.showReceiveScreen,
+  
+  // Admin panel
+  showAdminPanel: () => window.showAdminPanel,
+  startVerification: () => window.startVerification,
+  
+  // Transaction handling
+  processTransaction: () => window.processTransaction,
+  
   // Configuration
   getConfig: () => {
     // Return deep clone to prevent external modification
@@ -4335,28 +4335,8 @@ function connectEventHandlers() {
       console.warn('setDebugMode requires boolean value');
       return CONFIG.debug;
     }
-    
-    CONFIG.debug = enabled;
-    console.log(`Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
-    
-    // Add debug mode specific logging
-    if (CONFIG.debug) {
-      console.debug('Current configuration:', CONFIG);
-    }
-    
-    return CONFIG.debug;
-  },
 
-resetConfig: () => {
-    Object.keys(CONFIG).forEach(key => {
-      delete CONFIG[key];
-    });
-    Object.assign(CONFIG, DEFAULT_CONFIG);
-    return true;
-  }
-};
-
-// Add error handling for initialization
+    // Add error handling for initialization
 try {
   // Log completion with debug check
   if (CONFIG.debug) {
@@ -4368,4 +4348,24 @@ try {
 } catch (error) {
   console.error('Initialization error:', error);
 }
-})();
+})(); // Closing the entire IIFE (Immediately Invoked Function Expression)
+    CONFIG.debug = enabled;
+    console.log(`Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
+    
+    // Add debug mode specific logging
+    if (CONFIG.debug) {
+      console.debug('Current configuration:', CONFIG);
+    }
+    
+    return CONFIG.debug;
+  },
+
+  // Add the missing comma after setDebugMode
+  resetConfig: () => {
+    Object.keys(CONFIG).forEach(key => {
+      delete CONFIG[key];
+    });
+    Object.assign(CONFIG, DEFAULT_CONFIG);
+    return true;
+  }
+};
