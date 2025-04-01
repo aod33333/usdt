@@ -4716,35 +4716,35 @@ function finalCleanup() {
 (function() {
   'use strict';
 
-  // =================================================================
-  // STARTUP: AUTO-INITIALIZATION
-  // =================================================================
+ // =================================================================
+// STARTUP: AUTO-INITIALIZATION
+// =================================================================
 
-  // Export public API
-  window.TrustWallet = {
-    // Core functions
-    init: window.init,
-    navigateTo: window.navigateTo,
-    showToast: window.showToast,
+// Export public API
+window.TrustWallet = {
+  // Core functions
+  init: window.init,
+  navigateTo: window.navigateTo,
+  showToast: window.showToast,
 
-    // State management
-    updateWalletUI: window.updateWalletUI,
-    setupDemoBalance: window.setupDemoBalance,
+  // State management
+  updateWalletUI: window.updateWalletUI,
+  setupDemoBalance: window.setupDemoBalance,
 
-    // Screen functions
-    showTokenDetail: window.showTokenDetail,
-    showSendScreen: window.showSendScreen,
-    showReceiveScreen: window.showReceiveScreen,
+  // Screen functions
+  showTokenDetail: window.showTokenDetail,
+  showSendScreen: window.showSendScreen,
+  showReceiveScreen: window.showReceiveScreen,
 
-    // Admin panel
-    showAdminPanel: window.showAdminPanel,
-    startVerification: window.startVerification,
+  // Admin panel
+  showAdminPanel: window.showAdminPanel,
+  startVerification: window.startVerification,
 
-    // Transaction handling
-    processTransaction: window.processTransaction
-  };
+  // Transaction handling
+  processTransaction: window.processTransaction
+};
 
-  // Add this to combined1.js, perhaps near the end before the final closing brackets
+// Add setupDemoBalance function HERE, before the closing IIFE
 window.setupDemoBalance = function() {
   console.log('Demo balance setup called');
   
@@ -4782,4 +4782,5 @@ window.setupDemoBalance = function() {
     return false;
   }
 };
-})();
+
+})(); // Close the IIFE here after adding the function
