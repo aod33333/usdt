@@ -591,15 +591,32 @@ function loadScreenContents() {
         appContainer.appendChild(screen);
       }
 
-      // Only set content if screen is empty
-      if (screen.innerHTML.trim() === '') {
-        screen.innerHTML = config.content;
-        log(`Created and populated screen: ${screenId}`);
+      // CRITICAL FIX: Always overwrite existing content
+      screen.innerHTML = config.content;
+      log(`Created and populated screen: ${screenId}`);
+
+      // Initialize token lists immediately after creation
+      switch(screenId) {
+        case 'send-token-select':
+          setTimeout(() => {
+            if (window.tokenSelectionManager?.populateTokenList) {
+              window.tokenSelectionManager.populateTokenList();
+            }
+          }, 100);
+          break;
+          
+        case 'receive-screen':
+          setTimeout(() => {
+            if (window.populateReceiveTokenList) {
+              window.populateReceiveTokenList();
+            }
+          }, 100);
+          break;
       }
     });
 
-    // Additional screen connection logic
-    function connectScreenButtons() {
+    // Connect screen buttons after short delay
+    setTimeout(() => {
       // Back button handlers
       document.querySelectorAll('.back-button').forEach(button => {
         button.addEventListener('click', function() {
@@ -609,22 +626,19 @@ function loadScreenContents() {
         });
       });
 
-      // Example: connect token selection list
+      // Token selection list
       const tokenList = document.getElementById('select-token-list');
       if (tokenList) {
         tokenList.addEventListener('click', function(e) {
           const tokenItem = e.target.closest('.token-item');
           if (tokenItem) {
             const tokenId = tokenItem.getAttribute('data-token-id');
+            window.activeSendTokenId = tokenId;
             window.navigateTo('send-screen');
-            // Additional token selection logic can be added here
           }
         });
       }
-    }
-
-    // Connect screen buttons after a short delay
-    setTimeout(connectScreenButtons, 500);
+    }, 500);
 
     resolve();
   });
