@@ -2212,3 +2212,7 @@ img[src*="bnb-bnb-logo"] {
     border: 1px solid #3375BB !important;
     background-color: rgba(51, 117, 187, 0.1) !important;
 }
+
+.with-status-bar {
+    padding-top: 10px;
+}
