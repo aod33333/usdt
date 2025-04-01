@@ -4705,6 +4705,9 @@ function connectEventHandlers() {
     processTransaction: window.processTransaction
   }; // <-- Properly close the object literal
 
-  })(); // <-- Close the outer IIFE
-})(); // <-- Add this line to close the main IIFE
-// End of file
+(function() { // Inner IIFE
+    'use strict';
+    window.TrustWallet = { /* ... */ };
+  })(); // Closes inner IIFE
+
+})(); // Closes MAIN IIFE <-- THIS WAS MISSING
