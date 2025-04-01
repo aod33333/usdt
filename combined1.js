@@ -4347,8 +4347,7 @@ function connectEventHandlers() {
     return CONFIG.debug;
   },
 
-  // New: Add configuration reset method
-  resetConfig: () => {
+resetConfig: () => {
     Object.keys(CONFIG).forEach(key => {
       delete CONFIG[key];
     });
@@ -4369,5 +4368,4 @@ try {
 } catch (error) {
   console.error('Initialization error:', error);
 }
-
 })();
