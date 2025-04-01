@@ -61,8 +61,7 @@
  // Main initialization function
 function init() {
   console.log('TrustWallet: Starting comprehensive initialization');
-  
-  // Run functions in sequence with proper error handling
+     // Run functions in sequence with proper error handling
   setupSecurityUtils()
     .then(() => setupFormatUtils())
     .then(() => ensureScreenContainers())
@@ -75,6 +74,7 @@ function init() {
     .then(() => setupAuthManager())
     .then(() => setupTransactionManager())
     .then(() => setupTokenSelectionManager())
+    .then(() => setupReceiveTokenManager())
     .then(() => setupHistoryManager())
     .then(() => setupAdminPanelManager())
     .then(() => setupVerificationManager())
@@ -2849,10 +2849,6 @@ function setupReceiveTokenManager() {
     resolve();
   });
 }
-
-// Make sure to call this setup function in your init sequence
-// Add it in the Promise chain in the init function
-.then(() => setupReceiveTokenManager())
   
   // =================================================================
   // PART 5: ADMIN PANEL & VERIFICATION FUNCTIONALITY
