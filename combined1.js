@@ -4289,7 +4289,23 @@ function connectEventHandlers() {
           };
         }
       }
-      
+
+        // Fix explorer overlay
+  const explorerOverlay = document.getElementById('explorer-overlay');
+  if (explorerOverlay) {
+    explorerOverlay.style.zIndex = '9999';
+    
+    const backButton = explorerOverlay.querySelector('.explorer-back-button');
+    if (backButton) {
+      backButton.onclick = function() {
+        explorerOverlay.style.display = 'none';
+      };
+    }
+  }
+  
+  resolve(); // Add this line to close the Promise resolver
+}); // Add this line to close the Promise
+} // Add this line to close the finalCleanup function
   
   // =================================================================
   // STARTUP: AUTO-INITIALIZATION
