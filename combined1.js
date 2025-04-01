@@ -4730,6 +4730,11 @@ function connectEventHandlers() {
     return CONFIG.debug;
   },
 
+const myConfigObject = { // Assign the object to a variable
+  setDebugMode: (enabled) => {
+    // ... (your setDebugMode code)
+  },
+
   resetConfig: () => {
     Object.keys(CONFIG).forEach(key => {
       delete CONFIG[key];
@@ -4737,9 +4742,12 @@ function connectEventHandlers() {
     Object.assign(CONFIG, DEFAULT_CONFIG);
     return true;
   },
-};
+}; // <-- Object literal is now correctly terminated
 
-try {
+// Now, the try...catch and IIFE are outside the object
+(function() {
+  // Assuming CONFIG is defined elsewhere and is accessible here
+  try {
     if (CONFIG.debug) {
       console.info('TrustWallet initialized with debug mode');
       console.table(CONFIG);
@@ -4749,4 +4757,4 @@ try {
   } catch (error) {
     console.error('Initialization error:', error);
   }
-}()); // <-- CORRECT IIFE CLOSURE: "}());"
+}());
