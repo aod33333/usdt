@@ -4711,8 +4711,6 @@ function connectEventHandlers() {
       return {...CONFIG};
     }
   },
-  
-const CONFIG = { debug: false }; // Declaration of CONFIG (moved to the top)
 
 console.log(CONFIG); // Now this works!
 
