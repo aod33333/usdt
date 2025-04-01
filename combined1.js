@@ -2591,7 +2591,7 @@ window.FormatUtils = window.FormatUtils || {
 // Initialize after screenManager is available
 window.tokenSelectionManager = new TokenSelectionManager(window.screenManager);
 window.tokenSelectionManager.populateTokenList();
-
+}
     
   // Add this function near your setupTokenSelectionManager function:
 function setupReceiveTokenManager() {
