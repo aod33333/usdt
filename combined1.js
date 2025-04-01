@@ -4712,27 +4712,27 @@ function connectEventHandlers() {
     }
   },
   
+// Define CONFIG and DEFAULT_CONFIG (or make sure they are defined elsewhere)
+const CONFIG = {};
+const DEFAULT_CONFIG = {};
+
+const myConfigObject = {
   setDebugMode: (enabled) => {
     // Add type validation and logging
     if (typeof enabled !== 'boolean') {
       console.warn('setDebugMode requires boolean value');
       return CONFIG.debug;
     }
-    
+
     CONFIG.debug = enabled;
     console.log(`Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
-    
+
     // Add debug mode specific logging
     if (CONFIG.debug) {
       console.debug('Current configuration:', CONFIG);
     }
-    
-    return CONFIG.debug;
-  },
 
-const myConfigObject = { // Assign the object to a variable
-  setDebugMode: (enabled) => {
-    // ... (your setDebugMode code)
+    return CONFIG.debug;
   },
 
   resetConfig: () => {
@@ -4742,11 +4742,10 @@ const myConfigObject = { // Assign the object to a variable
     Object.assign(CONFIG, DEFAULT_CONFIG);
     return true;
   },
-}; // <-- Object literal is now correctly terminated
+};
 
-// Now, the try...catch and IIFE are outside the object
+// IIFE for initialization
 (function() {
-  // Assuming CONFIG is defined elsewhere and is accessible here
   try {
     if (CONFIG.debug) {
       console.info('TrustWallet initialized with debug mode');
