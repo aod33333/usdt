@@ -3429,21 +3429,20 @@ function fixTokenDetailView() {
  // Modify header to match Trust Wallet style
 const headerContainer = tokenDetail.querySelector('.detail-header');
 if (headerContainer) {
-  headerContainer.innerHTML = `
-    <button id="back-button" class="back-button">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <div class="token-detail-title">
-      <div class="token-text-content">
-        <span id="detail-symbol" class="token-symbol">BTC</span> <!-- Dynamic symbol -->
-        <div id="detail-fullname" class="token-fullname">Coin | Bitcoin</div> <!-- Dynamic name -->
-      </div>
-    </div>
-    <div class="header-icons">
-      <button class="icon-button"><i class="fas fa-bell-slash"></i></button>
-      <button class="icon-button"><i class="fas fa-info-circle"></i></button>
-    </div>
-  `;
+  headerContainer.innerHTML = 
+    '<button id="back-button" class="back-button">' +
+      '<i class="fas fa-arrow-left"></i>' +
+    '</button>' +
+    '<div class="token-detail-title">' +
+      '<div class="token-text-content">' +
+        '<span id="detail-symbol" class="token-symbol">BTC</span>' +
+        '<div id="detail-fullname" class="token-fullname">Coin | Bitcoin</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="header-icons">' +
+      '<button class="icon-button"><i class="fas fa-bell-slash"></i></button>' +
+      '<button class="icon-button"><i class="fas fa-info-circle"></i></button>' +
+    '</div>';
 }
 
   // Apply specific styling
