@@ -5411,32 +5411,32 @@ window.setupDemoBalance = function() {
           chainBadge: null
         },
         {
-          id: 'sol',
-          name: 'Solana',
-          symbol: 'SOL',
-          network: 'Solana',
-          icon: 'https://cryptologos.cc/logos/solana-sol-logo.png',
-          amount: 15,
-          value: 2250.75,
-          price: 150.05,
-          change: 2.15,
-          chainBadge: null     
-          },
-           
-         id: 'xrp,
-         name: 'XRP',
-         symbol: 'XRP',
-         network: 'XRP Ledger',
-         icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
-         amount: 500,
-         value: 267.50,
-         price: 0.535,
-         change: 1.25,
-         chainBadge: null
-        }
-      ]
-    }
-  };
+         id: 'sol',
+        name: 'Solana',
+        symbol: 'SOL',
+        network: 'Solana',
+        icon: 'https://cryptologos.cc/logos/solana-sol-logo.png',
+        amount: 15,
+        value: 2250.75,
+        price: 150.05,
+        change: 2.15,
+        chainBadge: null
+      },
+      {
+        id: 'xrp',
+        name: 'XRP',
+        symbol: 'XRP',
+        network: 'XRP Ledger',
+        icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+        amount: 500,
+        value: 267.50,
+        price: 0.535,
+        change: 1.25,
+        chainBadge: null
+      }
+    ]
+  }
+};
 
   // Set reference values directly
   window.originalWalletData = Object.assign({}, window.walletData);
