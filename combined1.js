@@ -808,7 +808,155 @@ function setupDefaultWalletData() {
     
     // Initialize default wallet data if not present
     if (!window.walletData) {
-      window.walletData = { /* your existing wallet data */ };
+      window.walletData = {
+        main: {
+          totalBalance: 250000,
+          tokens: [
+            {
+              id: 'btc',
+              name: 'Bitcoin',
+              symbol: 'BTC',
+              network: 'Bitcoin',
+              icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+              amount: 1.5,
+              value: 125976.11,
+              price: 83984.74,
+              change: -0.59,
+              chainBadge: null
+            },
+            {
+              id: 'eth',
+              name: 'Ethereum',
+              symbol: 'ETH',
+              network: 'Ethereum',
+              icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+              amount: 10,
+              value: 19738.10,
+              price: 1973.81,
+              change: -0.71,
+              chainBadge: null
+            },
+            {
+              id: 'usdt',
+              name: 'Tether',
+              symbol: 'USDT',
+              network: 'BNB Smart Chain',
+              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              amount: 50000,
+              value: 50000,
+              price: 1.00,
+              change: 0.00,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+              id: 'bnb',
+              name: 'Binance Coin',
+              symbol: 'BNB',
+              network: 'BNB Smart Chain',
+              icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+              amount: 25,
+              value: 7500.75,
+              price: 300.03,
+              change: 1.25,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+              id: 'trx',
+              name: 'Tron',
+              symbol: 'TRX',
+              network: 'Tron Network',
+              icon: 'https://cryptologos.cc/logos/tron-trx-logo.png',
+              amount: 5000,
+              value: 375.50,
+              price: 0.075,
+              change: -0.35,
+              chainBadge: null
+            },
+            {
+              id: 'twt',
+              name: 'Trust Wallet Token',
+              symbol: 'TWT',
+              network: 'BNB Smart Chain',
+              icon: 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png',
+              amount: 250,
+              value: 750.25,
+              price: 3.00,
+              change: 0.50,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+              id: 'sol',
+              name: 'Solana',
+              symbol: 'SOL',
+              network: 'Solana',
+              icon: 'https://cryptologos.cc/logos/solana-sol-logo.png',
+              amount: 15,
+              value: 2250.75,
+              price: 150.05,
+              change: 2.15,
+              chainBadge: null
+            }
+          ]
+        },
+        secondary: {
+          totalBalance: 75000,
+          tokens: [
+            {
+              id: 'usdt',
+              name: 'Tether',
+              symbol: 'USDT',
+              network: 'Polygon',
+              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              amount: 25000,
+              value: 25000,
+              price: 1.00,
+              change: 0.00,
+              chainBadge: 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+            },
+            {
+              id: 'matic',
+              name: 'Polygon',
+              symbol: 'MATIC',
+              network: 'Polygon',
+              icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+              amount: 500,
+              value: 750.25,
+              price: 1.50,
+              change: 1.25,
+              chainBadge: 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+            }
+          ]
+        },
+        business: {
+          totalBalance: 100000,
+          tokens: [
+            {
+              id: 'usdt',
+              name: 'Tether',
+              symbol: 'USDT',
+              network: 'Ethereum',
+              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              amount: 75000,
+              value: 75000,
+              price: 1.00,
+              change: 0.00,
+              chainBadge: 'https://cryptologos.cc/logos/ethereum-eth-logo.png'
+            },
+            {
+              id: 'eth',
+              name: 'Ethereum',
+              symbol: 'ETH',
+              network: 'Ethereum',
+              icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+              amount: 5,
+              value: 9869.05,
+              price: 1973.81,
+              change: -0.71,
+              chainBadge: null
+            }
+          ]
+        }
+      };
     }
     
     // Initialize wallet state
@@ -832,38 +980,25 @@ function setupDefaultWalletData() {
   });
 }
 
-// Global function to populate token list
-window.populateMainWalletTokenList = function() {
+// Token list population function
+function populateMainWalletTokenList() {
   const tokenList = document.getElementById('token-list');
   if (!tokenList) return;
   
-  // Clear existing items
+  // Clear list
   tokenList.innerHTML = '';
   
-  // Get tokens from active wallet
+  // Get active wallet data
   const activeWallet = window.activeWallet || 'main';
+  const wallet = window.currentWalletData && window.currentWalletData[activeWallet];
   
-  // Try multiple data sources
-  let wallet = null;
-  if (window.currentWalletData && window.currentWalletData[activeWallet]) {
-    wallet = window.currentWalletData[activeWallet];
-  } else if (window.walletData && window.walletData[activeWallet]) {
-    wallet = window.walletData[activeWallet];
-    // Ensure consistency
-    if (!window.currentWalletData) window.currentWalletData = {};
-    window.currentWalletData[activeWallet] = JSON.parse(JSON.stringify(wallet));
-  }
-  
-  if (!wallet || !wallet.tokens) {
-    console.error('No tokens found in active wallet');
+  if (!wallet || !wallet.tokens || !wallet.tokens.length) {
+    console.error('No tokens available for main wallet display');
     return;
   }
   
-  // Sort tokens by value (highest first)
-  const sortedTokens = [...wallet.tokens].sort((a, b) => b.value - a.value);
-  
   // Create token items
-  sortedTokens.forEach(token => {
+  wallet.tokens.forEach(token => {
     const tokenItem = document.createElement('div');
     tokenItem.className = 'token-item';
     tokenItem.setAttribute('data-token-id', token.id);
@@ -910,7 +1045,7 @@ window.populateMainWalletTokenList = function() {
     
     tokenList.appendChild(tokenItem);
   });
-};
+}
   
   // =================================================================
   // PART 3: STATE MANAGEMENT & APP COMPONENTS
