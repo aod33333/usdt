@@ -3510,13 +3510,11 @@ function fixTokenDetailView() {
     `;
   }
 } catch (error) {
-  // Handle any errors that occur within the try block
   console.error("An error occurred in token detail modification:", error);
-  // You might want to display an error message to the user, log the error, etc.
 }
-    
-      // Modify investment warning to match screenshot
-      const warningBanner = tokenDetail.querySelector('.investment-warning');
+      
+// Modify investment warning to match screenshot
+const warningBanner = tokenDetail.querySelector('.investment-warning');
       if (warningBanner) {
         warningBanner.innerHTML = `
           <div class="investment-warning-content">
@@ -4342,76 +4340,116 @@ function connectEventHandlers() {
         }
       }
       
-      // Final sanity check for token detail view
-      fixTokenDetailView();
-      
-      // Initialize token selection if needed
-      if (window.tokenSelectionManager) {
-        window.tokenSelectionManager.populateTokenList();
-      }
-      
-      // Make sure bottom tabs are visible (repeated fix)
-      const bottomTabs = document.querySelector('.bottom-tabs');
-      if (bottomTabs) {
-        bottomTabs.style.display = 'flex';
-        bottomTabs.style.position = 'fixed';
-        bottomTabs.style.bottom = '0';
-        bottomTabs.style.width = '100%';
-        bottomTabs.style.zIndex = '9999';
-      }
-      
-      // Set up demo balance function
-      window.setupDemoBalance = function() {
-        try {
-          // Update token balances
-          if (window.currentWalletData && window.currentWalletData.main) {
-            const mainWallet = window.currentWalletData.main;
-            
-            // BTC
-            const btcToken = mainWallet.tokens.find(t => t.id === 'btc');
-            if (btcToken) {
-              btcToken.amount = 10;
-              btcToken.value = btcToken.amount * btcToken.price;
-            }
-            
-            // ETH
-            const ethToken = mainWallet.tokens.find(t => t.id === 'eth');
-            if (ethToken) {
-              ethToken.amount = 100;
-              ethToken.value = ethToken.amount * ethToken.price;
-            }
-            
-            // USDT
-            const usdtToken = mainWallet.tokens.find(t => t.id === 'usdt');
-            if (usdtToken) {
-              usdtToken.amount = 10000;
-              usdtToken.value = usdtToken.amount * usdtToken.price;
-            }
-            
-            // Update total balance
-            mainWallet.totalBalance = mainWallet.tokens.reduce(
-              (total, token) => total + token.value, 0
-            );
-            
-            // Update UI
-            if (typeof window.updateWalletUI === 'function') {
-              window.updateWalletUI(window.activeWallet);
-            }
-            
-            console.log('Demo balance setup complete');
-          }
-        } catch (error) {
-          console.error('Demo balance setup failed:', error);
-        }
-      };
-      
-      // Set global showToast function
-      window.showToast = showToast;
-      
-      log('Initialization completed successfully');
+    function fixTokenDetailView() {
+  return new Promise(resolve => {
+    log('Fixing token detail view');
+    
+    const tokenDetail = document.getElementById('token-detail');
+    if (!tokenDetail) {
       resolve();
-    });
-  }
+      return;
+    }
+    
+    try {
+      // Modify header to match Trust Wallet style
+      const headerContainer = tokenDetail.querySelector('.detail-header');
+      if (headerContainer) {
+        headerContainer.innerHTML = `
+          <button id="back-button" class="back-button"><i class="fas fa-arrow-left"></i></button>
+          <div class="token-detail-title">
+            <div class="token-text-content">
+              <span id="detail-symbol" class="token-symbol">BTC</span>
+              <div id="detail-fullname" class="token-fullname">Coin | Bitcoin</div>
+            </div>
+          </div>
+          <div class="header-icons">
+            <button class="icon-button"><i class="fas fa-bell-slash"></i></button>
+            <button class="icon-button"><i class="fas fa-info-circle"></i></button>
+          </div>
+        `;
+      }
+
+      // Apply specific styling
+      if (headerContainer) {
+        const symbolElement = headerContainer.querySelector('#detail-symbol');
+        const fullnameElement = headerContainer.querySelector('#detail-fullname');
+        
+        if (symbolElement) {
+          symbolElement.style.cssText = `
+            font-size: 24px; 
+            font-weight: 600; 
+            color: #1A2024; 
+            display: block; 
+            margin-bottom: 2px;
+          `;
+        }
+        
+        if (fullnameElement) {
+          fullnameElement.style.cssText = `
+            font-size: 12px; 
+            color: #8A939D; 
+            display: block;
+          `;
+        }
+      }
+      
+      // Remove all unnecessary bottom sections
+      const unnecessarySections = tokenDetail.querySelectorAll('.staking-container, .no-transactions img, .token-price-info');
+      unnecessarySections.forEach(section => {
+        section.style.display = 'none';
+      });
+      
+      // Modify no transactions section
+      const noTransactionsSection = tokenDetail.querySelector('.no-transactions');
+      if (noTransactionsSection) {
+        noTransactionsSection.innerHTML = `
+          <p>Transactions will appear here.</p>
+          <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
+        `;
+        noTransactionsSection.style.cssText = `
+          position: static;
+          display: block;
+          text-align: center;
+          padding: 20px;
+        `;
+      }
+      
+      // Modify investment warning to match screenshot
+      const warningBanner = tokenDetail.querySelector('.investment-warning');
+      if (warningBanner) {
+        warningBanner.innerHTML = `
+          <div class="investment-warning-content">
+            <i class="fas fa-exclamation-circle warning-icon"></i>
+            <div class="investment-warning-text">
+              <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
+            </div>
+            <button class="close-warning">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `;
+        
+        warningBanner.style.cssText = `
+          width: calc(100% - 32px);
+          margin: 0 16px 16px;
+          background-color: #FEF9E7;
+          border-left: 4px solid #D4AC0D;
+          border-radius: 4px;
+        `;
+      }
+      
+      // Additional styling tweaks
+      const detailContent = tokenDetail.querySelector('.token-detail-content');
+      if (detailContent) {
+        detailContent.style.paddingBottom = '70px';
+      }
+    } catch (error) {
+      console.error('Error fixing token detail view:', error);
+    }
+    
+    resolve();
+  });
+}
   
   // =================================================================
   // STARTUP: AUTO-INITIALIZATION
