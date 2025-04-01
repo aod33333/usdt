@@ -4736,7 +4736,7 @@ function connectEventHandlers() {
     });
     Object.assign(CONFIG, DEFAULT_CONFIG);
     return true;
-  }
+  },
 };
 
 try {
