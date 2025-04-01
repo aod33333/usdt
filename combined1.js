@@ -2700,11 +2700,7 @@ window.tokenSelectionManager = new TokenSelectionManager();
 
 // Populate token list
 window.tokenSelectionManager.populateTokenList();
-
-resolve();
-    });
-  }
-
+    
   // Add this function near your setupTokenSelectionManager function:
 function setupReceiveTokenManager() {
   return new Promise(resolve => {
