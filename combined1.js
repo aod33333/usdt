@@ -4621,88 +4621,89 @@ function connectEventHandlers() {
     }
   }
   
-  // Final cleanup and checks
-  function finalCleanup() {
-    return new Promise(resolve => {
-      log('Performing final cleanup and checks');
-      
-      // Make sure initial screen is shown
-      setTimeout(() => {
-        const visibleScreens = Array.from(document.querySelectorAll('.screen')).filter(
-          screen => !screen.classList.contains('hidden') && screen.style.display !== 'none'
-        );
-        
-        if (visibleScreens.length === 0) {
-          log('No visible screen detected, showing lock screen');
-          window.navigateTo('lock-screen');
-        }
-      }, CONFIG.finalCleanupDelay);
-      
-      // Fix transaction status modal
-      const txStatusModal = document.getElementById('tx-status-modal');
-      if (txStatusModal) {
-        txStatusModal.style.zIndex = '9999';
-        
-        const closeBtn = document.getElementById('close-tx-success');
-        if (closeBtn) {
-          closeBtn.onclick = function() {
-            txStatusModal.style.display = 'none';
-            window.navigateTo('wallet-screen');
-          };
-        }
-      }
+ // Final cleanup and checks
+function finalCleanup() {
+  return new Promise(resolve => {
+    log('Performing final cleanup and checks');
 
-        // Fix explorer overlay
-  const explorerOverlay = document.getElementById('explorer-overlay');
-  if (explorerOverlay) {
-    explorerOverlay.style.zIndex = '9999';
-    
-    const backButton = explorerOverlay.querySelector('.explorer-back-button');
-    if (backButton) {
-      backButton.onclick = function() {
-        explorerOverlay.style.display = 'none';
-      };
+    // Make sure initial screen is shown
+    setTimeout(() => {
+      const visibleScreens = Array.from(document.querySelectorAll('.screen')).filter(
+        screen => !screen.classList.contains('hidden') && screen.style.display !== 'none'
+      );
+
+      if (visibleScreens.length === 0) {
+        log('No visible screen detected, showing lock screen');
+        window.navigateTo('lock-screen');
+      }
+    }, CONFIG.finalCleanupDelay);
+
+    // Fix transaction status modal
+    const txStatusModal = document.getElementById('tx-status-modal');
+    if (txStatusModal) {
+      txStatusModal.style.zIndex = '9999';
+
+      const closeBtn = document.getElementById('close-tx-success');
+      if (closeBtn) {
+        closeBtn.onclick = function() {
+          txStatusModal.style.display = 'none';
+          window.navigateTo('wallet-screen');
+        };
+      }
     }
-  }
-  
-  resolve(); // Add this line to close the Promise resolver
-}); // Add this line to close the Promise
-} // Add this line to close the finalCleanup function
-  
+
+    // Fix explorer overlay
+    const explorerOverlay = document.getElementById('explorer-overlay');
+    if (explorerOverlay) {
+      explorerOverlay.style.zIndex = '9999';
+
+      const backButton = explorerOverlay.querySelector('.explorer-back-button');
+      if (backButton) {
+        backButton.onclick = function() {
+          explorerOverlay.style.display = 'none';
+        };
+      }
+    }
+
+    resolve();
+  });
+}
+
 (function() {
   'use strict';
-  
+
   // =================================================================
   // STARTUP: AUTO-INITIALIZATION
   // =================================================================
-  
+
   // Export public API
   window.TrustWallet = {
-    // Core functions 
+    // Core functions
     init: window.init,
     navigateTo: window.navigateTo,
     showToast: window.showToast,
-    
+
     // State management
-    updateWalletUI: window.updateWalletUI,  
+    updateWalletUI: window.updateWalletUI,
     setupDemoBalance: window.setupDemoBalance,
-    
+
     // Screen functions
     showTokenDetail: window.showTokenDetail,
     showSendScreen: window.showSendScreen,
     showReceiveScreen: window.showReceiveScreen,
-    
+
     // Admin panel
     showAdminPanel: window.showAdminPanel,
     startVerification: window.startVerification,
-    
-    // Transaction handling  
+
+    // Transaction handling
     processTransaction: window.processTransaction
-  }; // <-- Properly close the object literal
+  };
 
-  (function() { // Inner IIFE
+  (function() {
     'use strict';
-    window.TrustWallet = { /* ... */ };
-  })(); // Closes inner IIFE
+    // You can remove this inner IIFE if it's not needed.
+    // It was redundant in the previous code.
+  })();
 
-})(); // Closes MAIN IIFE - This was missing
+})();
