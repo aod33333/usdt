@@ -4705,5 +4705,6 @@ function connectEventHandlers() {
     processTransaction: window.processTransaction
   }; // <-- Properly close the object literal
 
-})(); // <-- Correctly close the outer IIFE
+  })(); // <-- Close the outer IIFE
+})(); // <-- Add this line to close the main IIFE
 // End of file
