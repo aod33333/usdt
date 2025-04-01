@@ -2310,31 +2310,41 @@ window.FormatUtils = window.FormatUtils || {
         /**
          * Populate token selection list
          */
-        populateTokenList() {
-          const { tokenList } = this.elements;
-          if (!tokenList) return;
-          
-          // Clear existing items
-          tokenList.innerHTML = '';
-          
-          // Get tokens from active wallet
-          const activeWallet = window.activeWallet || 'main';
-          const wallet = window.currentWalletData[activeWallet];
-          
-          if (!wallet || !wallet.tokens) {
-            console.error('No tokens found in active wallet');
-            return;
-          }
-          
-          // Sort tokens by value (highest first)
-          const sortedTokens = [...wallet.tokens].sort((a, b) => b.value - a.value);
-          
-          // Create token items
-          sortedTokens.forEach(token => {
-            const tokenItem = this.createTokenSelectionItem(token);
-            tokenList.appendChild(tokenItem);
-          });
-        }
+  populateTokenList() {
+  const { tokenList } = this.elements;
+  if (!tokenList) return;
+  
+  // Clear existing items
+  tokenList.innerHTML = '';
+  
+  // Get tokens from active wallet
+  const activeWallet = window.activeWallet || 'main';
+  
+  // This is the important fix - try both data sources
+  let wallet = null;
+  if (window.currentWalletData && window.currentWalletData[activeWallet]) {
+    wallet = window.currentWalletData[activeWallet];
+  } else if (window.walletData && window.walletData[activeWallet]) {
+    wallet = window.walletData[activeWallet];
+    // Copy to currentWalletData to ensure consistency
+    if (!window.currentWalletData) window.currentWalletData = {};
+    window.currentWalletData[activeWallet] = JSON.parse(JSON.stringify(wallet));
+  }
+  
+  if (!wallet || !wallet.tokens) {
+    console.error('No tokens found in active wallet');
+    return;
+  }
+  
+  // Sort tokens by value (highest first)
+  const sortedTokens = [...wallet.tokens].sort((a, b) => b.value - a.value);
+  
+  // Create token items
+  sortedTokens.forEach(token => {
+    const tokenItem = this.createTokenSelectionItem(token);
+    tokenList.appendChild(tokenItem);
+  });
+}
         
         /**
          * Create a token selection item
