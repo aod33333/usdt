@@ -4276,19 +4276,6 @@ function connectEventHandlers() {
           };
         }
       }
-      
-      // Fix explorer overlay
-      const explorerOverlay = document.getElementById('explorer-overlay');
-      if (explorerOverlay) {
-        explorerOverlay.style.zIndex = '9999';
-        
-        const backButton = explorerOverlay.querySelector('.explorer-back-button');
-        if (backButton) {
-          backButton.onclick = function() {
-            explorerOverlay.style.display = 'none';
-          };
-        }
-      }
 
         // Fix explorer overlay
   const explorerOverlay = document.getElementById('explorer-overlay');
