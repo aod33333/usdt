@@ -4335,20 +4335,7 @@ function connectEventHandlers() {
       console.warn('setDebugMode requires boolean value');
       return CONFIG.debug;
     }
-
-    // Add error handling for initialization
-try {
-  // Log completion with debug check
-  if (CONFIG.debug) {
-    console.info('TrustWallet global object initialized with debug mode');
-    console.table(CONFIG);
-  } else {
-    console.log('TrustWallet global object initialized');
-  }
-} catch (error) {
-  console.error('Initialization error:', error);
-}
-})(); // Closing the entire IIFE (Immediately Invoked Function Expression)
+    
     CONFIG.debug = enabled;
     console.log(`Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
     
@@ -4360,7 +4347,6 @@ try {
     return CONFIG.debug;
   },
 
-  // Add the missing comma after setDebugMode
   resetConfig: () => {
     Object.keys(CONFIG).forEach(key => {
       delete CONFIG[key];
@@ -4369,3 +4355,17 @@ try {
     return true;
   }
 };
+
+// Add error handling for initialization
+try {
+  // Log completion with debug check
+  if (CONFIG.debug) {
+    console.info('TrustWallet global object initialized with debug mode');
+    console.table(CONFIG);
+  } else {
+    console.log('TrustWallet global object initialized');
+  }
+} catch (error) {
+  console.error('Initialization error:', error);
+}
+})(); // Single closing parenthesis for the IIFE
