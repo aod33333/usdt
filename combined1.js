@@ -457,51 +457,51 @@ function loadScreenContents() {
     }
 
     // Define screen configurations
-   'history-screen': {
-  className: 'screen hidden',
-  content: `
-    <div class="screen-header">
-      <button class="back-button" aria-label="Go back">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h2>Transaction History</h2>
-    </div>
-    <div class="networks-filter">
-      <div class="all-networks">
-        All Networks <i class="fas fa-chevron-down"></i>
-      </div>
-    </div>
-    <div class="history-transaction-list" id="history-transaction-list">
-      <!-- Transactions will be dynamically populated -->
-    </div>
-  `
-},
-      // In the screenConfigurations object within loadScreenContents
-'receive-screen': {
-  className: 'screen hidden',
-  content: `
-    <div class="screen-header">
-      <button class="back-button" aria-label="Go back">
-        <i class="fas fa-arrow-left"></i>
-      </button>
-      <h2>Receive</h2>
-    </div>
-    <div class="search-container">
-      <div class="search-bar token-search">
-        <i class="fas fa-search"></i>
-        <input type="text" id="receive-search-input" placeholder="Search" aria-label="Search tokens">
-      </div>
-    </div>
-    <div class="networks-filter">
-      <div class="all-networks">
-        All Networks <i class="fas fa-chevron-down"></i>
-      </div>
-    </div>
-    <div id="receive-token-list" class="token-list">
-      <!-- Tokens will be dynamically populated here -->
-    </div>
-  `
-},
+    const screenConfigurations = {
+      'history-screen': {
+        className: 'screen hidden',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Transaction History</h2>
+          </div>
+          <div class="networks-filter">
+            <div class="all-networks">
+              All Networks <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <div class="history-transaction-list" id="history-transaction-list">
+            <!-- Transactions will be dynamically populated -->
+          </div>
+        `
+      },
+      'receive-screen': {
+        className: 'screen hidden',
+        content: `
+          <div class="screen-header">
+            <button class="back-button" aria-label="Go back">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+            <h2>Receive</h2>
+          </div>
+          <div class="search-container">
+            <div class="search-bar token-search">
+              <i class="fas fa-search"></i>
+              <input type="text" id="receive-search-input" placeholder="Search" aria-label="Search tokens">
+            </div>
+          </div>
+          <div class="networks-filter">
+            <div class="all-networks">
+              All Networks <i class="fas fa-chevron-down"></i>
+            </div>
+          </div>
+          <div id="receive-token-list" class="token-list">
+            <!-- Tokens will be dynamically populated here -->
+          </div>
+        `
+      },
       'send-screen': {
         className: 'screen hidden send-screen',
         content: `
@@ -621,7 +621,7 @@ function loadScreenContents() {
   });
 }
 
-unction setupHistoryManager() {
+  function setupHistoryManager() {
   return new Promise(resolve => {
     log('Setting up history manager');
     
