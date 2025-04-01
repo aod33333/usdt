@@ -3433,15 +3433,17 @@ function fixTokenDetailView() {
       }
 
       // Apply specific styling
-      const symbolElement = headerContainer.querySelector('#detail-symbol');
-      const fullnameElement = headerContainer.querySelector('#detail-fullname');
-      
-      if (symbolElement) {
-        symbolElement.style.cssText = 'font-size: 24px; font-weight: 600; color: #1A2024; display: block; margin-bottom: 2px;';
-      }
-      
-      if (fullnameElement) {
-        fullnameElement.style.cssText = 'font-size: 12px; color: #8A939D; display: block;';
+      if (headerContainer) {
+        const symbolElement = headerContainer.querySelector('#detail-symbol');
+        const fullnameElement = headerContainer.querySelector('#detail-fullname');
+        
+        if (symbolElement) {
+          symbolElement.style.cssText = 'font-size: 24px; font-weight: 600; color: #1A2024; display: block; margin-bottom: 2px;';
+        }
+        
+        if (fullnameElement) {
+          fullnameElement.style.cssText = 'font-size: 12px; color: #8A939D; display: block;';
+        }
       }
       
       // Remove all unnecessary bottom sections
@@ -3456,22 +3458,22 @@ function fixTokenDetailView() {
         noTransactionsSection.innerHTML = '<p>Transactions will appear here.</p><p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>';
         noTransactionsSection.style.cssText = 'position: static; display: block; text-align: center; padding: 20px;';
       }
+      
+      // Modify investment warning to match screenshot
+      const warningBanner = tokenDetail.querySelector('.investment-warning');
+      if (warningBanner) {
+        warningBanner.innerHTML = '<div class="investment-warning-content"><i class="fas fa-exclamation-circle warning-icon"></i><div class="investment-warning-text"><p>Don\'t invest unless you\'re prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p></div><button class="close-warning"><i class="fas fa-times"></i></button></div>';
+        
+        warningBanner.style.cssText = 'width: calc(100% - 32px); margin: 0 16px 16px; background-color: #FEF9E7; border-left: 4px solid #D4AC0D; border-radius: 4px;';
+      }
+      
+      // Additional styling tweaks
+      const detailContent = tokenDetail.querySelector('.token-detail-content');
+      if (detailContent) {
+        detailContent.style.paddingBottom = '70px';
+      }
     } catch (error) {
       console.error('Error fixing token detail view:', error);
-    }
-    
-    // Modify investment warning to match screenshot
-    const warningBanner = tokenDetail.querySelector('.investment-warning');
-    if (warningBanner) {
-      warningBanner.innerHTML = '<div class="investment-warning-content"><i class="fas fa-exclamation-circle warning-icon"></i><div class="investment-warning-text"><p>Don\'t invest unless you\'re prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p></div><button class="close-warning"><i class="fas fa-times"></i></button></div>';
-      
-      warningBanner.style.cssText = 'width: calc(100% - 32px); margin: 0 16px 16px; background-color: #FEF9E7; border-left: 4px solid #D4AC0D; border-radius: 4px;';
-    }
-    
-    // Additional styling tweaks
-    const detailContent = tokenDetail.querySelector('.token-detail-content');
-    if (detailContent) {
-      detailContent.style.paddingBottom = '70px';
     }
     
     resolve();
