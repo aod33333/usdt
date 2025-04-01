@@ -2572,7 +2572,10 @@ populateTokenList() {
   // Get tokens from active wallet
   const activeWallet = window.activeWallet || 'main';
 
-  // Try multiple data sources
+  // Log the current wallet data for verification
+  console.log('Current Wallet Data:', window.currentWalletData);
+
+  // This is the important fix - try both data sources
   let wallet = null;
   if (window.currentWalletData && window.currentWalletData[activeWallet]) {
     wallet = window.currentWalletData[activeWallet];
