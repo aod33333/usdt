@@ -3648,70 +3648,71 @@ function setupReceiveTokenManager() {
         });
       }
       
-      // 5. Fix token list appearance and behavior
-      const tokenList = walletScreen.querySelector('#token-list');
-      if (tokenList) {
-        // Ensure smooth scrolling
-        tokenList.style.scrollBehavior = 'smooth';
-        
-        // Fix token items
-        const tokenItems = tokenList.querySelectorAll('.token-item');
-        tokenItems.forEach(item => {
-          // Fix spacing
-          item.style.padding = '14px 16px';
-          item.style.borderBottom = '1px solid #F5F5F5';
-          
-          // Fix token icon size
-          const tokenIcon = item.querySelector('.token-icon');
-          if (tokenIcon) {
-            tokenIcon.style.width = '36px';
-            tokenIcon.style.height = '36px';
-            tokenIcon.style.minWidth = '36px';
-            tokenIcon.style.marginRight = '16px';
-          }
-          
-         // Fix positive value colors to match TrustWallet blue
-const tokenValue = item.querySelector('.token-price-change');
-if (tokenValue && tokenValue.classList.contains('positive')) { 
-  tokenValue.style.color = '#3375BB';
+     // 5. Fix token list appearance and behavior
+const tokenList = walletScreen.querySelector('#token-list');
+if (tokenList) {
+  // Ensure smooth scrolling
+  tokenList.style.scrollBehavior = 'smooth';
+  
+  // Fix token items
+  const tokenItems = tokenList.querySelectorAll('.token-item');
+  tokenItems.forEach(item => {
+    // Fix spacing
+    item.style.padding = '14px 16px';
+    item.style.borderBottom = '1px solid #F5F5F5';
+    
+    // Fix token icon size
+    const tokenIcon = item.querySelector('.token-icon');
+    if (tokenIcon) {
+      tokenIcon.style.width = '36px';
+      tokenIcon.style.height = '36px';
+      tokenIcon.style.minWidth = '36px';
+      tokenIcon.style.marginRight = '16px';
+    }
+    
+    // Fix positive value colors
+    const tokenValue = item.querySelector('.token-price-change');
+    if (tokenValue && tokenValue.classList.contains('positive')) { 
+      tokenValue.style.color = '#3375BB';
+    }
+  }); // Closing for forEach
+  
+  // Add pull-to-refresh simulation
+  addPullToRefreshSimulation(tokenList);
+} // Closing for tokenList if-block
+
+// 6. Fix footer disclaimer text
+const footerInfo = walletScreen.querySelector('.footer-info');
+if (footerInfo) {
+  footerInfo.style.fontSize = '12px';
+  footerInfo.style.color = '#8A939D';
+  footerInfo.style.textAlign = 'center';
+  footerInfo.style.padding = '16px 16px 80px';
+  footerInfo.style.lineHeight = '1.4';
 }
-        
-        // Add pull-to-refresh simulation
-        addPullToRefreshSimulation(tokenList);
-      }
-      
-      // 6. Fix footer disclaimer text
-      const footerInfo = walletScreen.querySelector('.footer-info');
-      if (footerInfo) {
-        footerInfo.style.fontSize = '12px';
-        footerInfo.style.color = '#8A939D';
-        footerInfo.style.textAlign = 'center';
-        footerInfo.style.padding = '16px 16px 80px';
-        footerInfo.style.lineHeight = '1.4';
-      }
-      
-      // 7. Fix investment warning banner
-      const investmentWarning = walletScreen.querySelector('#investment-warning');
-      if (investmentWarning) {
-        investmentWarning.style.width = 'calc(100% - 32px)';
-        investmentWarning.style.margin = '16px';
-        investmentWarning.style.backgroundColor = '#FEF9E7';
-        investmentWarning.style.color = '#D4AC0D';
-        investmentWarning.style.borderRadius = '8px';
-        investmentWarning.style.borderLeft = '4px solid #D4AC0D';
-        
-        // Fix close button
-        const closeWarning = investmentWarning.querySelector('#close-investment-warning');
-        if (closeWarning) {
-          closeWarning.addEventListener('click', function() {
-            investmentWarning.style.display = 'none';
-          });
-        }
-      }
-      
-      resolve();
+
+// 7. Fix investment warning banner
+const investmentWarning = walletScreen.querySelector('#investment-warning');
+if (investmentWarning) {
+  investmentWarning.style.width = 'calc(100% - 32px)';
+  investmentWarning.style.margin = '16px';
+  investmentWarning.style.backgroundColor = '#FEF9E7';
+  investmentWarning.style.color = '#D4AC0D';
+  investmentWarning.style.borderRadius = '8px';
+  investmentWarning.style.borderLeft = '4px solid #D4AC0D';
+  
+  // Fix close button
+  const closeWarning = investmentWarning.querySelector('#close-investment-warning');
+  if (closeWarning) {
+    closeWarning.addEventListener('click', function() {
+      investmentWarning.style.display = 'none';
     });
   }
+}
+
+resolve(); // Final resolve for the Promise
+}); // Closing for Promise callback
+} // Closing for enhanceHomeScreen function
   
   // Fix network badges - unified solution
   function fixNetworkBadges() {
