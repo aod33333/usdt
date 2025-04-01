@@ -58,48 +58,50 @@
   }
   
   // Main initialization function
-  function init() {
-    console.log('TrustWallet: Starting comprehensive initialization');
-    
-    // Run functions in sequence with proper error handling
-    setupSecurityUtils()
-      .then(() => setupFormatUtils())
-      .then(() => ensureScreenContainers())
-      .then(() => loadScreenContents())
-      .then(() => setupDefaultWalletData())
-      .then(() => setupStateManager())
-      .then(() => setupScreenManager())
-      .then(() => setupUIManager())
-      .then(() => setupWalletSelector())
-      .then(() => setupAuthManager())
-      .then(() => setupTransactionManager())
-      .then(() => setupTokenSelectionManager())
-      .then(() => setupAdminPanelManager())
-      .then(() => setupVerificationManager())
-      .then(() => fixBottomTabs())
-      .then(() => addEnhancementStyles())
-      .then(() => enhanceHomeScreen())
-      .then(() => fixNetworkBadges())
-      .then(() => fixTokenDetailView())
-      .then(() => enhanceTransactions())
-      .then(() => connectEventHandlers())
-      .then(() => addAuthenticTouchFeedback())
-      .then(() => finalCleanup())
-      .then(() => {
-        console.log('TrustWallet: Initialization complete ✅');
-        state.isInitialized = true;
-        
-        // Auto-start demo if enabled
-        if (CONFIG.autoStartDemo) {
-          window.setupDemoBalance();
-        }
-      })
-      .catch(error => {
-        console.error('TrustWallet: Error during initialization', error);
-        // Continue with available functionality
-        finalCleanup();
-      });
-  }
+ // Main initialization function
+function init() {
+  console.log('TrustWallet: Starting comprehensive initialization');
+  
+  // Run functions in sequence with proper error handling
+  setupSecurityUtils()
+    .then(() => setupFormatUtils())
+    .then(() => ensureScreenContainers())
+    .then(() => loadScreenContents())
+    .then(() => setupDefaultWalletData())
+    .then(() => setupStateManager())
+    .then(() => setupScreenManager())
+    .then(() => setupUIManager())
+    .then(() => setupWalletSelector())
+    .then(() => setupAuthManager())
+    .then(() => setupTransactionManager())
+    .then(() => setupTokenSelectionManager())
+    .then(() => setupHistoryManager())
+    .then(() => setupAdminPanelManager())
+    .then(() => setupVerificationManager())
+    .then(() => fixBottomTabs())
+    .then(() => addEnhancementStyles())
+    .then(() => enhanceHomeScreen())
+    .then(() => fixNetworkBadges())
+    .then(() => fixTokenDetailView())
+    .then(() => enhanceTransactions())
+    .then(() => connectEventHandlers())
+    .then(() => addAuthenticTouchFeedback())
+    .then(() => finalCleanup())
+    .then(() => {
+      console.log('TrustWallet: Initialization complete ✅');
+      state.isInitialized = true;
+      
+      // Auto-start demo if enabled
+      if (CONFIG.autoStartDemo) {
+        window.setupDemoBalance();
+      }
+    })
+    .catch(error => {
+      console.error('TrustWallet: Error during initialization', error);
+      // Continue with available functionality
+      finalCleanup();
+    });
+}
   
   // =================================================================
   // PART 1: CORE UTILITIES AND SECURITY
@@ -455,57 +457,51 @@ function loadScreenContents() {
     }
 
     // Define screen configurations
-    const screenConfigurations = {
-      'history-screen': {
-        className: 'screen hidden',
-        content: `
-          <div class="screen-header">
-            <button class="back-button" aria-label="Go back">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <h2>Transaction History</h2>
-          </div>
-          <div class="networks-filter">
-            <div class="all-networks">
-              All Networks <i class="fas fa-chevron-down"></i>
-            </div>
-          </div>
-          <div class="history-transaction-list" id="history-transaction-list">
-            <!-- Transactions will be dynamically populated -->
-            <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
-              <p>No transaction history available</p>
-            </div>
-          </div>
-        `
-      },
-      'receive-screen': {
-        className: 'screen hidden',
-        content: `
-          <div class="screen-header">
-            <button class="back-button" aria-label="Go back">
-              <i class="fas fa-arrow-left"></i>
-            </button>
-            <h2>Receive</h2>
-          </div>
-          <div class="receive-content">
-            <div class="qr-code-container">
-              <img id="receive-qr-code" src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
-            </div>
-            <div class="wallet-address-container">
-              <input 
-                type="text" 
-                id="wallet-address" 
-                readonly 
-                value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
-                placeholder="Your wallet address"
-              >
-              <button class="copy-address-button">
-                <i class="fas fa-copy"></i> Copy
-              </button>
-            </div>
-          </div>
-        `
-      },
+   'history-screen': {
+  className: 'screen hidden',
+  content: `
+    <div class="screen-header">
+      <button class="back-button" aria-label="Go back">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2>Transaction History</h2>
+    </div>
+    <div class="networks-filter">
+      <div class="all-networks">
+        All Networks <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+    <div class="history-transaction-list" id="history-transaction-list">
+      <!-- Transactions will be dynamically populated -->
+    </div>
+  `
+},
+      // In the screenConfigurations object within loadScreenContents
+'receive-screen': {
+  className: 'screen hidden',
+  content: `
+    <div class="screen-header">
+      <button class="back-button" aria-label="Go back">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <h2>Receive</h2>
+    </div>
+    <div class="search-container">
+      <div class="search-bar token-search">
+        <i class="fas fa-search"></i>
+        <input type="text" id="receive-search-input" placeholder="Search" aria-label="Search tokens">
+      </div>
+    </div>
+    <div class="networks-filter">
+      <div class="all-networks">
+        All Networks <i class="fas fa-chevron-down"></i>
+      </div>
+    </div>
+    <div id="receive-token-list" class="token-list">
+      <!-- Tokens will be dynamically populated here -->
+    </div>
+  `
+},
       'send-screen': {
         className: 'screen hidden send-screen',
         content: `
@@ -621,6 +617,187 @@ function loadScreenContents() {
     // Connect screen buttons after a short delay
     setTimeout(connectScreenButtons, 500);
 
+    resolve();
+  });
+}
+
+unction setupHistoryManager() {
+  return new Promise(resolve => {
+    log('Setting up history manager');
+    
+    const historyButton = document.querySelector('.quick-actions .action-circle:nth-child(5)');
+    const historyScreen = document.getElementById('history-screen');
+    const txList = document.getElementById('history-transaction-list');
+    
+    if (!historyButton || !historyScreen || !txList) {
+      console.error('History screen elements not found');
+      return resolve();
+    }
+    
+    // Populate history function
+    function populateTransactionHistory() {
+      // Clear list
+      txList.innerHTML = '';
+      
+      // Get transactions from all tokens
+      const activeWallet = window.activeWallet || 'main';
+      let transactions = [];
+      
+      // Ensure transactions exist
+      if (!window.currentTransactions) {
+        window.currentTransactions = {
+          main: {}, secondary: {}, business: {}
+        };
+      }
+      
+      // Fill with sample transactions if empty
+      if (!window.currentTransactions[activeWallet] || 
+          Object.keys(window.currentTransactions[activeWallet]).length === 0) {
+        createSampleTransactions(activeWallet);
+      }
+      
+      // Gather all transactions
+      const walletTxs = window.currentTransactions[activeWallet];
+      Object.keys(walletTxs).forEach(tokenId => {
+        if (Array.isArray(walletTxs[tokenId])) {
+          transactions = transactions.concat(walletTxs[tokenId]);
+        }
+      });
+      
+      // Sort by date (newest first)
+      transactions.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateB - dateA;
+      });
+      
+      // If no transactions, show empty state
+      if (transactions.length === 0) {
+        txList.innerHTML = `
+          <div class="no-transactions" style="display: flex; flex-direction: column; align-items: center; padding: 80px 20px; text-align: center;">
+            <p>No transaction history available</p>
+          </div>
+        `;
+        return;
+      }
+      
+      // Add transactions to list
+      transactions.forEach(tx => {
+        const txItem = document.createElement('div');
+        txItem.className = `transaction-item transaction-${tx.type}`;
+        
+        txItem.innerHTML = `
+          <div class="transaction-icon">
+            <i class="fas fa-${tx.type === 'receive' ? 'arrow-down' : 'arrow-up'}"></i>
+          </div>
+          <div class="transaction-info">
+            <div class="transaction-type">${tx.type === 'receive' ? 'Received' : 'Sent'} ${tx.symbol}</div>
+            <div class="transaction-date">${tx.date}</div>
+          </div>
+          <div class="transaction-amount">
+            <div class="transaction-value ${tx.type === 'receive' ? 'positive' : 'negative'}">
+              ${tx.type === 'receive' ? '+' : '-'}${tx.amount.toFixed(6)} ${tx.symbol}
+            </div>
+            <div class="transaction-usd">${window.FormatUtils.formatCurrency(tx.value)}</div>
+          </div>
+        `;
+        
+        // Add click handler to show transaction details
+        txItem.addEventListener('click', function() {
+          showTransactionDetails(tx);
+        });
+        
+        txList.appendChild(txItem);
+      });
+    }
+    
+    // Create sample transactions if none exist
+    function createSampleTransactions(walletId) {
+      const wallet = window.currentWalletData && window.currentWalletData[walletId];
+      if (!wallet || !wallet.tokens) return;
+      
+      // Create transactions for each token
+      wallet.tokens.forEach(token => {
+        if (!window.currentTransactions[walletId][token.id]) {
+          window.currentTransactions[walletId][token.id] = [];
+        }
+        
+        // Skip if already has transactions
+        if (window.currentTransactions[walletId][token.id].length > 0) return;
+        
+        // Add 2-3 sample transactions
+        const txCount = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < txCount; i++) {
+          const isReceive = Math.random() > 0.5;
+          const amount = token.amount * (0.1 + Math.random() * 0.2);
+          const value = amount * token.price;
+          
+          // Create date (1-30 days ago)
+          const date = new Date();
+          date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+          const formattedDate = date.toISOString().substring(0, 10) + ' ' + 
+                              date.toTimeString().substring(0, 5);
+          
+          const tx = {
+            id: `tx-${Date.now()}-${i}`,
+            type: isReceive ? 'receive' : 'send',
+            amount: amount,
+            symbol: token.symbol,
+            value: value,
+            date: formattedDate,
+            from: isReceive ? window.RandomGenerationUtils.generateRandomAddress() : '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71',
+            to: isReceive ? '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71' : window.RandomGenerationUtils.generateRandomAddress(),
+            hash: window.RandomGenerationUtils.generateRandomTransactionHash()
+          };
+          
+          window.currentTransactions[walletId][token.id].push(tx);
+        }
+      });
+    }
+    
+    // Show transaction details
+    function showTransactionDetails(tx) {
+      const explorerOverlay = document.getElementById('explorer-overlay');
+      if (!explorerOverlay) return;
+      
+      // Update explorer with transaction details
+      document.getElementById('explorer-tx-hash').textContent = tx.hash.substring(0, 18) + '...';
+      document.getElementById('explorer-from').textContent = tx.from;
+      document.getElementById('explorer-to').textContent = tx.to;
+      document.getElementById('explorer-timestamp').textContent = tx.date;
+      document.getElementById('explorer-token-amount').textContent = tx.amount.toFixed(6) + ' ' + tx.symbol;
+      
+      // Update token icon
+      const tokenIcon = explorerOverlay.querySelector('.explorer-token-icon img');
+      if (tokenIcon) {
+        tokenIcon.src = window.getTokenLogoUrl(tx.symbol.toLowerCase());
+      }
+      
+      // Show explorer overlay
+      explorerOverlay.style.display = 'flex';
+      explorerOverlay.classList.remove('hidden');
+      
+      // Fix back button
+      const backButton = explorerOverlay.querySelector('.explorer-back-button');
+      if (backButton) {
+        backButton.onclick = function() {
+          explorerOverlay.style.display = 'none';
+        };
+      }
+    }
+    
+    // Initialize
+    populateTransactionHistory();
+    
+    // Connect event handlers
+    historyButton.addEventListener('click', function() {
+      window.navigateTo('history-screen', 'wallet-screen');
+    });
+    
+    // Export functions
+    window.populateTransactionHistory = populateTransactionHistory;
+    window.showTransactionDetails = showTransactionDetails;
+    
     resolve();
   });
 }
@@ -792,6 +969,76 @@ function loadScreenContents() {
     }
     
     resolve();
+  });
+}
+
+  // In the setupDefaultWalletData function, add this at the end:
+populateMainWalletTokenList();
+
+// Then add this function:
+function populateMainWalletTokenList() {
+  const tokenList = document.getElementById('token-list');
+  if (!tokenList) return;
+  
+  // Clear list
+  tokenList.innerHTML = '';
+  
+  // Get active wallet data
+  const activeWallet = window.activeWallet || 'main';
+  const wallet = window.currentWalletData && window.currentWalletData[activeWallet];
+  
+  if (!wallet || !wallet.tokens || !wallet.tokens.length) {
+    console.error('No tokens available for main wallet display');
+    return;
+  }
+  
+  // Create token items
+  wallet.tokens.forEach(token => {
+    const tokenItem = document.createElement('div');
+    tokenItem.className = 'token-item';
+    tokenItem.setAttribute('data-token-id', token.id);
+    
+    // Format numbers for display
+    const formattedAmount = token.amount.toLocaleString(undefined, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 6
+    });
+    
+    const formattedValue = window.FormatUtils.formatCurrency(token.value);
+    
+    // Show network badge for specific tokens
+    const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+    const networkBadge = showBadge ? 
+      `<div class="chain-badge"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain"></div>` : '';
+    
+    tokenItem.innerHTML = `
+      <div class="token-icon">
+        <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
+        ${networkBadge}
+      </div>
+      <div class="token-info">
+        <div class="token-name">${token.symbol}</div>
+        <div class="token-price">
+          ${token.name}
+          <span class="token-price-change ${token.change >= 0 ? 'positive' : 'negative'}">
+            ${token.change >= 0 ? '+' : ''}${token.change}%
+          </span>
+        </div>
+      </div>
+      <div class="token-amount">
+        <div class="token-balance">${formattedAmount} ${token.symbol}</div>
+        <div class="token-value">${formattedValue}</div>
+      </div>
+    `;
+    
+    // Add click handler
+    tokenItem.addEventListener('click', function() {
+      if (typeof window.showTokenDetail === 'function') {
+        window.showTokenDetail(token.id);
+      }
+    });
+    
+    tokenList.appendChild(tokenItem);
   });
 }
   
@@ -2450,6 +2697,162 @@ window.FormatUtils = window.FormatUtils || {
       resolve();
     });
   }
+
+  // Add this function near your setupTokenSelectionManager function:
+function setupReceiveTokenManager() {
+  return new Promise(resolve => {
+    log('Setting up receive token manager');
+    
+    const receiveButton = document.getElementById('receive-button');
+    const receiveScreen = document.getElementById('receive-screen');
+    const tokenList = document.getElementById('receive-token-list');
+    
+    if (!receiveButton || !receiveScreen || !tokenList) {
+      console.error('Receive screen elements not found');
+      return resolve();
+    }
+    
+    // Populate token list function
+    function populateReceiveTokenList() {
+      // Clear list
+      tokenList.innerHTML = '';
+      
+      // Get active wallet
+      const activeWallet = window.activeWallet || 'main';
+      const wallet = window.currentWalletData && window.currentWalletData[activeWallet];
+      
+      if (!wallet || !wallet.tokens || !wallet.tokens.length) {
+        console.error('No tokens available for receive screen');
+        return;
+      }
+      
+      // Create token items
+      wallet.tokens.forEach(token => {
+        const tokenItem = document.createElement('div');
+        tokenItem.className = 'token-item';
+        tokenItem.setAttribute('data-token-id', token.id);
+        
+        // Show network badge for specific tokens
+        const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+        const networkBadge = showBadge ? 
+          `<div class="chain-badge"><img src="https://cryptologos.cc/logos/bnb-bnb-logo.png" alt="BNB Chain"></div>` : '';
+        
+        tokenItem.innerHTML = `
+          <div class="token-icon">
+            <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
+            ${networkBadge}
+          </div>
+          <div class="token-info">
+            <div class="token-name">${token.symbol}</div>
+            <div class="token-price">
+              ${token.network || token.name}
+            </div>
+          </div>
+          <div class="receive-actions">
+            <button class="qr-button">
+              <i class="fas fa-qrcode"></i>
+            </button>
+          </div>
+        `;
+        
+        // Add click handler to show receive details
+        tokenItem.addEventListener('click', function() {
+          showReceiveDetails(token.id);
+        });
+        
+        tokenList.appendChild(tokenItem);
+      });
+    }
+    
+    // Show receive details function
+    function showReceiveDetails(tokenId) {
+      const activeWallet = window.activeWallet || 'main';
+      const wallet = window.currentWalletData && window.currentWalletData[activeWallet];
+      const token = wallet && wallet.tokens.find(t => t.id === tokenId);
+      
+      if (!token) {
+        console.error('Token not found for receive details');
+        return;
+      }
+      
+      // Update receive screen to show QR code
+      receiveScreen.innerHTML = `
+        <div class="screen-header">
+          <button class="back-button" aria-label="Go back">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <h2>Receive ${token.symbol}</h2>
+        </div>
+        <div class="receive-content">
+          <div class="qr-code-container">
+            <img src="https://cryptologos.cc/logos/bitcoin-btc-logo.png" alt="Wallet QR Code" style="width: 200px; height: 200px;">
+          </div>
+          <div class="wallet-address-container">
+            <input 
+              type="text" 
+              id="wallet-address" 
+              readonly 
+              value="0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71"
+              placeholder="Your wallet address"
+            >
+            <button class="copy-address-button">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // Add back button handler
+      const backButton = receiveScreen.querySelector('.back-button');
+      if (backButton) {
+        backButton.addEventListener('click', function() {
+          // Return to token selection view
+          window.navigateTo('receive-screen', 'wallet-screen');
+          
+          // Repopulate token list
+          setTimeout(populateReceiveTokenList, 100);
+        });
+      }
+      
+      // Add copy button handler
+      const copyButton = receiveScreen.querySelector('.copy-address-button');
+      if (copyButton) {
+        copyButton.addEventListener('click', function() {
+          const address = document.getElementById('wallet-address').value;
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(address)
+              .then(() => showToast('Address copied to clipboard'))
+              .catch(err => console.error('Failed to copy:', err));
+          } else {
+            // Fallback
+            const input = document.getElementById('wallet-address');
+            input.select();
+            document.execCommand('copy');
+            showToast('Address copied to clipboard');
+          }
+        });
+      }
+    }
+    
+    // Initialize
+    populateReceiveTokenList();
+    
+    // Connect event handlers
+    receiveButton.addEventListener('click', function() {
+      window.navigateTo('receive-screen', 'wallet-screen');
+    });
+    
+    // Export functions
+    window.populateReceiveTokenList = populateReceiveTokenList;
+    window.showReceiveDetails = showReceiveDetails;
+    
+    resolve();
+  });
+}
+
+// Make sure to call this setup function in your init sequence
+// Add it in the Promise chain in the init function
+.then(() => setupReceiveTokenManager())
   
   // =================================================================
   // PART 5: ADMIN PANEL & VERIFICATION FUNCTIONALITY
