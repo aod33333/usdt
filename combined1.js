@@ -57,7 +57,6 @@
     setTimeout(init, CONFIG.initDelay);
   }
   
-  // Main initialization function
  // Main initialization function
 function init() {
   console.log('TrustWallet: Starting comprehensive initialization');
