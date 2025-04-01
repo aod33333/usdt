@@ -4674,7 +4674,9 @@ function connectEventHandlers() {
 }); // Add this line to close the Promise
 } // Add this line to close the finalCleanup function
   
-// =================================================================
+(function() {
+  'use strict';
+  // =================================================================
   // STARTUP: AUTO-INITIALIZATION
   // =================================================================
   
@@ -4700,5 +4702,7 @@ function connectEventHandlers() {
     
     // Transaction handling
     processTransaction: window.processTransaction, // Assuming processTransaction is defined elsewhere
-  };
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    // Add a comma here!
+  }; // <-- Closing brace of the object literal
 }()); // End of the IIFE
