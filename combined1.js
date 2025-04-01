@@ -3426,72 +3426,76 @@ function fixTokenDetailView() {
     }
     
     try {
-      // Modify header to match Trust Wallet style
-const headerContainer = tokenDetail.querySelector('.detail-header');
-if (headerContainer) {
-  headerContainer.innerHTML = `
-    <button id="back-button" class="back-button">
-      <i class="fas fa-arrow-left"></i>
-    </button>
-    <div class="token-detail-title">
-      <div class="token-text-content">
-        <span id="detail-symbol" class="token-symbol">${token.symbol}</span> <!-- Dynamic symbol -->
-        <div id="detail-fullname" class="token-fullname">Coin | ${token.name}</div> <!-- Dynamic name -->
+  // Modify header to match Trust Wallet style
+  const headerContainer = tokenDetail.querySelector('.detail-header');
+  if (headerContainer) {
+    headerContainer.innerHTML = `
+      <button id="back-button" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div class="token-detail-title">
+        <div class="token-text-content">
+          <span id="detail-symbol" class="token-symbol">${token.symbol}</span> <!-- Dynamic symbol -->
+          <div id="detail-fullname" class="token-fullname">Coin | ${token.name}</div> <!-- Dynamic name -->
+        </div>
       </div>
-    </div>
-    <div class="header-icons">
-      <button class="icon-button"><i class="fas fa-bell-slash"></i></button>
-      <button class="icon-button"><i class="fas fa-info-circle"></i></button>
-    </div>
-  `;
-}
+      <div class="header-icons">
+        <button class="icon-button"><i class="fas fa-bell-slash"></i></button>
+        <button class="icon-button"><i class="fas fa-info-circle"></i></button>
+      </div>
+    `;
+  }
 
-        // Apply specific styling
-        const symbolElement = headerContainer.querySelector('#detail-symbol');
-        const fullnameElement = headerContainer.querySelector('#detail-fullname');
-        
-        if (symbolElement) {
-          symbolElement.style.cssText = `
-            font-size: 24px;
-            font-weight: 600;
-            color: #1A2024;
-            display: block;
-            margin-bottom: 2px;
-          `;
-        }
-        
-        if (fullnameElement) {
-          fullnameElement.style.cssText = `
-            font-size: 12px;
-            color: #8A939D;
-            display: block;
-          `;
-        }
-      }
-      
-      // Remove all unnecessary bottom sections
-      const unnecessarySections = tokenDetail.querySelectorAll('.staking-container, .no-transactions img, .token-price-info');
-      unnecessarySections.forEach(section => {
-        section.style.display = 'none';
-      });
-      
-      // Modify no transactions section
-      const noTransactionsSection = tokenDetail.querySelector('.no-transactions');
-      if (noTransactionsSection) {
-        noTransactionsSection.innerHTML = `
-          <p>Transactions will appear here.</p>
-          <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
-        `;
-        
-        // Ensure no overlay
-        noTransactionsSection.style.cssText = `
-          position: static;
-          display: block;
-          text-align: center;
-          padding: 20px;
-        `;
-      }
-      
+  // Apply specific styling
+  const symbolElement = headerContainer.querySelector('#detail-symbol');
+  const fullnameElement = headerContainer.querySelector('#detail-fullname');
+
+  if (symbolElement) {
+    symbolElement.style.cssText = `
+      font-size: 24px;
+      font-weight: 600;
+      color: #1A2024;
+      display: block;
+      margin-bottom: 2px;
+    `;
+  }
+
+  if (fullnameElement) {
+    fullnameElement.style.cssText = `
+      font-size: 12px;
+      color: #8A939D;
+      display: block;
+    `;
+  }
+
+  // Remove all unnecessary bottom sections
+  const unnecessarySections = tokenDetail.querySelectorAll('.staking-container, .no-transactions img, .token-price-info');
+  unnecessarySections.forEach(section => {
+    section.style.display = 'none';
+  });
+
+  // Modify no transactions section
+  const noTransactionsSection = tokenDetail.querySelector('.no-transactions');
+  if (noTransactionsSection) {
+    noTransactionsSection.innerHTML = `
+      <p>Transactions will appear here.</p>
+      <p class="explorer-link">Cannot find your transaction? <a href="#">Check explorer</a></p>
+    `;
+
+    // Ensure no overlay
+    noTransactionsSection.style.cssText = `
+      position: static;
+      display: block;
+      text-align: center;
+      padding: 20px;
+    `;
+  }
+} catch (error) {
+  // Handle any errors that occur within the try block
+  console.error("An error occurred in token detail modification:", error);
+  // You might want to display an error message to the user, log the error, etc.
+}
+    
       // Modify investment warning to match screenshot
       const warningBanner = tokenDetail.querySelector('.investment-warning');
       if (warningBanner) {
