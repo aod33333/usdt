@@ -3772,12 +3772,11 @@ function setupReceiveTokenManager() {
             tokenIcon.style.marginRight = '16px';
           }
           
-          // Fix positive value colors to match TrustWallet blue
-          const tokenValue = item.querySelector('.token-price-change');
-          if (tokenValue && tokenValue.classList.contains('positive')) {
-            tokenValue.style.color = '#3375BB';
-          }
-        });
+         // Fix positive value colors to match TrustWallet blue
+const tokenValue = item.querySelector('.token-price-change');
+if (tokenValue && tokenValue.classList.contains('positive')) { 
+  tokenValue.style.color = '#3375BB';
+}
         
         // Add pull-to-refresh simulation
         addPullToRefreshSimulation(tokenList);
