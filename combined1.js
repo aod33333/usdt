@@ -2597,32 +2597,6 @@ window.FormatUtils = window.FormatUtils || {
 window.tokenSelectionManager = new TokenSelectionManager(window.screenManager);
 window.tokenSelectionManager.populateTokenList();
 
-/**
- * Filter the token list based on search term
- * @param {string} searchTerm - Search term
- */
-filterTokenList(searchTerm) {
-  const tokenItems = this.elements.tokenList.querySelectorAll('.token-item');
-
-  tokenItems.forEach(item => {
-    const tokenId = item.getAttribute('data-token-id');
-    const activeWallet = window.activeWallet || 'main';
-    const tokenInfo = window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-
-    if (!tokenInfo) return;
-
-    const tokenName = tokenInfo.name.toLowerCase();
-    const tokenSymbol = tokenInfo.symbol.toLowerCase();
-
-    // Check if token matches search term
-    const matches = tokenName.includes(searchTerm) || 
-                    tokenSymbol.includes(searchTerm) ||
-                    tokenId.includes(searchTerm);
-
-    // Show/hide based on match
-    item.style.display = matches ? 'flex' : 'none';
-  });
-}
     
   // Add this function near your setupTokenSelectionManager function:
 function setupReceiveTokenManager() {
