@@ -1,10 +1,5 @@
 // TrustWallet.js - Comprehensive Solution
-// This file consolidates functionality from combined.js, finalfix.js, loader.js, UHS.js, URS.js, and USS.js
-// All conflicts resolved, duplicates removed, and functionality maintained
 
-(function() {
-  'use strict';
-  
   console.log('TrustWallet: Starting initialization...');
   
   // Configuration constants
