@@ -625,104 +625,175 @@ function loadScreenContents() {
   });
 }
   
-  // Setup default wallet data if not present
-  function setupDefaultWalletData() {
-    return new Promise(resolve => {
-      log('Setting up default wallet data');
-      
-      // Initialize default wallet data if not present
-      if (!window.walletData) {
-        window.walletData = {
-          main: {
-            totalBalance: 0,
-            tokens: [
-              {
-                id: 'btc',
-                name: 'Bitcoin',
-                symbol: 'BTC',
-                network: 'Bitcoin',
-                icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-                amount: 0,
-                value: 0,
-                price: 83984.74,
-                change: -0.59,
-                chainBadge: null
-              },
-              {
-                id: 'eth',
-                name: 'Ethereum',
-                symbol: 'ETH',
-                network: 'Ethereum',
-                icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-                amount: 0,
-                value: 0,
-                price: 1973.81,
-                change: -0.71,
-                chainBadge: null
-              },
-              {
-                id: 'usdt',
-                name: 'Tether',
-                symbol: 'USDT',
-                network: 'BNB Smart Chain',
-                icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-                amount: 0,
-                value: 0,
-                price: 1.00,
-                change: 0.00,
-                chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-              }
-            ]
-          },
-          secondary: {
-            totalBalance: 0,
-            tokens: [
-              {
-                id: 'btc',
-                name: 'Bitcoin',
-                symbol: 'BTC',
-                network: 'Bitcoin',
-                icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
-                amount: 0,
-                value: 0,
-                price: 83984.74,
-                change: -0.59,
-                chainBadge: null
-              }
-            ]
-          },
-          business: {
-            totalBalance: 0,
-            tokens: [
-              {
-                id: 'usdt',
-                name: 'Tether',
-                symbol: 'USDT',
-                network: 'BNB Smart Chain',
-                icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-                amount: 0,
-                value: 0,
-                price: 1.00,
-                change: 0.00,
-                chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
-              }
-            ]
-          }
-        };
-      }
-      
-      // Initialize wallet state
-      if (!window.originalWalletData) {
-        window.originalWalletData = JSON.parse(JSON.stringify(window.walletData));
-      }
-      
-      if (!window.currentWalletData) {
-        window.currentWalletData = JSON.parse(JSON.stringify(window.walletData));
-      }
-      
-      resolve();
-    });
-  }
+ function setupDefaultWalletData() {
+  return new Promise(resolve => {
+    log('Setting up default wallet data');
+    
+    // Initialize default wallet data if not present
+    if (!window.walletData) {
+      window.walletData = {
+        main: {
+          totalBalance: 250000,
+          tokens: [
+            {
+              id: 'btc',
+              name: 'Bitcoin',
+              symbol: 'BTC',
+              network: 'Bitcoin',
+              icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+              amount: 1.5,
+              value: 125976.11,
+              price: 83984.74,
+              change: -0.59,
+              chainBadge: null
+            },
+            {
+              id: 'eth',
+              name: 'Ethereum',
+              symbol: 'ETH',
+              network: 'Ethereum',
+              icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+              amount: 10,
+              value: 19738.10,
+              price: 1973.81,
+              change: -0.71,
+              chainBadge: null
+            },
+            {
+              id: 'usdt',
+              name: 'Tether',
+              symbol: 'USDT',
+              network: 'BNB Smart Chain',
+              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              amount: 50000,
+              value: 50000,
+              price: 1.00,
+              change: 0.00,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+              id: 'bnb',
+              name: 'Binance Coin',
+              symbol: 'BNB',
+              network: 'BNB Smart Chain',
+              icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+              amount: 100,
+              value: 30000,
+              price: 300.00,
+              change: 1.20,
+              chainBadge: null
+            },
+            {
+              id: 'twt',
+              name: 'Trust Wallet Token',
+              symbol: 'TWT',
+              network: 'BNB Smart Chain',
+              icon: 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png',
+              amount: 5000,
+              value: 5000,
+              price: 1.00,
+              change: 0.50,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            },
+            {
+              id: 'pol',
+              name: 'Polygon',
+              symbol: 'POL',
+              network: 'Polygon',
+              icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+              amount: 1000,
+              value: 1000,
+              price: 1.00,
+              change: 2.00,
+              chainBadge: null
+            },
+            {
+              id: 'sol',
+              name: 'Solana',
+              symbol: 'SOL',
+              network: 'Solana',
+              icon: 'https://cryptologos.cc/logos/solana-sol-logo.png',
+              amount: 200,
+              value: 4000,
+              price: 20.00,
+              change: -1.50,
+              chainBadge: null
+            },
+            {
+              id: 'xrp',
+              name: 'XRP',
+              symbol: 'XRP',
+              network: 'XRP Ledger',
+              icon: 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+              amount: 10000,
+              value: 5000,
+              price: 0.50,
+              change: 0.80,
+              chainBadge: null
+            }
+          ]
+        },
+        secondary: {
+          totalBalance: 50000,
+          tokens: [
+            {
+              id: 'btc',
+              name: 'Bitcoin',
+              symbol: 'BTC',
+              network: 'Bitcoin',
+              icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+              amount: 0.5,
+              value: 41992.37,
+              price: 83984.74,
+              change: -0.59,
+              chainBadge: null
+            },
+            {
+              id: 'eth',
+              name: 'Ethereum',
+              symbol: 'ETH',
+              network: 'Ethereum',
+              icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+              amount: 5,
+              value: 9869.05,
+              price: 1973.81,
+              change: -0.71,
+              chainBadge: null
+            }
+          ]
+        },
+        business: {
+          totalBalance: 100000,
+          tokens: [
+            {
+              id: 'usdt',
+              name: 'Tether',
+              symbol: 'USDT',
+              network: 'BNB Smart Chain',
+              icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              amount: 100000,
+              value: 100000,
+              price: 1.00,
+              change: 0.00,
+              chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+            }
+          ]
+        }
+      };
+    }
+    
+    // Initialize wallet state
+    if (!window.originalWalletData) {
+      window.originalWalletData = JSON.parse(JSON.stringify(window.walletData));
+    }
+    
+    if (!window.currentWalletData) {
+      window.currentWalletData = JSON.parse(JSON.stringify(window.walletData));
+    }
+    
+    resolve();
+  });
+}
   
   // =================================================================
   // PART 3: STATE MANAGEMENT & APP COMPONENTS
