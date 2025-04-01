@@ -4712,9 +4712,9 @@ function connectEventHandlers() {
     }
   },
   
-// Define CONFIG and DEFAULT_CONFIG (or make sure they are defined elsewhere)
-const CONFIG = {};
-const DEFAULT_CONFIG = {};
+const CONFIG = { debug: false }; // Declaration of CONFIG (moved to the top)
+
+console.log(CONFIG); // Now this works!
 
 const myConfigObject = {
   setDebugMode: (enabled) => {
