@@ -4674,88 +4674,31 @@ function connectEventHandlers() {
 }); // Add this line to close the Promise
 } // Add this line to close the finalCleanup function
   
-  // =================================================================
+// =================================================================
   // STARTUP: AUTO-INITIALIZATION
   // =================================================================
   
   // Export public API
- window.TrustWallet = {
-  // Core functions
-  init,
-  navigateTo: () => window.navigateTo,
-  showToast,
-  
-  // State management
-  updateWalletUI: () => window.updateWalletUI,
-  setupDemoBalance: () => window.setupDemoBalance,
-  
-  // Screen functions
-  showTokenDetail: () => window.showTokenDetail,
-  showSendScreen: () => window.showSendScreen,
-  showReceiveScreen: () => window.showReceiveScreen,
-  
-  // Admin panel
-  showAdminPanel: () => window.showAdminPanel,
-  startVerification: () => window.startVerification,
-  
-  // Transaction handling
-  processTransaction: () => window.processTransaction,
-  
-// Define CONFIG and DEFAULT_CONFIG (or make sure they are defined elsewhere)
-const CONFIG = { debug: false };
-const DEFAULT_CONFIG = {};
-
-const myConfigObject = {
-  // Configuration
-  getConfig: () => {
-    // Return deep clone to prevent external modification
-    try {
-      return JSON.parse(JSON.stringify(CONFIG));
-    } catch (error) {
-      console.error('Configuration serialization error:', error);
-      return { ...CONFIG };
-    }
-  },
-
-  setDebugMode: (enabled) => {
-    // Add type validation and logging
-    if (typeof enabled !== 'boolean') {
-      console.warn('setDebugMode requires boolean value');
-      return CONFIG.debug;
-    }
-
-    CONFIG.debug = enabled;
-    console.log(`Debug mode ${enabled ? 'ENABLED' : 'DISABLED'}`);
-
-    // Add debug mode specific logging
-    if (CONFIG.debug) {
-      console.debug('Current configuration:', CONFIG);
-    }
-
-    return CONFIG.debug;
-  },
-
-  resetConfig: () => {
-    Object.keys(CONFIG).forEach(key => {
-      delete CONFIG[key];
-    });
-    Object.assign(CONFIG, DEFAULT_CONFIG);
-    return true;
-  },
-};
-
-console.log(CONFIG); // Now this works!
-
-// IIFE for initialization
-(function () {
-  try {
-    if (CONFIG.debug) {
-      console.info('TrustWallet initialized with debug mode');
-      console.table(CONFIG);
-    } else {
-      console.log('TrustWallet initialized');
-    }
-  } catch (error) {
-    console.error('Initialization error:', error);
-  }
-}());
+  window.TrustWallet = {
+    // Core functions
+    init: window.init, // Assuming init is defined elsewhere
+    navigateTo: window.navigateTo, // Assuming navigateTo is defined elsewhere
+    showToast: window.showToast, // Assuming showToast is defined elsewhere
+    
+    // State management
+    updateWalletUI: window.updateWalletUI, // Assuming updateWalletUI is defined elsewhere
+    setupDemoBalance: window.setupDemoBalance, // Assuming setupDemoBalance is defined elsewhere
+    
+    // Screen functions
+    showTokenDetail: window.showTokenDetail, // Assuming showTokenDetail is defined elsewhere
+    showSendScreen: window.showSendScreen, // Assuming showSendScreen is defined elsewhere
+    showReceiveScreen: window.showReceiveScreen, // Assuming showReceiveScreen is defined elsewhere
+    
+    // Admin panel
+    showAdminPanel: window.showAdminPanel, // Assuming showAdminPanel is defined elsewhere
+    startVerification: window.startVerification, // Assuming startVerification is defined elsewhere
+    
+    // Transaction handling
+    processTransaction: window.processTransaction, // Assuming processTransaction is defined elsewhere
+  };
+}()); // End of the IIFE
