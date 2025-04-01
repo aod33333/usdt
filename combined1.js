@@ -4744,43 +4744,125 @@ window.TrustWallet = {
   processTransaction: window.processTransaction
 };
 
-// Add setupDemoBalance function HERE, before the closing IIFE
 window.setupDemoBalance = function() {
   console.log('Demo balance setup called');
   
-  // Make sure data exists
-  if (!window.walletData) {
-    setupDefaultWalletData();
-  }
-  
-  // Ensure currentWalletData exists
-  if (!window.currentWalletData) {
-    window.currentWalletData = JSON.parse(JSON.stringify(window.walletData || {}));
-  }
-  
-  // Get active wallet
-  const activeWallet = window.activeWallet || 'main';
-  
-  // Update UI
-  if (typeof window.updateWalletUI === 'function') {
-    window.updateWalletUI(activeWallet);
-  }
-  
-  // Simple balance update as fallback
-  const totalBalance = document.getElementById('total-balance');
-  if (totalBalance && window.currentWalletData && window.currentWalletData[activeWallet]) {
-    totalBalance.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2);
-    
-    // Force token list population
-    if (typeof window.populateMainWalletTokenList === 'function') {
-      setTimeout(window.populateMainWalletTokenList, 100);
+  // Force reload of wallet data (without JSON.stringify)
+  window.walletData = {
+    main: {
+      totalBalance: 250000,
+      tokens: [
+        {
+          id: 'btc',
+          name: 'Bitcoin',
+          symbol: 'BTC',
+          network: 'Bitcoin',
+          icon: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+          amount: 1.5,
+          value: 125976.11,
+          price: 83984.74,
+          change: -0.59,
+          chainBadge: null
+        },
+        {
+          id: 'eth',
+          name: 'Ethereum',
+          symbol: 'ETH',
+          network: 'Ethereum',
+          icon: 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+          amount: 10,
+          value: 19738.10,
+          price: 1973.81,
+          change: -0.71,
+          chainBadge: null
+        },
+        {
+          id: 'usdt',
+          name: 'Tether',
+          symbol: 'USDT',
+          network: 'BNB Smart Chain',
+          icon: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+          amount: 50000,
+          value: 50000,
+          price: 1.00,
+          change: 0.00,
+          chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+        },
+        {
+          id: 'bnb',
+          name: 'Binance Coin',
+          symbol: 'BNB',
+          network: 'BNB Smart Chain',
+          icon: 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+          amount: 25,
+          value: 7500.75,
+          price: 300.03,
+          change: 1.25,
+          chainBadge: 'https://cryptologos.cc/logos/bnb-bnb-logo.png'
+        },
+        {
+          id: 'trx',
+          name: 'Tron',
+          symbol: 'TRX',
+          network: 'Tron Network',
+          icon: 'https://cryptologos.cc/logos/tron-trx-logo.png',
+          amount: 5000,
+          value: 375.50,
+          price: 0.075,
+          change: -0.35,
+          chainBadge: null
+        },
+        {
+          id: 'pol',
+          name: 'Polygon',
+          symbol: 'MATIC',
+          network: 'Polygon',
+          icon: 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+          amount: 2000,
+          value: 3000,
+          price: 1.50,
+          change: 2.35,
+          chainBadge: null
+        },
+        {
+          id: 'sol',
+          name: 'Solana',
+          symbol: 'SOL',
+          network: 'Solana',
+          icon: 'https://cryptologos.cc/logos/solana-sol-logo.png',
+          amount: 15,
+          value: 2250.75,
+          price: 150.05,
+          change: 2.15,
+          chainBadge: null
+        }
+      ]
     }
-    
-    return true;
-  } else {
-    console.error('Elements not available for demo balance');
-    return false;
+  };
+
+  // Set reference values directly
+  window.originalWalletData = Object.assign({}, window.walletData);
+  window.currentWalletData = Object.assign({}, window.walletData);
+  window.activeWallet = 'main';
+  
+  // Update the UI
+  const totalBalance = document.getElementById('total-balance');
+  if (totalBalance) {
+    totalBalance.textContent = '$' + window.currentWalletData.main.totalBalance.toFixed(2);
   }
+  
+  // Force token list population directly
+  populateMainWalletTokenList();
+  return true;
 };
+
+// The following is the code that should come after your setupDemoBalance function:
+
+// Call setupDemoBalance with a delay to ensure DOM is loaded
+setTimeout(function() {
+  if (window.setupDemoBalance) {
+    window.setupDemoBalance();
+  }
+}, 1000);
 
 })(); // Close the IIFE here after adding the function
