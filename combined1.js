@@ -2521,139 +2521,81 @@ window.FormatUtils = window.FormatUtils || {
        * Token Selection Manager
        * Handles token selection for send/receive
        */
-      class TokenSelectionManager {
-        constructor() {
-          this.initializeElements();
-          this.setupEventListeners();
-        }
-        
-        /**
-         * Initialize token selection elements
-         */
-        initializeElements() {
-          this.elements = {
-            tokenSelectScreen: document.getElementById('send-token-select'),
-            tokenList: document.getElementById('select-token-list'),
-            backButton: document.querySelector('#send-token-select .back-button'),
-            searchInput: document.getElementById('token-search-input')
-          };
-        }
-        
-        /**
-         * Setup event listeners for token selection
-         */
-        setupEventListeners() {
-          // Back button
-          if (this.elements.backButton) {
-            this.elements.backButton.addEventListener('click', () => {
-              window.navigateTo('wallet-screen');
-            });
-          }
-          
-          // Search functionality
-          if (this.elements.searchInput) {
-            this.elements.searchInput.addEventListener('input', () => {
-              this.filterTokenList(this.elements.searchInput.value.toLowerCase());
-            });
-          }
-        }
-        
-/**
- * Populate token selection list
- */
-populateTokenList() {
-  const { tokenList } = this.elements;
-  if (!tokenList) return;
-
-  // Clear existing items
-  tokenList.innerHTML = '';
-
-  // Get tokens from active wallet
-  const activeWallet = window.activeWallet || 'main';
-
-  // Log the current wallet data for verification
-  console.log('Current Wallet Data:', window.currentWalletData);
-
-  // This is the important fix - try both data sources
-  let wallet = null;
-  if (window.currentWalletData && window.currentWalletData[activeWallet]) {
-    wallet = window.currentWalletData[activeWallet];
-  } else if (window.walletData && window.walletData[activeWallet]) {
-    wallet = window.walletData[activeWallet];
-    // Copy to currentWalletData to ensure consistency
-    if (!window.currentWalletData) window.currentWalletData = {};
-    window.currentWalletData[activeWallet] = Object.assign({}, wallet);
+     class TokenSelectionManager {
+  constructor(screenManager) {
+    this.screenManager = screenManager;
+    this.activeSendTokenId = null;
+    this.initializeElements();
   }
 
-  if (!wallet || !wallet.tokens) {
-    console.error('No tokens found in active wallet');
-    return;
+  initializeElements() {
+    this.elements = {
+      tokenSelectScreen: document.getElementById('send-token-select'),
+      tokenList: document.getElementById('select-token-list'),
+      searchInput: document.getElementById('token-search-input')
+    };
   }
 
-  // Sort tokens by value (highest first)
-  const sortedTokens = wallet.tokens.slice().sort((a, b) => b.value - a.value);
+  populateTokenList() {
+    const { tokenList } = this.elements;
+    if (!tokenList) return;
 
-  // Create token items
-  sortedTokens.forEach(token => {
-    const tokenItem = this.createTokenSelectionItem(token);
-    tokenList.appendChild(tokenItem);
-  });
+    // Clear existing items
+    tokenList.innerHTML = '';
+
+    // Get tokens from active wallet
+    const activeWallet = window.activeWallet || 'main';
+    const wallet = window.currentWalletData?.[activeWallet];
+
+    if (!wallet?.tokens) {
+      console.error('No tokens available for selection');
+      return;
+    }
+
+    // Create token items
+    wallet.tokens.forEach(token => {
+      const tokenItem = document.createElement('div');
+      tokenItem.className = 'token-item';
+      tokenItem.setAttribute('data-token-id', token.id);
+
+      tokenItem.innerHTML = `
+        <div class="token-icon">
+          <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
+        </div>
+        <div class="token-info">
+          <div class="token-name">${token.symbol}</div>
+          <div class="token-network">${token.network}</div>
+        </div>
+        <div class="token-balance">
+          ${token.amount.toLocaleString()} ${token.symbol}
+        </div>
+      `;
+
+      // Add click handler
+      tokenItem.addEventListener('click', () => {
+        this.selectTokenForSend(token.id);
+      });
+
+      tokenList.appendChild(tokenItem);
+    });
+  }
+
+  selectTokenForSend(tokenId) {
+    this.activeSendTokenId = tokenId;
+    this.screenManager.showSendScreen(tokenId);
+    this.updateActiveTokenStyle(tokenId);
+  }
+
+  updateActiveTokenStyle(tokenId) {
+    document.querySelectorAll('.token-item').forEach(item => {
+      item.classList.toggle('active', item.dataset.tokenId === tokenId);
+    });
+  }
 }
 
-/**
- * Create a token selection item
- * @param {Object} token - Token data
- * @returns {HTMLElement} Token list item
- */
-createTokenSelectionItem(token) {
-  const tokenItem = document.createElement('div');
-  tokenItem.className = 'token-item';
-  tokenItem.setAttribute('data-token-id', token.id);
-
-  // Format numbers for display
-  const formattedAmount = token.amount.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 6
-  });
-
-  const formattedValue = window.FormatUtils.formatCurrency(token.value);
-
-  // Show network badge for specific tokens
-  const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
-  const networkBadge = showBadge ? 
-    `<span class="token-network-badge">BEP20</span>` : '';
-
-  // Check if balance is zero (to show warning)
-  const isZeroBalance = token.amount <= 0;
-  const warningText = isZeroBalance ? 
-    `<div class="token-warning-text">Insufficient balance</div>` : '';
-
-  tokenItem.innerHTML = `
-    <div class="token-icon">
-      <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
-    </div>
-    <div class="token-info">
-      <div class="token-name">
-        ${token.symbol} ${networkBadge}
-      </div>
-      <div class="token-price">
-        ${token.name}
-      </div>
-    </div>
-    <div class="token-amount-container">
-      <div class="token-balance">${formattedAmount} ${token.symbol}</div>
-      <div class="token-value">${formattedValue}</div>
-      ${warningText}
-    </div>
-  `;
-
-  // Add click handler to select this token and go to send screen
-  tokenItem.addEventListener('click', () => {
-    this.selectTokenForSend(token.id);
-  });
-
-  return tokenItem;
-}
+// Initialize after screenManager is available
+window.tokenSelectionManager = new TokenSelectionManager(window.screenManager);
+window.tokenSelectionManager.populateTokenList();
 
 /**
  * Filter the token list based on search term
@@ -2681,24 +2623,6 @@ filterTokenList(searchTerm) {
     item.style.display = matches ? 'flex' : 'none';
   });
 }
-
-/**
- * Select token for sending
- * @param {string} tokenId - Token ID
- */
-selectTokenForSend(tokenId) {
-  // Store the selected token ID globally
-  window.activeSendTokenId = tokenId;
-
-  // Show the send screen with the selected token
-  window.showSendScreen(tokenId);
-}
-
-// Create global instance
-window.tokenSelectionManager = new TokenSelectionManager();
-
-// Populate token list
-window.tokenSelectionManager.populateTokenList();
     
   // Add this function near your setupTokenSelectionManager function:
 function setupReceiveTokenManager() {
