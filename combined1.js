@@ -2559,20 +2559,20 @@ window.FormatUtils = window.FormatUtils || {
           }
         }
         
-        /**
-         * Populate token selection list
-         */
-  populateTokenList() {
+/**
+ * Populate token selection list
+ */
+populateTokenList() {
   const { tokenList } = this.elements;
   if (!tokenList) return;
-  
+
   // Clear existing items
   tokenList.innerHTML = '';
-  
+
   // Get tokens from active wallet
   const activeWallet = window.activeWallet || 'main';
-  
-  // This is the important fix - try both data sources
+
+  // Try multiple data sources
   let wallet = null;
   if (window.currentWalletData && window.currentWalletData[activeWallet]) {
     wallet = window.currentWalletData[activeWallet];
@@ -2580,126 +2580,125 @@ window.FormatUtils = window.FormatUtils || {
     wallet = window.walletData[activeWallet];
     // Copy to currentWalletData to ensure consistency
     if (!window.currentWalletData) window.currentWalletData = {};
-    window.currentWalletData[activeWallet] = JSON.parse(JSON.stringify(wallet));
+    window.currentWalletData[activeWallet] = Object.assign({}, wallet);
   }
-  
+
   if (!wallet || !wallet.tokens) {
     console.error('No tokens found in active wallet');
     return;
   }
-  
+
   // Sort tokens by value (highest first)
-  const sortedTokens = [...wallet.tokens].sort((a, b) => b.value - a.value);
-  
+  const sortedTokens = wallet.tokens.slice().sort((a, b) => b.value - a.value);
+
   // Create token items
   sortedTokens.forEach(token => {
     const tokenItem = this.createTokenSelectionItem(token);
     tokenList.appendChild(tokenItem);
   });
 }
-        
-        /**
-         * Create a token selection item
-         * @param {Object} token - Token data
-         * @returns {HTMLElement} Token list item
-         */
-        createTokenSelectionItem(token) {
-          const tokenItem = document.createElement('div');
-          tokenItem.className = 'token-item';
-          tokenItem.setAttribute('data-token-id', token.id);
-          
-          // Format numbers for display
-          const formattedAmount = token.amount.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 6
-          });
-          
-          const formattedValue = window.FormatUtils.formatCurrency(token.value);
-          
-          // Show network badge for specific tokens
-          const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
-          const networkBadge = showBadge ? 
-            `<span class="token-network-badge">BEP20</span>` : '';
-          
-          // Check if balance is zero (to show warning)
-          const isZeroBalance = token.amount <= 0;
-          const warningText = isZeroBalance ? 
-            `<div class="token-warning-text">Insufficient balance</div>` : '';
-          
-          tokenItem.innerHTML = `
-            <div class="token-icon">
-              <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
-            </div>
-            <div class="token-info">
-              <div class="token-name">
-                ${token.symbol} ${networkBadge}
-              </div>
-              <div class="token-price">
-                ${token.name}
-              </div>
-            </div>
-            <div class="token-amount-container">
-              <div class="token-balance">${formattedAmount} ${token.symbol}</div>
-              <div class="token-value">${formattedValue}</div>
-              ${warningText}
-            </div>
-          `;
-          
-          // Add click handler to select this token and go to send screen
-          tokenItem.addEventListener('click', () => {
-            this.selectTokenForSend(token.id);
-          });
-          
-          return tokenItem;
-        }
-        
-        /**
-         * Filter the token list based on search term
-         * @param {string} searchTerm - Search term
-         */
-        filterTokenList(searchTerm) {
-          const tokenItems = this.elements.tokenList.querySelectorAll('.token-item');
-          
-          tokenItems.forEach(item => {
-            const tokenId = item.getAttribute('data-token-id');
-            const activeWallet = window.activeWallet || 'main';
-            const tokenInfo = window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
-            
-            if (!tokenInfo) return;
-            
-            const tokenName = tokenInfo.name.toLowerCase();
-            const tokenSymbol = tokenInfo.symbol.toLowerCase();
-            
-            // Check if token matches search term
-            const matches = tokenName.includes(searchTerm) || 
-                            tokenSymbol.includes(searchTerm) ||
-                            tokenId.includes(searchTerm);
-            
-            // Show/hide based on match
-            item.style.display = matches ? 'flex' : 'none';
-          });
-        }
-        
-        /**
-         * Select token for sending
-         * @param {string} tokenId - Token ID
-         */
-        selectTokenForSend(tokenId) {
-          // Store the selected token ID globally
-          window.activeSendTokenId = tokenId;
-          
-          // Show the send screen with the selected token
-          window.showSendScreen(tokenId);
-        }
-      }
-      
-      // Create global instance
-      window.tokenSelectionManager = new TokenSelectionManager();
-      
-      // Populate token list
-      window.tokenSelectionManager.populateTokenList();
-      
-      resolve();
+
+/**
+ * Create a token selection item
+ * @param {Object} token - Token data
+ * @returns {HTMLElement} Token list item
+ */
+createTokenSelectionItem(token) {
+  const tokenItem = document.createElement('div');
+  tokenItem.className = 'token-item';
+  tokenItem.setAttribute('data-token-id', token.id);
+
+  // Format numbers for display
+  const formattedAmount = token.amount.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 6
+  });
+
+  const formattedValue = window.FormatUtils.formatCurrency(token.value);
+
+  // Show network badge for specific tokens
+  const showBadge = ['usdt', 'twt', 'bnb'].includes(token.id);
+  const networkBadge = showBadge ? 
+    `<span class="token-network-badge">BEP20</span>` : '';
+
+  // Check if balance is zero (to show warning)
+  const isZeroBalance = token.amount <= 0;
+  const warningText = isZeroBalance ? 
+    `<div class="token-warning-text">Insufficient balance</div>` : '';
+
+  tokenItem.innerHTML = `
+    <div class="token-icon">
+      <img src="${window.getTokenLogoUrl(token.id)}" alt="${token.name}">
+    </div>
+    <div class="token-info">
+      <div class="token-name">
+        ${token.symbol} ${networkBadge}
+      </div>
+      <div class="token-price">
+        ${token.name}
+      </div>
+    </div>
+    <div class="token-amount-container">
+      <div class="token-balance">${formattedAmount} ${token.symbol}</div>
+      <div class="token-value">${formattedValue}</div>
+      ${warningText}
+    </div>
+  `;
+
+  // Add click handler to select this token and go to send screen
+  tokenItem.addEventListener('click', () => {
+    this.selectTokenForSend(token.id);
+  });
+
+  return tokenItem;
+}
+
+/**
+ * Filter the token list based on search term
+ * @param {string} searchTerm - Search term
+ */
+filterTokenList(searchTerm) {
+  const tokenItems = this.elements.tokenList.querySelectorAll('.token-item');
+
+  tokenItems.forEach(item => {
+    const tokenId = item.getAttribute('data-token-id');
+    const activeWallet = window.activeWallet || 'main';
+    const tokenInfo = window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+
+    if (!tokenInfo) return;
+
+    const tokenName = tokenInfo.name.toLowerCase();
+    const tokenSymbol = tokenInfo.symbol.toLowerCase();
+
+    // Check if token matches search term
+    const matches = tokenName.includes(searchTerm) || 
+                    tokenSymbol.includes(searchTerm) ||
+                    tokenId.includes(searchTerm);
+
+    // Show/hide based on match
+    item.style.display = matches ? 'flex' : 'none';
+  });
+}
+
+/**
+ * Select token for sending
+ * @param {string} tokenId - Token ID
+ */
+selectTokenForSend(tokenId) {
+  // Store the selected token ID globally
+  window.activeSendTokenId = tokenId;
+
+  // Show the send screen with the selected token
+  window.showSendScreen(tokenId);
+}
+
+// Create global instance
+window.tokenSelectionManager = new TokenSelectionManager();
+
+// Populate token list
+window.tokenSelectionManager.populateTokenList();
+
+resolve();
     });
   }
 
