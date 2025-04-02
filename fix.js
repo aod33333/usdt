@@ -2914,3 +2914,484 @@ window.addNetworkBadgesToTokens = addNetworkBadgesToTokens;
   
   console.log('Final UI enhancements applied successfully');
 })();
+
+// Additional UI Refinements for Trust Wallet
+
+// Function to center token detail header
+function centerTokenDetailHeader() {
+  const tokenDetailHeader = document.querySelector('#token-detail .detail-header');
+  if (!tokenDetailHeader) return;
+
+  // Apply flexbox layout
+  tokenDetailHeader.style.display = 'flex';
+  tokenDetailHeader.style.justifyContent = 'space-between';
+  tokenDetailHeader.style.alignItems = 'center';
+  tokenDetailHeader.style.padding = '12px 16px';
+  
+  // Center the title
+  const titleElement = tokenDetailHeader.querySelector('.token-detail-title');
+  if (titleElement) {
+    titleElement.style.position = 'absolute';
+    titleElement.style.left = '0';
+    titleElement.style.right = '0';
+    titleElement.style.textAlign = 'center';
+    titleElement.style.zIndex = '1';
+  }
+  
+  // Ensure back button and other icons are above the title
+  const backButton = tokenDetailHeader.querySelector('.back-button');
+  const headerIcons = tokenDetailHeader.querySelector('.header-icons');
+  
+  if (backButton) {
+    backButton.style.position = 'relative';
+    backButton.style.zIndex = '2';
+  }
+  
+  if (headerIcons) {
+    headerIcons.style.position = 'relative';
+    headerIcons.style.zIndex = '2';
+  }
+}
+
+// Enhance receive screen icons
+function enhanceReceiveScreenIcons() {
+  const receiveScreen = document.getElementById('receive-screen');
+  if (!receiveScreen) return;
+  
+  const actionButtons = receiveScreen.querySelectorAll('.action-button, .qr-button, .copy-button');
+  
+  actionButtons.forEach(button => {
+    // Style for circular buttons
+    button.style.width = '40px';
+    button.style.height = '40px';
+    button.style.borderRadius = '50%';
+    button.style.backgroundColor = '#F5F5F5';
+    button.style.display = 'flex';
+    button.style.justifyContent = 'center';
+    button.style.alignItems = 'center';
+    button.style.border = 'none';
+    
+    // Fix icon color
+    const icon = button.querySelector('i');
+    if (icon) {
+      icon.style.color = '#5F6C75';
+      icon.style.fontSize = '16px';
+    }
+  });
+}
+
+// Add network and token name to token items
+function enhanceTokenItemDetails() {
+  // Enhance receive screen token items
+  const receiveTokenItems = document.querySelectorAll('#receive-token-list .token-item');
+  receiveTokenItems.forEach(item => {
+    const tokenInfo = item.querySelector('.token-info');
+    if (!tokenInfo) return;
+    
+    // Get token data
+    const tokenId = item.getAttribute('data-token-id');
+    const activeWallet = window.activeWallet || 'main';
+    const token = window.currentWalletData?.[activeWallet]?.tokens.find(t => t.id === tokenId);
+    
+    if (token) {
+      // Update token info structure
+      tokenInfo.innerHTML = `
+        <div class="token-name-row">
+          <span class="token-symbol">${token.symbol}</span>
+          <span class="network-badge">${token.network || 'Unknown Network'}</span>
+        </div>
+        <div class="token-address">
+          ${shortenAddress('0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71')}
+        </div>
+      `;
+      
+      // Style the new elements
+      const nameRow = tokenInfo.querySelector('.token-name-row');
+      if (nameRow) {
+        nameRow.style.display = 'flex';
+        nameRow.style.alignItems = 'center';
+        nameRow.style.gap = '8px';
+      }
+      
+      const networkBadge = tokenInfo.querySelector('.network-badge');
+      if (networkBadge) {
+        networkBadge.style.backgroundColor = '#F5F5F5';
+        networkBadge.style.color = '#5F6C75';
+        networkBadge.style.padding = '2px 6px';
+        networkBadge.style.borderRadius = '12px';
+        networkBadge.style.fontSize = '10px';
+      }
+      
+      const tokenAddress = tokenInfo.querySelector('.token-address');
+      if (tokenAddress) {
+        tokenAddress.style.fontSize = '12px';
+        tokenAddress.style.color = '#8A939D';
+      }
+    }
+  });
+  
+  // Enhance send screen token selection
+  const sendTokenItems = document.querySelectorAll('#send-token-select .token-item');
+  sendTokenItems.forEach(item => {
+    const tokenInfo = item.querySelector('.token-info');
+    if (!tokenInfo) return;
+    
+    // Get token data
+    const tokenId = item.getAttribute('data-token-id');
+    const activeWallet = window.activeWallet || 'main';
+    const token = window.currentWalletData?.[activeWallet]?.tokens.find(t => t.id === tokenId);
+    
+    if (token) {
+      // Update token info structure
+      tokenInfo.innerHTML = `
+        <div class="token-name-row">
+          <span class="token-symbol">${token.symbol}</span>
+          <span class="network-badge">${token.network || 'Unknown Network'}</span>
+        </div>
+        <div class="token-fullname">${token.name}</div>
+      `;
+      
+      // Style the new elements
+      const nameRow = tokenInfo.querySelector('.token-name-row');
+      if (nameRow) {
+        nameRow.style.display = 'flex';
+        nameRow.style.alignItems = 'center';
+        nameRow.style.gap = '8px';
+      }
+      
+      const networkBadge = tokenInfo.querySelector('.network-badge');
+      if (networkBadge) {
+        networkBadge.style.backgroundColor = '#F5F5F5';
+        networkBadge.style.color = '#5F6C75';
+        networkBadge.style.padding = '2px 6px';
+        networkBadge.style.borderRadius = '12px';
+        networkBadge.style.fontSize = '10px';
+      }
+      
+      const tokenFullname = tokenInfo.querySelector('.token-fullname');
+      if (tokenFullname) {
+        tokenFullname.style.fontSize = '12px';
+        tokenFullname.style.color = '#8A939D';
+      }
+    }
+  });
+}
+
+// Shorten address utility function
+function shortenAddress(address) {
+  if (!address) return '';
+  return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+}
+
+// Fix bottom navigation tabs
+function fixBottomNavigationTabs() {
+  const bottomTabs = document.querySelector('.bottom-tabs');
+  if (!bottomTabs) {
+    // Create bottom tabs if missing
+    const newBottomTabs = document.createElement('div');
+    newBottomTabs.className = 'bottom-tabs';
+    newBottomTabs.innerHTML = `
+      <div class="tab-item active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </div>
+      <div class="tab-item">
+        <i class="fas fa-exchange-alt"></i>
+        <span>Swap</span>
+      </div>
+      <div class="tab-item">
+        <i class="fas fa-piggy-bank"></i>
+        <span>Earn</span>
+      </div>
+      <div class="tab-item">
+        <i class="fas fa-chart-line"></i>
+        <span>Markets</span>
+      </div>
+      <div class="tab-item">
+        <i class="fas fa-ellipsis-h"></i>
+        <span>More</span>
+      </div>
+    `;
+    
+    document.body.appendChild(newBottomTabs);
+  }
+  
+  // Style bottom tabs
+  const tabItems = bottomTabs.querySelectorAll('.tab-item');
+  tabItems.forEach(tab => {
+    tab.style.display = 'flex';
+    tab.style.flexDirection = 'column';
+    tab.style.alignItems = 'center';
+    
+    const icon = tab.querySelector('i');
+    if (icon) {
+      icon.style.fontSize = '20px';
+      icon.style.marginBottom = '4px';
+      icon.style.color = tab.classList.contains('active') ? '#3375BB' : '#8A939D';
+    }
+    
+    const span = tab.querySelector('span');
+    if (span) {
+      span.style.fontSize = '10px';
+      span.style.color = tab.classList.contains('active') ? '#3375BB' : '#8A939D';
+    }
+  });
+  
+  // Add click handlers to tabs
+  tabItems.forEach((tab, index) => {
+    tab.addEventListener('click', function() {
+      // Remove active state from all tabs
+      tabItems.forEach(t => {
+        t.classList.remove('active');
+        const icon = t.querySelector('i');
+        const span = t.querySelector('span');
+        if (icon) icon.style.color = '#8A939D';
+        if (span) span.style.color = '#8A939D';
+      });
+      
+      // Add active state to clicked tab
+      this.classList.add('active');
+      const icon = this.querySelector('i');
+      const span = this.querySelector('span');
+      if (icon) icon.style.color = '#3375BB';
+      if (span) span.style.color = '#3375BB';
+      
+      // Add toast for unimplemented tabs
+      if (index !== 0) {
+        showToast(`${span.textContent} feature coming soon`);
+      }
+    });
+  });
+}
+
+// Enhance admin panel functionality
+function enhanceAdminPanel() {
+  const adminPanel = document.getElementById('admin-panel');
+  if (!adminPanel) return;
+  
+  // Ensure all form controls work
+  const applyFakeButton = document.getElementById('apply-fake');
+  const resetWalletButton = document.getElementById('reset-wallet');
+  
+  if (applyFakeButton) {
+    applyFakeButton.addEventListener('click', function() {
+      const walletSelect = document.getElementById('admin-wallet-select');
+      const tokenSelect = document.getElementById('admin-token-select');
+      const balanceInput = document.getElementById('fake-balance');
+      const expirationInput = document.getElementById('expiration-time');
+      const generateHistoryCheckbox = document.getElementById('generate-history');
+      const modifyAllCheckbox = document.getElementById('modify-all-wallets');
+      
+      // Get form values
+      const walletId = walletSelect.value;
+      const tokenId = tokenSelect.value;
+      const balance = parseFloat(balanceInput.value);
+      const expiration = parseInt(expirationInput.value);
+      const generateHistory = generateHistoryCheckbox.checked;
+      const modifyAll = modifyAllCheckbox.checked;
+      
+      // Apply logic (similar to what might be in the combined1.js)
+      if (window.adminPanelManager && window.adminPanelManager.updateWalletBalance) {
+        const walletsToModify = modifyAll 
+          ? Object.keys(window.currentWalletData || {})
+          : [walletId];
+        
+        walletsToModify.forEach(wId => {
+          window.adminPanelManager.updateWalletBalance(wId, tokenId, balance, generateHistory);
+        });
+        
+        // Show success toast
+        showToast('Fake balance applied successfully');
+      } else {
+        console.error('Admin panel management not available');
+        showToast('Failed to apply fake balance');
+      }
+    });
+  }
+  
+  if (resetWalletButton) {
+    resetWalletButton.addEventListener('click', function() {
+      // Reset wallet logic
+      if (window.stateManager && window.stateManager.reset) {
+        const walletSelect = document.getElementById('admin-wallet-select');
+        const walletId = walletSelect.value;
+        
+        window.stateManager.reset(walletId);
+        
+        // Show success toast
+        showToast('Wallet reset to original state');
+      } else {
+        console.error('State management not available');
+        showToast('Failed to reset wallet');
+      }
+    });
+  }
+}
+
+// Global toast function (if not already defined)
+function showToast(message, duration = 2000) {
+  // Check if global showToast exists
+  if (typeof window.showToast === 'function') {
+    return window.showToast(message, duration);
+  }
+  
+  // Fallback implementation
+  const existingToast = document.querySelector('.tw-toast');
+  if (existingToast) {
+    existingToast.remove();
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = 'tw-toast';
+  toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '80px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+  toast.style.color = 'white';
+  toast.style.padding = '12px 20px';
+  toast.style.borderRadius = '8px';
+  toast.style.fontSize = '14px';
+  toast.style.zIndex = '10000';
+  toast.style.opacity = '0';
+  toast.style.transition = 'opacity 0.3s';
+  
+  document.body.appendChild(toast);
+  
+  // Show toast
+  setTimeout(() => {
+    toast.style.opacity = '1';
+  }, 10);
+  
+  // Hide and remove after duration
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, duration);
+}
+
+// Fix back buttons on all screens
+function fixBackButtons() {
+  const backButtons = document.querySelectorAll('.back-button');
+  
+  backButtons.forEach(button => {
+    // Ensure button is clickable
+    button.style.cursor = 'pointer';
+    
+    // Remove existing listeners to prevent multiple bindings
+    const newButton = button.cloneNode(true);
+    button.parentNode.replaceChild(newButton, button);
+    
+    // Add new click handler
+    newButton.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      // Get the current screen
+      const currentScreen = this.closest('.screen');
+      if (!currentScreen) return;
+      
+      // Determine return screen based on current screen
+      let returnTo = 'wallet-screen';
+      
+      switch(currentScreen.id) {
+        case 'token-detail':
+        case 'send-screen':
+        case 'send-token-select':
+        case 'receive-screen':
+        case 'history-screen':
+          returnTo = 'wallet-screen';
+          break;
+        // Add more specific cases if needed
+      }
+      
+      // Use existing navigation method if available
+      if (typeof window.navigateTo === 'function') {
+        window.navigateTo(returnTo);
+      } else {
+        // Fallback navigation
+        document.querySelectorAll('.screen').forEach(screen => {
+          screen.style.display = 'none';
+          screen.classList.add('hidden');
+        });
+        
+        const targetScreen = document.getElementById(returnTo);
+        if (targetScreen) {
+          targetScreen.style.display = 'flex';
+          targetScreen.classList.remove('hidden');
+        }
+      }
+    });
+  });
+}
+
+// Main initialization function to apply all refinements
+function applyAllRefinements() {
+  // Apply refinements with a small delay to ensure DOM is fully loaded
+  setTimeout(() => {
+    centerTokenDetailHeader();
+    enhanceReceiveScreenIcons();
+    enhanceTokenItemDetails();
+    fixBottomNavigationTabs();
+    enhanceAdminPanel();
+    fixBackButtons();
+  }, 300);
+}
+
+// Run refinements when page loads
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  applyAllRefinements();
+} else {
+  document.addEventListener('DOMContentLoaded', applyAllRefinements);
+}
+
+// Create a mutation observer to reapply refinements when screens change
+function setupRefinementObserver() {
+  const observer = new MutationObserver(function(mutations) {
+    let needsUpdate = false;
+    
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && 
+          mutation.attributeName === 'style' &&
+          mutation.target.classList.contains('screen') &&
+          mutation.target.style.display !== 'none') {
+        needsUpdate = true;
+      }
+    });
+    
+    if (needsUpdate) {
+      setTimeout(() => {
+        centerTokenDetailHeader();
+        enhanceReceiveScreenIcons();
+        enhanceTokenItemDetails();
+        fixBackButtons();
+      }, 200);
+    }
+  });
+  
+  // Observe the app container
+  const appContainer = document.querySelector('.app-container');
+  if (appContainer) {
+    observer.observe(appContainer, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['style', 'class']
+    });
+  }
+}
+
+// Initialize the observer
+setupRefinementObserver();
+
+// Expose refinement functions globally for debugging
+window.trustWalletRefinements = {
+  centerTokenDetailHeader,
+  enhanceReceiveScreenIcons,
+  enhanceTokenItemDetails,
+  fixBottomNavigationTabs,
+  enhanceAdminPanel,
+  fixBackButtons,
+  applyAllRefinements
+};
