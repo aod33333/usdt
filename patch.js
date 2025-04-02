@@ -1,4 +1,4 @@
-// Trust Wallet - Comprehensive Patch
+// Trust Wallet - Comprehensive Patch 
 // This patch resolves all known issues and improves UI consistency
 
 (function() {
