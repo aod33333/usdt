@@ -1399,15 +1399,18 @@ img[src*="bnb-bnb-logo"] {
     margin-left: var(--space-xs);
 }
 
-/* History Screen Styles */
+/* ====================== */
+/* HISTORY SCREEN UPDATES */
+/* ====================== */
 .history-screen {
-    background-color: #FFFFFF;
+    background-color: var(--tw-white);
     overflow-y: auto;
 }
 
 .networks-filter {
-    padding: 8px 16px;
-    background-color: #F5F5F5;
+    padding: var(--space-sm) var(--space-md);
+    background-color: var(--tw-bg-gray);
+    border-bottom: 1px solid var(--tw-bg-gray);
     display: flex;
     align-items: center;
 }
@@ -1415,310 +1418,194 @@ img[src*="bnb-bnb-logo"] {
 .all-networks {
     display: flex;
     align-items: center;
-    background-color: #FFFFFF;
+    background-color: var(--tw-white);
     border-radius: 16px;
     padding: 6px 12px;
-    font-size: 12px;
+    font-size: var(--font-sm);
     color: var(--tw-black);
     cursor: pointer;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    margin-right: auto;
+    border: 1px solid var(--tw-light-gray);
+    box-shadow: none;
 }
 
 .all-networks i {
-    margin-left: 4px;
-    font-size: 10px;
+    margin-left: var(--space-xs);
+    font-size: var(--font-xs);
     color: var(--tw-medium-gray);
 }
 
 .transaction-date-header {
-    padding: 8px 16px;
-    font-size: 14px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--font-sm);
     font-weight: 500;
-    color: var(--tw-black);
-    background-color: #F5F5F5;
-}
-
-.history-transaction-list {
-    background-color: #FFFFFF;
+    color: var(--tw-medium-gray);
+    background-color: var(--tw-bg-gray);
 }
 
 .history-transaction-list .transaction-item {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid #F5F5F5;
-    background-color: #FFFFFF;
-}
-
-#history-screen .transaction-value.positive {
-    color: #3375BB !important;
+    padding: var(--space-sm) var(--space-md);
+    border-bottom: 1px solid var(--tw-bg-gray);
+    background-color: var(--tw-white);
+    min-height: 56px;
 }
 
 .transaction-token-icon {
-    min-width: 36px;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 12px;
-    position: relative;
+    width: 32px;
+    height: 32px;
     background-color: rgba(51, 117, 187, 0.1);
+    margin-right: var(--space-md);
 }
 
 .transaction-token-icon img {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
 }
 
-/* Send Screen */
+/* =================== */
+/* SEND SCREEN UPDATES */
+/* =================== */
 .send-content {
     padding: var(--space-md);
     flex: 1;
     display: flex;
     flex-direction: column;
-}
-
-.form-group {
-    margin-bottom: var(--space-md);
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: var(--space-xs);
-    color: var(--tw-dark-gray);
-    font-weight: 500;
+    gap: var(--space-md);
 }
 
 .address-input, .amount-input {
-    display: flex;
-    align-items: center;
-    border: 1px solid var(--tw-light-gray);
-    border-radius: 8px;
+    border: 1px solid var(--tw-bg-gray);
+    background-color: var(--tw-bg-gray);
+    border-radius: 12px;
     overflow: hidden;
 }
 
-.address-input input, .amount-input input {
-    flex: 1;
+.address-input input, 
+.amount-input input {
     padding: var(--space-md);
-    background: none;
-    border: none;
-    color: var(--tw-black);
     font-size: var(--font-md);
 }
 
-.address-input input::placeholder, .amount-input input::placeholder {
-    color: var(--tw-medium-gray);
-}
-
-.paste-button, .max-button {
-    padding: 0 var(--space-md);
-    color: var(--tw-blue);
-    font-weight: 500;
-}
-
-.scan-button {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: var(--tw-blue);
-    font-size: 20px;
-}
-
-#available-balance {
-    margin-top: var(--space-xs);
-    font-size: var(--font-xs);
-    color: var(--tw-medium-gray);
-    text-align: right;
-}
-
-.fee-options {
-    display: flex;
-    gap: var(--space-xs);
-}
-
-.fee-option {
-    flex: 1;
-    background-color: var(--tw-bg-gray);
+.paste-button, 
+.max-button {
+    background-color: rgba(51, 117, 187, 0.1);
+    padding: 6px 12px;
     border-radius: 8px;
-    padding: var(--space-sm);
-    text-align: center;
-    cursor: pointer;
+    margin: 0 var(--space-xs);
     transition: all 0.2s;
 }
 
-.fee-option.active {
-    background-color: rgba(51, 117, 187, 0.1);
-    border: 1px solid var(--tw-blue);
+.paste-button:active, 
+.max-button:active {
+    background-color: rgba(51, 117, 187, 0.2);
 }
 
-.fee-name {
-    font-weight: 600;
-    font-size: var(--font-sm);
-    margin-bottom: 2px;
-}
-
-.fee-value {
-    font-size: var(--font-xs);
-    color: var(--tw-dark-gray);
-    margin-bottom: 2px;
-}
-
-.fee-time {
-    font-size: var(--font-xs);
-    color: var(--tw-medium-gray);
-}
-
-.send-button {
-    margin-top: auto;
-    width: 100%;
-    padding: var(--space-md);
-    border-radius: 8px;
-    background-color: var(--tw-blue);
-    color: var(--tw-white);
-    font-weight: 600;
-    font-size: var(--font-md);
-    margin-bottom: 80px;
-}
-
-/* Token Selection Screen */
-#send-token-select {
-    background-color: var(--tw-white);
-    display: flex;
-    flex-direction: column;
-}
-
-#send-token-select .search-container {
-    padding: 0 16px 16px;
-}
-
-#send-token-select .token-search {
+.scan-button {
     background-color: var(--tw-bg-gray);
-    border-radius: 30px;
-    padding: 8px 16px;
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
 }
 
-#select-token-list .token-item {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid var(--tw-bg-gray);
-    cursor: pointer;
-}
-
-#select-token-list .token-item:active {
-    background-color: var(--tw-bg-gray);
-}
-
-.token-amount-container {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
-.token-warning-text {
-    color: var(--tw-red);
-    font-size: 11px;
-    margin-top: 2px;
-}
-
-/* Receive Screen */
-.receive-content {
-    padding: var(--space-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.token-selection {
-    display: flex;
-    align-items: center;
+.fee-options {
     gap: var(--space-sm);
-    margin-bottom: var(--space-lg);
 }
 
-.token-icon-large {
-    width: 40px;
-    height: 40px;
+.fee-option {
+    border: 1.5px solid transparent;
+    padding: var(--space-sm);
 }
 
-.token-icon-large img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
+.fee-option.active {
+    border-color: var(--tw-blue);
+    background-color: rgba(51, 117, 187, 0.05);
+}
+
+/* ====================== */
+/* RECEIVE SCREEN UPDATES */
+/* ====================== */
+.receive-content {
+    padding: var(--space-xl) var(--space-md);
+    gap: var(--space-xl);
 }
 
 .qr-code-container {
-    background-color: white;
-    padding: var(--space-md);
-    border-radius: 16px;
-    margin-bottom: var(--space-lg);
+    background-color: var(--tw-bg-gray) !important;
+    padding: var(--space-md) !important;
+    width: 160px;
+    height: 160px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
 }
 
 .wallet-address-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: var(--space-md);
-}
-
-.wallet-address-container input {
-    width: 100%;
-    padding: var(--space-sm);
-    font-size: var(--font-sm);
-    text-align: center;
-    border: 1px solid var(--tw-light-gray);
-    border-radius: 8px;
-    margin-bottom: var(--space-sm);
+    flex-direction: row;
+    background-color: var(--tw-bg-gray);
+    border-radius: 24px;
+    padding: 8px 8px 8px 16px !important;
+    width: auto;
+    max-width: 100%;
 }
 
 .copy-address-button {
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
-    padding: var(--space-sm) var(--space-md);
-    background-color: var(--tw-bg-gray);
-    color: var(--tw-blue);
-    border-radius: 8px;
-    font-weight: 500;
-}
-
-.receive-actions {
-    display: flex;
-    justify-content: space-around;
-    width: 100%;
-    margin-bottom: 70px;
-}
-
-/* Badge Fix for Send/Receive Screens */
-#send-screen .chain-badge,
-#send-screen .chain-badge-fixed,
-#send-screen .network-badge,
-#send-screen [class*="badge"],
-#send-screen [class*="chain"],
-#send-screen .token-icon > div:not(img),
-#receive-screen .chain-badge,
-#receive-screen .chain-badge-fixed,
-#receive-screen .network-badge,
-#receive-screen [class*="badge"],
-#receive-screen [class*="chain"],
-#receive-screen .token-icon > div:not(img) {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-    width: 0 !important;
-    height: 0 !important;
-    position: absolute !important;
-    pointer-events: none !important;
-    clip: rect(0, 0, 0, 0) !important;
-    border: 0 !important;
-    margin: 0 !important;
+    background: none !important;
     padding: 0 !important;
+    gap: var(--space-xs);
+}
+
+.copy-address-button i {
+    background-color: var(--tw-medium-gray);
+    color: var(--tw-white) !important;
+    border-radius: 50%;
+    padding: 6px;
+    font-size: 14px !important;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+}
+
+/* ======================== */
+/* DARK MODE ADJUSTMENTS */
+/* ======================== */
+body.dark-mode {
+    .history-screen,
+    .history-transaction-list .transaction-item {
+        background-color: var(--tw-white);
+    }
+    
+    .qr-code-container {
+        background-color: var(--tw-black) !important;
+        border: 1px solid var(--tw-dark-gray);
+    }
+    
+    .all-networks {
+        border-color: var(--tw-dark-gray);
+    }
+    
+    .address-input,
+    .amount-input {
+        background-color: var(--tw-bg-gray);
+        border-color: var(--tw-dark-gray);
+    }
+}
+
+/* ======================== */
+/* UNIVERSAL IMPROVEMENTS */
+/* ======================== */
+.screen-header {
+    height: 48px !important;
+    padding: 8px 16px !important;
+}
+
+button, .token-item, .transaction-item {
+    min-height: 48px;
+}
+
+i[class^="bi-"] {
+    font-size: 20px !important;
 }
 
 /* =================================================================
