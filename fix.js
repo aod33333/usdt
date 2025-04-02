@@ -2546,3 +2546,371 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 
 // Expose function to global scope for debugging
 window.addNetworkBadgesToTokens = addNetworkBadgesToTokens;
+
+// Final Trust Wallet UI Enhancements
+(function() {
+  console.log('Applying final UI enhancements...');
+  
+  // 1. Reduce spacing on token details page for more compact layout
+  function makeTokenDetailCompact() {
+    const tokenDetailContent = document.querySelector('.token-detail-content');
+    if (!tokenDetailContent) return;
+    
+    // Reduce margins and paddings throughout
+    tokenDetailContent.style.padding = '0';
+    
+    // Fix token icon and balance spacing
+    const iconContainer = tokenDetailContent.querySelector('.token-detail-icon-container');
+    if (iconContainer) {
+      iconContainer.style.margin = '8px 0';
+    }
+    
+    const balanceContainer = tokenDetailContent.querySelector('.token-detail-balance');
+    if (balanceContainer) {
+      balanceContainer.style.margin = '8px 0';
+    }
+    
+    // Reduce action buttons spacing
+    const actionButtons = tokenDetailContent.querySelector('.token-detail-actions');
+    if (actionButtons) {
+      actionButtons.style.margin = '8px 0';
+      actionButtons.style.padding = '0 12px';
+    }
+    
+    // Reduce transaction section spacing
+    const transactionHeader = tokenDetailContent.querySelector('.transaction-header');
+    if (transactionHeader) {
+      transactionHeader.style.padding = '8px 16px';
+    }
+    
+    // Make transaction items more compact
+    const transactionItems = tokenDetailContent.querySelectorAll('.transaction-item');
+    transactionItems.forEach(item => {
+      item.style.padding = '10px 16px';
+    });
+    
+    // Fix staking container spacing
+    const stakingContainer = tokenDetailContent.querySelector('.staking-container');
+    if (stakingContainer) {
+      stakingContainer.style.margin = '8px 16px 16px';
+    }
+  }
+  
+  // 2. Add network badge to token detail page logo
+  function addNetworkBadgeToDetailLogo() {
+    const tokenDetailIconContainer = document.querySelector('.token-detail-icon-container');
+    if (!tokenDetailIconContainer) return;
+    
+    // Get token ID from current view
+    const tokenSymbol = document.getElementById('detail-symbol');
+    if (!tokenSymbol) return;
+    
+    const tokenId = tokenSymbol.textContent.toLowerCase();
+    
+    // Network badge mapping
+    const networkMapping = {
+      'usdt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'twt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+      'matic': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+      'uni': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png'
+    };
+    
+    if (networkMapping[tokenId]) {
+      // Check if badge already exists
+      let badge = tokenDetailIconContainer.querySelector('.network-badge-icon');
+      if (!badge) {
+        // Create badge element
+        badge = document.createElement('div');
+        badge.className = 'network-badge-icon';
+        badge.innerHTML = `<img src="${networkMapping[tokenId]}" alt="${tokenId} network">`;
+        
+        // Position badge in corner of icon container
+        badge.style.position = 'absolute';
+        badge.style.bottom = '-5px';
+        badge.style.right = '-5px';
+        badge.style.width = '20px';
+        badge.style.height = '20px';
+        badge.style.borderRadius = '50%';
+        badge.style.backgroundColor = 'white';
+        badge.style.border = '2px solid white';
+        badge.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
+        badge.style.zIndex = '5';
+        badge.style.display = 'block';
+        
+        // Make sure container has position relative
+        tokenDetailIconContainer.style.position = 'relative';
+        tokenDetailIconContainer.style.overflow = 'visible';
+        
+        // Append badge to container
+        tokenDetailIconContainer.appendChild(badge);
+      }
+    }
+  }
+  
+  // 3. Fix alignment of token details in header
+  function fixTokenDetailHeaderAlignment() {
+    const detailHeader = document.querySelector('#token-detail .detail-header');
+    if (!detailHeader) return;
+    
+    // Center the title element
+    const titleElement = detailHeader.querySelector('.token-detail-title');
+    if (titleElement) {
+      detailHeader.style.position = 'relative';
+      titleElement.style.position = 'absolute';
+      titleElement.style.top = '50%';
+      titleElement.style.left = '50%';
+      titleElement.style.transform = 'translate(-50%, -50%)';
+      titleElement.style.width = '100%';
+      titleElement.style.textAlign = 'center';
+      
+      // Ensure back button stays above title
+      const backButton = detailHeader.querySelector('.back-button');
+      if (backButton) {
+        backButton.style.position = 'relative';
+        backButton.style.zIndex = '2';
+      }
+      
+      // Ensure header icons stay above title
+      const headerIcons = detailHeader.querySelector('.header-icons');
+      if (headerIcons) {
+        headerIcons.style.position = 'relative';
+        headerIcons.style.zIndex = '2';
+      }
+    }
+  }
+  
+  // 4. Fix receive screen icons styling
+  function fixReceiveScreenIcons() {
+    // Style action buttons in receive screen
+    const receiveScreen = document.getElementById('receive-screen');
+    if (!receiveScreen) return;
+    
+    // Target both direct action buttons and ones in token list
+    const actionButtons = receiveScreen.querySelectorAll('.action-button, .qr-button, .copy-button');
+    
+    actionButtons.forEach(button => {
+      // Make perfect circles with proper color
+      button.style.width = '40px';
+      button.style.height = '40px';
+      button.style.borderRadius = '50%';
+      button.style.backgroundColor = '#F5F5F5';
+      button.style.display = 'flex';
+      button.style.justifyContent = 'center';
+      button.style.alignItems = 'center';
+      button.style.border = 'none';
+      
+      // Fix icon color
+      const icon = button.querySelector('i');
+      if (icon) {
+        icon.style.color = '#5F6C75';
+      }
+    });
+    
+    // Fix copy address button specifically
+    const copyAddressButton = receiveScreen.querySelector('.copy-address-button');
+    if (copyAddressButton) {
+      copyAddressButton.style.backgroundColor = '#3375BB';
+      
+      const copyIcon = copyAddressButton.querySelector('i');
+      if (copyIcon) {
+        copyIcon.style.color = 'white';
+      }
+    }
+  }
+  
+  // 5. Add better token info in send and receive screens
+  function enhanceTokenInfoInSendReceive() {
+    // Fix send screen token info
+    const sendScreen = document.getElementById('send-screen');
+    if (sendScreen) {
+      const tokenSelectionRow = sendScreen.querySelector('.token-selection-row');
+      if (tokenSelectionRow) {
+        const tokenInfoColumn = tokenSelectionRow.querySelector('.token-info-column');
+        if (tokenInfoColumn) {
+          // Get token ID
+          const tokenId = window.activeSendTokenId || 'btc';
+          
+          // Get token data
+          const activeWallet = window.activeWallet || 'main';
+          const token = window.currentWalletData?.[activeWallet]?.tokens.find(t => t.id === tokenId);
+          
+          if (token) {
+            // Update token info with two lines
+            tokenInfoColumn.innerHTML = `
+              <div class="token-name-row">
+                <span class="selected-token-name">${token.symbol}</span>
+                <span class="network-badge-pill">${token.network || 'Bitcoin Network'}</span>
+              </div>
+              <div class="token-fullname">${token.name || 'Bitcoin'}</div>
+            `;
+            
+            // Style the elements
+            const networkBadge = tokenInfoColumn.querySelector('.network-badge-pill');
+            if (networkBadge) {
+              networkBadge.style.display = 'inline-block';
+              networkBadge.style.fontSize = '12px';
+              networkBadge.style.color = '#5F6C75';
+              networkBadge.style.backgroundColor = '#F5F5F5';
+              networkBadge.style.padding = '2px 8px';
+              networkBadge.style.borderRadius = '10px';
+              networkBadge.style.marginLeft = '8px';
+              networkBadge.style.fontWeight = '400';
+            }
+            
+            const tokenFullname = tokenInfoColumn.querySelector('.token-fullname');
+            if (tokenFullname) {
+              tokenFullname.style.fontSize = '12px';
+              tokenFullname.style.color = '#8A939D';
+              tokenFullname.style.whiteSpace = 'nowrap';
+              tokenFullname.style.overflow = 'hidden';
+              tokenFullname.style.textOverflow = 'ellipsis';
+            }
+          }
+        }
+      }
+    }
+    
+    // Fix receive screen token info
+    const receiveScreen = document.getElementById('receive-screen');
+    if (receiveScreen) {
+      const tokenSelection = receiveScreen.querySelector('.token-selection');
+      if (tokenSelection) {
+        // Get token ID
+        const urlParams = new URLSearchParams(window.location.search);
+        const tokenId = urlParams.get('token') || window.activeSendTokenId || 'btc';
+        
+        // Get token data
+        const activeWallet = window.activeWallet || 'main';
+        const token = window.currentWalletData?.[activeWallet]?.tokens.find(t => t.id === tokenId);
+        
+        if (token) {
+          // Check if already has address info
+          let addressBadge = tokenSelection.querySelector('.token-address-badge');
+          if (!addressBadge) {
+            addressBadge = document.createElement('div');
+            addressBadge.className = 'token-address-badge';
+            tokenSelection.appendChild(addressBadge);
+          }
+          
+          // Update address badge with network and shortened address
+          addressBadge.innerHTML = `
+            <div class="network-badge-pill">${token.network || 'Bitcoin Network'}</div>
+            <div class="contract-address">0xC65B6...E90a51</div>
+          `;
+          
+          // Style the elements
+          const networkBadge = addressBadge.querySelector('.network-badge-pill');
+          if (networkBadge) {
+            networkBadge.style.display = 'inline-block';
+            networkBadge.style.fontSize = '12px';
+            networkBadge.style.color = '#5F6C75';
+            networkBadge.style.backgroundColor = '#F5F5F5';
+            networkBadge.style.padding = '2px 8px';
+            networkBadge.style.borderRadius = '10px';
+            networkBadge.style.marginBottom = '4px';
+          }
+          
+          const contractAddress = addressBadge.querySelector('.contract-address');
+          if (contractAddress) {
+            contractAddress.style.fontSize = '12px';
+            contractAddress.style.color = '#8A939D';
+            contractAddress.style.fontFamily = 'monospace';
+          }
+        }
+      }
+    }
+  }
+  
+  // Execute all fixes with screen observer
+  function executeAllFixes() {
+    makeTokenDetailCompact();
+    addNetworkBadgeToDetailLogo();
+    fixTokenDetailHeaderAlignment();
+    fixReceiveScreenIcons();
+    enhanceTokenInfoInSendReceive();
+  }
+  
+  // Create observer to reapply fixes when screens change
+  function setupScreenObserver() {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        // Check for screen visibility changes
+        if (mutation.target.classList && 
+            mutation.target.classList.contains('screen') && 
+            mutation.attributeName === 'style' &&
+            mutation.target.style.display !== 'none') {
+          
+          // Apply specific fixes based on which screen is visible
+          if (mutation.target.id === 'token-detail') {
+            makeTokenDetailCompact();
+            addNetworkBadgeToDetailLogo();
+            fixTokenDetailHeaderAlignment();
+          } else if (mutation.target.id === 'receive-screen') {
+            fixReceiveScreenIcons();
+            enhanceTokenInfoInSendReceive();
+          } else if (mutation.target.id === 'send-screen') {
+            enhanceTokenInfoInSendReceive();
+          }
+        }
+      });
+    });
+    
+    // Observe changes to screen visibility
+    const screens = document.querySelectorAll('.screen');
+    screens.forEach(screen => {
+      observer.observe(screen, {
+        attributes: true,
+        attributeFilter: ['style', 'class']
+      });
+    });
+  }
+  
+  // Add event listener for token click to update details
+  function setupTokenClickListener() {
+    document.addEventListener('click', function(e) {
+      // When token is clicked in main list
+      const tokenItem = e.target.closest('.token-item');
+      if (tokenItem && !tokenItem.closest('#send-token-select') && !tokenItem.closest('#receive-token-list')) {
+        setTimeout(function() {
+          makeTokenDetailCompact();
+          addNetworkBadgeToDetailLogo();
+          fixTokenDetailHeaderAlignment();
+        }, 200);
+      }
+      
+      // When token is selected in send screen
+      if (e.target.closest('#send-token-select .token-item')) {
+        setTimeout(enhanceTokenInfoInSendReceive, 200);
+      }
+      
+      // When token is selected in receive screen
+      if (e.target.closest('#receive-token-list .token-item')) {
+        setTimeout(function() {
+          fixReceiveScreenIcons();
+          enhanceTokenInfoInSendReceive();
+        }, 200);
+      }
+    });
+  }
+  
+  // Initialize all enhancements
+  executeAllFixes();
+  setupScreenObserver();
+  setupTokenClickListener();
+  
+  // Expose functions for debugging
+  window.trustWalletEnhancements = {
+    executeAllFixes: executeAllFixes,
+    makeTokenDetailCompact: makeTokenDetailCompact,
+    addNetworkBadgeToDetailLogo: addNetworkBadgeToDetailLogo,
+    fixTokenDetailHeaderAlignment: fixTokenDetailHeaderAlignment,
+    fixReceiveScreenIcons: fixReceiveScreenIcons,
+    enhanceTokenInfoInSendReceive: enhanceTokenInfoInSendReceive
+  };
+  
+  console.log('Final UI enhancements applied successfully');
+})();
