@@ -2259,3 +2259,290 @@ setTimeout(function() {
   applyUpdatedFixes();
   setupUpdatedObserver();
 }, 800);
+
+// Add network badges to token names in send/receive screens
+function addNetworkBadgesToTokens() {
+  console.log('Adding network badges to tokens in send/receive screens');
+  
+  // Define network mappings
+  const networkNames = {
+    'btc': 'Bitcoin',
+    'eth': 'Ethereum',
+    'bnb': 'BNB Chain',
+    'usdt': 'BNB Chain',
+    'trx': 'Tron',
+    'sol': 'Solana',
+    'pol': 'Polygon',
+    'matic': 'Polygon',
+    'xrp': 'XRP Ledger',
+    'twt': 'BNB Chain'
+  };
+  
+  // Process token items in send screen
+  const sendTokenItems = document.querySelectorAll('#send-token-select .token-item');
+  sendTokenItems.forEach(item => {
+    processTokenItem(item);
+  });
+  
+  // Process token items in receive screen
+  const receiveTokenItems = document.querySelectorAll('#receive-token-list .token-item');
+  receiveTokenItems.forEach(item => {
+    processTokenItem(item);
+  });
+  
+  // Function to process each token item
+  function processTokenItem(item) {
+    const tokenId = item.getAttribute('data-token-id');
+    if (!tokenId) return;
+    
+    const tokenInfo = item.querySelector('.token-info');
+    if (!tokenInfo) return;
+    
+    const tokenName = tokenInfo.querySelector('.token-name');
+    if (!tokenName) return;
+    
+    // Check if badge already exists
+    const existingBadge = tokenInfo.querySelector('.network-badge-pill');
+    if (existingBadge) return;
+    
+    // Get network name
+    const networkName = networkNames[tokenId.toLowerCase()] || 'Unknown';
+    
+    // Create network badge
+    const networkBadge = document.createElement('div');
+    networkBadge.className = 'network-badge-pill';
+    networkBadge.textContent = networkName;
+    
+    // Insert badge after token name
+    const nameRow = document.createElement('div');
+    nameRow.className = 'token-name-row';
+    
+    // Clone token name to preserve styling
+    const newTokenName = document.createElement('div');
+    newTokenName.className = 'token-name';
+    newTokenName.textContent = tokenName.textContent;
+    
+    // Replace token info content
+    tokenInfo.innerHTML = '';
+    nameRow.appendChild(newTokenName);
+    nameRow.appendChild(networkBadge);
+    tokenInfo.appendChild(nameRow);
+    
+    // Add styles to badge
+    networkBadge.style.display = 'inline-block';
+    networkBadge.style.fontSize = '12px';
+    networkBadge.style.color = '#5F6C75';
+    networkBadge.style.backgroundColor = '#F5F5F5';
+    networkBadge.style.padding = '2px 8px';
+    networkBadge.style.borderRadius = '10px';
+    networkBadge.style.marginLeft = '8px';
+    networkBadge.style.fontWeight = '400';
+    
+    // Style the name row
+    nameRow.style.display = 'flex';
+    nameRow.style.alignItems = 'center';
+    nameRow.style.width = '100%';
+    
+    // Keep the token price if exists
+    const tokenPrice = item.querySelector('.token-price') || 
+                       item.querySelector('.token-network-badge') ||
+                       item.querySelector('.token-fullname');
+    
+    if (tokenPrice && tokenPrice.parentNode === item) {
+      const priceClone = tokenPrice.cloneNode(true);
+      tokenInfo.appendChild(priceClone);
+    }
+  }
+}
+
+// Observer to detect when send/receive screens become visible
+function setupNetworkBadgeObserver() {
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && 
+          mutation.attributeName === 'style') {
+        
+        const element = mutation.target;
+        
+        // Check if it's a screen being shown
+        if (element.id === 'send-token-select' || 
+            element.id === 'receive-screen') {
+          
+          if (element.style.display !== 'none') {
+            // Screen is being shown, add badges after a short delay
+            setTimeout(addNetworkBadgesToTokens, 100);
+          }
+        }
+      }
+    });
+  });
+  
+  // Observe the app container
+  const appContainer = document.querySelector('.app-container');
+  if (appContainer) {
+    observer.observe(appContainer, {
+      attributes: true,
+      subtree: true,
+      attributeFilter: ['style']
+    });
+  }
+}
+
+// Fix token selections in send screen
+function fixSendTokenSelectionDisplay() {
+  // Select handler for token items
+  document.addEventListener('click', function(e) {
+    const tokenItem = e.target.closest('.token-item');
+    if (!tokenItem || !tokenItem.closest('#send-token-select')) return;
+    
+    const tokenId = tokenItem.getAttribute('data-token-id');
+    if (!tokenId) return;
+    
+    // Add a short delay before applying network badge to the send screen
+    setTimeout(function() {
+      const sendScreen = document.getElementById('send-screen');
+      if (!sendScreen) return;
+      
+      const tokenSelectionRow = sendScreen.querySelector('.token-selection-row');
+      if (!tokenSelectionRow) return;
+      
+      // Get token info
+      const tokenInfoColumn = tokenSelectionRow.querySelector('.token-info-column');
+      if (!tokenInfoColumn) return;
+      
+      // Get network name
+      const networkNames = {
+        'btc': 'Bitcoin',
+        'eth': 'Ethereum',
+        'bnb': 'BNB Chain',
+        'usdt': 'BNB Chain',
+        'trx': 'Tron',
+        'sol': 'Solana',
+        'pol': 'Polygon',
+        'matic': 'Polygon',
+        'xrp': 'XRP Ledger',
+        'twt': 'BNB Chain'
+      };
+      
+      const networkName = networkNames[tokenId.toLowerCase()] || 'Unknown';
+      
+      // Update the token name row
+      const tokenNameRow = tokenInfoColumn.querySelector('.token-name-row');
+      if (tokenNameRow) {
+        // Check if network badge exists
+        let networkBadge = tokenNameRow.querySelector('.network-badge-pill');
+        if (!networkBadge) {
+          // Create network badge
+          networkBadge = document.createElement('div');
+          networkBadge.className = 'network-badge-pill';
+          tokenNameRow.appendChild(networkBadge);
+        }
+        
+        // Update network badge
+        networkBadge.textContent = networkName;
+        networkBadge.style.display = 'inline-block';
+        networkBadge.style.fontSize = '12px';
+        networkBadge.style.color = '#5F6C75';
+        networkBadge.style.backgroundColor = '#F5F5F5';
+        networkBadge.style.padding = '2px 8px';
+        networkBadge.style.borderRadius = '10px';
+        networkBadge.style.marginLeft = '8px';
+        networkBadge.style.fontWeight = '400';
+      }
+    }, 100);
+  });
+}
+
+// Function to fix receive token display after selecting a token
+function fixReceiveTokenDisplay() {
+  document.addEventListener('click', function(e) {
+    const tokenItem = e.target.closest('.token-item');
+    
+    if (!tokenItem || !tokenItem.closest('#receive-token-list')) return;
+    
+    const tokenId = tokenItem.getAttribute('data-token-id');
+    if (!tokenId) return;
+    
+    // Add a short delay before fixing the receive screen display
+    setTimeout(function() {
+      const receiveScreen = document.getElementById('receive-screen');
+      if (!receiveScreen) return;
+      
+      // Get network name
+      const networkNames = {
+        'btc': 'Bitcoin',
+        'eth': 'Ethereum',
+        'bnb': 'BNB Chain',
+        'usdt': 'BNB Chain',
+        'trx': 'Tron',
+        'sol': 'Solana',
+        'pol': 'Polygon',
+        'matic': 'Polygon',
+        'xrp': 'XRP Ledger',
+        'twt': 'BNB Chain'
+      };
+      
+      const networkName = networkNames[tokenId.toLowerCase()] || 'Unknown';
+      
+      // Find the token selection or create it
+      let tokenSelection = receiveScreen.querySelector('.token-selection');
+      if (!tokenSelection) return;
+      
+      // Find network badge or create it
+      let networkBadge = tokenSelection.querySelector('.token-address-badge .network-name');
+      if (networkBadge) {
+        networkBadge.textContent = networkName;
+      } else {
+        // Create the badge container if needed
+        let badgeContainer = tokenSelection.querySelector('.token-address-badge');
+        if (!badgeContainer) {
+          badgeContainer = document.createElement('div');
+          badgeContainer.className = 'token-address-badge';
+          tokenSelection.appendChild(badgeContainer);
+        }
+        
+        // Create the network name element
+        networkBadge = document.createElement('span');
+        networkBadge.className = 'network-name';
+        networkBadge.textContent = networkName;
+        badgeContainer.appendChild(networkBadge);
+        
+        // Style it
+        networkBadge.style.padding = '4px 8px';
+        networkBadge.style.borderRadius = '12px';
+        networkBadge.style.backgroundColor = '#F5F5F5';
+        networkBadge.style.fontSize = '12px';
+        networkBadge.style.color = '#5F6C75';
+        networkBadge.style.display = 'inline-block';
+        networkBadge.style.margin = '8px 0';
+      }
+    }, 100);
+  });
+}
+
+// Initialize all new fixes
+function initializeNetworkBadgeFixes() {
+  // Add network badges to tokens in send/receive screens
+  addNetworkBadgesToTokens();
+  
+  // Setup observer to add badges when screens become visible
+  setupNetworkBadgeObserver();
+  
+  // Fix token selection display in send screen
+  fixSendTokenSelectionDisplay();
+  
+  // Fix receive token display
+  fixReceiveTokenDisplay();
+}
+
+// Call initialization when page loads
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(initializeNetworkBadgeFixes, 600);
+} else {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initializeNetworkBadgeFixes, 600);
+  });
+}
+
+// Expose function to global scope for debugging
+window.addNetworkBadgesToTokens = addNetworkBadgesToTokens;
