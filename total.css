@@ -2212,3 +2212,19 @@ img[src*="bnb-bnb-logo"] {
     border: 1px solid #3375BB !important;
     background-color: rgba(51, 117, 187, 0.1) !important;
 }
+
+/* Add to all screens */
+.screen-header {
+  height: 48px !important;
+  padding: 8px 16px !important;
+}
+
+/* Better touch targets */
+button, .token-item, .transaction-item {
+  min-height: 48px; /* Minimum touch target size */
+}
+
+/* Consistent icon sizes */
+i[class^="bi-"] {
+  font-size: 20px !important; /* Bootstrap icons size fix */
+}
