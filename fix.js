@@ -18,6 +18,12 @@ function initFixes() {
   fixReceivePage();
   fixSendPage();
   fixTokenDetailPage();
+  centerHeaderTitles();
+  fixHeaderIconsAlignment();
+  addCommasToBalances();
+  enhanceNetworkBadges();
+  fixTokenDetailStaking();
+  setupObserverForDynamicChanges();
   
   // Connect to dynamic content updates
   setupDynamicContentObserver();
@@ -1346,3 +1352,447 @@ document.addEventListener('click', function(e) {
     setTimeout(fixTokenDetailPage, 300);
   }
 });
+
+// ================================================================= 
+// NEW UI FIXES - Add to bottom of existing fix.js file
+// =================================================================
+
+// Center header titles in send, receive, and transaction history screens
+function centerHeaderTitles() {
+  console.log('Centering header titles');
+  
+  // Select all screen headers in relevant screens
+  const headers = document.querySelectorAll(
+    '#send-screen .screen-header, #receive-screen .screen-header, #history-screen .screen-header, #send-token-select .screen-header'
+  );
+  
+  headers.forEach(header => {
+    // Get the title element (h2)
+    const title = header.querySelector('h2');
+    if (!title) return;
+    
+    // Center the title text
+    title.style.textAlign = 'center';
+    title.style.width = '100%';
+    title.style.position = 'absolute';
+    title.style.left = '0';
+    title.style.right = '0';
+    
+    // Ensure the header has position relative for absolute positioning of title
+    header.style.position = 'relative';
+    
+    // Style the back button to ensure it stays visible
+    const backButton = header.querySelector('.back-button');
+    if (backButton) {
+      backButton.style.position = 'relative';
+      backButton.style.zIndex = '2';
+    }
+  });
+}
+
+// Fix header icons alignment (make them side by side instead of stacked)
+function fixHeaderIconsAlignment() {
+  console.log('Fixing header icons alignment');
+  
+  // Fix alignment in token detail page header
+  const tokenDetailHeader = document.querySelector('#token-detail .detail-header');
+  if (tokenDetailHeader) {
+    tokenDetailHeader.style.display = 'flex';
+    tokenDetailHeader.style.flexDirection = 'row';
+    tokenDetailHeader.style.alignItems = 'center';
+    tokenDetailHeader.style.justifyContent = 'space-between';
+    
+    // Adjust the token detail title
+    const titleElement = tokenDetailHeader.querySelector('.token-detail-title');
+    if (titleElement) {
+      titleElement.style.position = 'absolute';
+      titleElement.style.left = '0';
+      titleElement.style.right = '0';
+      titleElement.style.textAlign = 'center';
+    }
+    
+    // Make header icons display horizontally
+    const headerIcons = tokenDetailHeader.querySelector('.header-icons');
+    if (headerIcons) {
+      headerIcons.style.display = 'flex';
+      headerIcons.style.flexDirection = 'row';
+      headerIcons.style.alignItems = 'center';
+      headerIcons.style.gap = '8px';
+      headerIcons.style.position = 'relative';
+      headerIcons.style.zIndex = '2';
+    }
+  }
+}
+
+// Add commas to balance amounts
+function addCommasToBalances() {
+  console.log('Adding commas to balance amounts');
+  
+  // Format main balance
+  const totalBalance = document.getElementById('total-balance');
+  if (totalBalance) {
+    const currentText = totalBalance.textContent;
+    const match = currentText.match(/\$([\d.]+)/);
+    
+    if (match) {
+      const amount = parseFloat(match[1]);
+      totalBalance.textContent = '$' + amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+  }
+  
+  // Format token balances
+  const tokenBalances = document.querySelectorAll('.token-balance');
+  tokenBalances.forEach(balance => {
+    const currentText = balance.textContent;
+    const match = currentText.match(/([\d.]+)\s+([A-Z]+)/i);
+    
+    if (match) {
+      const amount = parseFloat(match[1]);
+      const symbol = match[2];
+      
+      balance.textContent = amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 6
+      }) + ' ' + symbol;
+    }
+  });
+  
+  // Format token values
+  const tokenValues = document.querySelectorAll('.token-value');
+  tokenValues.forEach(value => {
+    const currentText = value.textContent;
+    const match = currentText.match(/\$([\d.]+)/);
+    
+    if (match) {
+      const amount = parseFloat(match[1]);
+      value.textContent = '$' + amount.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+  });
+}
+
+// Enhance network badges across all screens
+function enhanceNetworkBadges() {
+  console.log('Enhancing network badges');
+  
+  // Define which tokens should have network badges
+  const networkMapping = {
+    'usdt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    'twt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+    'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+    'matic': 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+  };
+  
+  // Add badges to all token items in all screens
+  const tokenItems = document.querySelectorAll('.token-item');
+  tokenItems.forEach(item => {
+    const tokenId = item.getAttribute('data-token-id');
+    if (!tokenId || !networkMapping[tokenId]) return;
+    
+    const tokenIcon = item.querySelector('.token-icon');
+    if (!tokenIcon) return;
+    
+    // Only add badge if it doesn't already exist
+    let badge = tokenIcon.querySelector('.chain-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'chain-badge';
+      
+      const badgeImg = document.createElement('img');
+      badgeImg.src = networkMapping[tokenId];
+      badgeImg.alt = tokenId.toUpperCase() + ' Network';
+      
+      badge.appendChild(badgeImg);
+      tokenIcon.appendChild(badge);
+    }
+    
+    // Ensure badge is visible
+    badge.style.display = 'block';
+    badge.style.position = 'absolute';
+    badge.style.bottom = '-6px';
+    badge.style.right = '-6px';
+    badge.style.width = '20px';
+    badge.style.height = '20px';
+    badge.style.borderRadius = '50%';
+    badge.style.backgroundColor = 'white';
+    badge.style.border = '2px solid white';
+    badge.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
+    badge.style.zIndex = '5';
+  });
+  
+  // Add badges in token detail view (for icon at the top)
+  const tokenDetailIcon = document.querySelector('.token-detail-icon-container img');
+  const tokenDetailScreen = document.getElementById('token-detail');
+  
+  if (tokenDetailIcon && tokenDetailScreen) {
+    const tokenSymbol = document.getElementById('detail-symbol');
+    if (tokenSymbol) {
+      const tokenId = tokenSymbol.textContent.toLowerCase();
+      
+      if (networkMapping[tokenId]) {
+        let detailBadge = document.querySelector('.token-detail-icon-container .chain-badge');
+        
+        // Create badge if doesn't exist
+        if (!detailBadge) {
+          detailBadge = document.createElement('div');
+          detailBadge.className = 'chain-badge';
+          
+          const badgeImg = document.createElement('img');
+          badgeImg.src = networkMapping[tokenId];
+          badgeImg.alt = tokenId.toUpperCase() + ' Network';
+          
+          detailBadge.appendChild(badgeImg);
+          tokenDetailIcon.parentElement.appendChild(detailBadge);
+        }
+        
+        // Ensure it's visible and styled correctly
+        detailBadge.style.display = 'block';
+        detailBadge.style.position = 'absolute';
+        detailBadge.style.bottom = '-6px';
+        detailBadge.style.right = '-6px';
+        detailBadge.style.width = '24px';
+        detailBadge.style.height = '24px';
+        detailBadge.style.borderRadius = '50%';
+        detailBadge.style.backgroundColor = 'white';
+        detailBadge.style.border = '2px solid white';
+        detailBadge.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
+        detailBadge.style.zIndex = '5';
+      }
+    }
+  }
+}
+
+// Special function to fix token detail staking section
+function fixTokenDetailStaking() {
+  console.log('Fixing token detail staking section');
+  
+  // Find the token detail page and staking banner
+  const tokenDetailPage = document.getElementById('token-detail');
+  if (!tokenDetailPage) return;
+  
+  // Find existing staking banner
+  let stakingBanner = tokenDetailPage.querySelector('.staking-container');
+  
+  // If no staking banner exists, create one
+  if (!stakingBanner) {
+    // Find where to insert the banner
+    const tokenDetailContent = tokenDetailPage.querySelector('.token-detail-content');
+    const actionsSection = tokenDetailPage.querySelector('.token-detail-actions');
+    
+    if (!tokenDetailContent || !actionsSection) return;
+    
+    // Create staking banner
+    stakingBanner = document.createElement('div');
+    stakingBanner.className = 'staking-container';
+    
+    // Get token symbol
+    const tokenSymbol = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'eth';
+    
+    // Create the banner content
+    stakingBanner.innerHTML = `
+      <div class="staking-icon">
+        <img src="https://i.ibb.co/GfrLnXLp/Screenshot-20250325-033954-Trust-Wallet.jpg" alt="Staking">
+      </div>
+      <div class="staking-content">
+        <h3>Start earning</h3>
+        <p>Start earning on your ${tokenSymbol}</p>
+      </div>
+      <i class="fas fa-chevron-right staking-arrow"></i>
+    `;
+    
+    // Insert after actions section
+    actionsSection.insertAdjacentElement('afterend', stakingBanner);
+    
+    // Style the banner
+    stakingBanner.style.backgroundColor = '#F5F5F5';
+    stakingBanner.style.borderRadius = '16px';
+    stakingBanner.style.padding = '16px';
+    stakingBanner.style.margin = '16px';
+    stakingBanner.style.display = 'flex';
+    stakingBanner.style.alignItems = 'center';
+    stakingBanner.style.position = 'relative';
+    stakingBanner.style.cursor = 'pointer';
+    
+    // Style the staking icon
+    const stakingIcon = stakingBanner.querySelector('.staking-icon');
+    if (stakingIcon) {
+      stakingIcon.style.width = '40px';
+      stakingIcon.style.height = '40px';
+      stakingIcon.style.borderRadius = '50%';
+      stakingIcon.style.marginRight = '16px';
+      stakingIcon.style.overflow = 'hidden';
+      
+      const iconImg = stakingIcon.querySelector('img');
+      if (iconImg) {
+        iconImg.style.width = '100%';
+        iconImg.style.height = '100%';
+        iconImg.style.objectFit = 'cover';
+      }
+    }
+    
+    // Style the content
+    const stakingContent = stakingBanner.querySelector('.staking-content');
+    if (stakingContent) {
+      stakingContent.style.flex = '1';
+      
+      const heading = stakingContent.querySelector('h3');
+      if (heading) {
+        heading.style.fontSize = '16px';
+        heading.style.fontWeight = '600';
+        heading.style.marginBottom = '4px';
+      }
+      
+      const paragraph = stakingContent.querySelector('p');
+      if (paragraph) {
+        paragraph.style.fontSize = '12px';
+        paragraph.style.color = '#8A939D';
+      }
+    }
+    
+    // Style the arrow
+    const stakingArrow = stakingBanner.querySelector('.staking-arrow');
+    if (stakingArrow) {
+      stakingArrow.style.color = '#8A939D';
+      stakingArrow.style.position = 'absolute';
+      stakingArrow.style.right = '16px';
+    }
+    
+    // Add click handler
+    stakingBanner.addEventListener('click', function() {
+      showToast('Staking feature coming soon');
+    });
+  } else {
+    // Update existing staking banner
+    const stakingIcon = stakingBanner.querySelector('.staking-icon img');
+    if (stakingIcon) {
+      stakingIcon.src = 'https://i.ibb.co/GfrLnXLp/Screenshot-20250325-033954-Trust-Wallet.jpg';
+    }
+    
+    const stakingTitle = stakingBanner.querySelector('.staking-content h3');
+    if (stakingTitle) {
+      stakingTitle.textContent = 'Start earning';
+    }
+    
+    const stakingDesc = stakingBanner.querySelector('.staking-content p');
+    if (stakingDesc) {
+      const tokenSymbol = document.getElementById('detail-symbol')?.textContent?.toLowerCase() || 'eth';
+      stakingDesc.textContent = `Start earning on your ${tokenSymbol}`;
+    }
+  }
+}
+
+// Function to remove padding in token detail
+function fixTokenDetailPadding() {
+  console.log('Fixing token detail padding');
+  
+  // Remove excess padding in token display
+  const tokenDetailContent = document.querySelector('.token-detail-content');
+  if (tokenDetailContent) {
+    tokenDetailContent.style.padding = '0';
+  }
+  
+  const tokenDetailIconContainer = document.querySelector('.token-detail-icon-container');
+  if (tokenDetailIconContainer) {
+    tokenDetailIconContainer.style.margin = '12px 0';
+  }
+}
+
+// Function to continuously update UI fixes
+function setupObserverForDynamicChanges() {
+  console.log('Setting up observer for dynamic UI changes');
+  
+  // Create a MutationObserver to watch for screen changes
+  const observer = new MutationObserver(function(mutations) {
+    let needsUIRefresh = false;
+    
+    mutations.forEach(function(mutation) {
+      // If a screen's display style changes
+      if (mutation.type === 'attributes' && 
+          mutation.attributeName === 'style' &&
+          mutation.target.classList.contains('screen') && 
+          mutation.target.style.display !== 'none') {
+        needsUIRefresh = true;
+      }
+      
+      // If new elements are added to the DOM
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        needsUIRefresh = true;
+      }
+    });
+    
+    if (needsUIRefresh) {
+      // Apply fixes again when UI changes
+      setTimeout(function() {
+        centerHeaderTitles();
+        fixHeaderIconsAlignment();
+        addCommasToBalances();
+        enhanceNetworkBadges();
+        fixTokenDetailStaking();
+        fixTokenDetailPadding();
+      }, 100);
+    }
+  });
+  
+  // Observe changes to the app container
+  const appContainer = document.querySelector('.app-container');
+  if (appContainer) {
+    observer.observe(appContainer, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+  }
+}
+
+// Update the existing fixTokenDetailPage function to include our new fixes
+const originalFixTokenDetailPage = fixTokenDetailPage;
+fixTokenDetailPage = function() {
+  // Call original function first
+  originalFixTokenDetailPage();
+  
+  // Then apply our additional fixes
+  fixTokenDetailPadding();
+  fixTokenDetailStaking();
+};
+
+// Add event listener for token detail page viewing
+document.addEventListener('click', function(e) {
+  // Check if a token item was clicked (which would load the token detail page)
+  const tokenItem = e.target.closest('.token-item');
+  if (tokenItem) {
+    // Apply fixes with a small delay to ensure the token detail page is loaded
+    setTimeout(function() {
+      fixTokenDetailPage();
+      fixHeaderIconsAlignment();
+    }, 200);
+  }
+});
+
+// Execute new fixes when script is loaded
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  setTimeout(function() {
+    centerHeaderTitles();
+    fixHeaderIconsAlignment();
+    addCommasToBalances();
+    enhanceNetworkBadges();
+    setupObserverForDynamicChanges();
+  }, 500);
+} else {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      centerHeaderTitles();
+      fixHeaderIconsAlignment();
+      addCommasToBalances();
+      enhanceNetworkBadges();
+      setupObserverForDynamicChanges();
+    }, 500);
+  });
+}
