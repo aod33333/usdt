@@ -1796,3 +1796,466 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
     }, 500);
   });
 }
+
+// Add these updated fixes to your fix.js file
+
+// Fix scrolling on all screens that need it
+function fixScrollingOnAllScreens() {
+  console.log('Fixing scrolling on all screens');
+  
+  // List of screens that should have scrolling enabled
+  const scrollableScreens = [
+    'send-screen',
+    'receive-screen',
+    'history-screen',
+    'send-token-select',
+    'token-detail'
+  ];
+  
+  scrollableScreens.forEach(screenId => {
+    const screen = document.getElementById(screenId);
+    if (!screen) return;
+    
+    // Enable scrolling
+    screen.style.overflowY = 'auto';
+    screen.style.overflowX = 'hidden';
+    
+    // Find content container in the screen
+    const contentElement = screen.querySelector('.send-content, .receive-content, .screen-content, .token-detail-content, .token-list');
+    if (contentElement) {
+      // Ensure proper padding at the bottom for scrolling
+      contentElement.style.paddingBottom = '80px';
+    }
+  });
+  
+  // Special handling for token list to ensure smooth scrolling
+  const tokenLists = document.querySelectorAll('.token-list');
+  tokenLists.forEach(list => {
+    list.style.overflowY = 'auto';
+    list.style.overflowX = 'hidden';
+    list.style.webkitOverflowScrolling = 'touch'; // For smooth scrolling on iOS
+  });
+}
+
+// Set token icons to official Trust Wallet size (40px based on research)
+function setOfficialTokenIconSizes() {
+  console.log('Setting token icons to official size');
+  
+  // Set proper icon size across all screens
+  const allTokenIcons = document.querySelectorAll('.token-icon');
+  allTokenIcons.forEach(icon => {
+    icon.style.width = '40px';
+    icon.style.height = '40px';
+    icon.style.minWidth = '40px'; // Prevent shrinking
+    icon.style.position = 'relative'; // For badge positioning
+    
+    // Increase image size within
+    const img = icon.querySelector('img');
+    if (img) {
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+    }
+    
+    // Adjust badge positioning for proper icon
+    const badge = icon.querySelector('.chain-badge');
+    if (badge) {
+      badge.style.bottom = '-4px';
+      badge.style.right = '-4px';
+      badge.style.width = '18px';
+      badge.style.height = '18px';
+    }
+  });
+  
+  // Special handling for token detail page icon (larger)
+  const detailIcon = document.querySelector('.token-detail-large-icon');
+  if (detailIcon) {
+    detailIcon.style.width = '48px';
+    detailIcon.style.height = '48px';
+  }
+}
+
+// Simplify receive screen with direct copy functionality
+function simplifyReceiveScreen() {
+  console.log('Simplifying receive screen');
+  
+  const receiveScreen = document.getElementById('receive-screen');
+  if (!receiveScreen) return;
+  
+  // Only handle the token list view (not QR code view)
+  const tokenList = receiveScreen.querySelector('#receive-token-list');
+  if (!tokenList) return;
+  
+  // Find all token items
+  const tokenItems = tokenList.querySelectorAll('.token-item');
+  
+  tokenItems.forEach(item => {
+    // Find or create action container
+    let actionContainer = item.querySelector('.receive-actions');
+    if (!actionContainer) {
+      actionContainer = document.createElement('div');
+      actionContainer.className = 'receive-actions';
+      item.appendChild(actionContainer);
+    }
+    
+    // Clear any existing actions
+    actionContainer.innerHTML = '';
+    
+    // Get token data
+    const tokenId = item.getAttribute('data-token-id') || '';
+    const tokenSymbol = item.querySelector('.token-name')?.textContent || '';
+    
+    // Generate address (this would normally come from the wallet)
+    const walletAddress = '0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71';
+    
+    // Add copy and QR buttons
+    actionContainer.innerHTML = `
+      <button class="action-button copy-button" data-address="${walletAddress}" title="Copy ${tokenSymbol} address">
+        <i class="fas fa-copy"></i>
+      </button>
+      <button class="action-button qr-button" title="Show QR code (disabled)">
+        <i class="fas fa-qrcode"></i>
+      </button>
+    `;
+    
+    // Style the action container
+    actionContainer.style.display = 'flex';
+    actionContainer.style.gap = '12px';
+    actionContainer.style.marginLeft = 'auto';
+    
+    // Style the buttons
+    const buttons = actionContainer.querySelectorAll('.action-button');
+    buttons.forEach(button => {
+      button.style.width = '36px';
+      button.style.height = '36px';
+      button.style.borderRadius = '50%';
+      button.style.backgroundColor = '#F5F5F5';
+      button.style.display = 'flex';
+      button.style.justifyContent = 'center';
+      button.style.alignItems = 'center';
+      button.style.border = 'none';
+      button.style.cursor = 'pointer';
+      
+      const icon = button.querySelector('i');
+      if (icon) {
+        icon.style.color = '#8A939D';
+        icon.style.fontSize = '16px';
+      }
+    });
+    
+    // Add copy functionality to copy button
+    const copyButton = actionContainer.querySelector('.copy-button');
+    if (copyButton) {
+      copyButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent token item click
+        
+        const address = this.getAttribute('data-address');
+        if (!address) return;
+        
+        // Try to copy to clipboard
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(address)
+            .then(() => {
+              showToast(`${tokenSymbol} address copied to clipboard`);
+            })
+            .catch(err => {
+              console.error('Failed to copy address:', err);
+              // Fallback
+              copyToClipboardFallback(address);
+              showToast(`${tokenSymbol} address copied to clipboard`);
+            });
+        } else {
+          // Fallback method
+          copyToClipboardFallback(address);
+          showToast(`${tokenSymbol} address copied to clipboard`);
+        }
+      });
+    }
+    
+    // QR button is for display only (as requested)
+    const qrButton = actionContainer.querySelector('.qr-button');
+    if (qrButton) {
+      qrButton.addEventListener('click', function(e) {
+        e.stopPropagation(); // Prevent token item click
+        
+        // Do nothing, as requested
+        // Could show a toast notifying the user
+        showToast('QR code display is disabled');
+      });
+    }
+  });
+  
+  // Make sure the screen header has proper heading
+  const screenHeader = receiveScreen.querySelector('.screen-header h2');
+  if (screenHeader) {
+    screenHeader.textContent = 'Receive';
+  }
+}
+
+// Fallback copy to clipboard function
+function copyToClipboardFallback(text) {
+  // Create temporary input
+  const input = document.createElement('input');
+  input.value = text;
+  input.style.position = 'absolute';
+  input.style.left = '-9999px';
+  document.body.appendChild(input);
+  
+  // Select and copy
+  input.select();
+  document.execCommand('copy');
+  
+  // Clean up
+  document.body.removeChild(input);
+}
+
+// Fix visibility toggle for token values
+function fixVisibilityToggle() {
+  console.log('Fixing visibility toggle for token values');
+  
+  // Fix or replace the visibility toggle click handler
+  const visibilityToggle = document.querySelector('.visibility-toggle');
+  
+  if (visibilityToggle) {
+    // Remove any existing click handlers
+    const newToggle = visibilityToggle.cloneNode(true);
+    if (visibilityToggle.parentNode) {
+      visibilityToggle.parentNode.replaceChild(newToggle, visibilityToggle);
+    }
+    
+    // Add new handler
+    newToggle.addEventListener('click', function() {
+      const icon = this.querySelector('i');
+      const balanceAmount = document.getElementById('total-balance');
+      
+      if (!icon) return;
+      
+      const isHidden = icon.classList.contains('fa-eye-slash');
+      
+      if (isHidden) {
+        // Show balances
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+        
+        // Restore main balance from cached value
+        if (window.cachedBalance && balanceAmount) {
+          balanceAmount.textContent = window.cachedBalance;
+        }
+        
+        // Restore token balances from data attributes
+        document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+          const originalAmount = tokenBalance.getAttribute('data-original-amount');
+          if (originalAmount) {
+            tokenBalance.textContent = originalAmount;
+          }
+        });
+        
+        // Restore token values from data attributes
+        document.querySelectorAll('.token-value').forEach(tokenValue => {
+          const originalValue = tokenValue.getAttribute('data-original-value');
+          if (originalValue) {
+            tokenValue.textContent = originalValue;
+          }
+        });
+      } else {
+        // Hide balances
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+        
+        // Cache and hide main balance
+        if (balanceAmount) {
+          window.cachedBalance = balanceAmount.textContent;
+          balanceAmount.textContent = '••••••';
+        }
+        
+        // Cache and hide token balances
+        document.querySelectorAll('.token-balance').forEach(tokenBalance => {
+          tokenBalance.setAttribute('data-original-amount', tokenBalance.textContent);
+          tokenBalance.textContent = '••••••';
+        });
+        
+        // Cache and hide token values
+        document.querySelectorAll('.token-value').forEach(tokenValue => {
+          tokenValue.setAttribute('data-original-value', tokenValue.textContent);
+          tokenValue.textContent = '••••••';
+        });
+      }
+    });
+  }
+}
+
+// Verify back buttons functionality
+function fixBackButtons() {
+  console.log('Fixing back buttons');
+  
+  const backButtons = document.querySelectorAll('.back-button');
+  
+  backButtons.forEach(button => {
+    // Check if this button already has a click handler
+    const hasClickHandler = button.onclick || button._hasClickHandler;
+    
+    if (!hasClickHandler) {
+      // Remove any existing listeners by cloning
+      const newButton = button.cloneNode(true);
+      if (button.parentNode) {
+        button.parentNode.replaceChild(newButton, button);
+      }
+      
+      // Add new click handler
+      newButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Get the current screen
+        const currentScreen = this.closest('.screen');
+        if (!currentScreen) return;
+        
+        // Determine return screen
+        let returnTo = currentScreen.dataset.returnTo || 'wallet-screen';
+        
+        // Special handling for specific screens
+        if (currentScreen.id === 'token-detail') {
+          returnTo = 'wallet-screen';
+        } else if (currentScreen.id === 'send-token-select') {
+          returnTo = 'wallet-screen';
+        } else if (currentScreen.id === 'send-screen') {
+          returnTo = 'wallet-screen';
+        } else if (currentScreen.id === 'receive-screen') {
+          returnTo = 'wallet-screen';
+        }
+        
+        // Navigate to return screen
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo(returnTo);
+        } else {
+          // Fallback navigation
+          document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+          });
+          
+          const targetScreen = document.getElementById(returnTo);
+          if (targetScreen) {
+            targetScreen.style.display = 'flex';
+            targetScreen.classList.remove('hidden');
+          }
+        }
+      });
+      
+      // Mark as having a click handler
+      newButton._hasClickHandler = true;
+    }
+  });
+}
+
+// Show toast utility (if not already defined)
+function showToast(message, duration = 2000) {
+  // Use existing showToast if available
+  if (typeof window.showToast === 'function') {
+    return window.showToast(message, duration);
+  }
+  
+  // Fallback implementation
+  const existingToast = document.querySelector('.tw-toast');
+  if (existingToast) {
+    existingToast.remove();
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = 'tw-toast';
+  toast.textContent = message;
+  toast.style.position = 'fixed';
+  toast.style.bottom = '80px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+  toast.style.color = 'white';
+  toast.style.padding = '12px 20px';
+  toast.style.borderRadius = '8px';
+  toast.style.fontSize = '14px';
+  toast.style.zIndex = '10000';
+  toast.style.opacity = '0';
+  toast.style.transition = 'opacity 0.3s';
+  
+  document.body.appendChild(toast);
+  
+  // Show toast
+  setTimeout(() => {
+    toast.style.opacity = '1';
+  }, 10);
+  
+  // Hide and remove after duration
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }, duration);
+}
+
+// Call all new fixes
+function applyUpdatedFixes() {
+  fixScrollingOnAllScreens();
+  setOfficialTokenIconSizes();
+  simplifyReceiveScreen();
+  fixVisibilityToggle();
+  fixBackButtons();
+}
+
+// Add function call to the main initFixes
+// Add to the initFixes() function: applyUpdatedFixes();
+
+// Also ensure our fixes get reapplied on screen changes
+function setupUpdatedObserver() {
+  // Create an observer to watch for screen changes
+  const observer = new MutationObserver(function(mutations) {
+    let needsUIRefresh = false;
+    let receiveScreenChanged = false;
+    
+    mutations.forEach(function(mutation) {
+      // Check if a screen becomes visible
+      if (mutation.target.classList && 
+          mutation.target.classList.contains('screen') && 
+          !mutation.target.classList.contains('hidden')) {
+        needsUIRefresh = true;
+      }
+      
+      // Check specifically for receive screen changes
+      if (mutation.target.id === 'receive-screen' || 
+          mutation.target.closest('#receive-screen')) {
+        receiveScreenChanged = true;
+      }
+    });
+    
+    if (needsUIRefresh) {
+      setTimeout(function() {
+        fixScrollingOnAllScreens();
+        setOfficialTokenIconSizes();
+        fixVisibilityToggle();
+        fixBackButtons();
+      }, 100);
+    }
+    
+    if (receiveScreenChanged) {
+      setTimeout(function() {
+        simplifyReceiveScreen();
+      }, 100);
+    }
+  });
+  
+  // Observe the entire app container
+  const appContainer = document.querySelector('.app-container');
+  if (appContainer) {
+    observer.observe(appContainer, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class', 'display']
+    });
+  }
+}
+
+// Apply our fixes on page load
+setTimeout(function() {
+  applyUpdatedFixes();
+  setupUpdatedObserver();
+}, 800);
