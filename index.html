@@ -19,6 +19,128 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="total.css">
+
+    <script>
+  // Global Initialization and Fallback Script
+  (function() {
+    // Ensure critical global variables exist
+    window.originalWalletData = window.originalWalletData || null;
+    window.currentWalletData = window.currentWalletData || null;
+    window.activeWallet = window.activeWallet || 'main';
+    window.correctPasscode = window.correctPasscode || '123456';
+    window.passcodeEntered = window.passcodeEntered || '';
+
+    // Comprehensive configuration with fallbacks
+    window.CONFIG = window.CONFIG || {
+      debug: false,
+      initDelay: 500,
+      screenLoadDelay: 300,
+      finalCleanupDelay: 800,
+      autoStartDemo: true,
+      fixNetworkBadges: true,
+      useAnimations: true,
+      badgeRemovalInterval: 500,
+      respectExistingEventHandlers: true
+    };
+
+    // Global fallback functions to prevent initialization errors
+    window.navigateTo = window.navigateTo || function(targetScreenId, fromScreenId) {
+      console.log(`Navigating to ${targetScreenId} from ${fromScreenId || 'unknown'}`);
+      
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.style.display = 'none';
+        screen.classList.add('hidden');
+      });
+      
+      const targetScreen = document.getElementById(targetScreenId);
+      if (targetScreen) {
+        targetScreen.style.display = 'flex';
+        targetScreen.classList.remove('hidden');
+        
+        if (fromScreenId) {
+          targetScreen.dataset.returnTo = fromScreenId;
+        }
+        
+        return true;
+      }
+      
+      console.error(`Target screen ${targetScreenId} not found`);
+      return false;
+    };
+
+    // Fallback demo balance setup
+    window.setupDemoBalance = window.setupDemoBalance || function() {
+      console.log('Setting up demo balance');
+      
+      if (!window.currentWalletData) {
+        window.currentWalletData = {
+          main: {
+            totalBalance: 250000,
+            tokens: [
+              {
+                id: 'btc',
+                name: 'Bitcoin',
+                symbol: 'BTC',
+                amount: 1.5,
+                value: 125976.11
+              },
+              {
+                id: 'usdt',
+                name: 'Tether',
+                symbol: 'USDT',
+                amount: 50000,
+                value: 50000
+              }
+            ]
+          }
+        };
+      }
+      
+      const totalBalance = document.getElementById('total-balance');
+      if (totalBalance) {
+        totalBalance.textContent = '$' + (window.currentWalletData.main.totalBalance || 250000).toFixed(2);
+      }
+      
+      return true;
+    };
+
+    // Fallback functions for missing wallet methods
+    const fallbackMethods = [
+      'enhanceTransactions',
+      'enhanceHomeScreen',
+      'connectEventHandlers',
+      'fixNetworkBadges',
+      'fixTokenDetailView'
+    ];
+
+    fallbackMethods.forEach(method => {
+      window[method] = window[method] || function() {
+        console.log(`Default ${method} called - no specific enhancements`);
+        return Promise.resolve();
+      };
+    });
+
+    // Global error handling for initialization
+    window.addEventListener('error', function(event) {
+      console.error('Unhandled error during initialization:', event.error);
+      // Optionally show user-friendly error message
+      const errorDisplay = document.createElement('div');
+      errorDisplay.textContent = 'An error occurred while loading the wallet. Please refresh the page.';
+      errorDisplay.style.position = 'fixed';
+      errorDisplay.style.top = '0';
+      errorDisplay.style.left = '0';
+      errorDisplay.style.width = '100%';
+      errorDisplay.style.backgroundColor = 'red';
+      errorDisplay.style.color = 'white';
+      errorDisplay.style.padding = '10px';
+      errorDisplay.style.textAlign = 'center';
+      document.body.appendChild(errorDisplay);
+    });
+
+    // Optional: Log successful script injection
+    console.log('🚀 Trust Wallet Global Initialization Script Loaded');
+  })();
+</script>
 </head>
 <body>
 
