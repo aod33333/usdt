@@ -833,7 +833,7 @@ function loadScreenContents() {
           </div>
         `
       },
-      ''send-token-select': {
+      'send-token-select': {
         className: 'screen hidden',
         content: `
           <div class="screen-header">
