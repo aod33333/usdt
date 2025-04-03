@@ -54,6 +54,76 @@ window.navigateTo = function(targetScreenId, fromScreenId) {
   }
 };
 
+// Fix for "fixNetworkBadges is not defined"
+window.fixNetworkBadges = function() {
+  console.log("Fixing network badges");
+  
+  // Style all network filters
+  document.querySelectorAll('.networks-filter .all-networks').forEach(filter => {
+    if (filter) {
+      filter.style.display = 'inline-flex';
+      filter.style.alignItems = 'center';
+      filter.style.background = '#F5F5F5';
+      filter.style.borderRadius = '16px';
+      filter.style.padding = '6px 12px';
+      filter.style.fontSize = '12px';
+      filter.style.color = '#5F6C75';
+      filter.style.margin = '8px 16px';
+      filter.style.fontWeight = '500';
+    }
+  });
+  
+  // Add network badges to tokens
+  const networkMapping = {
+    'usdt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    'twt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+    'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
+    'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+    'matic': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+    'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+    'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png',
+    'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png'
+  };
+  
+  document.querySelectorAll('.token-item').forEach(item => {
+    const tokenId = item.getAttribute('data-token-id');
+    if (!tokenId || !networkMapping[tokenId]) return;
+    
+    const tokenIcon = item.querySelector('.token-icon');
+    if (!tokenIcon) return;
+    
+    // Add badge if missing
+    let badge = tokenIcon.querySelector('.chain-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'chain-badge';
+      
+      const badgeImg = document.createElement('img');
+      badgeImg.src = networkMapping[tokenId];
+      badgeImg.alt = tokenId.toUpperCase() + ' Network';
+      
+      badge.appendChild(badgeImg);
+      tokenIcon.appendChild(badge);
+      
+      // Style the badge
+      badge.style.display = 'block';
+      badge.style.position = 'absolute';
+      badge.style.bottom = '-4px';
+      badge.style.right = '-4px';
+      badge.style.width = '18px';
+      badge.style.height = '18px';
+      badge.style.borderRadius = '50%';
+      badge.style.backgroundColor = 'white';
+      badge.style.border = '2px solid white';
+      badge.style.boxShadow = '0 1px 2px rgba(0,0,0,0.1)';
+      badge.style.zIndex = '1000';
+    }
+  });
+  
+  return Promise.resolve();
+};
+
 // Essential utility functions
 function formatTokenAmount(amount) {
   if (typeof amount !== 'number') {
