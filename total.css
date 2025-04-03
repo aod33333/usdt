@@ -88,7 +88,7 @@ html, body {
 }
 
 .hidden {
-    display: none !important;
+    display: none;
 }
 
 button {
@@ -148,7 +148,7 @@ button {
 }
 .space-between { justify-content: space-between; }
 
-.positive { color: var(--tw-blue) !important; }
+.positive { color: var(--tw-blue); }
 .negative { color: var(--tw-red); }
 
 .loading {
@@ -331,7 +331,7 @@ button {
     background-color: var(--tw-warning-bg);
     color: var(--tw-warning-text);
     padding: 8px;
-    font-size: 10px !important;
+    font-size: 10px;
     margin: 8px;
     border-radius: 8px;
     border-left: 4px solid var(--tw-warning-text);
@@ -605,7 +605,7 @@ button {
 }
 
 .token-price-change.positive {
-    color: var(--tw-blue) !important;
+    color: var(--tw-blue);
 }
 
 .token-amount {
