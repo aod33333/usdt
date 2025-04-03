@@ -10,7 +10,1847 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initFixes() {
-  console.log('Initializing TrustWallet UI fixes...');
+  console.log('Initializing TrustWallet UI fixes...');// Enhanced TrustWallet UI Fixes (Part 1 of 5)
+// This script applies various fixes to make the UI more authentic to Trust Wallet
+
+// Use an IIFE to avoid global scope pollution
+(function() {
+  'use strict';
+
+  console.log('Loading Enhanced TrustWallet UI fixes...'); 
+
+  // Configuration object for customization
+  const CONFIG = {
+    enableLogging: true,
+    waitForDom: true,
+    initialDelay: 500,
+    forceStyles: true, // Use !important for critical styles
+    screenCheckInterval: 1000, // How often to check for screens becoming visible
+    maxRetries: 5, // Maximum times to try fixing a screen
+    retryDelay: 300 // Milliseconds between retries
+  };
+
+  // Utility functions that will be used throughout the code
+  const UTILS = {
+    // Log message with timestamp if logging is enabled
+    log: function(message) {
+      if (CONFIG.enableLogging) {
+        console.log(`[TrustWallet UI Fix] ${message}`);
+      }
+    },
+    
+    // Get active token ID
+    getActiveTokenId: function() {
+      // First try to get from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenId = urlParams.get('token');
+      
+      if (tokenId) return tokenId;
+      
+      // Try to get from detail symbol
+      const detailSymbol = document.getElementById('detail-symbol');
+      if (detailSymbol) {
+        return detailSymbol.textContent.toLowerCase();
+      }
+      
+      // Fallback to window variable or default
+      return window.activeSendTokenId || 'btc';
+    },
+    
+    // Get token data
+    getTokenData: function(tokenId) {
+      if (!tokenId) return null;
+      
+      const activeWallet = window.activeWallet || 'main';
+      if (!window.currentWalletData || !window.currentWalletData[activeWallet]) return null;
+      
+      return window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+    },
+    
+    // Get token name by ID
+    getTokenNameById: function(tokenId) {
+      const token = this.getTokenData(tokenId);
+      return token?.name || 'Bitcoin';
+    },
+    
+    // Get token symbol by ID
+    getTokenSymbolById: function(tokenId) {
+      const token = this.getTokenData(tokenId);
+      return token?.symbol || 'BTC';
+    },
+    
+    // Get token network by ID
+    getTokenNetworkById: function(tokenId) {
+      const token = this.getTokenData(tokenId);
+      return token?.network || 'Bitcoin Network';
+    },
+    
+    // Get token logo URL
+    getTokenLogoUrl: function(tokenId) {
+      // Use existing function if available
+      if (typeof window.getTokenLogoUrl === 'function') {
+        return window.getTokenLogoUrl(tokenId);
+      }
+      
+      // Fallback implementation
+      const logoUrls = {
+        'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+        'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+        'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+        'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+        'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
+        'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png',
+        'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png',
+        'matic': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+        'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+        'uni': 'https://cryptologos.cc/logos/uniswap-uni-logo.png',
+        'twt': 'https://i.ibb.co/NdQ4xthx/Screenshot-2025-03-25-031716.png'
+      };
+      
+      return logoUrls[tokenId.toLowerCase()] || 'https://cryptologos.cc/logos/bitcoin-btc-logo.png';
+    },
+    
+    // Format token amount based on size
+    formatTokenAmount: function(amount) {
+      if (typeof amount !== 'number') {
+        amount = parseFloat(amount) || 0;
+      }
+      
+      // Format based on size
+      if (amount >= 1000000) {
+        return (amount / 1000000).toFixed(2) + 'M';
+      } else if (amount >= 1000) {
+        return (amount / 1000).toFixed(2) + 'K';
+      } else if (amount >= 1) {
+        return amount.toFixed(2);
+      } else {
+        // For small values, show more precision
+        return amount.toFixed(6);
+      }
+    },
+    
+    // Format currency value
+    formatCurrency: function(amount) {
+      if (typeof amount !== 'number') {
+        amount = parseFloat(amount) || 0;
+      }
+      
+      // Format based on size
+      if (amount >= 1000000) {
+        return '$' + (amount / 1000000).toFixed(2) + 'M';
+      } else if (amount >= 1000) {
+        return '$' + (amount / 1000).toFixed(2) + 'K';
+      } else {
+        return '$' + amount.toFixed(2);
+      }
+    },
+    
+    // Shorten address for display
+    shortenAddress: function(address) {
+      if (!address) return '';
+      return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+    },
+    
+    // Show toast notification
+    showToast: function(message, duration = 2000) {
+      // Use existing function if available
+      if (typeof window.showToast === 'function') {
+        return window.showToast(message, duration);
+      }
+      
+      // Fallback implementation
+      const existingToast = document.querySelector('.tw-toast');
+      if (existingToast) {
+        existingToast.remove();
+      }
+      
+      const toast = document.createElement('div');
+      toast.className = 'tw-toast';
+      toast.textContent = message;
+      toast.style.position = 'fixed';
+      toast.style.bottom = '80px';
+      toast.style.left = '50%';
+      toast.style.transform = 'translateX(-50%)';
+      toast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+      toast.style.color = 'white';
+      toast.style.padding = '12px 20px';
+      toast.style.borderRadius = '8px';
+      toast.style.fontSize = '14px';
+      toast.style.zIndex = '10000';
+      toast.style.opacity = '0';
+      toast.style.transition = 'opacity 0.3s';
+      
+      document.body.appendChild(toast);
+      
+      // Show toast
+      setTimeout(() => {
+        toast.style.opacity = '1';
+      }, 10);
+      
+      // Hide and remove after duration
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, duration);
+    },
+    
+    // Check if an element is already fixed
+    isFixed: function(element, fixName) {
+      if (!element) return true; // Consider null elements as "fixed"
+      const fixAttr = 'data-fixed-' + fixName.replace(/[^a-zA-Z0-9-]/g, '-');
+      return element.getAttribute(fixAttr) === 'true';
+    },
+    
+    // Mark an element as fixed
+    markFixed: function(element, fixName) {
+      if (!element) return false;
+      const fixAttr = 'data-fixed-' + fixName.replace(/[^a-zA-Z0-9-]/g, '-');
+      
+      // Skip if already fixed
+      if (element.getAttribute(fixAttr) === 'true') {
+        return false;
+      }
+      
+      element.setAttribute(fixAttr, 'true');
+      return true;
+    },
+    
+    // Force apply a style with !important
+    forceStyle: function(element, property, value) {
+      if (!element) return;
+      
+      if (CONFIG.forceStyles) {
+        // Either set inline style with !important or use style property
+        const currentStyle = element.getAttribute('style') || '';
+        if (!currentStyle.includes(`${property}:`)) {
+          element.setAttribute('style', `${currentStyle}; ${property}: ${value} !important;`);
+        } else {
+          // Replace existing style
+          const newStyle = currentStyle.replace(
+            new RegExp(`${property}:[^;]+;?`), 
+            `${property}: ${value} !important;`
+          );
+          element.setAttribute('style', newStyle);
+        }
+      } else {
+        // Regular style application without !important
+        element.style[property] = value;
+      }
+    },
+    
+    // Create element from HTML string
+    createElementFromHTML: function(htmlString) {
+      const div = document.createElement('div');
+      div.innerHTML = htmlString.trim();
+      return div.firstChild;
+    },
+    
+    // Insert element at specific position
+    insertElement: function(newElement, referenceElement, position = 'after') {
+      if (!referenceElement || !newElement) return;
+      
+      switch(position) {
+        case 'after':
+          if (referenceElement.nextSibling) {
+            referenceElement.parentNode.insertBefore(newElement, referenceElement.nextSibling);
+          } else {
+            referenceElement.parentNode.appendChild(newElement);
+          }
+          break;
+        case 'before':
+          referenceElement.parentNode.insertBefore(newElement, referenceElement);
+          break;
+        case 'prepend':
+          referenceElement.insertBefore(newElement, referenceElement.firstChild);
+          break;
+        case 'append':
+          referenceElement.appendChild(newElement);
+          break;
+      }
+    },
+    
+    // Replace one element with another
+    replaceElement: function(oldElement, newElement) {
+      if (!oldElement || !oldElement.parentNode) return;
+      oldElement.parentNode.replaceChild(newElement, oldElement);
+    },
+    
+    // Find a specific element with retries
+    findElementWithRetry: function(selector, callback, retries = CONFIG.maxRetries, delay = CONFIG.retryDelay) {
+      const attempt = (remaining) => {
+        const element = document.querySelector(selector);
+        
+        if (element) {
+          callback(element);
+          return true;
+        } else if (remaining > 0) {
+          this.log(`Element ${selector} not found, retrying (${remaining} attempts left)`);
+          setTimeout(() => attempt(remaining - 1), delay);
+          return false;
+        } else {
+          this.log(`Failed to find element ${selector} after multiple attempts`);
+          return false;
+        }
+      };
+      
+      return attempt(retries);
+    },
+    
+    // Add global style element
+    addGlobalStyle: function(css) {
+      // Check if this style already exists
+      const existingStyle = document.getElementById('enhanced-ui-fixes-style');
+      if (existingStyle) {
+        existingStyle.textContent = css;
+        return existingStyle;
+      }
+      
+      // Create new style
+      const style = document.createElement('style');
+      style.id = 'enhanced-ui-fixes-style';
+      style.textContent = css;
+      document.head.appendChild(style);
+      return style;
+    }
+  };
+
+  // Apply critical global styles first thing
+  function addCriticalStyles() {
+    UTILS.log('Adding critical styles for UI improvements');
+    
+    UTILS.addGlobalStyle(`
+      /* Token Detail styles */
+      #token-detail .token-price-info {
+        position: sticky !important;
+        bottom: 0 !important;
+        background-color: white !important;
+        z-index: 50 !important;
+        padding-bottom: 80px !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important;
+      }
+      
+      /* Investment warning styles */
+      .investment-warning {
+        width: calc(100% - 32px) !important;
+        margin: 16px !important;
+        background-color: #FEF9E7 !important;
+        color: #D4AC0D !important;
+        padding: 8px !important;
+        font-size: 10px !important;
+        border-radius: 8px !important;
+        border-left: 4px solid #D4AC0D !important;
+      }
+      
+      .investment-warning-content {
+        display: flex !important;
+        align-items: flex-start !important;
+        padding: 4px !important;
+      }
+      
+      .warning-icon {
+        font-size: 20px !important;
+        margin-right: 8px !important;
+        margin-top: 2px !important;
+      }
+      
+      .investment-warning-text {
+        flex: 1 !important;
+        font-size: 10px !important;
+        line-height: 1.4 !important;
+      }
+      
+      /* Staking container styles */
+      .staking-container {
+        background-color: #F5F5F5 !important;
+        border-radius: 16px !important;
+        padding: 16px !important;
+        margin: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        position: relative !important;
+      }
+      
+      .staking-icon {
+        width: 40px !important;
+        height: 40px !important;
+        margin-right: 16px !important;
+      }
+      
+      .staking-content {
+        flex: 1 !important;
+      }
+      
+      .staking-content h3 {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        margin-bottom: 4px !important;
+      }
+      
+      .staking-content p {
+        font-size: 12px !important;
+        color: #8A939D !important;
+        margin: 0 !important;
+      }
+      
+      .staking-arrow {
+        position: absolute !important;
+        right: 16px !important;
+        color: #8A939D !important;
+      }
+      
+      /* Network filter styles */
+      .networks-filter .all-networks {
+        display: inline-flex !important;
+        align-items: center !important;
+        background: #F5F5F5 !important;
+        border-radius: 16px !important;
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        color: #5F6C75 !important;
+        margin: 8px 16px !important;
+        font-weight: 500 !important;
+      }
+      
+      .networks-filter {
+        text-align: left !important;
+        border-bottom: 1px solid #F5F5F5 !important;
+        padding-bottom: 8px !important;
+      }
+      
+      /* Send screen token selection styles */
+      .token-selection-row {
+        display: grid !important;
+        grid-template-columns: 36px 1fr auto !important;
+        align-items: center !important;
+        gap: 16px !important;
+        padding: 12px 16px !important;
+        background-color: #F5F5F5 !important;
+        border-radius: 8px !important;
+        margin-bottom: 16px !important;
+        cursor: pointer !important;
+      }
+      
+      .token-info-column {
+        overflow: hidden !important;
+      }
+      
+      .token-name-row {
+        display: flex !important;
+        align-items: center !important;
+        gap: 8px !important;
+      }
+      
+      .selected-token-name {
+        font-weight: 600 !important;
+        font-size: 16px !important;
+      }
+      
+      .token-fullname {
+        font-size: 12px !important;
+        color: #8A939D !important;
+      }
+      
+      .network-badge-pill {
+        display: inline-block !important;
+        font-size: 12px !important;
+        color: #5F6C75 !important;
+        background-color: rgba(138, 147, 157, 0.1) !important;
+        padding: 2px 6px !important;
+        border-radius: 10px !important;
+        font-weight: 400 !important;
+      }
+      
+      /* Receive screen styles */
+      .token-selection {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 8px !important;
+        margin-bottom: 16px !important;
+      }
+      
+      .token-address-badge {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 4px !important;
+      }
+      
+      .contract-address {
+        font-size: 12px !important;
+        color: #8A939D !important;
+        font-family: monospace !important;
+      }
+    `);
+  }
+
+  // ================================================================= 
+  // ENHANCED TOKEN DETAIL PAGE
+  // =================================================================
+  function fixTokenDetailPage() {
+    UTILS.log('Fixing token detail page');
+    
+    const tokenDetailPage = document.getElementById('token-detail');
+    if (!tokenDetailPage) {
+      UTILS.log('Token detail page not found');
+      return false;
+    }
+    
+    // Center the header title
+    fixTokenDetailHeader(tokenDetailPage);
+    
+    // Add missing components if needed
+    const detailContent = tokenDetailPage.querySelector('.token-detail-content');
+    if (!detailContent) {
+      UTILS.log('Token detail content not found');
+      return false;
+    }
+    
+    // Add the investment warning if it doesn't exist
+    addInvestmentWarning(detailContent);
+    
+    // Add staking banner if it doesn't exist
+    addStakingBanner(detailContent);
+    
+    // Fix layout and scrolling
+    fixTokenDetailLayout(detailContent);
+    
+    // Fix transaction amounts
+    fixTransactionAmounts(tokenDetailPage);
+    
+    UTILS.log('Token detail page fixed');
+    return true;
+  }
+
+  function fixTokenDetailHeader(tokenDetailPage) {
+    const tokenDetailHeader = tokenDetailPage.querySelector('.detail-header');
+    if (!tokenDetailHeader) return;
+
+    // Apply flexbox layout with important flags
+    UTILS.forceStyle(tokenDetailHeader, 'display', 'flex');
+    UTILS.forceStyle(tokenDetailHeader, 'justify-content', 'space-between');
+    UTILS.forceStyle(tokenDetailHeader, 'align-items', 'center');
+    UTILS.forceStyle(tokenDetailHeader, 'position', 'relative');
+    
+    // Center the title
+    const titleElement = tokenDetailHeader.querySelector('.token-detail-title');
+    if (titleElement) {
+      UTILS.forceStyle(titleElement, 'position', 'absolute');
+      UTILS.forceStyle(titleElement, 'left', '0');
+      UTILS.forceStyle(titleElement, 'right', '0');
+      UTILS.forceStyle(titleElement, 'text-align', 'center');
+      UTILS.forceStyle(titleElement, 'z-index', '1');
+    }
+    
+    // Ensure back button and other icons are above the title
+    const backButton = tokenDetailHeader.querySelector('.back-button');
+    const headerIcons = tokenDetailHeader.querySelector('.header-icons');
+    
+    if (backButton) {
+      UTILS.forceStyle(backButton, 'position', 'relative');
+      UTILS.forceStyle(backButton, 'z-index', '2');
+    }
+    
+    if (headerIcons) {
+      UTILS.forceStyle(headerIcons, 'position', 'relative');
+      UTILS.forceStyle(headerIcons, 'z-index', '2');
+    }
+  }
+
+  function addInvestmentWarning(detailContent) {
+    // Skip if warning already exists or element already fixed
+    if (detailContent.querySelector('.investment-warning')) {
+      return;
+    }
+    
+    UTILS.log('Adding investment warning to token detail');
+    
+    // Create investment warning
+    const warningBanner = UTILS.createElementFromHTML(`
+      <div class="investment-warning">
+        <div class="investment-warning-content">
+          <i class="fas fa-exclamation-circle warning-icon"></i>
+          <div class="investment-warning-text">
+            <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
+          </div>
+          <button class="close-warning">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+    `);
+    
+    // Find where to insert
+    const balanceDisplay = detailContent.querySelector('.token-detail-balance');
+    const iconContainer = detailContent.querySelector('.token-detail-icon-container');
+    
+    if (iconContainer) {
+      // Insert before icon container
+      UTILS.insertElement(warningBanner, iconContainer, 'before');
+    } else if (balanceDisplay) {
+      // Insert before balance display
+      UTILS.insertElement(warningBanner, balanceDisplay, 'before');
+    } else {
+      // Insert at beginning
+      UTILS.insertElement(warningBanner, detailContent, 'prepend');
+    }
+    
+    // Add close button functionality
+    const closeButton = warningBanner.querySelector('.close-warning');
+    if (closeButton) {
+      closeButton.addEventListener('click', function() {
+        warningBanner.style.display = 'none';
+      });
+    }
+  }
+
+  function addStakingBanner(detailContent) {
+    // Skip if banner already exists
+    if (detailContent.querySelector('.staking-container')) {
+      return;
+    }
+    
+    UTILS.log('Adding staking banner to token detail');
+    
+    // Get active token
+    const tokenSymbol = document.getElementById('detail-symbol')?.textContent || 'BTC';
+    const tokenId = tokenSymbol.toLowerCase();
+    
+    // Create staking banner
+    const stakingBanner = UTILS.createElementFromHTML(`
+      <div class="staking-container">
+        <div class="staking-icon">
+          <img src="${UTILS.getTokenLogoUrl(tokenId)}" alt="${tokenSymbol}">
+        </div>
+        <div class="staking-content">
+          <h3>Earn ${tokenSymbol}</h3>
+          <p>Stake your ${tokenSymbol} to earn up to 6.5% APY</p>
+        </div>
+        <i class="fas fa-chevron-right staking-arrow"></i>
+      </div>
+    `);
+    
+    // Find where to insert
+    const transactionHeader = detailContent.querySelector('.transaction-header');
+    const actionButtons = detailContent.querySelector('.token-detail-actions');
+    
+    if (actionButtons && actionButtons.nextSibling) {
+      // Insert after action buttons
+      UTILS.insertElement(stakingBanner, actionButtons, 'after');
+    } else if (transactionHeader) {
+      // Insert before transaction header
+      UTILS.insertElement(stakingBanner, transactionHeader, 'before');
+    } else {
+      // Find transaction list as fallback
+      const transactionList = detailContent.querySelector('.transaction-list');
+      if (transactionList) {
+        UTILS.insertElement(stakingBanner, transactionList, 'before');
+      } else {
+        // Last resort: append to content
+        UTILS.insertElement(stakingBanner, detailContent, 'append');
+      }
+    }
+    
+    // Add click handler
+    stakingBanner.addEventListener('click', function() {
+      UTILS.showToast(`${tokenSymbol} staking coming soon`);
+    });
+  }
+
+  function fixTokenDetailLayout(detailContent) {
+    // Make only transaction list scrollable while keeping price at bottom
+    UTILS.forceStyle(detailContent, 'display', 'flex');
+    UTILS.forceStyle(detailContent, 'flex-direction', 'column');
+    
+    // Make transaction list scrollable
+    const transactionList = detailContent.querySelector('.transaction-list');
+    if (transactionList) {
+      UTILS.forceStyle(transactionList, 'flex', '1');
+      UTILS.forceStyle(transactionList, 'overflow-y', 'auto');
+      UTILS.forceStyle(transactionList, 'overflow-x', 'hidden');
+      UTILS.forceStyle(transactionList, 'max-height', '300px');
+    }
+    
+    // Fix price section to stick at bottom
+    const priceSection = detailContent.querySelector('.token-price-info');
+    if (priceSection) {
+      UTILS.forceStyle(priceSection, 'position', 'sticky');
+      UTILS.forceStyle(priceSection, 'bottom', '0');
+      UTILS.forceStyle(priceSection, 'background-color', 'white');
+      UTILS.forceStyle(priceSection, 'z-index', '50');
+      UTILS.forceStyle(priceSection, 'padding-bottom', '80px'); // For bottom tabs
+      UTILS.forceStyle(priceSection, 'margin-bottom', '0');
+      UTILS.forceStyle(priceSection, 'box-shadow', '0 -2px 10px rgba(0,0,0,0.05)');
+    }
+  }
+
+  function fixTransactionAmounts(detailPage) {
+    // Find all transaction items
+    const transactions = detailPage.querySelectorAll('.transaction-item');
+    
+    transactions.forEach(tx => {
+      const txValue = tx.querySelector('.transaction-value');
+      const txUSD = tx.querySelector('.transaction-usd');
+      
+      // Shorten transaction amount display
+      if (txValue) {
+        const currentText = txValue.textContent;
+        // Extract token amount and symbol
+        const match = currentText.match(/([+-])?([\d.,]+)\s+([A-Z]+)/i);
+        
+        if (match) {
+          const sign = match[1] || '';
+          const amount = parseFloat(match[2].replace(',', ''));
+          const symbol = match[3];
+          
+          // Format with shortened number
+          txValue.textContent = `${sign}${UTILS.formatTokenAmount(amount)} ${symbol}`;
+          UTILS.forceStyle(txValue, 'font-size', '14px'); // Smaller font size
+        }
+      }
+      
+      // Shorten USD value
+      if (txUSD) {
+        const currentText = txUSD.textContent;
+        const match = currentText.match(/\$?([\d.,]+)/);
+        
+        if (match) {
+          const amount = parseFloat(match[1].replace(',', ''));
+          txUSD.textContent = UTILS.formatCurrency(amount);
+          UTILS.forceStyle(txUSD, 'font-size', '12px'); // Smaller font size
+        }
+      }
+    });
+  }
+  
+  // =================================================================
+  // ENHANCED NETWORK FILTERS
+  // =================================================================
+  function fixNetworkFilters() {
+    UTILS.log('Fixing network filters');
+    
+    const networkFilters = document.querySelectorAll('.networks-filter .all-networks');
+    
+    networkFilters.forEach(filter => {
+      // Remove existing inline styles first, then apply new ones
+      filter.removeAttribute('style');
+      
+      UTILS.forceStyle(filter, 'display', 'inline-flex');
+      UTILS.forceStyle(filter, 'align-items', 'center');
+      UTILS.forceStyle(filter, 'background', '#F5F5F5');
+      UTILS.forceStyle(filter, 'border-radius', '16px');
+      UTILS.forceStyle(filter, 'padding', '6px 12px');
+      UTILS.forceStyle(filter, 'font-size', '12px');
+      UTILS.forceStyle(filter, 'color', '#5F6C75');
+      UTILS.forceStyle(filter, 'margin', '8px 16px');
+      UTILS.forceStyle(filter, 'font-weight', '500');
+      
+      // Make sure the chevron is properly aligned
+      const chevron = filter.querySelector('i.fa-chevron-down');
+      if (chevron) {
+        UTILS.forceStyle(chevron, 'margin-left', '6px');
+        UTILS.forceStyle(chevron, 'font-size', '10px');
+      }
+    });
+    
+    // Fix container styles
+    const filterContainers = document.querySelectorAll('.networks-filter');
+    filterContainers.forEach(container => {
+      UTILS.forceStyle(container, 'text-align', 'left');
+      UTILS.forceStyle(container, 'border-bottom', '1px solid #F5F5F5');
+      UTILS.forceStyle(container, 'padding-bottom', '8px');
+    });
+    
+    UTILS.log('Network filters fixed');
+  }
+  
+  // =================================================================
+  // ENHANCED SEND SCREEN
+  // =================================================================
+  function fixSendScreen() {
+    UTILS.log('Fixing send screen');
+    
+    const sendScreen = document.getElementById('send-screen');
+    if (!sendScreen) {
+      UTILS.log('Send screen not found');
+      return false;
+    }
+    
+    fixSendForm(sendScreen);
+    
+    UTILS.log('Send screen fixed');
+    return true;
+  }
+
+  function fixSendForm(sendScreen) {
+    UTILS.log('Fixing send form');
+    
+    // Get token ID and data
+    const tokenId = window.activeSendTokenId || 'usdt';
+    const token = UTILS.getTokenData(tokenId);
+    
+    if (!token) {
+      UTILS.log('Token data not found for send screen');
+      return false;
+    }
+    
+    // Get or create token selection row
+    const sendContent = sendScreen.querySelector('.send-content');
+    if (!sendContent) {
+      UTILS.log('Send content not found');
+      return false;
+    }
+    
+    // Check if token selection row exists
+    let tokenSelectionRow = sendContent.querySelector('.token-selection-row');
+    
+    // Create token selection row if it doesn't exist
+    if (!tokenSelectionRow) {
+      UTILS.log('Creating token selection row');
+      
+      tokenSelectionRow = UTILS.createElementFromHTML(`
+        <div class="token-selection-row">
+          <div class="token-icon">
+            <img src="${UTILS.getTokenLogoUrl(token.id)}" alt="${token.name}">
+          </div>
+          <div class="token-info-column">
+            <div class="token-name-row">
+              <span class="selected-token-name">${token.symbol}</span>
+              <span class="network-badge-pill">${token.network || 'Unknown Network'}</span>
+            </div>
+            <div class="token-fullname">${token.name}</div>
+          </div>
+          <div class="token-change-button">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+      `);
+      
+      // Insert at the beginning of send content
+      if (sendContent.firstChild) {
+        UTILS.insertElement(tokenSelectionRow, sendContent.firstChild, 'before');
+      } else {
+        UTILS.insertElement(tokenSelectionRow, sendContent, 'prepend');
+      }
+      
+      // Add click handler to change token
+      tokenSelectionRow.addEventListener('click', function() {
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo('send-token-select', 'send-screen');
+        }
+      });
+    } else {
+      // Update existing token selection row
+      UTILS.log('Updating existing token selection row');
+      
+      // Update token icon
+      const tokenIcon = tokenSelectionRow.querySelector('.token-icon img');
+      if (tokenIcon) {
+        tokenIcon.src = UTILS.getTokenLogoUrl(token.id);
+        tokenIcon.alt = token.name;
+      }
+      
+      // Update token name and badge
+      const selectedTokenName = tokenSelectionRow.querySelector('.selected-token-name');
+      if (selectedTokenName) {
+        selectedTokenName.textContent = token.symbol;
+      }
+      
+      const networkBadge = tokenSelectionRow.querySelector('.network-badge-pill');
+      if (networkBadge) {
+        networkBadge.textContent = token.network || 'Unknown Network';
+      }
+      
+      // Update token fullname
+      const tokenFullname = tokenSelectionRow.querySelector('.token-fullname');
+      if (tokenFullname) {
+        tokenFullname.textContent = token.name;
+      }
+    }
+    
+    // Add available balance with dollar value
+    const availableBalance = sendContent.querySelector('#available-balance');
+    if (availableBalance) {
+      // Get max amount element
+      const maxAmount = availableBalance.querySelector('#max-amount');
+      const maxSymbol = availableBalance.querySelector('#max-symbol');
+      
+      if (maxAmount && maxSymbol) {
+        maxAmount.textContent = token.amount.toFixed(6);
+        maxSymbol.textContent = token.symbol;
+        
+        // Add dollar value if not already present
+        if (!availableBalance.querySelector('.dollar-value')) {
+          const dollarValue = document.createElement('span');
+          dollarValue.className = 'dollar-value';
+          UTILS.forceStyle(dollarValue, 'margin-left', '4px');
+          UTILS.forceStyle(dollarValue, 'color', '#8A939D');
+          dollarValue.textContent = UTILS.formatCurrency(token.value);
+          
+          // Insert after the max symbol
+          maxSymbol.insertAdjacentElement('afterend', dollarValue);
+        } else {
+          // Update existing dollar value
+          const dollarValue = availableBalance.querySelector('.dollar-value');
+          dollarValue.textContent = UTILS.formatCurrency(token.value);
+        }
+      }
+    }
+    
+    // Update send amount input for dollar value
+    const amountInput = sendContent.querySelector('#send-amount');
+    const dollarValueDisplay = sendContent.querySelector('.dollar-value-display');
+    
+    if (amountInput && !dollarValueDisplay) {
+      // Create dollar value display
+      const valueDisplay = document.createElement('div');
+      valueDisplay.className = 'dollar-value-display';
+      valueDisplay.textContent = '$0.00';
+      UTILS.forceStyle(valueDisplay, 'font-size', '12px');
+      UTILS.forceStyle(valueDisplay, 'color', '#8A939D');
+      UTILS.forceStyle(valueDisplay, 'margin-top', '4px');
+      
+      // Insert after the amount input container
+      const amountInputContainer = amountInput.closest('.amount-input');
+      if (amountInputContainer) {
+        amountInputContainer.insertAdjacentElement('afterend', valueDisplay);
+      }
+      
+      // Update dollar value on input
+      amountInput.addEventListener('input', function() {
+        const amount = parseFloat(this.value) || 0;
+        const dollarValue = amount * token.price;
+        valueDisplay.textContent = UTILS.formatCurrency(dollarValue);
+      });
+    }
+    
+    return true;
+  }
+  
+  // =================================================================
+  // ENHANCED RECEIVE SCREEN
+  // =================================================================
+  function fixReceiveScreen() {
+    UTILS.log('Fixing receive screen');
+    
+    const receiveScreen = document.getElementById('receive-screen');
+    if (!receiveScreen) {
+      UTILS.log('Receive screen not found');
+      return false;
+    }
+    
+    // Check for token list or QR view
+    const tokenList = receiveScreen.querySelector('#receive-token-list');
+    
+    if (tokenList) {
+      // Token list mode
+      fixReceiveTokenList(tokenList);
+    } else {
+      // QR view mode - individual token receive screen
+      fixReceiveQRView(receiveScreen);
+    }
+    
+    UTILS.log('Receive screen fixed');
+    return true;
+  }
+
+  function fixReceiveTokenList(tokenList) {
+    UTILS.log('Fixing receive token list');
+    
+    // Process token items
+    const tokenItems = tokenList.querySelectorAll('.token-item');
+    
+    tokenItems.forEach(item => {
+      // Skip if already processed
+      if (UTILS.isFixed(item, 'receive-token')) return;
+      
+      // Get token data
+      const tokenId = item.getAttribute('data-token-id');
+      if (!tokenId) return;
+      
+      const token = UTILS.getTokenData(tokenId);
+      if (!token) return;
+      
+      // Find token info element
+      const tokenInfo = item.querySelector('.token-info');
+      if (!tokenInfo) return;
+      
+      // Get token name before we modify the structure
+      const tokenName = tokenInfo.querySelector('.token-name')?.textContent || token.symbol;
+      
+      // Replace content with improved layout
+      tokenInfo.innerHTML = `
+        <div class="token-name-row">
+          <div class="token-name">${tokenName}</div>
+          <div class="network-badge-pill">${token.network || 'Unknown Network'}</div>
+        </div>
+        <div class="contract-address">
+          ${UTILS.shortenAddress('0xC65B6...E90a51')}
+        </div>
+      `;
+      
+      // Mark as fixed
+      UTILS.markFixed(item, 'receive-token');
+    });
+  }
+
+  function fixReceiveQRView(receiveScreen) {
+    UTILS.log('Fixing receive QR view');
+    
+    const receiveContent = receiveScreen.querySelector('.receive-content');
+    if (!receiveContent) return;
+    
+    // Skip if already fixed
+    if (UTILS.isFixed(receiveContent, 'receive-qr')) return;
+    
+    // Check if already has token selection
+    let tokenSelection = receiveContent.querySelector('.token-selection');
+    
+    if (!tokenSelection) {
+      UTILS.log('Creating token selection for QR view');
+      
+      // Get token ID from URL or default
+      const urlParams = new URLSearchParams(window.location.search);
+      const tokenId = urlParams.get('token') || window.activeSendTokenId || 'btc';
+      
+      const token = UTILS.getTokenData(tokenId) || {
+        id: tokenId,
+        name: UTILS.getTokenNameById(tokenId),
+        symbol: UTILS.getTokenSymbolById(tokenId),
+        network: UTILS.getTokenNetworkById(tokenId)
+      };
+      
+      // Create token selection
+      tokenSelection = UTILS.createElementFromHTML(`
+        <div class="token-selection">
+          <div class="token-icon-large">
+            <img src="${UTILS.getTokenLogoUrl(token.id)}" alt="${token.name}">
+          </div>
+          <h3>${token.name} (${token.symbol})</h3>
+          <div class="token-address-badge">
+            <span class="network-badge-pill">${token.network || 'Unknown Network'}</span>
+            <span class="contract-address">${UTILS.shortenAddress('0xC65B6...E90a51')}</span>
+          </div>
+        </div>
+      `);
+      
+      // Find QR code container or another reference point for insertion
+      const qrContainer = receiveContent.querySelector('.qr-code-container');
+      if (qrContainer) {
+        UTILS.insertElement(tokenSelection, qrContainer, 'before');
+      } else {
+        UTILS.insertElement(tokenSelection, receiveContent, 'prepend');
+      }
+    }
+    
+    // Mark as fixed
+    UTILS.markFixed(receiveContent, 'receive-qr');
+  }
+  
+  // =================================================================
+  // SCROLL FIXES
+  // =================================================================
+  function fixScrollingOnAllScreens() {
+    UTILS.log('Fixing scrolling on all screens');
+    
+    // List of screens that should have scrolling enabled
+    const scrollableScreens = [
+      'send-screen',
+      'receive-screen',
+      'history-screen',
+      'send-token-select',
+      'token-detail'
+    ];
+    
+    scrollableScreens.forEach(screenId => {
+      const screen = document.getElementById(screenId);
+      if (!screen) return;
+      
+      // Enable scrolling
+      UTILS.forceStyle(screen, 'overflow-y', 'auto');
+      UTILS.forceStyle(screen, 'overflow-x', 'hidden');
+      
+      // Find content container in the screen
+      const contentElement = screen.querySelector('.send-content, .receive-content, .screen-content, .token-detail-content, .token-list');
+      if (contentElement) {
+        // Ensure proper padding at the bottom for scrolling
+        UTILS.forceStyle(contentElement, 'padding-bottom', '80px');
+      }
+    });
+    
+    // Special handling for token list to ensure smooth scrolling
+    const tokenLists = document.querySelectorAll('.token-list');
+    tokenLists.forEach(list => {
+      UTILS.forceStyle(list, 'overflow-y', 'auto');
+      UTILS.forceStyle(list, 'overflow-x', 'hidden');
+      UTILS.forceStyle(list, 'webkit-overflow-scrolling', 'touch'); // For smooth scrolling on iOS
+    });
+  }
+
+  // =================================================================
+  // TOKEN ICON & BADGE FIXES
+  // =================================================================
+  function setOfficialTokenIconSizes() {
+    UTILS.log('Setting token icons to official size');
+    
+    // Set proper icon size across all screens
+    const allTokenIcons = document.querySelectorAll('.token-icon');
+    allTokenIcons.forEach(icon => {
+      UTILS.forceStyle(icon, 'width', '40px');
+      UTILS.forceStyle(icon, 'height', '40px');
+      UTILS.forceStyle(icon, 'min-width', '40px'); // Prevent shrinking
+      UTILS.forceStyle(icon, 'position', 'relative'); // For badge positioning
+      
+      // Increase image size within
+      const img = icon.querySelector('img');
+      if (img) {
+        UTILS.forceStyle(img, 'width', '100%');
+        UTILS.forceStyle(img, 'height', '100%');
+        UTILS.forceStyle(img, 'object-fit', 'contain');
+      }
+      
+      // Adjust badge positioning for proper icon
+      const badge = icon.querySelector('.chain-badge');
+      if (badge) {
+        UTILS.forceStyle(badge, 'bottom', '-4px');
+        UTILS.forceStyle(badge, 'right', '-4px');
+        UTILS.forceStyle(badge, 'width', '18px');
+        UTILS.forceStyle(badge, 'height', '18px');
+      }
+    });
+    
+    // Special handling for token detail page icon (larger)
+    const detailIcon = document.querySelector('.token-detail-large-icon');
+    if (detailIcon) {
+      UTILS.forceStyle(detailIcon, 'width', '48px');
+      UTILS.forceStyle(detailIcon, 'height', '48px');
+    }
+  }
+
+  function enhanceNetworkBadges() {
+    UTILS.log('Enhancing network badges');
+    
+    // Define which tokens should have network badges
+    const networkMapping = {
+      'usdt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'twt': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
+      'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'matic': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+      'pol': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
+      'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png',
+      'xrp': 'https://cryptologos.cc/logos/xrp-xrp-logo.png'
+    };
+    
+    // Add badges to all token items in all screens
+    const tokenItems = document.querySelectorAll('.token-item');
+    tokenItems.forEach(item => {
+      const tokenId = item.getAttribute('data-token-id');
+      if (!tokenId || !networkMapping[tokenId]) return;
+      
+      const tokenIcon = item.querySelector('.token-icon');
+      if (!tokenIcon) return;
+      
+      // Only add badge if it doesn't already exist
+      let badge = tokenIcon.querySelector('.chain-badge');
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'chain-badge';
+        
+        const badgeImg = document.createElement('img');
+        badgeImg.src = networkMapping[tokenId];
+        badgeImg.alt = tokenId.toUpperCase() + ' Network';
+        
+        badge.appendChild(badgeImg);
+        tokenIcon.appendChild(badge);
+      }
+      
+      // Ensure badge is visible with forced styling
+      UTILS.forceStyle(badge, 'display', 'block');
+      UTILS.forceStyle(badge, 'position', 'absolute');
+      UTILS.forceStyle(badge, 'bottom', '-6px');
+      UTILS.forceStyle(badge, 'right', '-6px');
+      UTILS.forceStyle(badge, 'width', '20px');
+      UTILS.forceStyle(badge, 'height', '20px');
+      UTILS.forceStyle(badge, 'border-radius', '50%');
+      UTILS.forceStyle(badge, 'background-color', 'white');
+      UTILS.forceStyle(badge, 'border', '2px solid white');
+      UTILS.forceStyle(badge, 'box-shadow', '0 1px 2px rgba(0,0,0,0.1)');
+      UTILS.forceStyle(badge, 'z-index', '5');
+      UTILS.forceStyle(badge, 'overflow', 'visible');
+      
+      // Make sure image fills the badge
+      const badgeImg = badge.querySelector('img');
+      if (badgeImg) {
+        UTILS.forceStyle(badgeImg, 'width', '100%');
+        UTILS.forceStyle(badgeImg, 'height', '100%');
+        UTILS.forceStyle(badgeImg, 'object-fit', 'contain');
+      }
+    });
+    
+    // Add badges in token detail view (for icon at the top)
+    const tokenDetailIcon = document.querySelector('.token-detail-icon-container img');
+    const tokenDetailScreen = document.getElementById('token-detail');
+    
+    if (tokenDetailIcon && tokenDetailScreen) {
+      const tokenSymbol = document.getElementById('detail-symbol');
+      if (tokenSymbol) {
+        const tokenId = tokenSymbol.textContent.toLowerCase();
+        
+        if (networkMapping[tokenId]) {
+          // Find existing badge or create new one
+          let detailBadge = document.querySelector('.token-detail-icon-container .chain-badge');
+          
+          if (!detailBadge) {
+            detailBadge = document.createElement('div');
+            detailBadge.className = 'chain-badge';
+            
+            const badgeImg = document.createElement('img');
+            badgeImg.src = networkMapping[tokenId];
+            badgeImg.alt = tokenId.toUpperCase() + ' Network';
+            
+            detailBadge.appendChild(badgeImg);
+            tokenDetailIcon.parentElement.appendChild(detailBadge);
+          }
+          
+          // Ensure it's visible and styled correctly
+          UTILS.forceStyle(detailBadge, 'display', 'block');
+          UTILS.forceStyle(detailBadge, 'position', 'absolute');
+          UTILS.forceStyle(detailBadge, 'bottom', '-6px');
+          UTILS.forceStyle(detailBadge, 'right', '-6px');
+          UTILS.forceStyle(detailBadge, 'width', '24px');
+          UTILS.forceStyle(detailBadge, 'height', '24px');
+          UTILS.forceStyle(detailBadge, 'border-radius', '50%');
+          UTILS.forceStyle(detailBadge, 'background-color', 'white');
+          UTILS.forceStyle(detailBadge, 'border', '2px solid white');
+          UTILS.forceStyle(detailBadge, 'box-shadow', '0 1px 2px rgba(0,0,0,0.1)');
+          UTILS.forceStyle(detailBadge, 'z-index', '5');
+          UTILS.forceStyle(detailBadge, 'overflow', 'visible');
+          
+          // Make sure image fills the badge
+          const badgeImg = detailBadge.querySelector('img');
+          if (badgeImg) {
+            UTILS.forceStyle(badgeImg, 'width', '100%');
+            UTILS.forceStyle(badgeImg, 'height', '100%');
+            UTILS.forceStyle(badgeImg, 'object-fit', 'contain');
+          }
+        }
+      }
+    }
+  }
+
+  // Add network badges to token names in send/receive screens
+  function addNetworkBadgesToTokens() {
+    UTILS.log('Adding network badges to tokens in send/receive screens');
+    
+    // Define network mappings
+    const networkNames = {
+      'btc': 'Bitcoin',
+      'eth': 'Ethereum',
+      'bnb': 'BNB Chain',
+      'usdt': 'BNB Chain',
+      'trx': 'Tron',
+      'sol': 'Solana',
+      'pol': 'Polygon',
+      'matic': 'Polygon',
+      'xrp': 'XRP Ledger',
+      'twt': 'BNB Chain'
+    };
+    
+    // Process token items in send screen
+    const sendTokenItems = document.querySelectorAll('#send-token-select .token-item');
+    sendTokenItems.forEach(item => {
+      processTokenItem(item, networkNames);
+    });
+    
+    // Process token items in receive screen
+    const receiveTokenItems = document.querySelectorAll('#receive-token-list .token-item');
+    receiveTokenItems.forEach(item => {
+      processTokenItem(item, networkNames);
+    });
+    
+    // Function to process each token item
+    function processTokenItem(item, networkNames) {
+      // Skip if already processed
+      if (UTILS.isFixed(item, 'network-badge')) return;
+      
+      const tokenId = item.getAttribute('data-token-id');
+      if (!tokenId) return;
+      
+      const tokenInfo = item.querySelector('.token-info');
+      if (!tokenInfo) return;
+      
+      const tokenName = tokenInfo.querySelector('.token-name');
+      if (!tokenName) return;
+      
+      // Check if badge already exists
+      const existingBadge = tokenInfo.querySelector('.network-badge-pill');
+      if (existingBadge) return;
+      
+      // Get network name
+      const networkName = networkNames[tokenId.toLowerCase()] || 'Unknown';
+      
+      // Create network badge
+      const networkBadge = document.createElement('div');
+      networkBadge.className = 'network-badge-pill';
+      networkBadge.textContent = networkName;
+      
+      // Insert badge after token name
+      const nameRow = document.createElement('div');
+      nameRow.className = 'token-name-row';
+      
+      // Clone token name to preserve styling
+      const newTokenName = document.createElement('div');
+      newTokenName.className = 'token-name';
+      newTokenName.textContent = tokenName.textContent;
+      
+      // Replace token info content
+      tokenInfo.innerHTML = '';
+      nameRow.appendChild(newTokenName);
+      nameRow.appendChild(networkBadge);
+      tokenInfo.appendChild(nameRow);
+      
+      // Add styles to badge
+      UTILS.forceStyle(networkBadge, 'display', 'inline-block');
+      UTILS.forceStyle(networkBadge, 'font-size', '12px');
+      UTILS.forceStyle(networkBadge, 'color', '#5F6C75');
+      UTILS.forceStyle(networkBadge, 'background-color', '#F5F5F5');
+      UTILS.forceStyle(networkBadge, 'padding', '2px 8px');
+      UTILS.forceStyle(networkBadge, 'border-radius', '10px');
+      UTILS.forceStyle(networkBadge, 'margin-left', '8px');
+      UTILS.forceStyle(networkBadge, 'font-weight', '400');
+      
+      // Style the name row
+      UTILS.forceStyle(nameRow, 'display', 'flex');
+      UTILS.forceStyle(nameRow, 'align-items', 'center');
+      UTILS.forceStyle(nameRow, 'width', '100%');
+      
+      // Keep the token price if exists
+      const tokenPrice = item.querySelector('.token-price') || 
+                         item.querySelector('.token-network-badge') ||
+                         item.querySelector('.token-fullname');
+      
+      if (tokenPrice && tokenPrice.parentNode === item) {
+        const priceClone = tokenPrice.cloneNode(true);
+        tokenInfo.appendChild(priceClone);
+      } else {
+        // Add contract address
+        const contractAddress = document.createElement('div');
+        contractAddress.className = 'contract-address';
+        contractAddress.textContent = UTILS.shortenAddress('0xC65B6...E90a51');
+        UTILS.forceStyle(contractAddress, 'font-size', '12px');
+        UTILS.forceStyle(contractAddress, 'color', '#8A939D');
+        UTILS.forceStyle(contractAddress, 'font-family', 'monospace');
+        tokenInfo.appendChild(contractAddress);
+      }
+      
+      // Mark as fixed
+      UTILS.markFixed(item, 'network-badge');
+    }
+  }
+
+  // Fix token selections in send screen
+  function fixSendTokenSelectionDisplay() {
+    // Monitor token item clicks in send token selection screen
+    document.addEventListener('click', function(e) {
+      const tokenItem = e.target.closest('.token-item');
+      if (!tokenItem || !tokenItem.closest('#send-token-select')) return;
+      
+      const tokenId = tokenItem.getAttribute('data-token-id');
+      if (!tokenId) return;
+      
+      // Add a short delay before applying network badge to the send screen
+      setTimeout(function() {
+        const sendScreen = document.getElementById('send-screen');
+        if (!sendScreen) return;
+        
+        const tokenSelectionRow = sendScreen.querySelector('.token-selection-row');
+        if (!tokenSelectionRow) return;
+        
+        // Get token info
+        const tokenInfoColumn = tokenSelectionRow.querySelector('.token-info-column');
+        if (!tokenInfoColumn) return;
+        
+        // Get network name
+        const networkNames = {
+          'btc': 'Bitcoin',
+          'eth': 'Ethereum',
+          'bnb': 'BNB Chain',
+          'usdt': 'BNB Chain',
+          'trx': 'Tron',
+          'sol': 'Solana',
+          'pol': 'Polygon',
+          'matic': 'Polygon',
+          'xrp': 'XRP Ledger',
+          'twt': 'BNB Chain'
+        };
+        
+        const networkName = networkNames[tokenId.toLowerCase()] || 'Unknown';
+        
+        // Update the token name row
+        const tokenNameRow = tokenInfoColumn.querySelector('.token-name-row');
+        if (tokenNameRow) {
+          // Check if network badge exists
+          let networkBadge = tokenNameRow.querySelector('.network-badge-pill');
+          if (!networkBadge) {
+            // Create network badge
+            networkBadge = document.createElement('div');
+            networkBadge.className = 'network-badge-pill';
+            tokenNameRow.appendChild(networkBadge);
+          }
+          
+          // Update network badge
+          networkBadge.textContent = networkName;
+          UTILS.forceStyle(networkBadge, 'display', 'inline-block');
+          UTILS.forceStyle(networkBadge, 'font-size', '12px');
+          UTILS.forceStyle(networkBadge, 'color', '#5F6C75');
+          UTILS.forceStyle(networkBadge, 'background-color', '#F5F5F5');
+          UTILS.forceStyle(networkBadge, 'padding', '2px 8px');
+          UTILS.forceStyle(networkBadge, 'border-radius', '10px');
+          UTILS.forceStyle(networkBadge, 'margin-left', '8px');
+          UTILS.forceStyle(networkBadge, 'font-weight', '400');
+        }
+      }, 100);
+    });
+  }
+
+  // Function to fix receive token display after selecting a token
+  function fixReceiveTokenDisplay() {
+    document.addEventListener('click', function(e) {
+      const tokenItem = e.target.closest('.token-item');
+      
+      if (!tokenItem || !tokenItem.closest('#receive-token-list')) return;
+      
+      const tokenId = tokenItem.getAttribute('data-token-id');
+      if (!tokenId) return;
+      
+      // Add a short delay before fixing the receive screen display
+      setTimeout(function() {
+        const receiveScreen = document.getElementById('receive-screen');
+        if (!receiveScreen) return;
+        
+        // Get network name
+        const networkNames = {
+          'btc': 'Bitcoin',
+          'eth': 'Ethereum',
+          'bnb': 'BNB Chain',
+          'usdt': 'BNB Chain',
+          'trx': 'Tron',
+          'sol': 'Solana',
+          'pol': 'Polygon',
+          'matic': 'Polygon',
+          'xrp': 'XRP Ledger',
+          'twt': 'BNB Chain'
+        };
+        
+        const networkName = networkNames[tokenId.toLowerCase()] || 'Unknown';
+        
+        // Find the token selection or create it
+        let tokenSelection = receiveScreen.querySelector('.token-selection');
+        if (!tokenSelection) return;
+        
+        // Find network badge or create it
+        let networkBadge = tokenSelection.querySelector('.token-address-badge .network-name');
+        if (networkBadge) {
+          networkBadge.textContent = networkName;
+        } else {
+          // Create the badge container if needed
+          let badgeContainer = tokenSelection.querySelector('.token-address-badge');
+          if (!badgeContainer) {
+            badgeContainer = document.createElement('div');
+            badgeContainer.className = 'token-address-badge';
+            tokenSelection.appendChild(badgeContainer);
+          }
+          
+          // Create the network name element
+          networkBadge = document.createElement('span');
+          networkBadge.className = 'network-name';
+          networkBadge.textContent = networkName;
+          badgeContainer.appendChild(networkBadge);
+          
+          // Style it
+          UTILS.forceStyle(networkBadge, 'padding', '4px 8px');
+          UTILS.forceStyle(networkBadge, 'border-radius', '12px');
+          UTILS.forceStyle(networkBadge, 'background-color', '#F5F5F5');
+          UTILS.forceStyle(networkBadge, 'font-size', '12px');
+          UTILS.forceStyle(networkBadge, 'color', '#5F6C75');
+          UTILS.forceStyle(networkBadge, 'display', 'inline-block');
+          UTILS.forceStyle(networkBadge, 'margin', '8px 0');
+        }
+      }, 100);
+    });
+  }
+
+  // =================================================================
+  // HEADER, NAVIGATION & EVENT HANDLERS
+  // =================================================================
+  function centerHeaderTitles() {
+    UTILS.log('Centering header titles');
+    
+    // Create a style element for header fixes
+    UTILS.addGlobalStyle(`
+      .screen-header h2 {
+        position: absolute !important;
+        left: 0 !important;
+        right: 0 !important;
+        text-align: center !important;
+        width: auto !important;
+        margin: 0 auto !important;
+        z-index: 1 !important;
+        pointer-events: none !important;
+      }
+      
+      .screen-header .back-button {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+      
+      .screen-header .icon-button {
+        position: relative !important;
+        z-index: 2 !important;
+      }
+    `);
+    
+    // Apply to all screen headers
+    document.querySelectorAll('.screen-header').forEach(header => {
+      const title = header.querySelector('h2');
+      const backButton = header.querySelector('.back-button');
+      
+      if (title) {
+        UTILS.forceStyle(title, 'position', 'absolute');
+        UTILS.forceStyle(title, 'left', '0');
+        UTILS.forceStyle(title, 'right', '0');
+        UTILS.forceStyle(title, 'text-align', 'center');
+        UTILS.forceStyle(title, 'z-index', '1');
+        UTILS.forceStyle(title, 'pointer-events', 'none');
+      }
+      
+      if (backButton) {
+        UTILS.forceStyle(backButton, 'position', 'relative');
+        UTILS.forceStyle(backButton, 'z-index', '2');
+      }
+    });
+  }
+
+  function fixHeaderIconsAlignment() {
+    UTILS.log('Fixing header icons alignment');
+    
+    // Fix alignment in token detail page header
+    const tokenDetailHeader = document.querySelector('#token-detail .detail-header');
+    if (tokenDetailHeader) {
+      UTILS.forceStyle(tokenDetailHeader, 'display', 'flex');
+      UTILS.forceStyle(tokenDetailHeader, 'flex-direction', 'row');
+      UTILS.forceStyle(tokenDetailHeader, 'align-items', 'center');
+      UTILS.forceStyle(tokenDetailHeader, 'justify-content', 'space-between');
+      
+      // Adjust the token detail title
+      const titleElement = tokenDetailHeader.querySelector('.token-detail-title');
+      if (titleElement) {
+        UTILS.forceStyle(titleElement, 'position', 'absolute');
+        UTILS.forceStyle(titleElement, 'left', '0');
+        UTILS.forceStyle(titleElement, 'right', '0');
+        UTILS.forceStyle(titleElement, 'text-align', 'center');
+      }
+      
+      // Make header icons display horizontally
+      const headerIcons = tokenDetailHeader.querySelector('.header-icons');
+      if (headerIcons) {
+        UTILS.forceStyle(headerIcons, 'display', 'flex');
+        UTILS.forceStyle(headerIcons, 'flex-direction', 'row');
+        UTILS.forceStyle(headerIcons, 'align-items', 'center');
+        UTILS.forceStyle(headerIcons, 'gap', '8px');
+        UTILS.forceStyle(headerIcons, 'position', 'relative');
+        UTILS.forceStyle(headerIcons, 'z-index', '2');
+      }
+    }
+  }
+
+  // Fix back buttons on all screens
+  function fixBackButtons() {
+    UTILS.log('Fixing back buttons');
+    
+    const backButtons = document.querySelectorAll('.back-button');
+    
+    backButtons.forEach(button => {
+      // Skip if already fixed
+      if (UTILS.isFixed(button, 'back-button')) return;
+      
+      // Ensure button is clickable
+      UTILS.forceStyle(button, 'cursor', 'pointer');
+      
+      // Remove existing listeners to prevent multiple bindings
+      const newButton = button.cloneNode(true);
+      button.parentNode.replaceChild(newButton, button);
+      
+      // Add new click handler
+      newButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Get the current screen
+        const currentScreen = this.closest('.screen');
+        if (!currentScreen) return;
+        
+        // Determine return screen based on current screen
+        let returnTo = 'wallet-screen';
+        
+        switch(currentScreen.id) {
+          case 'token-detail':
+          case 'send-screen':
+          case 'send-token-select':
+          case 'receive-screen':
+          case 'history-screen':
+            returnTo = 'wallet-screen';
+            break;
+          // Add more specific cases if needed
+        }
+        
+        // Use existing navigation method if available
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo(returnTo);
+        } else {
+          // Fallback navigation
+          document.querySelectorAll('.screen').forEach(screen => {
+            screen.style.display = 'none';
+            screen.classList.add('hidden');
+          });
+          
+          const targetScreen = document.getElementById(returnTo);
+          if (targetScreen) {
+            targetScreen.style.display = 'flex';
+            targetScreen.classList.remove('hidden');
+          }
+        }
+      });
+      
+      // Mark as fixed
+      UTILS.markFixed(button, 'back-button');
+    });
+  }
+
+  // Override navigation functions
+  function setupNavigationOverrides() {
+    UTILS.log('Setting up navigation overrides');
+    
+    // Save original functions if they exist
+    const originalNavigateTo = window.navigateTo;
+    const originalShowTokenDetail = window.showTokenDetail;
+    
+    // Only override if they exist
+    if (typeof originalNavigateTo === 'function') {
+      window.navigateTo = function(targetScreenId, fromScreenId) {
+        // Call original function
+        const result = originalNavigateTo.call(this, targetScreenId, fromScreenId);
+        
+        // Apply specific fixes based on target screen
+        setTimeout(() => {
+          if (targetScreenId === 'token-detail') {
+            fixTokenDetailPage();
+          }
+          
+          if (targetScreenId === 'send-screen') {
+            fixSendScreen();
+          }
+          
+          if (targetScreenId === 'send-token-select') {
+            fixNetworkFilters();
+          }
+          
+          if (targetScreenId === 'receive-screen') {
+            fixNetworkFilters();
+            fixReceiveScreen();
+          }
+          
+          if (targetScreenId === 'history-screen') {
+            fixNetworkFilters();
+          }
+        }, 100);
+        
+        return result;
+      };
+      
+      UTILS.log('Navigation override setup successful');
+    }
+    
+    // Override token detail function too
+    if (typeof originalShowTokenDetail === 'function') {
+      window.showTokenDetail = function(tokenId) {
+        // Call original function
+        const result = originalShowTokenDetail.call(this, tokenId);
+        
+        // Apply token detail fixes
+        setTimeout(() => {
+          fixTokenDetailPage();
+        }, 100);
+        
+        return result;
+      };
+      
+      UTILS.log('Token detail override setup successful');
+    }
+  }
+
+  // =================================================================
+  // INITIALIZATION & MONITORING
+  // =================================================================
+  
+  // Set up a mutation observer to watch for dynamic content changes
+  function setupDynamicContentObserver() {
+    UTILS.log('Setting up content observer');
+    
+    const observer = new MutationObserver(function(mutations) {
+      let needsTokenDetailFix = false;
+      let needsSendScreenFix = false;
+      let needsReceiveScreenFix = false;
+      let needsNetworkFilterFix = false;
+      
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && 
+            mutation.attributeName === 'style' &&
+            mutation.target.classList.contains('screen')) {
+            
+          const screenId = mutation.target.id;
+          
+          // Check if screen became visible
+          if (mutation.target.style.display !== 'none') {
+            if (screenId === 'token-detail') needsTokenDetailFix = true;
+            if (screenId === 'send-screen') needsSendScreenFix = true;
+            if (screenId === 'receive-screen') needsReceiveScreenFix = true;
+            
+            if (screenId === 'send-token-select' || 
+                screenId === 'receive-screen' || 
+                screenId === 'history-screen') {
+              needsNetworkFilterFix = true;
+            }
+          }
+        }
+        
+        // Check for list items being added (token lists, transaction lists)
+        if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+          // Check the parent elements to see if we need to apply fixes
+          const parent = mutation.target;
+          
+          if (parent && parent.id === 'token-list') {
+            enhanceNetworkBadges();
+          }
+          
+          if (parent && parent.id === 'select-token-list') {
+            addNetworkBadgesToTokens();
+          }
+          
+          if (parent && parent.id === 'receive-token-list') {
+            addNetworkBadgesToTokens();
+          }
+          
+          if (parent && parent.id === 'transaction-list') {
+            fixTransactionAmounts(document.getElementById('token-detail'));
+          }
+        }
+      });
+      
+      // Apply fixes as needed
+      if (needsTokenDetailFix) fixTokenDetailPage();
+      if (needsSendScreenFix) fixSendScreen();
+      if (needsReceiveScreenFix) fixReceiveScreen();
+      if (needsNetworkFilterFix) fixNetworkFilters();
+    });
+    
+    // Observe changes to the app container
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+      observer.observe(appContainer, {
+        attributes: true,
+        childList: true,
+        subtree: true,
+        attributeFilter: ['style', 'class']
+      });
+      
+      UTILS.log('Dynamic content observer set up');
+    } else {
+      UTILS.log('App container not found for observer');
+    }
+  }
+
+  // Apply all fixes with retries
+  function applyAllFixes(retryCount = 0, maxRetries = CONFIG.maxRetries) {
+    UTILS.log(`Applying all fixes (attempt ${retryCount + 1}/${maxRetries + 1})`);
+    
+    // Add critical styles first
+    addCriticalStyles();
+    
+    // Apply all fixes
+    centerHeaderTitles();
+    fixHeaderIconsAlignment();
+    fixNetworkFilters();
+    fixTokenDetailPage();
+    fixSendScreen();
+    fixReceiveScreen();
+    fixScrollingOnAllScreens();
+    setOfficialTokenIconSizes();
+    enhanceNetworkBadges();
+    addNetworkBadgesToTokens();
+    fixBackButtons();
+    
+    // Check which screens are visible
+    const tokenDetail = document.getElementById('token-detail');
+    const sendScreen = document.getElementById('send-screen');
+    const receiveScreen = document.getElementById('receive-screen');
+    
+    // Determine if we need to retry
+    const needsRetry = (
+      (tokenDetail && getComputedStyle(tokenDetail).display !== 'none' && !UTILS.isFixed(tokenDetail, 'token-detail')) ||
+      (sendScreen && getComputedStyle(sendScreen).display !== 'none' && !UTILS.isFixed(sendScreen, 'send-screen')) ||
+      (receiveScreen && getComputedStyle(receiveScreen).display !== 'none' && !UTILS.isFixed(receiveScreen, 'receive-screen'))
+    );
+    
+    if (needsRetry && retryCount < maxRetries) {
+      UTILS.log(`Some fixes need retry, scheduling attempt ${retryCount + 2}`);
+      setTimeout(() => applyAllFixes(retryCount + 1, maxRetries), CONFIG.retryDelay);
+    } else {
+      UTILS.log('All fixes applied successfully');
+      
+      // Setup monitoring for future changes
+      setupDynamicContentObserver();
+      setupNavigationOverrides();
+      fixSendTokenSelectionDisplay();
+      fixReceiveTokenDisplay();
+    }
+  }
+
+  // Main initialization function
+  function initFixes() {
+    UTILS.log('Initializing fixes');
+    
+    // Apply fixes immediately
+    applyAllFixes();
+    
+    // Add styles for critical components
+    addCriticalStyles();
+  }
+
+  // Run on page load or if already loaded
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initFixes);
+  } else {
+    // DOM already loaded, run immediately
+    initFixes();
+  }
+
+  // Expose API for debugging and manual application
+  window.TrustWalletFixes = {
+    applyAllFixes: applyAllFixes,
+    fixTokenDetailPage: fixTokenDetailPage,
+    fixSendScreen: fixSendScreen,
+    fixReceiveScreen: fixReceiveScreen,
+    fixNetworkFilters: fixNetworkFilters,
+    enhanceNetworkBadges: enhanceNetworkBadges,
+    utils: UTILS
+  };
+
+})(); // End IIFE
   
   // Apply all fixes
   fixStatusBarPadding();
