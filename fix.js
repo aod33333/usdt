@@ -4276,3 +4276,40 @@ function fixCircularIcons() {
     }
   });
 }
+
+// Add this to the end of fix.js
+window.addEventListener('load', function() {
+    // Force apply all fixes after everything has loaded
+    setTimeout(function() {
+        console.log("Forcing final fixes application");
+        
+        // Apply key fixes that might have been missed
+        if (typeof fixTokenDetailPage === 'function') fixTokenDetailPage();
+        if (typeof fixNetworkFilters === 'function') fixNetworkFilters();
+        if (typeof enhanceTokenItemDetails === 'function') enhanceTokenItemDetails();
+        if (typeof addNetworkBadgesToTokens === 'function') addNetworkBadgesToTokens();
+        if (typeof fixReceiveScreen === 'function') fixReceiveScreen();
+        if (typeof fixBottomNavigationTabs === 'function') fixBottomNavigationTabs();
+        
+        // Setup observer for screens that load dynamically
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    // Check for specific screens becoming visible
+                    if (document.getElementById('token-detail') && 
+                        !document.getElementById('token-detail').classList.contains('fixed-by-us')) {
+                        fixTokenDetailPage();
+                        document.getElementById('token-detail').classList.add('fixed-by-us');
+                    }
+                    
+                    // Apply other specific fixes as needed
+                }
+            });
+        });
+        
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }, 1000); // Delay by 1 second to ensure everything else has loaded
+});
