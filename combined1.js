@@ -55,6 +55,17 @@ if (document.readyState === 'loading') {
 function init() {
   console.log('TrustWallet: Starting comprehensive initialization');
   
+  // Add fallback functions for missing enhancers
+  window.enhanceTransactions = window.enhanceTransactions || function() {
+    console.log('Default enhanceTransactions called');
+    return Promise.resolve();
+  };
+
+  window.enhanceHomeScreen = window.enhanceHomeScreen || function() {
+    console.log('Default enhanceHomeScreen called');
+    return Promise.resolve();
+  };
+
   setupDefaultWalletData()
     .then(() => {
       // Update UI with what we have
@@ -107,9 +118,12 @@ function init() {
     })
     .catch(error => {
       console.error('TrustWallet: Error during initialization', error);
-      // Continue with available functionality
+      // Fallback to essential UI updates
       if (window.updateWalletUI) {
         window.updateWalletUI(window.activeWallet || 'main');
+      }
+      if (typeof window.populateMainWalletTokenList === 'function') {
+        window.populateMainWalletTokenList();
       }
       finalCleanup();
     });
