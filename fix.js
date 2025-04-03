@@ -5,6 +5,55 @@
 
 console.log('🔧 TrustWallet: Starting comprehensive fix script...');
 
+// Add these to the beginning of your fix.js file
+
+// Fix for "enhanceHomeScreen is not defined"
+window.enhanceHomeScreen = function() {
+  console.log("Enhancing home screen");
+  // Basic implementation to prevent errors
+  return Promise.resolve();
+};
+
+// Fix for "navigateTo is not defined" 
+window.navigateTo = function(targetScreenId, fromScreenId) {
+  console.log(`Navigating to ${targetScreenId} from ${fromScreenId || 'unknown'}`);
+  
+  // Hide all screens
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.style.display = 'none';
+    screen.classList.add('hidden');
+  });
+  
+  // Show target screen
+  const targetScreen = document.getElementById(targetScreenId);
+  if (targetScreen) {
+    targetScreen.style.display = 'flex';
+    targetScreen.classList.remove('hidden');
+    
+    // Set return to screen
+    if (fromScreenId) {
+      targetScreen.dataset.returnTo = fromScreenId;
+    }
+    
+    // Apply specific fixes based on the target screen
+    setTimeout(() => {
+      if (targetScreenId === 'token-detail' && window.fixTokenDetailPage) 
+        window.fixTokenDetailPage();
+      if (targetScreenId === 'send-screen' && window.fixSendScreen) 
+        window.fixSendScreen();
+      if (targetScreenId === 'receive-screen' && window.fixReceiveScreen) 
+        window.fixReceiveScreen();
+      if (window.centerHeaderTitles) 
+        window.centerHeaderTitles();
+    }, 50);
+    
+    return true;
+  } else {
+    console.error(`Target screen ${targetScreenId} not found`);
+    return false;
+  }
+};
+
 // Essential utility functions
 function formatTokenAmount(amount) {
   if (typeof amount !== 'number') {
