@@ -150,7 +150,6 @@ function fixNetworkFilters() {
       chevron.style.fontSize = '10px';
     }
   });
-}
   
   // Fix container styles
   const filterContainers = document.querySelectorAll('.networks-filter');
