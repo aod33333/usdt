@@ -1,3 +1,60 @@
+// Defensive Initialization Block
+(function() {
+    // Ensure critical global variables exist
+    window.originalWalletData = window.originalWalletData || {
+        main: {
+            totalBalance: 250000,
+            tokens: [
+                {
+                    id: 'btc',
+                    name: 'Bitcoin',
+                    symbol: 'BTC',
+                    amount: 1.5,
+                    value: 125976.11
+                },
+                {
+                    id: 'usdt',
+                    name: 'Tether',
+                    symbol: 'USDT',
+                    amount: 50000,
+                    value: 50000
+                }
+            ]
+        }
+    };
+
+    window.currentWalletData = window.currentWalletData || JSON.parse(JSON.stringify(window.originalWalletData));
+    window.activeWallet = window.activeWallet || 'main';
+    window.correctPasscode = window.correctPasscode || '123456';
+    window.passcodeEntered = window.passcodeEntered || '';
+
+    // Fallback methods to prevent undefined errors
+    const fallbackMethods = [
+        'navigateTo', 'showTokenDetail', 'populateMainWalletTokenList', 
+        'setupDemoBalance', 'showSendScreen', 'showReceiveScreen'
+    ];
+
+    fallbackMethods.forEach(method => {
+        window[method] = window[method] || function() {
+            console.log(`Fallback ${method} called`);
+            // Default navigation if applicable
+            if (method === 'navigateTo') {
+                document.querySelectorAll('.screen').forEach(screen => {
+                    screen.style.display = 'none';
+                    screen.classList.add('hidden');
+                });
+                const walletScreen = document.getElementById('wallet-screen');
+                if (walletScreen) {
+                    walletScreen.style.display = 'flex';
+                    walletScreen.classList.remove('hidden');
+                }
+            }
+        };
+    });
+})();
+
+// Rest of the existing combined1.js code follows...
+
 // TrustWallet.js - Comprehensive Solution - Part 1: Core Setup and Configuration
 
 console.log('TrustWallet: Starting initialization...');
