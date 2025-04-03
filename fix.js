@@ -124,6 +124,63 @@ window.fixNetworkBadges = function() {
   return Promise.resolve();
 };
 
+// Fix for "fixTokenDetailView is not defined"
+window.fixTokenDetailView = function() {
+  console.log("Fixing token detail view");
+  
+  // Find token detail page
+  const tokenDetail = document.getElementById('token-detail');
+  if (!tokenDetail) {
+    console.log('Token detail page not found, will initialize on demand');
+    return Promise.resolve();
+  }
+  
+  // Add investment warning if not already present
+  if (!tokenDetail.querySelector('.investment-warning')) {
+    const detailContent = tokenDetail.querySelector('.token-detail-content');
+    if (detailContent) {
+      const warningBanner = document.createElement('div');
+      warningBanner.className = 'investment-warning';
+      warningBanner.innerHTML = `
+        <div class="investment-warning-content">
+          <i class="fas fa-exclamation-circle warning-icon"></i>
+          <div class="investment-warning-text">
+            <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong.</p>
+          </div>
+          <button class="close-warning">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+      
+      // Insert at the beginning
+      detailContent.insertBefore(warningBanner, detailContent.firstChild);
+      
+      // Add close functionality
+      const closeButton = warningBanner.querySelector('.close-warning');
+      if (closeButton) {
+        closeButton.addEventListener('click', function() {
+          warningBanner.style.display = 'none';
+        });
+      }
+    }
+  }
+  
+  // Fix price section to stick at bottom
+  const priceSection = tokenDetail.querySelector('.token-price-info');
+  if (priceSection) {
+    priceSection.style.position = 'sticky';
+    priceSection.style.bottom = '0';
+    priceSection.style.backgroundColor = 'white';
+    priceSection.style.zIndex = '50';
+    priceSection.style.paddingBottom = '80px';
+    priceSection.style.marginBottom = '0';
+    priceSection.style.boxShadow = '0 -2px 10px rgba(0,0,0,0.05)';
+  }
+  
+  return Promise.resolve();
+};
+
 // Essential utility functions
 function formatTokenAmount(amount) {
   if (typeof amount !== 'number') {
