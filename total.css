@@ -359,18 +359,18 @@ button {
 .investment-warning-text {
     flex: 1;
     padding-right: 8px;
-    line-height: 1.4 !important;
+    line-height: 1.4;
 }
 
 .investment-warning-text p {
-    line-height: 1.4 !important;
-    margin-bottom: 3px !important;
+    line-height: 1.4;
+    margin-bottom: 3px;
 }
 
 .learn-more {
-    display: inline-block !important;
-    margin-top: 0 !important;
-    line-height: 1.4 !important;
+    display: inline-block;
+    margin-top: 0;
+    line-height: 1.4;
 }
 
 .close-warning {
@@ -638,63 +638,63 @@ button {
 
 /* Chain Badge */
 .chain-badge {
-    position: absolute !important;
-    bottom: -6px !important;
-    right: -6px !important;
-    width: 20px !important;
-    height: 20px !important;
-    border-radius: 50% !important;
-    border: 2px solid #FFFFFF !important;
-    background: #FFFFFF !important;
-    z-index: 1000 !important;
-    overflow: visible !important;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1) !important;
-    display: block !important;
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    background: #FFFFFF;
+    z-index: 1000;
+    overflow: visible;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    display: block;
 }
 
 .chain-badge img,
 .chain-badge-fixed img {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-    padding: 2px !important;
-    display: block !important;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 2px;
+    display: block;
 }
 
 .chain-badge[data-network="bsc"] img, 
 img[src*="bnb-bnb-logo"] {
-    content: url('https://cryptologos.cc/logos/bnb-bnb-logo.png') !important;
+    content: url('https://cryptologos.cc/logos/bnb-bnb-logo.png');
 }
 
 .chain-badge-fixed {
-    position: absolute !important;
-    bottom: -6px !important;
-    right: -6px !important;
-    width: 24px !important;
-    height: 24px !important;
-    border-radius: 50% !important; 
-    border: 2px solid #FFFFFF !important;
-    background: #FFFFFF !important;
-    z-index: 999 !important;
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    overflow: visible !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%; 
+    border: 2px solid #FFFFFF;
+    background: #FFFFFF;
+    z-index: 999;
+    display: block;
+    visibility: visible;
+    opacity: 1;
+    overflow: visible;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 /* Bottom Tabs */
 .bottom-tabs {
-    display: flex !important;
+    display: flex;
     justify-content: space-around;
-    background-color: var(--tw-white) !important;
-    border-top: 1px solid var(--tw-bg-gray) !important;
+    background-color: var(--tw-white);
+    border-top: 1px solid var(--tw-bg-gray);
     padding: var(--space-xs) 0;
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    z-index: 9999 !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
 }
 
 .tab-item {
@@ -753,9 +753,8 @@ img[src*="bnb-bnb-logo"] {
 
 /* Token Detail Header */
 #token-detail .detail-header {
-    background-color: white !important;
-    padding: 12px 16px !important; 
-    border-bottom: none !important;
+    background-color: white;
+    padding: 12px 16px; 
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -783,16 +782,16 @@ img[src*="bnb-bnb-logo"] {
 }
 
 #detail-symbol {
-    font-size: 24px !important;
-    font-weight: 600 !important;
-    text-align: center !important;
-    margin-bottom: 2px !important;
+    font-size: 24px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 2px;
 }
 
 #detail-fullname {
-    font-size: 12px !important;
-    color: var(--tw-medium-gray) !important;
-    text-align: center !important;
+    font-size: 12px;
+    color: var(--tw-medium-gray);
+    text-align: center;
 }
 
 /* Token Balance Display */
@@ -825,8 +824,8 @@ img[src*="bnb-bnb-logo"] {
     justify-content: center;
     align-items: center;
     margin: 16px 0;
-    position: relative !important;
-    overflow: visible !important;
+    position: relative;
+    overflow: visible;
     z-index: 10;
 }
 
@@ -927,7 +926,7 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .gas-fee-indicator i {
-    color: var(--tw-blue) !important;
+    color: var(--tw-blue);
     margin-right: 12px;
     font-size: 16px;
 }
@@ -1019,7 +1018,7 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .transaction-value.positive {
-    color: var(--tw-blue) !important;
+    color: var(--tw-blue);
 }
 
 .transaction-value.negative {
@@ -1090,7 +1089,7 @@ img[src*="bnb-bnb-logo"] {
 
 /* Trust Wallet uses BLUE for positive values */
 #token-price-change.positive {
-    color: var(--tw-blue) !important;
+    color: var(--tw-blue);
 }
 
 #token-price-change.negative {
@@ -1114,7 +1113,7 @@ img[src*="bnb-bnb-logo"] {
 #token-detail .chain-badge-fixed,
 .token-detail-icon-container .chain-badge,
 .token-detail-icon-container .chain-badge-fixed {
-    display: none !important;
+    display: none;
 }
 
 /* =================================================================
@@ -1431,14 +1430,14 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .transaction-type {
-  font-weight: 500 !important;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .transaction-date {
-  font-size: var(--font-xs) !important;
+  font-size: var(--font-xs);
   color: var(--tw-medium-gray);
 }
 
@@ -1476,17 +1475,17 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .token-name {
-  font-weight: 500 !important;
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .token-network-badge {
-  background: none !important;
-  color: var(--tw-medium-gray) !important;
-  padding: 0 !important;
-  font-size: var(--font-xs) !important;
+  background: none;
+  color: var(--tw-medium-gray);
+  padding: 0;
+  font-size: var(--font-xs);
 }
 
 .amount-input-container {
@@ -1502,9 +1501,9 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .max-button {
-  background-color: rgba(51, 117, 187, 0.1) !important;
-  color: var(--tw-blue) !important;
-  padding: 2px 8px !important;
+  background-color: rgba(51, 117, 187, 0.1);
+  color: var(--tw-blue);
+  padding: 2px 8px;
   border-radius: 4px;
 }
 
@@ -1529,9 +1528,9 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .qr-code-container {
-  width: 160px !important;
-  height: 160px !important;
-  padding: var(--space-md) !important;
+  width: 160px;
+  height: 160px;
+  padding: var(--space-md);
 }
 
 .address-container {
@@ -1564,8 +1563,8 @@ img[src*="bnb-bnb-logo"] {
 }
 
 .copy-button i {
-  color: var(--tw-white) !important;
-  font-size: 16px !important;
+  color: var(--tw-white);
+  font-size: 16px;
 }
 
 .receive-actions {
@@ -1594,15 +1593,15 @@ body.dark-mode {
   .qr-section,
   .address-container,
   .action-button {
-    background-color: var(--tw-dark-gray) !important;
+    background-color: var(--tw-dark-gray);
   }
   
   .address-text {
-    color: var(--tw-white) !important;
+    color: var(--tw-white);
   }
   
   .copy-button {
-    background-color: var(--tw-medium-gray) !important;
+    background-color: var(--tw-medium-gray;
   }
 }
 
@@ -1627,7 +1626,7 @@ body.dark-mode {
 
 .value-display {
   text-align: right;
-  display: grid !important;
+  display: grid;
   gap: 2px;
 }
 
@@ -2129,14 +2128,14 @@ body.dark-mode {
 
 /* Fix network fees */
 .fee-option.active {
-    border: 1px solid #3375BB !important;
-    background-color: rgba(51, 117, 187, 0.1) !important;
+    border: 1px solid #3375BB;
+    background-color: rgba(51, 117, 187, 0.1);
 }
 
 /* Add to all screens */
 .screen-header {
-  height: 48px !important;
-  padding: 8px 16px !important;
+  height: 48px;
+  padding: 8px 16px;
 }
 
 /* Better touch targets */
@@ -2146,5 +2145,5 @@ button, .token-item, .transaction-item {
 
 /* Consistent icon sizes */
 i[class^="bi-"] {
-  font-size: 20px !important; /* Bootstrap icons size fix */
+  font-size: 20px; /* Bootstrap icons size fix */
 }
