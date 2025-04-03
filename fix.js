@@ -1,7 +1,7 @@
 // TrustWallet UI Fixes - Complete Version
 // This script applies various fixes to make the UI more authentic to Trust Wallet
 
-console.log('Loading TrustWallet UI fixes...');
+console.log('Loading TrustWallet UI fixes...'); 
 
 // Wait for DOM content to be loaded
 document.addEventListener('DOMContentLoaded', function() {
