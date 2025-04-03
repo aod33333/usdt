@@ -439,35 +439,25 @@ function fixTokenDetailLayout(detailPage) {
   const detailContent = detailPage.querySelector('.token-detail-content');
   if (!detailContent) return;
 
+  // Make only transaction list scrollable
   detailContent.style.display = 'flex';
   detailContent.style.flexDirection = 'column';
 
-  // Add investment warning
-  const investmentWarning = document.createElement('div');
-  investmentWarning.className = 'investment-warning';
-  investmentWarning.textContent = 'Investment Warning: Details about the investment risk.';
-  detailContent.insertBefore(investmentWarning, detailContent.firstChild);
-
-  // Add staking banner
-  const stakingBanner = document.createElement('div');
-  stakingBanner.className = 'staking-banner';
-  stakingBanner.textContent = 'Staking is available for this token.';
-  detailContent.appendChild(stakingBanner);
-
+  // Get price section to pin at bottom
   const priceSection = detailContent.querySelector('.token-price-info');
   if (priceSection) {
     priceSection.style.marginTop = 'auto';
   }
 
+  // Make transaction list scrollable
   const transactionList = detailContent.querySelector('.transaction-list');
   if (transactionList) {
     transactionList.style.flex = '1';
     transactionList.style.overflowY = 'auto';
     transactionList.style.overflowX = 'hidden';
-    transactionList.style.maxHeight = '300px';
+    transactionList.style.maxHeight = '300px'; // Adjust based on screen size
   }
 }
-
 function fixTransactionAmounts(detailPage) {
   // Find all transaction items
   const transactions = detailPage.querySelectorAll('.transaction-item');
@@ -1481,10 +1471,14 @@ function fixHeaderIconsAlignment() {
 }
 
 function addCommasToBalances() {
+  console.log('Adding commas to balance amounts');
+  
+  // Format main balance
   const totalBalance = document.getElementById('total-balance');
   if (totalBalance) {
     const currentText = totalBalance.textContent;
     const match = currentText.match(/\$([\d.]+)/);
+    
     if (match) {
       const amount = parseFloat(match[1]);
       totalBalance.textContent = '$' + amount.toLocaleString('en-US', {
@@ -1493,7 +1487,6 @@ function addCommasToBalances() {
       });
     }
   }
-}
   
   // Format token balances
   const tokenBalances = document.querySelectorAll('.token-balance');
