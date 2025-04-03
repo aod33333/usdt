@@ -5277,3 +5277,75 @@ setTimeout(function() {
 }, 2000);
 
 console.log('TrustWallet: Comprehensive initialization complete ✅');
+
+// Add these near the end of fix.js
+
+// Fallback functions to prevent undefined errors
+window.fixNetworkBadges = window.fixNetworkBadges || function() {
+  console.log('Default fixNetworkBadges called');
+  return Promise.resolve();
+};
+
+window.enhanceNetworkBadges = window.enhanceNetworkBadges || function() {
+  console.log('Default enhanceNetworkBadges called');
+  return Promise.resolve();
+};
+
+window.fixTokenDetailView = window.fixTokenDetailView || function() {
+  console.log('Default fixTokenDetailView called');
+  return Promise.resolve();
+};
+
+window.connectEventHandlers = window.connectEventHandlers || function() {
+  console.log('Default connectEventHandlers called');
+  return Promise.resolve();
+};
+
+window.addAuthenticTouchFeedback = window.addAuthenticTouchFeedback || function() {
+  console.log('Default addAuthenticTouchFeedback called');
+  return Promise.resolve();
+};
+
+window.applyAllEnhancedFixes = window.applyAllEnhancedFixes || function() {
+  console.log('Default applyAllEnhancedFixes called');
+  return Promise.resolve();
+};
+
+// Comprehensive initialization function
+function initializeTrustWallet() {
+  console.log("🔧 Initializing Trust Wallet with comprehensive fixes");
+  
+  // Ensure all critical functions are defined
+  window.TrustWallet = window.TrustWallet || {};
+  
+  // Add fallback initialization methods
+  window.TrustWallet.init = function() {
+    console.log("Trust Wallet initialization called");
+    
+    // Call all initialization and fix functions
+    applyAllFixes();
+    setupNumpad();
+    fixBottomNavigation();
+    fixVisibilityToggle();
+    fixWalletSelector();
+    fixQuickActions();
+    
+    // Populate token list
+    if (typeof window.populateMainWalletTokenList === 'function') {
+      window.populateMainWalletTokenList();
+    }
+    
+    // Show success toast
+    window.showToast('Trust Wallet successfully initialized');
+  };
+  
+  // Auto-initialize on load
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      window.TrustWallet.init();
+    }, 500);
+  });
+}
+
+// Call initialization function
+initializeTrustWallet();
