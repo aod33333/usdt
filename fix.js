@@ -4313,3 +4313,400 @@ window.addEventListener('load', function() {
         });
     }, 1000); // Delay by 1 second to ensure everything else has loaded
 });
+
+// =====================================================
+// ENHANCED FIXES - Add to end of existing fix.js file
+// =====================================================
+(function() {
+  'use strict';
+  
+  console.log('🔧 Loading enhanced TrustWallet UI fixes...');
+  
+  // Helper to check if element is already fixed
+  function markFixed(element, fixName) {
+    if (!element) return false;
+    const attrName = 'data-fixed-' + fixName;
+    if (element.getAttribute(attrName) === 'true') return false;
+    element.setAttribute(attrName, 'true');
+    return true;
+  }
+  
+  // Force apply styles with !important
+  function forceStyle(element, property, value) {
+    if (!element) return;
+    const currentStyle = element.getAttribute('style') || '';
+    element.setAttribute('style', `${currentStyle}; ${property}: ${value} !important;`);
+  }
+  
+  // Add global styles with high specificity
+  function addHighPriorityStyles() {
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Networks filter badge styling */
+      .networks-filter .all-networks {
+        display: inline-flex !important;
+        align-items: center !important;
+        background: #F5F5F5 !important;
+        border-radius: 16px !important;
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        color: #5F6C75 !important;
+        margin: 8px 16px !important;
+        font-weight: 500 !important;
+      }
+      
+      /* Token Detail Price Section - Force sticky */
+      #token-detail .token-price-info {
+        position: sticky !important;
+        bottom: 0 !important;
+        background-color: white !important;
+        z-index: 50 !important;
+        padding-bottom: 80px !important;
+        margin-bottom: 0 !important;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // Force add investment warning and staking banner to token detail
+  function enhanceTokenDetailPage() {
+    const tokenDetail = document.getElementById('token-detail');
+    if (!tokenDetail) return;
+    if (!markFixed(tokenDetail, 'enhanced')) return;
+    
+    const detailContent = tokenDetail.querySelector('.token-detail-content');
+    if (!detailContent) return;
+    
+    // Add investment warning if not present
+    if (!detailContent.querySelector('.investment-warning')) {
+      const iconContainer = detailContent.querySelector('.token-detail-icon-container');
+      
+      const warningBanner = document.createElement('div');
+      warningBanner.className = 'investment-warning';
+      warningBanner.innerHTML = `
+        <div class="investment-warning-content">
+          <i class="fas fa-exclamation-circle warning-icon"></i>
+          <div class="investment-warning-text">
+            <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong.</p>
+          </div>
+          <button class="close-warning">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      `;
+      
+      // Insert before icon container
+      if (iconContainer && iconContainer.parentNode) {
+        iconContainer.parentNode.insertBefore(warningBanner, iconContainer);
+      } else {
+        detailContent.insertBefore(warningBanner, detailContent.firstChild);
+      }
+      
+      // Add close handler
+      warningBanner.querySelector('.close-warning').addEventListener('click', function() {
+        warningBanner.style.display = 'none';
+      });
+    }
+    
+    // Add staking banner if not present
+    if (!detailContent.querySelector('.staking-container')) {
+      const tokenSymbol = document.getElementById('detail-symbol')?.textContent || 'BTC';
+      const actionButtons = detailContent.querySelector('.token-detail-actions');
+      const transactionHeader = detailContent.querySelector('.transaction-header');
+      
+      const stakingBanner = document.createElement('div');
+      stakingBanner.className = 'staking-container';
+      stakingBanner.innerHTML = `
+        <div class="staking-icon">
+          <img src="${getTokenLogoUrl(tokenSymbol.toLowerCase())}" alt="${tokenSymbol}">
+        </div>
+        <div class="staking-content">
+          <h3>Earn ${tokenSymbol}</h3>
+          <p>Stake your ${tokenSymbol} to earn up to 6.5% APY</p>
+        </div>
+        <i class="fas fa-chevron-right staking-arrow"></i>
+      `;
+      
+      // Insert after action buttons or before transaction header
+      if (actionButtons && actionButtons.nextSibling) {
+        actionButtons.parentNode.insertBefore(stakingBanner, actionButtons.nextSibling);
+      } else if (transactionHeader) {
+        transactionHeader.parentNode.insertBefore(stakingBanner, transactionHeader);
+      }
+      
+      // Add click handler
+      stakingBanner.addEventListener('click', function() {
+        if (typeof showToast === 'function') {
+          showToast(`${tokenSymbol} staking coming soon`);
+        }
+      });
+    }
+    
+    // Fix price section
+    const priceSection = detailContent.querySelector('.token-price-info');
+    if (priceSection) {
+      forceStyle(priceSection, 'position', 'sticky');
+      forceStyle(priceSection, 'bottom', '0');
+      forceStyle(priceSection, 'background-color', 'white');
+      forceStyle(priceSection, 'z-index', '50');
+      forceStyle(priceSection, 'padding-bottom', '80px');
+      forceStyle(priceSection, 'box-shadow', '0 -2px 10px rgba(0,0,0,0.05)');
+    }
+  }
+  
+  // Ensure network badges have proper styling
+  function enhanceNetworkBadges() {
+    document.querySelectorAll('.networks-filter .all-networks').forEach(filter => {
+      if (!markFixed(filter, 'enhanced')) {
+        forceStyle(filter, 'display', 'inline-flex');
+        forceStyle(filter, 'align-items', 'center');
+        forceStyle(filter, 'background', '#F5F5F5');
+        forceStyle(filter, 'border-radius', '16px');
+        forceStyle(filter, 'padding', '6px 12px');
+        forceStyle(filter, 'font-size', '12px');
+        forceStyle(filter, 'color', '#5F6C75');
+        forceStyle(filter, 'margin', '8px 16px');
+      }
+    });
+  }
+  
+  // Add token selection row with network badge to send screen
+  function enhanceSendScreen() {
+    const sendScreen = document.getElementById('send-screen');
+    if (!sendScreen) return;
+    if (!markFixed(sendScreen, 'enhanced')) return;
+    
+    const sendContent = sendScreen.querySelector('.send-content');
+    if (!sendContent) return;
+    
+    // Get token data
+    const tokenId = window.activeSendTokenId || 'usdt';
+    const token = getTokenData(tokenId);
+    if (!token) return;
+    
+    // Check for token selection row or create it
+    let tokenRow = sendContent.querySelector('.token-selection-row');
+    
+    if (!tokenRow) {
+      // Create token selection row
+      tokenRow = document.createElement('div');
+      tokenRow.className = 'token-selection-row';
+      tokenRow.innerHTML = `
+        <div class="token-icon">
+          <img src="${getTokenLogoUrl(token.id)}" alt="${token.name}">
+        </div>
+        <div class="token-info-column">
+          <div class="token-name-row">
+            <span class="selected-token-name">${token.symbol}</span>
+            <span class="network-badge-pill">${token.network || 'Unknown Network'}</span>
+          </div>
+          <div class="token-fullname">${token.name}</div>
+        </div>
+        <div class="token-change-button">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      `;
+      
+      // Style appropriately
+      forceStyle(tokenRow, 'display', 'grid');
+      forceStyle(tokenRow, 'grid-template-columns', '36px 1fr auto');
+      forceStyle(tokenRow, 'align-items', 'center');
+      forceStyle(tokenRow, 'gap', '16px');
+      forceStyle(tokenRow, 'padding', '12px 16px');
+      forceStyle(tokenRow, 'background-color', '#F5F5F5');
+      forceStyle(tokenRow, 'border-radius', '8px');
+      forceStyle(tokenRow, 'margin-bottom', '16px');
+      
+      // Insert at the beginning
+      if (sendContent.firstChild) {
+        sendContent.insertBefore(tokenRow, sendContent.firstChild);
+      } else {
+        sendContent.appendChild(tokenRow);
+      }
+      
+      // Add click handler
+      tokenRow.addEventListener('click', function() {
+        if (typeof window.navigateTo === 'function') {
+          window.navigateTo('send-token-select', 'send-screen');
+        }
+      });
+    }
+  }
+  
+  // Add contract address to receive tokens
+  function enhanceReceiveScreen() {
+    const receiveScreen = document.getElementById('receive-screen');
+    if (!receiveScreen) return;
+    
+    // For token list view
+    const tokenList = receiveScreen.querySelector('#receive-token-list');
+    if (tokenList && markFixed(tokenList, 'enhanced')) {
+      // Process all token items
+      tokenList.querySelectorAll('.token-item').forEach(item => {
+        const tokenInfo = item.querySelector('.token-info');
+        if (!tokenInfo || !markFixed(tokenInfo, 'enhanced')) return;
+        
+        const tokenName = tokenInfo.querySelector('.token-name')?.textContent || '';
+        const tokenId = item.getAttribute('data-token-id');
+        const token = getTokenData(tokenId);
+        
+        // Replace with enhanced layout
+        tokenInfo.innerHTML = `
+          <div class="token-name">${tokenName}</div>
+          <div class="token-price">
+            <span class="network-badge-pill">${token?.network || 'Unknown Network'}</span>
+            <div class="contract-address">${shortenAddress('0xC65B6...E90a51')}</div>
+          </div>
+        `;
+      });
+    }
+    
+    // For QR view (if exists)
+    const receiveContent = receiveScreen.querySelector('.receive-content');
+    if (receiveContent && !receiveContent.querySelector('.token-address-badge') && 
+        !receiveScreen.querySelector('#receive-token-list')) {
+      
+      if (markFixed(receiveContent, 'enhanced')) {
+        const tokenId = window.activeSendTokenId || 'btc';
+        const token = getTokenData(tokenId);
+        
+        // Create token info section
+        const tokenInfo = document.createElement('div');
+        tokenInfo.className = 'token-address-badge';
+        tokenInfo.innerHTML = `
+          <div class="network-badge-pill">${token?.network || 'Unknown Network'}</div>
+          <div class="contract-address">${shortenAddress('0xC65B6...E90a51')}</div>
+        `;
+        
+        // Insert into appropriate location
+        const qrContainer = receiveContent.querySelector('.qr-code-container');
+        if (qrContainer && qrContainer.parentNode) {
+          qrContainer.parentNode.insertBefore(tokenInfo, qrContainer);
+        } else {
+          receiveContent.insertBefore(tokenInfo, receiveContent.firstChild);
+        }
+      }
+    }
+  }
+  
+  // Helper function to get token data
+  function getTokenData(tokenId) {
+    if (!tokenId) return null;
+    const activeWallet = window.activeWallet || 'main';
+    if (!window.currentWalletData || !window.currentWalletData[activeWallet]) return null;
+    return window.currentWalletData[activeWallet].tokens.find(t => t.id === tokenId);
+  }
+  
+  // Helper for token logo URLs
+  function getTokenLogoUrl(tokenId) {
+    if (typeof window.getTokenLogoUrl === 'function') {
+      return window.getTokenLogoUrl(tokenId);
+    }
+    
+    const logoUrls = {
+      'btc': 'https://cryptologos.cc/logos/bitcoin-btc-logo.png',
+      'eth': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
+      'bnb': 'https://cryptologos.cc/logos/bnb-bnb-logo.png',
+      'usdt': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+      'trx': 'https://cryptologos.cc/logos/tron-trx-logo.png',
+      'sol': 'https://cryptologos.cc/logos/solana-sol-logo.png',
+      'matic': 'https://cryptologos.cc/logos/polygon-matic-logo.png'
+    };
+    
+    return logoUrls[tokenId] || 'https://cryptologos.cc/logos/bitcoin-btc-logo.png';
+  }
+  
+  // Helper for address shortening
+  function shortenAddress(address) {
+    if (!address) return '';
+    return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+  }
+  
+  // Apply all enhanced fixes when screens change
+  function setupEnhancedObserver() {
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'attributes' && 
+            mutation.attributeName === 'style' &&
+            mutation.target.classList.contains('screen') &&
+            mutation.target.style.display !== 'none') {
+          
+          // Screen has become visible
+          const screenId = mutation.target.id;
+          
+          if (screenId === 'token-detail') enhanceTokenDetailPage();
+          if (screenId === 'send-screen') enhanceSendScreen();
+          if (screenId === 'receive-screen') enhanceReceiveScreen();
+          
+          // Apply network badges to all visible screens
+          enhanceNetworkBadges();
+        }
+      });
+    });
+    
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+      observer.observe(appContainer, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['style', 'class']
+      });
+    }
+  }
+  
+  // Override navigation function
+  function setupNavigationOverride() {
+    if (typeof window.navigateTo === 'function') {
+      const originalNavigateTo = window.navigateTo;
+      
+      window.navigateTo = function(targetScreenId, fromScreenId) {
+        const result = originalNavigateTo.call(this, targetScreenId, fromScreenId);
+        
+        setTimeout(() => {
+          if (targetScreenId === 'token-detail') enhanceTokenDetailPage();
+          if (targetScreenId === 'send-screen') enhanceSendScreen();
+          if (targetScreenId === 'receive-screen') enhanceReceiveScreen();
+          enhanceNetworkBadges();
+        }, 50);
+        
+        return result;
+      };
+    }
+  }
+  
+  // Initialize enhanced fixes
+  function initEnhancedFixes() {
+    addHighPriorityStyles();
+    enhanceNetworkBadges();
+    enhanceTokenDetailPage();
+    enhanceSendScreen();
+    enhanceReceiveScreen();
+    setupEnhancedObserver();
+    setupNavigationOverride();
+    
+    // Apply again after delay to handle dynamic content
+    setTimeout(() => {
+      enhanceNetworkBadges();
+      enhanceTokenDetailPage();
+      enhanceSendScreen();
+      enhanceReceiveScreen();
+    }, 1000);
+  }
+  
+  // Run initialization
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initEnhancedFixes();
+  } else {
+    document.addEventListener('DOMContentLoaded', initEnhancedFixes);
+  }
+  
+  // Expose for debugging
+  window.enhancedFixesAPI = {
+    enhanceTokenDetailPage,
+    enhanceNetworkBadges,
+    enhanceSendScreen,
+    enhanceReceiveScreen,
+    forceApplyAll: initEnhancedFixes
+  };
+})();
