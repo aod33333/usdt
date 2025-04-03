@@ -21,7 +21,8 @@
     <link rel="stylesheet" href="total.css">
 </head>
 <body>
-    <!-- Status Bar -->
+
+      <!-- Status Bar -->
     <div class="status-bar">
         <div class="status-time">02:08</div>
         <div class="status-icons">
@@ -76,9 +77,11 @@
                 </div>
             </div>
         </div>
+        
 
-        <!-- Wallet Screen -->
+          <!-- Main Wallet Screen -->
         <div id="wallet-screen" class="screen hidden">
+            <!-- Main Header with title -->
             <div class="main-header">
                 <button class="icon-button settings-button">
                     <i class="fas fa-cog"></i>
@@ -89,12 +92,101 @@
                 </button>
             </div>
             
-            <div class="wallet-body">
-                <div class="token-list" id="token-list">
-                    <!-- Tokens will be inserted here by JS -->
+            <!-- Investment Warning Banner -->
+            <div id="investment-warning" class="investment-warning">
+                <div class="investment-warning-content">
+                    <i class="fas fa-exclamation-circle warning-icon"></i>
+                    <div class="investment-warning-text">
+                        <p>Don't invest unless you're prepared to lose all the money you invest. This is a high-risk investment and you are unlikely to be protected if something goes wrong. <a href="#" class="learn-more">Take 2 mins to learn more</a>.</p>
+                    </div>
+                    <button id="close-investment-warning" class="close-warning">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
             
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" 
+                        id="search-input" 
+                        name="search"
+                        aria-label="Search tokens"
+                        placeholder="Search">
+                </div>
+            </div>
+            
+            <!-- Wallet Selector -->
+            <div class="wallet-selector-container">
+                <div class="wallet-selector">
+                    <span class="wallet-name">Main Wallet 1</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="wallet-actions">
+                    <button class="wallet-action-button">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                    <button class="wallet-action-button">
+                        <i class="fas fa-qrcode"></i>
+                    </button>
+                    <button class="wallet-action-button">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Balance Display -->
+            <div class="balance-display">
+                <div class="balance-amount" id="total-balance">$0.00</div>
+                <button class="visibility-toggle">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+            
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-circle" id="send-button">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>Send</span>
+                </button>
+                <button class="action-circle" id="receive-button">
+                    <i class="fas fa-arrow-down"></i>
+                    <span>Receive</span>
+                </button>
+                <button class="action-circle">
+                    <i class="fas fa-credit-card"></i>
+                    <span>Buy</span>
+                </button>
+                <button class="action-circle">
+                    <i class="fas fa-university"></i>
+                    <span>Sell</span>
+                </button>
+                <button class="action-circle">
+                    <i class="fas fa-history"></i>
+                    <span>History</span>
+                </button>
+            </div>
+            
+            <div class="wallet-body">
+                <!-- Tab Navigation -->
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="tokens">Crypto (%24H)</button>
+                    <button class="tab-button" data-tab="nfts">NFTs</button>
+                </div>
+                
+                <!-- Token List -->
+                <div class="token-list" id="token-list">
+                    <!-- Tokens will be inserted here by JS -->
+                </div>
+                
+                <!-- Footer Info -->
+                <div class="footer-info">
+                    Past performance is not a reliable indicator of future results. Data source is from CoinMarketCap. <a href="#" class="disclaimer-link">Learn more about risks</a>.
+                    <div class="manage-crypto">Manage Crypto</div>
+                </div>
+            </div>
+            
+            <!-- Bottom Navigation -->
             <div class="bottom-tabs">
                 <div class="tab-item active">
                     <i class="fas fa-home"></i>
@@ -114,16 +206,20 @@
                 </div>
             </div>
         </div>
-
-        <!-- Placeholder Screens -->
+        
+        <!-- Token Detail Screen - Simplified for combined1.js -->
         <div id="token-detail" class="screen hidden"></div>
-        <div id="send-screen" class="screen hidden"></div>
-        <div id="receive-screen" class="screen hidden"></div>
-        <div id="send-token-select" class="screen hidden"></div>
-        <div id="history-screen" class="screen hidden"></div>
-        <div id="explorer-overlay" class="screen hidden"></div>
 
-        <!-- Modals and Overlays -->
+        <!-- Token Selection Screen - Simplified for combined1.js -->
+        <div id="send-token-select" class="screen hidden"></div>
+        
+        <div id="send-screen" class="screen hidden"></div>
+
+        <div id="receive-screen" class="screen hidden"></div>
+
+        <div id="history-screen" class="screen hidden"></div>
+        
+        <!-- Transaction Status Modal -->
         <div id="tx-status-modal" class="modal">
             <div class="modal-content">
                 <div class="tx-status-container">
@@ -170,7 +266,93 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Blockchain Explorer Overlay -->
+        <div id="explorer-overlay" class="explorer-overlay">
+            <div class="explorer-header">
+                <button id="close-explorer" class="explorer-back-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="explorer-title">Blockchain Explorer</div>
+                <button class="explorer-button">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+            </div>
+            <div class="explorer-body">
+                <div class="explorer-search-container">
+                    <div class="explorer-search">
+                        <i class="fas fa-search"></i>
+                        <label for="explorer-search-input" class="visually-hidden">Search blockchain</label>
+                        <input type="text" id="explorer-search-input" placeholder="Search by Address / Txn Hash / Block / Token">
+                    </div>
+                </div>
+                
+                <div class="explorer-transaction">
+                    <div class="explorer-section">
+                        <div class="explorer-section-header">
+                            <h3>Transaction Details</h3>
+                            <span class="explorer-status success">Success</span>
+                        </div>
+                        
+                        <div class="explorer-detail-rows">
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">Transaction Hash:</div>
+                                <div id="explorer-tx-hash" class="explorer-detail-value">0x8a65d7c4f5f43c3b39...</div>
+                            </div>
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">Status:</div>
+                                <div class="explorer-detail-value"><span class="explorer-badge success">Success</span> <span class="explorer-confirmations">285 Block Confirmations</span></div>
+                            </div>
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">Timestamp:</div>
+                                <div id="explorer-timestamp" class="explorer-detail-value">Mar-22-2025 02:44:15 PM +UTC</div>
+                            </div>
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">From:</div>
+                                <div id="explorer-from" class="explorer-detail-value address">0x9B3a54D092f6B4b3d2eC676cd589f124E9921E71</div>
+                            </div>
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">To:</div>
+                                <div id="explorer-to" class="explorer-detail-value address">0x742d35Cc6634C0532925a3b844Bc454e4438f44e</div>
+                            </div>
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">Value:</div>
+                                <div id="explorer-value" class="explorer-detail-value">0 BNB</div>
+                            </div>
+                            <div class="explorer-detail-row">
+                                <div class="explorer-detail-label">Transaction Fee:</div>
+                                <div class="explorer-detail-value">0.000105 BNB ($0.05)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="explorer-section">
+                        <div class="explorer-section-header">
+                            <h3>Token Transfer</h3>
+                        </div>
+                        
+                        <div class="explorer-token-transfer">
+                            <div class="explorer-token-icon">
+                                <img src="https://cryptologos.cc/logos/tether-usdt-logo.png" alt="USDT">
+                            </div>
+                            <div class="explorer-token-details">
+                                <div class="explorer-token-from-to">
+                                    <span class="explorer-address-short">0x9B3a...21E71</span>
+                                    <i class="fas fa-arrow-right"></i>
+                                    <span class="explorer-address-short">0x742d...8f44e</span>
+                                </div>
+                                <div class="explorer-token-info">
+                                    <span>For</span>
+                                    <span id="explorer-token-amount" class="explorer-token-amount">100 USDT</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+          <!-- Biometric Authentication Overlay -->
         <div id="biometric-overlay" class="modal">
             <div class="biometric-content">
                 <h3>Touch ID</h3>
@@ -185,93 +367,145 @@
                 <button id="cancel-biometric" class="cancel-biometric">Cancel</button>
             </div>
         </div>
-    </div>
-
-    <!-- Initialization Script -->
-    <script>
-        // Minimal global variables needed before loading combined1.js
-        window.originalWalletData = null;
-        window.currentWalletData = null;
-        window.activeWallet = 'main';
-        window.correctPasscode = '123456';
-        window.passcodeEntered = '';
-
-        // Setup demo balance function
-        window.setupDemoBalance = function() {
-            console.log('Demo balance setup called');
-            
-            // Get active wallet
-            const activeWallet = window.activeWallet || 'main';
-            
-            // Simple balance update
-            const totalBalance = document.getElementById('total-balance');
-            if (totalBalance && window.currentWalletData && window.currentWalletData[activeWallet]) {
-                totalBalance.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2);
-                return true;
-            } else {
-                console.error('Elements not available for demo balance');
-                return false;
-            }
-        };
-
-        // Fallback navigation function
-        if (typeof window.navigateTo !== 'function') {
-            window.navigateTo = function(targetScreenId, fromScreenId) {
-                // Hide all screens
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.style.display = 'none';
-                    screen.classList.add('hidden');
-                });
+        
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="modal">
+            <div class="admin-content">
+                <h2>Admin Panel</h2>
+                <button id="close-admin" class="close-button"><i class="fas fa-times"></i></button>
                 
-                // Show target screen
-                const targetScreen = document.getElementById(targetScreenId);
-                if (targetScreen) {
-                    targetScreen.style.display = 'flex';
-                    targetScreen.classList.remove('hidden');
+                <div class="admin-form">
+                    <div class="admin-form-group">
+                        <label for="admin-wallet-select">Select Wallet to Modify</label>
+                        <select id="admin-wallet-select">
+                            <option value="main">Mnemonic 1</option>
+                            <option value="secondary">Mnemonic 2</option>
+                            <option value="business">Mnemonic 3</option>
+                        </select>
+                    </div>
                     
-                    // Set return to screen
-                    if (fromScreenId) {
-                        targetScreen.dataset.returnTo = fromScreenId;
-                    }
+                    <div class="admin-form-group">
+                        <label for="admin-token-select">Select Token to Modify</label>
+                        <select id="admin-token-select">
+                            <option value="usdt">Tether (USDT)</option>
+                            <option value="btc">Bitcoin (BTC)</option>
+                            <option value="eth">Ethereum (ETH)</option>
+                            <option value="bnb">Binance Coin (BNB)</option>
+                            <option value="trx">Tron (TRX)</option>
+                        </select>
+                    </div>
                     
-                    console.log('Navigated to ' + targetScreenId + (fromScreenId ? ' from ' + fromScreenId : ''));
-                    return true;
-                } else {
-                    console.error('Target screen ' + targetScreenId + ' not found');
-                    return false;
-                }
-            };
-        }
+                    <div class="admin-form-group">
+                        <label for="fake-balance">Token Balance</label>
+                        <input type="number" id="fake-balance" placeholder="Enter amount" value="100000">
+                    </div>
+                    
+                    <div class="admin-form-group">
+                        <label for="expiration-time">Expiration (hours)</label>
+                        <input type="number" id="expiration-time" value="48" min="1" max="168">
+                    </div>
+                    
+                    <div class="admin-form-group checkbox">
+                        <input type="checkbox" id="generate-history" checked>
+                        <label for="generate-history">Create Fake Transaction History</label>
+                    </div>
+                    
+                    <div class="admin-form-group checkbox">
+                        <input type="checkbox" id="modify-all-wallets">
+                        <label for="modify-all-wallets">Apply to all wallets</label>
+                    </div>
+                    
+                    <button id="apply-fake" class="admin-button primary">Activate Fake Balance</button>
+                    <button id="reset-wallet" class="admin-button secondary">Reset to Original</button>
+                    <div class="expiration-timer">
+                        <span class="expiration-label">Auto Reset:</span>
+                        <span class="expiration-time" id="expiration-countdown">Not Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Verification overlay -->
+        <div id="verification-overlay" class="modal">
+            <div class="verification-content">
+                <h2>Secure Blockchain Verification</h2>
+                <div class="verification-progress">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <div class="verification-status" id="verification-status">Connecting to blockchain...</div>
+                </div>
+                
+                <div id="verification-result" class="verification-result hidden">
+                    <div class="verification-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>VERIFIED</span>
+                    </div>
+                    <div class="verification-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Certificate ID:</span>
+                            <span class="detail-value" id="cert-id">TW-A7B3C9D2</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Timestamp:</span>
+                            <span class="detail-value" id="verify-timestamp">03/22/2025 02:44:13</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Wallet Address:</span>
+                            <span class="detail-value">0x9B3a...9921E71</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">USDT Balance:</span>
+                            <span class="detail-value" id="verify-balance">$100,000.00</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Status:</span>
+                            <span class="detail-value positive">Valid</span>
+                        </div>
+                    </div>
+                    
+                    <div class="verification-actions">
+                        <button id="close-verification" class="verification-button">Close</button>
+                        <button id="view-blockchain" class="verification-button secondary">
+                            <i class="fas fa-external-link-alt"></i> View on Blockchain
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div><!-- End of app-container -->
 
-       // Fallback toast notification
-        if (typeof window.showToast !== 'function') {
-            window.showToast = function(message, duration = 2000) {
-                // Remove any existing toast
-                const existingToast = document.querySelector('.tw-toast');
-                if (existingToast) {
-                    existingToast.remove();
-                }
-                
-                // Create new toast
-                const toast = document.createElement('div');
-                toast.className = 'tw-toast';
-                toast.textContent = message;
-                document.body.appendChild(toast);
-                
-                // Show toast
-                setTimeout(() => toast.classList.add('visible'), 10);
-                
-                // Hide and remove after duration
-                setTimeout(() => {
-                    toast.classList.remove('visible');
-                    setTimeout(() => toast.remove(), 300);
-                }, duration);
-            };
-        }
-    </script>
+ <!-- Initialize global variables -->
+<script>
+    // Minimal global variables needed before loading combined1.js
+    window.originalWalletData = null;
+    window.currentWalletData = null;
+    window.activeWallet = 'main';
+    window.correctPasscode = '123456';
+    window.passcodeEntered = '';
 
-    <!-- Load core JavaScript files -->
-    <script src="combined1.js"></script>
-    <script src="fix.js"></script>
+    // Setup demo balance function
+    window.setupDemoBalance = function() {
+      console.log('Demo balance setup called');
+      
+      // Get active wallet
+      const activeWallet = window.activeWallet || 'main';
+      
+      // Simple balance update
+      const totalBalance = document.getElementById('total-balance');
+      if (totalBalance && window.currentWalletData && window.currentWalletData[activeWallet]) {
+        totalBalance.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2);
+        return true;
+      } else {
+        console.error('Elements not available for demo balance');
+        return false;
+      }
+    };
+</script>
+
+<!-- Load combined1.js - this should be the only script besides our minimal initialization -->
+<script src="combined1.js"></script>
+
+
 </body>
 </html>
