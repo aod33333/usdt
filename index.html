@@ -503,6 +503,70 @@
     };
 </script>
 
+<!-- Replace the existing script block with this, just before loading combined1.js -->
+<script>
+  // Ensure critical global variables are set
+  window.originalWalletData = null;
+  window.currentWalletData = null;
+  window.activeWallet = 'main';
+  window.correctPasscode = '123456';
+  window.passcodeEntered = '';
+
+  // Setup demo balance with more robust fallbacks
+  window.setupDemoBalance = function() {
+    console.log('Demo balance setup called');
+    
+    try {
+      const activeWallet = window.activeWallet || 'main';
+      
+      // Ensure wallet data exists
+      if (!window.currentWalletData) {
+        window.currentWalletData = {
+          main: {
+            totalBalance: 250000,
+            tokens: [
+              {
+                id: 'btc',
+                name: 'Bitcoin',
+                symbol: 'BTC',
+                amount: 1.5,
+                value: 125976.11
+              },
+              {
+                id: 'usdt',
+                name: 'Tether',
+                symbol: 'USDT',
+                amount: 50000,
+                value: 50000
+              }
+            ]
+          }
+        };
+      }
+      
+      const totalBalance = document.getElementById('total-balance');
+      if (totalBalance && window.currentWalletData[activeWallet]) {
+        totalBalance.textContent = '$' + window.currentWalletData[activeWallet].totalBalance.toFixed(2);
+        
+        // Populate token list if function exists
+        if (typeof window.populateMainWalletTokenList === 'function') {
+          window.populateMainWalletTokenList();
+        }
+        
+        return true;
+      }
+    } catch (error) {
+      console.error('Demo balance setup failed:', error);
+    }
+    
+    return false;
+  };
+</script>
+
+<!-- Load scripts with explicit order and defer -->
+<script src="combined1.js" defer></script>
+<script src="fix.js" defer></script>
+
 <!-- Load combined1.js - this should be the only script besides our minimal initialization -->
 <script src="combined1.js"></script>
 <script src="fix.js"></script>
